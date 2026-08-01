@@ -2,6 +2,11 @@ import mongoose, { Schema, type Document, type Model } from 'mongoose';
 
 export type TenantApprovalStatus = 'pending' | 'approved' | 'rejected';
 
+export interface TenantBranding {
+  logoUrl: string | null;
+  primaryColor: string | null;
+}
+
 export interface ITenant {
   name: string;
   isActive: boolean;
@@ -11,6 +16,7 @@ export interface ITenant {
   approvedBy?: mongoose.Types.ObjectId;
   createdBy?: mongoose.Types.ObjectId;
   updatedBy?: mongoose.Types.ObjectId;
+  branding?: TenantBranding;
 }
 
 export interface ITenantDocument extends ITenant, Document {
@@ -33,6 +39,10 @@ const tenantSchema = new Schema<ITenantDocument>(
     approvedBy: { type: Schema.Types.ObjectId, ref: 'User' },
     createdBy: { type: Schema.Types.ObjectId, ref: 'User' },
     updatedBy: { type: Schema.Types.ObjectId, ref: 'User' },
+    branding: {
+      logoUrl: { type: String, default: null },
+      primaryColor: { type: String, default: null },
+    },
   },
   { timestamps: true }
 );

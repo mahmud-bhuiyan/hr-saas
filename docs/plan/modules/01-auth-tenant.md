@@ -20,6 +20,7 @@ Authentication, multi-tenant isolation, and company onboarding. Every business r
 | Self-register company | — | ✅ (public) | — | — | — |
 | Approve / reject registration | ✅ | — | — | — | — |
 | Create company directly | ✅ | — | — | — | — |
+| Edit platform site settings | ✅ | — | — | — | — |
 | Login / logout / refresh | ✅ | ✅ | ✅ | ✅ | ✅ |
 | View / edit own profile | ✅ | ✅ | ✅ | ✅ | ✅ |
 
@@ -76,6 +77,7 @@ Authentication, multi-tenant isolation, and company onboarding. Every business r
 | Register company | `/register` | ✅ |
 | My profile | `/dashboard/profile` | ✅ |
 | Companies (super admin) | `/dashboard/registrations` | ✅ |
+| Platform site settings (super admin) | `/dashboard/platform/site-settings` | ✅ Complete |
 | Forgot password | `/forgot-password` | ⬜ Not started |
 
 ---

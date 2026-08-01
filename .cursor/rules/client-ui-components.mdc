@@ -13,7 +13,7 @@ Use arrow functions for components and helpers — `export const MyPage = () => 
 
 ## Reuse before creating
 
-Check `client/src/components/ui/` first. Reuse `Button`, `Input`, `PasswordInput`, `FormField`, `FormActions`, `Modal`, `FormModal`, `Table`, `Tabs`, `PageContainer`, `PageHeader`, `Dropdown`, and `Spinner`. Create a new file in that folder only when no existing component fits.
+Check `client/src/components/ui/` first. Reuse `Button`, `Input`, `PasswordInput`, `Select`, `Textarea`, `FormField`, `FormActions`, `Modal`, `FormModal`, `Table`, `Tabs`, `PageContainer`, `PageHeader`, `Dropdown`, and `Spinner`. Create a new file in that folder only when no existing component fits.
 
 ## Page file organization
 
@@ -73,12 +73,19 @@ Use `react-icons/hi2` with colorful Tailwind classes on buttons, dropdown items,
 
 ## Form field icons (required)
 
-Pass `icon` to every `Input` and `PasswordInput` in forms (`h-5 w-5 text-brand-600`):
+**Every form control must have an icon** — all existing and new forms. Pass `icon` to every `Input`, `PasswordInput`, `Select`, and `Textarea` (`h-4 w-4 text-brand-600`). Do not use raw HTML form elements in forms.
 
 - Company → `HiBuildingOffice2`
 - Name → `HiUser`
 - Email → `HiEnvelope`
 - Password → `HiLockClosed`
 - Search → `HiMagnifyingGlass`
+- Phone → `HiPhone`
+- Job title → `HiBriefcase`
+- Department → `HiRectangleGroup`
+- Date → `HiCalendarDays`
+- Manager / team → `HiUserGroup`
+- Status → `HiSignal`
+- Notes / reason → `HiChatBubbleLeftEllipsis`
 
-See `login/LoginPage` and `register/RegisterPage` for reference.
+See `login/LoginForm`, `register/RegisterForm`, and `employees/CreateEmployeeModal` for reference.

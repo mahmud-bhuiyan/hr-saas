@@ -65,7 +65,7 @@ export const RegisterForm = ({
             value={companyName}
             onChange={(e) => onCompanyNameChange(e.target.value)}
             placeholder="Acme Ltd"
-            icon={<HiBuildingOffice2 className="h-5 w-5 text-brand-600" />}
+            icon={<HiBuildingOffice2 className="h-4 w-4 text-brand-600" />}
           />
         </FormField>
 
@@ -76,7 +76,7 @@ export const RegisterForm = ({
               value={firstName}
               onChange={(e) => onFirstNameChange(e.target.value)}
               placeholder="Jane"
-              icon={<HiUser className="h-5 w-5 text-brand-600" />}
+              icon={<HiUser className="h-4 w-4 text-brand-600" />}
             />
           </FormField>
           <FormField label="Last name" htmlFor="lastName">
@@ -85,7 +85,7 @@ export const RegisterForm = ({
               value={lastName}
               onChange={(e) => onLastNameChange(e.target.value)}
               placeholder="Admin"
-              icon={<HiUser className="h-5 w-5 text-brand-600" />}
+              icon={<HiUser className="h-4 w-4 text-brand-600" />}
             />
           </FormField>
         </div>
@@ -99,7 +99,7 @@ export const RegisterForm = ({
             value={email}
             onChange={(e) => onEmailChange(e.target.value)}
             placeholder="admin@acme.com"
-            icon={<HiEnvelope className="h-5 w-5 text-brand-600" />}
+            icon={<HiEnvelope className="h-4 w-4 text-brand-600" />}
           />
         </FormField>
 
@@ -112,7 +112,7 @@ export const RegisterForm = ({
             value={password}
             onChange={(e) => onPasswordChange(e.target.value)}
             placeholder="At least 8 characters"
-            icon={<HiLockClosed className="h-5 w-5 text-brand-600" />}
+            icon={<HiLockClosed className="h-4 w-4 text-brand-600" />}
           />
         </FormField>
 

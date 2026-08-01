@@ -1,7 +1,17 @@
 import { FormEvent } from 'react';
+import {
+  HiBriefcase,
+  HiCalendarDays,
+  HiEnvelope,
+  HiPhone,
+  HiRectangleGroup,
+  HiUser,
+  HiUserGroup,
+} from 'react-icons/hi2';
 import { FormField } from '../../../components/ui/FormField';
 import { FormModal } from '../../../components/ui/FormModal';
 import { Input } from '../../../components/ui/Input';
+import { Select } from '../../../components/ui/Select';
 import type { CreateEmployeeInput, Employee } from '../../../types';
 import { employeeName } from '../utils';
 
@@ -45,6 +55,7 @@ export const CreateEmployeeModal = ({
             value={form.firstName}
             onChange={(e) => onFormChange((f) => ({ ...f, firstName: e.target.value }))}
             required
+            icon={<HiUser className="h-4 w-4 text-brand-600" />}
           />
         </FormField>
         <FormField label="Last name" htmlFor="create-lastName">
@@ -53,6 +64,7 @@ export const CreateEmployeeModal = ({
             value={form.lastName}
             onChange={(e) => onFormChange((f) => ({ ...f, lastName: e.target.value }))}
             required
+            icon={<HiUser className="h-4 w-4 text-brand-600" />}
           />
         </FormField>
       </div>
@@ -64,6 +76,7 @@ export const CreateEmployeeModal = ({
             type="email"
             value={form.email ?? ''}
             onChange={(e) => onFormChange((f) => ({ ...f, email: e.target.value }))}
+            icon={<HiEnvelope className="h-4 w-4 text-brand-600" />}
           />
         </FormField>
         <FormField label="Phone" htmlFor="create-phone">
@@ -71,6 +84,7 @@ export const CreateEmployeeModal = ({
             id="create-phone"
             value={form.phone ?? ''}
             onChange={(e) => onFormChange((f) => ({ ...f, phone: e.target.value }))}
+            icon={<HiPhone className="h-4 w-4 text-brand-600" />}
           />
         </FormField>
       </div>
@@ -81,6 +95,7 @@ export const CreateEmployeeModal = ({
             id="create-jobTitle"
             value={form.jobTitle ?? ''}
             onChange={(e) => onFormChange((f) => ({ ...f, jobTitle: e.target.value }))}
+            icon={<HiBriefcase className="h-4 w-4 text-brand-600" />}
           />
         </FormField>
         <FormField label="Department" htmlFor="create-department">
@@ -89,6 +104,7 @@ export const CreateEmployeeModal = ({
             value={form.department ?? ''}
             onChange={(e) => onFormChange((f) => ({ ...f, department: e.target.value }))}
             placeholder="e.g. Engineering"
+            icon={<HiRectangleGroup className="h-4 w-4 text-brand-600" />}
           />
         </FormField>
       </div>
@@ -100,16 +116,17 @@ export const CreateEmployeeModal = ({
             type="date"
             value={form.startDate ?? ''}
             onChange={(e) => onFormChange((f) => ({ ...f, startDate: e.target.value }))}
+            icon={<HiCalendarDays className="h-4 w-4 text-brand-600" />}
           />
         </FormField>
         <FormField label="Manager" htmlFor="create-managerId">
-          <select
+          <Select
             id="create-managerId"
             value={form.managerId ?? ''}
             onChange={(e) =>
               onFormChange((f) => ({ ...f, managerId: e.target.value || undefined }))
             }
-            className="block w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm shadow-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500"
+            icon={<HiUserGroup className="h-4 w-4 text-brand-600" />}
           >
             <option value="">No manager</option>
             {managerOptions.map((manager) => (
@@ -117,9 +134,9 @@ export const CreateEmployeeModal = ({
                 {employeeName(manager)}
               </option>
             ))}
-          </select>
+          </Select>
         </FormField>
       </div>
     </FormModal>
   );
-}
+};

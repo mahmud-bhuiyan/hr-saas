@@ -91,7 +91,7 @@ export const ChangePasswordModal = ({ open, onClose, onSuccess }: ChangePassword
           required
           value={currentPassword}
           onChange={(e) => setCurrentPassword(e.target.value)}
-          icon={<HiLockClosed className="h-5 w-5 text-brand-600" />}
+          icon={<HiLockClosed className="h-4 w-4 text-brand-600" />}
         />
       </FormField>
       <FormField label="New password" htmlFor="change-password-new">
@@ -103,7 +103,7 @@ export const ChangePasswordModal = ({ open, onClose, onSuccess }: ChangePassword
           value={newPassword}
           onChange={(e) => setNewPassword(e.target.value)}
           placeholder="At least 8 characters"
-          icon={<HiLockClosed className="h-5 w-5 text-brand-600" />}
+          icon={<HiLockClosed className="h-4 w-4 text-brand-600" />}
         />
       </FormField>
     </FormModal>

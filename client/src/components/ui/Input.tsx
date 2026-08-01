@@ -20,7 +20,7 @@ export const Input = ({ error, className = '', id, icon, ...props }: InputProps)
         <input
           id={id}
           className={`block w-full rounded-lg border py-2.5 text-sm shadow-sm transition focus:outline-none focus:ring-2 focus:ring-brand-500 ${
-            icon ? 'pl-10 pr-3' : 'px-3'
+            icon ? 'pl-9 pr-3' : 'px-3'
           } ${
             error
               ? 'border-red-300 focus:border-red-500 focus:ring-red-500'

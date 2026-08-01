@@ -49,7 +49,7 @@ This flow covers **signup → people → leave workflow → documents → settin
 
 | Role | Can do in Demo 1 |
 |------|------------------|
-| **Super admin** | Platform operator: approve/reject registrations, add companies, bootstrap admins |
+| **Super admin** | Platform operator: approve/reject registrations, add companies, bootstrap admins, customize platform site (name, theme color, logo, favicon) |
 | **Company admin** | Everything in Demo 1 for their tenant |
 | **HR manager** | Manage employees, documents, approve leave |
 | **Manager** | View team, approve team leave |
@@ -85,6 +85,7 @@ This flow covers **signup → people → leave workflow → documents → settin
 - Company profile: name, address, logo
 - Departments (add / rename / archive)
 - User list with role assignment
+- **Platform site settings (super admin):** site name, primary theme color, logo, favicon — visible to all users on login, register, and app shell
 - Dashboard shell: placeholder cards for headcount, pending leave count, recent activity
 
 ### 2.7 Platform Quality (required for demo credibility)
@@ -119,7 +120,7 @@ Be explicit with the client so expectations stay aligned.
 | GPS on clock-in | Stage 2 | |
 | SSO / Microsoft Google login | Stage 3+ | |
 | Mobile native apps | Stage 4+ | Responsive web first |
-| White-label / custom branding beyond logo | Stage 3 | |
+| Per-tenant white-label (each company’s own theme/logo) | Demo 1 (partial) | Logo + primary color override for company admin; full profile in Step 7 |
 
 ---
 
@@ -132,6 +133,8 @@ Be explicit with the client so expectations stay aligned.
 
 ### Super admin
 - [x] Companies — pending queue, approve/reject, add company directly
+- [x] Platform site settings — site name, theme color, logo, favicon (`/dashboard/platform/site-settings`)
+- [x] Company branding overrides — logo + primary color (`/dashboard/settings/branding`)
 
 ### Dashboard
 - [x] Home dashboard (summary cards + quick links — **placeholders**; real counts in Step 7)
@@ -261,7 +264,7 @@ Full roadmap: [hr-saas-mern-project-plan.md](./hr-saas-mern-project-plan.md)
 | Employees (Step 4) | ✅ Ready for review | User link deferred |
 | Leave (Step 5) | ⬜ Pending | |
 | Documents (Step 6) | ⬜ Pending | |
-| Settings (Step 7) | ⬜ Pending | |
+| Settings (Step 7) | 🟡 Partial | Platform site settings + tenant branding done; company profile, departments, users pending |
 | Demo polish (Step 8) | ⬜ Pending | |
 
 **Next step:** Step 5 — Leave & absence. See [IMPLEMENTATION-STEPS.md](./IMPLEMENTATION-STEPS.md).

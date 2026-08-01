@@ -164,3 +164,71 @@ export interface ListEmployeesQuery {
   department?: string;
   status?: EmployeeStatus;
 }
+
+export interface SiteConfig {
+  siteName: string;
+  logoUrl: string | null;
+  faviconUrl: string | null;
+  primaryColor: string;
+  logoDisplay: LogoDisplaySettings;
+  faviconDisplay: FaviconDisplaySettings;
+}
+
+export type LogoObjectFit = 'contain' | 'cover';
+
+export type FaviconMimeType =
+  | 'auto'
+  | 'image/png'
+  | 'image/x-icon'
+  | 'image/svg+xml'
+  | 'image/webp';
+
+export interface LogoDisplaySettings {
+  heightPx: number;
+  maxWidthPx: number;
+  objectFit: LogoObjectFit;
+  showSiteName: boolean;
+}
+
+export interface FaviconDisplaySettings {
+  mimeType: FaviconMimeType;
+}
+
+export interface EffectiveBranding extends SiteConfig {
+  tenantDisplayName?: string;
+}
+
+export interface PlatformSiteSettings extends SiteConfig {
+  updatedAt?: string;
+  updatedBy?: string;
+}
+
+export interface TenantBrandingOverrides {
+  logoUrl: string | null;
+  primaryColor: string | null;
+}
+
+export interface PatchPlatformSiteSettingsInput {
+  siteName?: string;
+  logoUrl?: string | null;
+  faviconUrl?: string | null;
+  primaryColor?: string;
+  logoDisplay?: Partial<LogoDisplaySettings>;
+  faviconDisplay?: Partial<FaviconDisplaySettings>;
+}
+
+export interface UploadPlatformAssetInput {
+  asset: 'logo' | 'favicon';
+  imageBase64: string;
+  filename: string;
+}
+
+export interface UploadPlatformAssetResponse {
+  url: string;
+  asset: 'logo' | 'favicon';
+}
+
+export interface PatchTenantBrandingInput {
+  logoUrl?: string | null;
+  primaryColor?: string | null;
+}

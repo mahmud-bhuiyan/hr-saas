@@ -14,7 +14,8 @@ One detailed plan file per business module. Use these for sprint planning and as
 | 02 | Employee Management | [02-employees.md](./02-employees.md) | Ready for review |
 | 03 | Leave & Absence | [03-leave.md](./03-leave.md) | Not started |
 | 04 | Document Storage | [04-documents.md](./04-documents.md) | Not started |
-| 05 | Admin & Settings | [05-admin-settings.md](./05-admin-settings.md) | Not started |
+| 05 | Admin & Settings | [05-admin-settings.md](./05-admin-settings.md) | In progress (branding done) |
+| 15 | Platform Site Settings | [15-platform-site-settings.md](./15-platform-site-settings.md) | Complete |
 
 ---
 
@@ -55,3 +56,4 @@ Features not in the original Demo 1 write-up but implemented — also tracked in
 | UI component kit | 03 App shell | Step 3 |
 | Manager team-scoped employee read | 02 Employees | Step 4 |
 | Direct reports on profile | 02 Employees | Step 4 |
+| Platform site customization | 15 Platform Site Settings | Step 7 |

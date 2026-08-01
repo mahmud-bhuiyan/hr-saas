@@ -53,7 +53,7 @@ export const LoginForm = ({
             value={email}
             onChange={(e) => onEmailChange(e.target.value)}
             placeholder="you@company.com"
-            icon={<HiEnvelope className="h-5 w-5 text-brand-600" />}
+            icon={<HiEnvelope className="h-4 w-4 text-brand-600" />}
           />
         </FormField>
 
@@ -65,7 +65,7 @@ export const LoginForm = ({
             value={password}
             onChange={(e) => onPasswordChange(e.target.value)}
             placeholder="••••••••"
-            icon={<HiLockClosed className="h-5 w-5 text-brand-600" />}
+            icon={<HiLockClosed className="h-4 w-4 text-brand-600" />}
           />
         </FormField>
 

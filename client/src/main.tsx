@@ -5,6 +5,7 @@ import { BrowserRouter } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import App from './App';
 import { AuthProvider } from './contexts/AuthContext';
+import { SiteConfigProvider } from './contexts/SiteConfigContext';
 import './index.css';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -22,7 +23,9 @@ createRoot(document.getElementById('root')!).render(
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
         <AuthProvider>
-          <App />
+          <SiteConfigProvider>
+            <App />
+          </SiteConfigProvider>
           <ToastContainer
             position="top-right"
             autoClose={5000}

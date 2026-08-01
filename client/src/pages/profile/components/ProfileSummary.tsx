@@ -1,8 +1,5 @@
 import type { UserProfile } from '../../../types';
-
-const roleLabel = (role: string): string => {
-  return role.replace(/_/g, ' ');
-}
+import { roleLabel } from '../../../utils/user';
 
 const formatDate = (iso: string): string => {
   return new Date(iso).toLocaleString();

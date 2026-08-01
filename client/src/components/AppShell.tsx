@@ -1,6 +1,6 @@
 import { NavLink, Outlet } from 'react-router-dom';
-import { APP_NAME } from '../constants/app';
 import { useAuth } from '../contexts/AuthContext';
+import { BrandMark } from './BrandMark';
 import { SidebarUserBar } from './SidebarUserBar';
 import { UserMenu } from './UserMenu';
 import type { UserRole } from '../types';
@@ -14,10 +14,19 @@ const navItems: Array<{
 }> = [
   { to: '/dashboard', label: 'Dashboard', end: true },
   { to: '/dashboard/registrations', label: 'Companies', roles: ['super_admin'] },
+  {
+    to: '/dashboard/platform/site-settings',
+    label: 'Site settings',
+    roles: ['super_admin'],
+  },
   { to: '/dashboard/employees', label: 'Employees', roles: ['company_admin', 'hr_manager', 'manager'] },
   { to: '/dashboard/leave', label: 'Leave', disabled: true },
   { to: '/dashboard/documents', label: 'Documents', disabled: true },
-  { to: '/dashboard/settings', label: 'Settings', disabled: true },
+  {
+    to: '/dashboard/settings/branding',
+    label: 'Settings',
+    roles: ['company_admin'],
+  },
 ];
 
 export const AppShell = () => {
@@ -27,10 +36,12 @@ export const AppShell = () => {
     <div className="h-screen overflow-hidden bg-slate-50">
       <header className="fixed inset-x-0 top-0 z-20 flex border-b border-slate-200 bg-white">
         <div className="hidden h-14 w-64 shrink-0 items-center border-r border-slate-200 px-6 md:flex">
-          <span className="text-lg font-semibold text-brand-700">{APP_NAME}</span>
+          <BrandMark />
         </div>
         <div className="flex h-14 min-w-0 flex-1 items-center justify-between px-4 md:px-6">
-          <span className="text-lg font-semibold text-brand-700 md:hidden">{APP_NAME}</span>
+          <span className="md:hidden">
+            <BrandMark />
+          </span>
           <div className="ml-auto">
             <UserMenu />
           </div>
@@ -77,4 +88,4 @@ export const AppShell = () => {
       </main>
     </div>
   );
-}
+};

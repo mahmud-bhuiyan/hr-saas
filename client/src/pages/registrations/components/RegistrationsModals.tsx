@@ -1,6 +1,7 @@
 import { FormEvent } from 'react';
 import {
   HiBuildingOffice2,
+  HiChatBubbleLeftEllipsis,
   HiEnvelope,
   HiLockClosed,
   HiUser,
@@ -11,6 +12,7 @@ import { FormModal } from '../../../components/ui/FormModal';
 import { Input } from '../../../components/ui/Input';
 import { Modal } from '../../../components/ui/Modal';
 import { PasswordInput } from '../../../components/ui/PasswordInput';
+import { Textarea } from '../../../components/ui/Textarea';
 import type { CreateCompanyInput, RegistrationRequest } from '../../../types';
 import type { EditCompanyForm } from '../utils';
 import { CompanyDetailsContent } from './CompanyDetailsContent';
@@ -53,7 +55,7 @@ export const CreateCompanyModal = ({
           onChange={(e) => onFormChange((f) => ({ ...f, companyName: e.target.value }))}
           placeholder="Acme Ltd"
           required
-          icon={<HiBuildingOffice2 className="h-5 w-5 text-brand-600" />}
+          icon={<HiBuildingOffice2 className="h-4 w-4 text-brand-600" />}
         />
       </FormField>
 
@@ -64,7 +66,7 @@ export const CreateCompanyModal = ({
             value={form.firstName ?? ''}
             onChange={(e) => onFormChange((f) => ({ ...f, firstName: e.target.value }))}
             placeholder="Jane"
-            icon={<HiUser className="h-5 w-5 text-brand-600" />}
+            icon={<HiUser className="h-4 w-4 text-brand-600" />}
           />
         </FormField>
         <FormField label="Admin last name" htmlFor="create-lastName">
@@ -73,7 +75,7 @@ export const CreateCompanyModal = ({
             value={form.lastName ?? ''}
             onChange={(e) => onFormChange((f) => ({ ...f, lastName: e.target.value }))}
             placeholder="Admin"
-            icon={<HiUser className="h-5 w-5 text-brand-600" />}
+            icon={<HiUser className="h-4 w-4 text-brand-600" />}
           />
         </FormField>
       </div>
@@ -86,7 +88,7 @@ export const CreateCompanyModal = ({
           onChange={(e) => onFormChange((f) => ({ ...f, email: e.target.value }))}
           placeholder="admin@acme.com"
           required
-          icon={<HiEnvelope className="h-5 w-5 text-brand-600" />}
+          icon={<HiEnvelope className="h-4 w-4 text-brand-600" />}
         />
       </FormField>
 
@@ -98,7 +100,7 @@ export const CreateCompanyModal = ({
           placeholder="Min. 8 characters"
           required
           minLength={8}
-          icon={<HiLockClosed className="h-5 w-5 text-brand-600" />}
+          icon={<HiLockClosed className="h-4 w-4 text-brand-600" />}
         />
       </FormField>
     </FormModal>
@@ -179,13 +181,13 @@ export const RejectRegistrationModal = ({
       size="sm"
     >
       <FormField label="Rejection reason (optional)" htmlFor="reject-reason">
-        <textarea
+        <Textarea
           id="reject-reason"
           value={reason}
           onChange={(e) => onReasonChange(e.target.value)}
           rows={3}
-          className="block w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm shadow-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500"
           placeholder="Reason shown to the company admin on login"
+          icon={<HiChatBubbleLeftEllipsis className="h-4 w-4 text-brand-600" />}
         />
       </FormField>
     </FormModal>
@@ -257,7 +259,7 @@ export const EditCompanyModal = ({
               value={form.companyName}
               onChange={(e) => onFormChange((f) => ({ ...f, companyName: e.target.value }))}
               required
-              icon={<HiBuildingOffice2 className="h-5 w-5 text-brand-600" />}
+              icon={<HiBuildingOffice2 className="h-4 w-4 text-brand-600" />}
             />
           </FormField>
 
@@ -267,7 +269,7 @@ export const EditCompanyModal = ({
                 id="edit-firstName"
                 value={form.adminFirstName}
                 onChange={(e) => onFormChange((f) => ({ ...f, adminFirstName: e.target.value }))}
-                icon={<HiUser className="h-5 w-5 text-brand-600" />}
+                icon={<HiUser className="h-4 w-4 text-brand-600" />}
               />
             </FormField>
             <FormField label="Admin last name" htmlFor="edit-lastName">
@@ -275,7 +277,7 @@ export const EditCompanyModal = ({
                 id="edit-lastName"
                 value={form.adminLastName}
                 onChange={(e) => onFormChange((f) => ({ ...f, adminLastName: e.target.value }))}
-                icon={<HiUser className="h-5 w-5 text-brand-600" />}
+                icon={<HiUser className="h-4 w-4 text-brand-600" />}
               />
             </FormField>
           </div>
@@ -287,7 +289,7 @@ export const EditCompanyModal = ({
               value={form.adminEmail}
               onChange={(e) => onFormChange((f) => ({ ...f, adminEmail: e.target.value }))}
               required
-              icon={<HiEnvelope className="h-5 w-5 text-brand-600" />}
+              icon={<HiEnvelope className="h-4 w-4 text-brand-600" />}
             />
           </FormField>
         </>
