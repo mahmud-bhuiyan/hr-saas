@@ -1,20 +1,36 @@
-import { createApp } from './app.js';
-import { connectToDatabase } from './config/db.js';
+import cors from 'cors';
+import express from 'express';
 import { loadServerEnv } from './config/env.js';
+import { APP_NAME } from './constants/app.js';
+import { createAdminRoutes } from './modules/admin/admin.routes.js';
+import type { ApiHealthResponse } from './types/index.js';
 
-const env = loadServerEnv();
+export function createApp() {
+  const env = loadServerEnv();
+  const app = express();
 
-async function start(): Promise<void> {
-  await connectToDatabase(env.mongodbUri);
+  app.use(
+    cors({
+      origin: env.clientUrl,
+      credentials: true,
+    })
+  );
+  app.use(express.json());
 
-  const app = createApp();
-
-  app.listen(env.port, () => {
-    console.log(`Server running at http://localhost:${env.port}`);
+  app.get('/', (_req, res) => {
+    res.type('text').send('Server is running');
   });
-}
 
-start().catch((error: unknown) => {
-  console.error('Failed to start server:', error);
-  process.exit(1);
-});
+  app.get('/api/v1/health', (_req, res) => {
+    const response: ApiHealthResponse = {
+      status: 'ok',
+      service: APP_NAME,
+      timestamp: new Date().toISOString(),
+    };
+    res.json(response);
+  });
+
+  app.use('/api/v1/admins', createAdminRoutes(env));
+
+  return app;
+}
