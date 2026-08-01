@@ -8,9 +8,9 @@
     "npm": ">=10"
   },
   "scripts": {
-    "dev": "tsx watch app.ts",
+    "dev": "tsx watch api/index.ts",
     "build": "tsc",
-    "start": "tsx app.ts",
+    "start": "tsx api/index.ts",
     "seed:superadmin": "tsx scripts/seed-superadmin.ts",
     "test": "vitest run",
     "test:watch": "vitest"

@@ -62,7 +62,7 @@ Run `npm test` in that folder before finishing work.
 ### Every API → registry + API test
 
 1. Add row to [`docs/API-REGISTRY.md`](./docs/API-REGISTRY.md)
-2. Add Supertest test in `server/tests/api/<module>.test.ts` using `createApp()` from `server/src/index.ts`
+2. Add Supertest test in `server/tests/api/<module>.test.ts` using `createApp()` from `server/src/app.ts`
 3. Run `cd server && npm test`
 
 ### README (keep current)
@@ -79,8 +79,9 @@ Do not duplicate detailed API or plan docs — link to `docs/API-REGISTRY.md` an
 
 ## Server conventions
 
-- `server/src/index.ts` — Express app factory (`createApp`)
-- `server/app.ts` — Dev entry (`npm run dev`) and Vercel default export
+- `server/src/app.ts` — Express app factory (`createApp`)
+- `server/api/index.ts` — Vercel entry + local dev (`npm run dev`); exports Express app, connects MongoDB
+- `server/vercel.json` — Rewrites all routes to `/api`
 
 ## Client conventions
 

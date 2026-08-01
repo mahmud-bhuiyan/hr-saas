@@ -1,6 +1,6 @@
 import request from 'supertest';
 import { beforeEach, describe, expect, it } from 'vitest';
-import { createApp } from '../../src/index.js';
+import { createApp } from '../../src/app.js';
 import { loadServerEnv } from '../../src/config/env.js';
 import { User } from '../../src/modules/admin/user.model.js';
 import { signAccessToken } from '../../src/utils/jwt.js';
