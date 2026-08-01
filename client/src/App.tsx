@@ -9,6 +9,8 @@ import { LoginPage } from "./pages/login/LoginPage";
 import { ProfilePage } from "./pages/profile/ProfilePage";
 import { RegisterPage } from "./pages/register/RegisterPage";
 import { RegistrationsPage } from "./pages/registrations/RegistrationsPage";
+import { PlatformSiteSettingsPage } from "./pages/platform/site-settings/PlatformSiteSettingsPage";
+import { TenantBrandingPage } from "./pages/settings/branding/TenantBrandingPage";
 
 const App = () => {
   return (
@@ -28,6 +30,11 @@ const App = () => {
           />
           <Route path="/dashboard/employees" element={<EmployeesPage />} />
           <Route path="/dashboard/employees/:id" element={<EmployeeProfilePage />} />
+          <Route
+            path="/dashboard/platform/site-settings"
+            element={<PlatformSiteSettingsPage />}
+          />
+          <Route path="/dashboard/settings/branding" element={<TenantBrandingPage />} />
         </Route>
       </Route>
 

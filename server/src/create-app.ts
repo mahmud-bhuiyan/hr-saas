@@ -7,6 +7,9 @@ import { createAdminRoutes } from './modules/admin/admin.routes.js';
 import { createRegistrationRoutes } from './modules/admin/registration.routes.js';
 import { createAuthRoutes } from './modules/auth/auth.routes.js';
 import { createEmployeeRoutes } from './modules/employees/employee.routes.js';
+import { createPlatformAdminRoutes } from './modules/platform/platform-admin.routes.js';
+import { createPlatformRoutes } from './modules/platform/platform.routes.js';
+import { createSettingsRoutes } from './modules/settings/settings.routes.js';
 import type { ApiHealthResponse } from './types/index.js';
 
 export const createApp = () => {
@@ -39,6 +42,9 @@ export const createApp = () => {
   app.use('/api/v1/admins', createAdminRoutes(env));
   app.use('/api/v1/admin/registrations', createRegistrationRoutes(env));
   app.use('/api/v1/employees', createEmployeeRoutes(env));
+  app.use('/api/v1/platform', createPlatformRoutes());
+  app.use('/api/v1/admin/platform', createPlatformAdminRoutes(env));
+  app.use('/api/v1/settings', createSettingsRoutes(env));
 
   return app;
 }

@@ -41,7 +41,7 @@ export const ProfileEditForm = ({
             value={firstName}
             onChange={(e) => onFirstNameChange(e.target.value)}
             placeholder="Jane"
-            icon={<HiUser className="h-5 w-5 text-brand-600" />}
+            icon={<HiUser className="h-4 w-4 text-brand-600" />}
           />
         </FormField>
         <FormField label="Last name" htmlFor="lastName">
@@ -50,7 +50,7 @@ export const ProfileEditForm = ({
             value={lastName}
             onChange={(e) => onLastNameChange(e.target.value)}
             placeholder="Admin"
-            icon={<HiUser className="h-5 w-5 text-brand-600" />}
+            icon={<HiUser className="h-4 w-4 text-brand-600" />}
           />
         </FormField>
       </div>
@@ -62,7 +62,7 @@ export const ProfileEditForm = ({
           required
           value={email}
           onChange={(e) => onEmailChange(e.target.value)}
-          icon={<HiEnvelope className="h-5 w-5 text-brand-600" />}
+          icon={<HiEnvelope className="h-4 w-4 text-brand-600" />}
         />
       </FormField>
 

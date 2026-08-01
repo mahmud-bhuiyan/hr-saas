@@ -27,6 +27,10 @@ tags:
     description: Platform admin user management and company registration approval
   - name: Employees
     description: Tenant-scoped employee directory and profiles
+  - name: Platform
+    description: Platform-wide site branding and configuration
+  - name: Settings
+    description: Tenant settings including branding overrides
 
 paths:
   /:
@@ -911,6 +915,253 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
 
+  /api/v1/platform/site-config:
+    get:
+      tags: [Platform]
+      summary: Get public site config
+      description: |
+        Returns platform-wide branding for client bootstrap.
+        No authentication required. Cacheable.
+      operationId: getSiteConfig
+      responses:
+        '200':
+          description: Platform site configuration
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, data]
+                properties:
+                  status:
+                    type: string
+                    enum: [ok]
+                  data:
+                    $ref: '#/components/schemas/SiteConfig'
+
+  /api/v1/admin/platform/site-settings:
+    get:
+      tags: [Platform]
+      summary: Get platform site settings (admin)
+      description: Full platform settings for the super admin edit form.
+      operationId: getPlatformSiteSettings
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Platform site settings
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, data]
+                properties:
+                  status:
+                    type: string
+                    enum: [ok]
+                  data:
+                    $ref: '#/components/schemas/PlatformSiteSettings'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+    patch:
+      tags: [Platform]
+      summary: Update platform site settings
+      description: Partial update of platform-wide branding. Super admin only.
+      operationId: patchPlatformSiteSettings
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchPlatformSiteSettingsRequest'
+            example:
+              siteName: Acme HR Platform
+              primaryColor: '#059669'
+      responses:
+        '200':
+          description: Updated platform site settings
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, data]
+                properties:
+                  status:
+                    type: string
+                    enum: [ok]
+                  data:
+                    $ref: '#/components/schemas/PlatformSiteSettings'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /api/v1/admin/platform/site-settings/upload:
+    post:
+      tags: [Platform]
+      summary: Upload platform logo or favicon
+      description: |
+        Uploads an image to ImgBB via the server (requires `IMGBB_API_KEY`).
+        Returns a hosted URL — does not save settings until PATCH site-settings.
+        Super admin only.
+      operationId: uploadPlatformAsset
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UploadPlatformAssetRequest'
+            example:
+              asset: logo
+              filename: logo.png
+              imageBase64: iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJ...
+      responses:
+        '200':
+          description: Uploaded asset URL
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, data]
+                properties:
+                  status:
+                    type: string
+                    enum: [ok]
+                  data:
+                    $ref: '#/components/schemas/UploadPlatformAssetResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '502':
+          description: ImgBB upload failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '503':
+          description: IMGBB_API_KEY not configured
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/settings/branding:
+    get:
+      tags: [Settings]
+      summary: Get effective branding
+      description: |
+        Returns merged branding for the current user.
+        Tenant users receive platform defaults merged with tenant overrides.
+        Super admin receives platform defaults only.
+      operationId: getEffectiveBranding
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Effective site branding
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, data]
+                properties:
+                  status:
+                    type: string
+                    enum: [ok]
+                  data:
+                    $ref: '#/components/schemas/EffectiveBranding'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+    patch:
+      tags: [Settings]
+      summary: Update tenant branding overrides
+      description: |
+        Company admin only. Updates tenant-level branding overrides.
+        Set a field to null or empty string to revert to platform default.
+      operationId: patchTenantBranding
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchTenantBrandingRequest'
+            example:
+              primaryColor: '#059669'
+              logoUrl: https://example.com/logo.png
+      responses:
+        '200':
+          description: Effective branding after update
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, data]
+                properties:
+                  status:
+                    type: string
+                    enum: [ok]
+                  data:
+                    $ref: '#/components/schemas/EffectiveBranding'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          description: Tenant not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/settings/branding/overrides:
+    get:
+      tags: [Settings]
+      summary: Get tenant branding overrides
+      description: Returns raw tenant override values for the company admin edit form.
+      operationId: getTenantBrandingOverrides
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Tenant branding overrides
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, data]
+                properties:
+                  status:
+                    type: string
+                    enum: [ok]
+                  data:
+                    $ref: '#/components/schemas/TenantBrandingOverrides'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          description: Tenant not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
 components:
   securitySchemes:
     bearerAuth:
@@ -958,7 +1209,7 @@ components:
           enum: [ok]
         service:
           type: string
-          example: HR SaaS
+          example: Daily HR
         timestamp:
           type: string
           format: date-time
@@ -1314,3 +1565,169 @@ components:
           nullable: true
         status:
           $ref: '#/components/schemas/EmployeeStatus'
+
+    SiteConfig:
+      type: object
+      required: [siteName, logoUrl, faviconUrl, primaryColor, logoDisplay, faviconDisplay]
+      properties:
+        siteName:
+          type: string
+          example: Daily HR
+        logoUrl:
+          type: string
+          nullable: true
+          format: uri
+        faviconUrl:
+          type: string
+          nullable: true
+          format: uri
+        primaryColor:
+          type: string
+          pattern: '^#[0-9A-Fa-f]{6}$'
+          example: '#2563eb'
+        logoDisplay:
+          $ref: '#/components/schemas/LogoDisplay'
+        faviconDisplay:
+          $ref: '#/components/schemas/FaviconDisplay'
+
+    LogoDisplay:
+      type: object
+      required: [heightPx, maxWidthPx, objectFit, showSiteName]
+      properties:
+        heightPx:
+          type: integer
+          minimum: 24
+          maximum: 80
+          example: 32
+        maxWidthPx:
+          type: integer
+          minimum: 80
+          maximum: 320
+          example: 160
+        objectFit:
+          type: string
+          enum: [contain, cover]
+        showSiteName:
+          type: boolean
+
+    FaviconDisplay:
+      type: object
+      required: [mimeType]
+      properties:
+        mimeType:
+          type: string
+          enum: [auto, image/png, image/x-icon, image/svg+xml, image/webp]
+
+    UploadPlatformAssetRequest:
+      type: object
+      required: [asset, imageBase64, filename]
+      properties:
+        asset:
+          type: string
+          enum: [logo, favicon]
+        imageBase64:
+          type: string
+          description: Base64-encoded image (optional data-URL prefix)
+        filename:
+          type: string
+          maxLength: 255
+
+    UploadPlatformAssetResponse:
+      type: object
+      required: [url, asset]
+      properties:
+        url:
+          type: string
+          format: uri
+        asset:
+          type: string
+          enum: [logo, favicon]
+
+    EffectiveBranding:
+      allOf:
+        - $ref: '#/components/schemas/SiteConfig'
+        - type: object
+          properties:
+            tenantDisplayName:
+              type: string
+              description: Company name for tenant users
+
+    PlatformSiteSettings:
+      allOf:
+        - $ref: '#/components/schemas/SiteConfig'
+        - type: object
+          properties:
+            updatedAt:
+              type: string
+              format: date-time
+            updatedBy:
+              type: string
+              description: User id of last editor
+
+    TenantBrandingOverrides:
+      type: object
+      required: [logoUrl, primaryColor]
+      properties:
+        logoUrl:
+          type: string
+          nullable: true
+          format: uri
+        primaryColor:
+          type: string
+          nullable: true
+          pattern: '^#[0-9A-Fa-f]{6}$'
+
+    PatchPlatformSiteSettingsRequest:
+      type: object
+      minProperties: 1
+      properties:
+        siteName:
+          type: string
+          minLength: 2
+          maxLength: 64
+        logoUrl:
+          type: string
+          nullable: true
+          format: uri
+        faviconUrl:
+          type: string
+          nullable: true
+          format: uri
+        primaryColor:
+          type: string
+          pattern: '^#[0-9A-Fa-f]{6}$'
+        logoDisplay:
+          type: object
+          properties:
+            heightPx:
+              type: integer
+              minimum: 24
+              maximum: 80
+            maxWidthPx:
+              type: integer
+              minimum: 80
+              maximum: 320
+            objectFit:
+              type: string
+              enum: [contain, cover]
+            showSiteName:
+              type: boolean
+        faviconDisplay:
+          type: object
+          properties:
+            mimeType:
+              type: string
+              enum: [auto, image/png, image/x-icon, image/svg+xml, image/webp]
+
+    PatchTenantBrandingRequest:
+      type: object
+      minProperties: 1
+      properties:
+        logoUrl:
+          type: string
+          nullable: true
+          format: uri
+        primaryColor:
+          type: string
+          nullable: true
+          pattern: '^#[0-9A-Fa-f]{6}$'

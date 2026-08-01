@@ -36,9 +36,9 @@ export const PasswordInput = ({
         className="absolute right-2 top-2.5 rounded-md p-1 text-slate-400 transition hover:text-brand-600 disabled:cursor-not-allowed disabled:opacity-50"
       >
         {visible ? (
-          <HiEyeSlash className="h-5 w-5 text-slate-500" aria-hidden />
+          <HiEyeSlash className="h-4 w-4 text-slate-500" aria-hidden />
         ) : (
-          <HiEye className="h-5 w-5 text-brand-600" aria-hidden />
+          <HiEye className="h-4 w-4 text-brand-600" aria-hidden />
         )}
       </button>
     </div>

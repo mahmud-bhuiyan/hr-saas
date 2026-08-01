@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { APP_NAME } from '../constants/app';
+import { BrandMark } from './BrandMark';
 import type { ReactNode } from 'react';
 
 interface AuthLayoutProps {
@@ -13,8 +13,8 @@ export const AuthLayout = ({ title, subtitle, children, footer }: AuthLayoutProp
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-slate-50 px-4 py-12">
       <div className="mb-8 text-center">
-        <Link to="/" className="text-2xl font-semibold text-brand-700">
-          {APP_NAME}
+        <Link to="/" className="inline-block">
+          <BrandMark className="text-2xl font-semibold text-brand-700" />
         </Link>
       </div>
 
@@ -30,4 +30,4 @@ export const AuthLayout = ({ title, subtitle, children, footer }: AuthLayoutProp
       </div>
     </div>
   );
-}
+};

@@ -12,6 +12,7 @@ export interface ServerEnv {
   redisUrl: string;
   clientUrl: string;
   adminJwtSecret: string;
+  imgbbApiKey: string;
 }
 
 export const loadServerEnv = (): ServerEnv => {
@@ -21,5 +22,6 @@ export const loadServerEnv = (): ServerEnv => {
     redisUrl: process.env.REDIS_URL ?? 'redis://localhost:6379',
     clientUrl: process.env.CLIENT_URL ?? 'http://localhost:5173',
     adminJwtSecret: process.env.ADMIN_JWT_SECRET ?? '',
+    imgbbApiKey: process.env.IMGBB_API_KEY ?? '',
   };
 }

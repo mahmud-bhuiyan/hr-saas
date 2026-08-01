@@ -593,6 +593,173 @@
           "response": []
         }
       ]
+    },
+    {
+      "name": "Platform",
+      "item": [
+        {
+          "name": "Get Site Config (public)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/platform/site-config",
+            "description": "Public platform branding for client bootstrap. No auth required."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Platform Site Settings",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/admin/platform/site-settings",
+            "description": "Super admin only. Full platform settings for edit form."
+          },
+          "response": []
+        },
+        {
+          "name": "Update Platform Site Settings",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"siteName\": \"Acme HR Platform\",\n  \"primaryColor\": \"#059669\"\n}"
+            },
+            "url": "{{baseUrl}}/api/v1/admin/platform/site-settings",
+            "description": "Super admin only. Partial update of platform branding."
+          },
+          "response": []
+        },
+        {
+          "name": "Upload Platform Asset",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"asset\": \"logo\",\n  \"filename\": \"logo.png\",\n  \"imageBase64\": \"<base64-without-prefix>\"\n}"
+            },
+            "url": "{{baseUrl}}/api/v1/admin/platform/site-settings/upload",
+            "description": "Super admin only. Uploads logo or favicon to ImgBB; returns URL (does not auto-save settings)."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Settings",
+      "item": [
+        {
+          "name": "Get Effective Branding",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/settings/branding",
+            "description": "Merged branding for current user. Tenant overrides applied for tenant users."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Tenant Branding Overrides",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/settings/branding/overrides",
+            "description": "Company admin only. Raw tenant override values for edit form."
+          },
+          "response": []
+        },
+        {
+          "name": "Update Tenant Branding",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"primaryColor\": \"#059669\",\n  \"logoUrl\": \"https://example.com/logo.png\"\n}"
+            },
+            "url": "{{baseUrl}}/api/v1/settings/branding",
+            "description": "Company admin only. Set null or empty to revert to platform default."
+          },
+          "response": []
+        }
+      ]
     }
   ]
 }

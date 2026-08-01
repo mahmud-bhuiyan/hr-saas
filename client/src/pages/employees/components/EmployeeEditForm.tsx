@@ -1,8 +1,19 @@
 import { FormEvent } from 'react';
+import {
+  HiBriefcase,
+  HiCalendarDays,
+  HiEnvelope,
+  HiPhone,
+  HiRectangleGroup,
+  HiSignal,
+  HiUser,
+  HiUserGroup,
+} from 'react-icons/hi2';
 import { Button } from '../../../components/ui/Button';
 import { FormActions } from '../../../components/ui/FormActions';
 import { FormField } from '../../../components/ui/FormField';
 import { Input } from '../../../components/ui/Input';
+import { Select } from '../../../components/ui/Select';
 import type { Employee, EmployeeStatus } from '../../../types';
 import { employeeName } from '../utils';
 
@@ -62,6 +73,7 @@ export const EmployeeEditForm = ({
             value={form.firstName}
             onChange={(e) => onFieldChange('firstName', e.target.value)}
             required
+            icon={<HiUser className="h-4 w-4 text-brand-600" />}
           />
         </FormField>
         <FormField label="Last name" htmlFor="lastName">
@@ -70,6 +82,7 @@ export const EmployeeEditForm = ({
             value={form.lastName}
             onChange={(e) => onFieldChange('lastName', e.target.value)}
             required
+            icon={<HiUser className="h-4 w-4 text-brand-600" />}
           />
         </FormField>
       </div>
@@ -81,6 +94,7 @@ export const EmployeeEditForm = ({
             type="email"
             value={form.email}
             onChange={(e) => onFieldChange('email', e.target.value)}
+            icon={<HiEnvelope className="h-4 w-4 text-brand-600" />}
           />
         </FormField>
         <FormField label="Phone" htmlFor="phone">
@@ -88,6 +102,7 @@ export const EmployeeEditForm = ({
             id="phone"
             value={form.phone}
             onChange={(e) => onFieldChange('phone', e.target.value)}
+            icon={<HiPhone className="h-4 w-4 text-brand-600" />}
           />
         </FormField>
       </div>
@@ -98,6 +113,7 @@ export const EmployeeEditForm = ({
             id="jobTitle"
             value={form.jobTitle}
             onChange={(e) => onFieldChange('jobTitle', e.target.value)}
+            icon={<HiBriefcase className="h-4 w-4 text-brand-600" />}
           />
         </FormField>
         <FormField label="Department" htmlFor="department">
@@ -105,6 +121,7 @@ export const EmployeeEditForm = ({
             id="department"
             value={form.department}
             onChange={(e) => onFieldChange('department', e.target.value)}
+            icon={<HiRectangleGroup className="h-4 w-4 text-brand-600" />}
           />
         </FormField>
       </div>
@@ -116,14 +133,15 @@ export const EmployeeEditForm = ({
             type="date"
             value={form.startDate}
             onChange={(e) => onFieldChange('startDate', e.target.value)}
+            icon={<HiCalendarDays className="h-4 w-4 text-brand-600" />}
           />
         </FormField>
         <FormField label="Manager" htmlFor="managerId">
-          <select
+          <Select
             id="managerId"
             value={form.managerId}
             onChange={(e) => onFieldChange('managerId', e.target.value)}
-            className="block w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm shadow-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500"
+            icon={<HiUserGroup className="h-4 w-4 text-brand-600" />}
           >
             <option value="">No manager</option>
             {managerOptions.map((manager) => (
@@ -131,23 +149,24 @@ export const EmployeeEditForm = ({
                 {employeeName(manager)}
               </option>
             ))}
-          </select>
+          </Select>
         </FormField>
       </div>
 
       <FormField label="Status" htmlFor="status">
-        <select
+        <Select
           id="status"
           value={form.status}
           onChange={(e) => onFieldChange('status', e.target.value as EmployeeStatus)}
-          className="block w-full max-w-xs rounded-lg border border-slate-300 px-3 py-2.5 text-sm shadow-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500"
+          className="max-w-xs"
+          icon={<HiSignal className="h-4 w-4 text-brand-600" />}
         >
           {STATUS_OPTIONS.map((option) => (
             <option key={option.value} value={option.value}>
               {option.label}
             </option>
           ))}
-        </select>
+        </Select>
       </FormField>
 
       <div className="flex flex-wrap items-center justify-between gap-3">
@@ -172,7 +191,7 @@ export const EmployeeEditForm = ({
       </div>
     </form>
   );
-}
+};
 
 export const toEmployeeFormValues = (employee: Employee): EmployeeFormValues => {
   return {
@@ -186,4 +205,4 @@ export const toEmployeeFormValues = (employee: Employee): EmployeeFormValues => 
     managerId: employee.managerId ?? '',
     status: employee.status,
   };
-}
+};

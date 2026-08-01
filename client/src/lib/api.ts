@@ -24,6 +24,14 @@ import type {
   CreateEmployeeInput,
   UpdateEmployeeInput,
   ListEmployeesQuery,
+  SiteConfig,
+  EffectiveBranding,
+  PlatformSiteSettings,
+  TenantBrandingOverrides,
+  PatchPlatformSiteSettingsInput,
+  PatchTenantBrandingInput,
+  UploadPlatformAssetInput,
+  UploadPlatformAssetResponse,
 } from '../types';
 
 const apiBase = import.meta.env.VITE_API_URL || '';
@@ -342,3 +350,80 @@ export const updateEmployee = async (
   });
   return json.data;
 }
+
+export const fetchSiteConfig = async (): Promise<SiteConfig> => {
+  const json = await apiFetch<ApiSuccessResponse<SiteConfig>>('/api/v1/platform/site-config', {
+    skipAuth: true,
+  });
+  return json.data;
+};
+
+export const fetchPlatformSiteSettings = async (): Promise<PlatformSiteSettings> => {
+  const json = await apiFetch<ApiSuccessResponse<PlatformSiteSettings>>(
+    '/api/v1/admin/platform/site-settings'
+  );
+  return json.data;
+};
+
+export const updatePlatformSiteSettings = async (
+  input: PatchPlatformSiteSettingsInput
+): Promise<PlatformSiteSettings> => {
+  const json = await apiFetch<ApiSuccessResponse<PlatformSiteSettings>>(
+    '/api/v1/admin/platform/site-settings',
+    {
+      method: 'PATCH',
+      body: JSON.stringify(input),
+    }
+  );
+  return json.data;
+};
+
+export const uploadPlatformAsset = async (
+  input: UploadPlatformAssetInput
+): Promise<UploadPlatformAssetResponse> => {
+  const json = await apiFetch<ApiSuccessResponse<UploadPlatformAssetResponse>>(
+    '/api/v1/admin/platform/site-settings/upload',
+    {
+      method: 'POST',
+      body: JSON.stringify(input),
+    }
+  );
+  return json.data;
+};
+
+export const readFileAsBase64 = (file: File): Promise<string> =>
+  new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const result = reader.result;
+      if (typeof result !== 'string') {
+        reject(new Error('Failed to read file'));
+        return;
+      }
+      resolve(result);
+    };
+    reader.onerror = () => reject(new Error('Failed to read file'));
+    reader.readAsDataURL(file);
+  });
+
+export const fetchEffectiveBranding = async (): Promise<EffectiveBranding> => {
+  const json = await apiFetch<ApiSuccessResponse<EffectiveBranding>>('/api/v1/settings/branding');
+  return json.data;
+};
+
+export const fetchTenantBrandingOverrides = async (): Promise<TenantBrandingOverrides> => {
+  const json = await apiFetch<ApiSuccessResponse<TenantBrandingOverrides>>(
+    '/api/v1/settings/branding/overrides'
+  );
+  return json.data;
+};
+
+export const updateTenantBranding = async (
+  input: PatchTenantBrandingInput
+): Promise<EffectiveBranding> => {
+  const json = await apiFetch<ApiSuccessResponse<EffectiveBranding>>('/api/v1/settings/branding', {
+    method: 'PATCH',
+    body: JSON.stringify(input),
+  });
+  return json.data;
+};

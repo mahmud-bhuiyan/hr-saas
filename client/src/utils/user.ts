@@ -1,4 +1,4 @@
-import type { AuthUser } from '../types';
+import type { AuthUser, UserRole } from '../types';
 
 export const displayName = (user: AuthUser): string => {
   if (user.firstName || user.lastName) {
@@ -15,4 +15,8 @@ export const avatarLetter = (user: AuthUser): string => {
     return user.firstName[0]!.toUpperCase();
   }
   return (user.email[0] ?? 'U').toUpperCase();
+}
+
+export const roleLabel = (role: UserRole | string): string => {
+  return role.replace(/_/g, ' ');
 }

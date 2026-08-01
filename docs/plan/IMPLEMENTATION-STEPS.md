@@ -29,6 +29,10 @@ Features added during implementation that extend the original step list. Keep th
 | Companies page (super admin) | 3 | `/dashboard/registrations` — pending queue + add company |
 | Manager team-scoped employee read | 4 | Managers see direct reports only (`employee:read:team`) |
 | Direct reports org view | 4 | `GET /api/v1/employees/:id/reports` + profile section |
+| Platform site customization | 7 | Super admin: global site name, theme color, logo, favicon |
+| Per-tenant branding overrides | 7 | Company admin: logo + primary color override (pulled forward from Stage 3) |
+| ImgBB logo/favicon upload | 7 | Super admin: upload or URL for platform logo/favicon via `IMGBB_API_KEY` |
+| Logo/favicon display settings | 7 | Super admin: logo size/fit/name toggle; favicon MIME type + preview |
 
 ---
 
@@ -128,8 +132,15 @@ Features added during implementation that extend the original step list. Keep th
 - [ ] Company profile settings (name, address, logo)
 - [ ] Departments CRUD (replace free-text department on employees)
 - [ ] User list with role assignment
+- [x] Platform site settings (super admin): site name, primary color, logo, favicon
+- [x] Logo/favicon ImgBB upload + display customization (height, fit, favicon type)
+- [x] Public `GET /api/v1/platform/site-config` + super_admin PATCH endpoints
+- [x] Tenant branding overrides (company admin): logo URL + primary color
+- [x] Client: dynamic theme, title, favicon from site config
+- [x] Super admin screen: `/dashboard/platform/site-settings`
+- [x] Company admin screen: `/dashboard/settings/branding`
 - [x] Dashboard summary cards wired to real counts (role-based: super admin, tenant admin, manager, employee)
-- [ ] `docs/openapi.yaml` and Postman collection updated
+- [x] `docs/openapi.yaml` and Postman collection updated (platform + branding endpoints)
 
 **Review:** Test settings before Step 8.
 

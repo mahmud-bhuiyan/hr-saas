@@ -1,6 +1,7 @@
-import { HiMagnifyingGlass } from 'react-icons/hi2';
+import { HiMagnifyingGlass, HiRectangleGroup, HiSignal } from 'react-icons/hi2';
 import { FormField } from '../../../components/ui/FormField';
 import { Input } from '../../../components/ui/Input';
+import { Select } from '../../../components/ui/Select';
 import type { EmployeeStatus } from '../../../types';
 
 const STATUS_OPTIONS: Array<{ value: EmployeeStatus | ''; label: string }> = [
@@ -37,15 +38,16 @@ export const EmployeeFilters = ({
           value={search}
           onChange={(e) => onSearchChange(e.target.value)}
           placeholder="Name, email, job title…"
-          icon={<HiMagnifyingGlass className="h-5 w-5 text-brand-600" />}
+          icon={<HiMagnifyingGlass className="h-4 w-4 text-brand-600" />}
         />
       </FormField>
       <FormField label="Department" htmlFor="employee-department">
-        <select
+        <Select
           id="employee-department"
           value={department}
           onChange={(e) => onDepartmentChange(e.target.value)}
-          className="block w-full min-w-[10rem] rounded-lg border border-slate-300 px-3 py-2.5 text-sm shadow-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500"
+          className="min-w-[10rem]"
+          icon={<HiRectangleGroup className="h-4 w-4 text-brand-600" />}
         >
           <option value="">All departments</option>
           {departments.map((dept) => (
@@ -53,22 +55,23 @@ export const EmployeeFilters = ({
               {dept}
             </option>
           ))}
-        </select>
+        </Select>
       </FormField>
       <FormField label="Status" htmlFor="employee-status">
-        <select
+        <Select
           id="employee-status"
           value={status}
           onChange={(e) => onStatusChange(e.target.value as EmployeeStatus | '')}
-          className="block w-full min-w-[10rem] rounded-lg border border-slate-300 px-3 py-2.5 text-sm shadow-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500"
+          className="min-w-[10rem]"
+          icon={<HiSignal className="h-4 w-4 text-brand-600" />}
         >
           {STATUS_OPTIONS.map((option) => (
             <option key={option.value || 'all'} value={option.value}>
               {option.label}
             </option>
           ))}
-        </select>
+        </Select>
       </FormField>
     </div>
   );
-}
+};

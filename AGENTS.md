@@ -119,8 +119,10 @@ Before building custom markup, check `client/src/components/ui/`. **Reuse existi
 |-----------|------|---------|
 | `Button` | `Button.tsx` | All actions; supports `loading`, `icon`, `disabled` |
 | `Spinner` | `Spinner.tsx` | Inline loading indicator (used by `Button`, `Table`) |
-| `Input` | `Input.tsx` | Text, email, etc. |
+| `Input` | `Input.tsx` | Text, email, date, etc. |
 | `PasswordInput` | `PasswordInput.tsx` | Password fields with show/hide toggle |
+| `Select` | `Select.tsx` | Dropdown selects with optional left icon |
+| `Textarea` | `Textarea.tsx` | Multi-line text with optional left icon |
 | `FormField` | `FormField.tsx` | Label + control wrapper |
 | `FormActions` | `FormActions.tsx` | Form footer with submit/cancel |
 | `Modal` | `Modal.tsx` | Generic dialog shell |
@@ -172,7 +174,7 @@ Follow existing dashboard pages (`employees/EmployeesPage`, `registrations/Regis
 1. Wrap content in `PageContainer`
 2. Use `PageHeader` with `label`, `title`, `description`, and optional primary `action` (`Button` with icon)
 3. List data with `Table` (loading, empty states via props; **center-aligned by default** — override per table or column)
-4. Create/edit records in `FormModal` + `FormField` + `Input` / `PasswordInput`
+4. Create/edit records in `FormModal` + `FormField` + `Input` / `PasswordInput` / `Select` / `Textarea` (all with icons)
 5. Separate related data views (e.g. pending vs registered) with `Tabs` — each tab gets its own `Table`
 6. Success/error alerts: `rounded-lg border px-4 py-3 text-sm` with green/red/amber variants
 
@@ -219,13 +221,15 @@ Use `react-icons` (e.g. `react-icons/hi2`) with Tailwind color classes (`text-br
 
 ### Form field icons (required)
 
-Every `Input` and `PasswordInput` in a form should pass an `icon` prop — same pattern as `login/LoginPage` and `register/RegisterPage`:
+**Every form control must have an icon** — applies to all existing and new forms. Pass `icon` on every `Input`, `PasswordInput`, `Select`, and `Textarea`. Do not use raw `<input>`, `<select>`, or `<textarea>` in forms; use the UI kit components with icons.
+
+Pattern (same as `login/LoginPage` and `register/RegisterPage`):
 
 ```tsx
-icon={<HiEnvelope className="h-5 w-5 text-brand-600" />}
+icon={<HiEnvelope className="h-4 w-4 text-brand-600" />}
 ```
 
-Standard mappings (`react-icons/hi2`, `h-5 w-5 text-brand-600`):
+Standard mappings (`react-icons/hi2`, `h-4 w-4 text-brand-600`):
 
 | Field type | Icon |
 |------------|------|
@@ -234,6 +238,15 @@ Standard mappings (`react-icons/hi2`, `h-5 w-5 text-brand-600`):
 | Email | `HiEnvelope` |
 | Password | `HiLockClosed` |
 | Search | `HiMagnifyingGlass` |
+| Phone | `HiPhone` |
+| Job title | `HiBriefcase` |
+| Department | `HiRectangleGroup` |
+| Date | `HiCalendarDays` |
+| Manager / team | `HiUserGroup` |
+| Status | `HiSignal` |
+| Notes / reason / comment | `HiChatBubbleLeftEllipsis` |
+
+When adding or editing any form, audit all fields and add missing icons. Reference forms: `login/LoginForm`, `register/RegisterForm`, `employees/CreateEmployeeModal`, `employees/EmployeeEditForm`.
 
 Page-header and action buttons: white icon on primary buttons (`text-white`), brand-colored elsewhere.
 

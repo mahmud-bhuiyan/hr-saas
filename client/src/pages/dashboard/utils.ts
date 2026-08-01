@@ -35,6 +35,7 @@ export const superAdminLinks = (): DashboardLink[] => [
   { label: 'Review pending registrations', to: '/dashboard/registrations' },
   { label: 'Add company', to: '/dashboard/registrations' },
   { label: 'View registered companies', to: '/dashboard/registrations' },
+  { label: 'Platform site settings', to: '/dashboard/platform/site-settings' },
 ];
 
 export const tenantAdminCards = (
@@ -50,8 +51,8 @@ export const tenantAdminCards = (
 export const tenantAdminLinks = (canCreate: boolean): DashboardLink[] => [
   ...(canCreate ? [{ label: 'Add employee', to: '/dashboard/employees' }] : []),
   { label: 'View employees', to: '/dashboard/employees' },
+  { label: 'Company branding', to: '/dashboard/settings/branding' },
   { label: 'Upload document', note: 'Coming in Step 6', disabled: true },
-  { label: 'Company settings', note: 'Coming in Step 7', disabled: true },
 ];
 
 export const managerCards = (team: Employee[]): DashboardCard[] => {
