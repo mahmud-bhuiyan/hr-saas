@@ -21,6 +21,10 @@
     {
       "key": "employeeId",
       "value": ""
+    },
+    {
+      "key": "leaveRequestId",
+      "value": ""
     }
   ],
   "item": [
@@ -447,16 +451,18 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/api/v1/employees?search=&department=&status=",
+              "raw": "{{baseUrl}}/api/v1/employees?search=&department=&status=&sortBy=name&sortOrder=asc",
               "host": ["{{baseUrl}}"],
               "path": ["api", "v1", "employees"],
               "query": [
                 { "key": "search", "value": "" },
                 { "key": "department", "value": "" },
-                { "key": "status", "value": "" }
+                { "key": "status", "value": "" },
+                { "key": "sortBy", "value": "name" },
+                { "key": "sortOrder", "value": "asc" }
               ]
             },
-            "description": "List employees for the authenticated tenant. Supports search, department, and status filters."
+            "description": "List employees for the authenticated tenant. Supports search, department, status, and sort filters."
           },
           "response": []
         },
@@ -589,6 +595,158 @@
             "header": [],
             "url": "{{baseUrl}}/api/v1/employees/{{employeeId}}/reports",
             "description": "Returns employees who report to the given manager."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Leave",
+      "item": [
+        {
+          "name": "List Leave Requests",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/leave/requests?status=",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "leave", "requests"],
+              "query": [{ "key": "status", "value": "" }]
+            },
+            "description": "List leave requests scoped by role."
+          },
+          "response": []
+        },
+        {
+          "name": "Submit Leave Request",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "  const json = pm.response.json();",
+                  "  pm.collectionVariables.set('leaveRequestId', json.data.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+            },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"type\": \"annual\",\n  \"startDate\": \"2026-03-10\",\n  \"endDate\": \"2026-03-12\",\n  \"reason\": \"Family holiday\"\n}"
+            },
+            "url": "{{baseUrl}}/api/v1/leave/requests",
+            "description": "Requires leave:create:own. Employee email must match employee record."
+          },
+          "response": []
+        },
+        {
+          "name": "Get My Leave Balance",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+            },
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/leave/balances/me",
+            "description": "Annual leave balance for current year."
+          },
+          "response": []
+        },
+        {
+          "name": "Approve Leave Request",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+            },
+            "method": "POST",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/leave/requests/{{leaveRequestId}}/approve",
+            "description": "Manager or HR approves pending request."
+          },
+          "response": []
+        },
+        {
+          "name": "Decline Leave Request",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+            },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"declineReason\": \"Team coverage needed\"\n}"
+            },
+            "url": "{{baseUrl}}/api/v1/leave/requests/{{leaveRequestId}}/decline",
+            "description": "Manager or HR declines pending request."
+          },
+          "response": []
+        },
+        {
+          "name": "Cancel Leave Request",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+            },
+            "method": "POST",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/leave/requests/{{leaveRequestId}}/cancel",
+            "description": "Employee cancels own pending request."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Leave Calendar",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/leave/calendar?year=2026&month=3",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "leave", "calendar"],
+              "query": [
+                { "key": "year", "value": "2026" },
+                { "key": "month", "value": "3" }
+              ]
+            },
+            "description": "Team or all leave for calendar month."
+          },
+          "response": []
+        },
+        {
+          "name": "Pending Leave Count",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+            },
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/leave/pending-count",
+            "description": "Count pending requests for dashboard."
           },
           "response": []
         }

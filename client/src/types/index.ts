@@ -130,6 +130,8 @@ export interface Employee {
   manager?: EmployeeManagerSummary;
   status: EmployeeStatus;
   userId?: string;
+  createdByName?: string;
+  updatedByName?: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -163,6 +165,79 @@ export interface ListEmployeesQuery {
   search?: string;
   department?: string;
   status?: EmployeeStatus;
+  sortBy?: EmployeeSortField;
+  sortOrder?: 'asc' | 'desc';
+}
+
+export type EmployeeSortField =
+  | 'name'
+  | 'employeeNumber'
+  | 'jobTitle'
+  | 'department'
+  | 'manager';
+
+export type LeaveType = 'annual' | 'sick' | 'unpaid';
+export type LeaveRequestStatus = 'pending' | 'approved' | 'declined' | 'cancelled';
+
+export interface LeaveEmployeeSummary {
+  id: string;
+  firstName: string;
+  lastName: string;
+  email?: string;
+}
+
+export interface LeaveRequest {
+  id: string;
+  employeeId: string;
+  employee: LeaveEmployeeSummary;
+  type: LeaveType;
+  startDate: string;
+  endDate: string;
+  halfDay: boolean;
+  days: number;
+  reason?: string;
+  status: LeaveRequestStatus;
+  approverId?: string;
+  approvedAt?: string;
+  declineReason?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateLeaveRequestInput {
+  type: LeaveType;
+  startDate: string;
+  endDate: string;
+  halfDay?: boolean;
+  reason?: string;
+}
+
+export interface ListLeaveRequestsQuery {
+  status?: LeaveRequestStatus;
+  employeeId?: string;
+  from?: string;
+  to?: string;
+}
+
+export interface LeaveBalance {
+  employeeId: string;
+  year: number;
+  entitlement: number;
+  taken: number;
+  pending: number;
+  carriedOver: number;
+  remaining: number;
+}
+
+export interface LeaveCalendarEntry {
+  id: string;
+  employeeId: string;
+  employeeName: string;
+  type: LeaveType;
+  startDate: string;
+  endDate: string;
+  halfDay: boolean;
+  status: LeaveRequestStatus;
 }
 
 export interface SiteConfig {

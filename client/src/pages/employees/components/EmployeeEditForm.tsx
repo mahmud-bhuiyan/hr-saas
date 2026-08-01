@@ -1,4 +1,3 @@
-import { FormEvent } from 'react';
 import {
   HiBriefcase,
   HiCalendarDays,
@@ -9,8 +8,6 @@ import {
   HiUser,
   HiUserGroup,
 } from 'react-icons/hi2';
-import { Button } from '../../../components/ui/Button';
-import { FormActions } from '../../../components/ui/FormActions';
 import { FormField } from '../../../components/ui/FormField';
 import { Input } from '../../../components/ui/Input';
 import { Select } from '../../../components/ui/Select';
@@ -35,50 +32,37 @@ export interface EmployeeFormValues {
   status: EmployeeStatus;
 }
 
-interface EmployeeEditFormProps {
+interface EmployeeEditFieldsProps {
   form: EmployeeFormValues;
   onFieldChange: <K extends keyof EmployeeFormValues>(
     key: K,
     value: EmployeeFormValues[K]
   ) => void;
-  onSubmit: (event: FormEvent) => void;
   managerOptions: Employee[];
-  hasChanges: boolean;
-  loading: boolean;
-  showDeactivate: boolean;
-  onDeactivate: () => void;
+  idPrefix?: string;
 }
 
-export const EmployeeEditForm = ({
+export const EmployeeEditFields = ({
   form,
   onFieldChange,
-  onSubmit,
   managerOptions,
-  hasChanges,
-  loading,
-  showDeactivate,
-  onDeactivate,
-}: EmployeeEditFormProps) => {
+  idPrefix = '',
+}: EmployeeEditFieldsProps) => {
   return (
-    <form
-      onSubmit={(e) => void onSubmit(e)}
-      className="space-y-6 rounded-xl border border-slate-200 bg-white p-6 shadow-sm"
-    >
-      <h2 className="text-lg font-semibold text-slate-900">Edit details</h2>
-
+    <>
       <div className="grid gap-4 sm:grid-cols-2">
-        <FormField label="First name" htmlFor="firstName">
+        <FormField label="First name" htmlFor={`${idPrefix}firstName`}>
           <Input
-            id="firstName"
+            id={`${idPrefix}firstName`}
             value={form.firstName}
             onChange={(e) => onFieldChange('firstName', e.target.value)}
             required
             icon={<HiUser className="h-4 w-4 text-brand-600" />}
           />
         </FormField>
-        <FormField label="Last name" htmlFor="lastName">
+        <FormField label="Last name" htmlFor={`${idPrefix}lastName`}>
           <Input
-            id="lastName"
+            id={`${idPrefix}lastName`}
             value={form.lastName}
             onChange={(e) => onFieldChange('lastName', e.target.value)}
             required
@@ -88,18 +72,18 @@ export const EmployeeEditForm = ({
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2">
-        <FormField label="Email" htmlFor="email">
+        <FormField label="Email" htmlFor={`${idPrefix}email`}>
           <Input
-            id="email"
+            id={`${idPrefix}email`}
             type="email"
             value={form.email}
             onChange={(e) => onFieldChange('email', e.target.value)}
             icon={<HiEnvelope className="h-4 w-4 text-brand-600" />}
           />
         </FormField>
-        <FormField label="Phone" htmlFor="phone">
+        <FormField label="Phone" htmlFor={`${idPrefix}phone`}>
           <Input
-            id="phone"
+            id={`${idPrefix}phone`}
             value={form.phone}
             onChange={(e) => onFieldChange('phone', e.target.value)}
             icon={<HiPhone className="h-4 w-4 text-brand-600" />}
@@ -108,17 +92,17 @@ export const EmployeeEditForm = ({
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2">
-        <FormField label="Job title" htmlFor="jobTitle">
+        <FormField label="Job title" htmlFor={`${idPrefix}jobTitle`}>
           <Input
-            id="jobTitle"
+            id={`${idPrefix}jobTitle`}
             value={form.jobTitle}
             onChange={(e) => onFieldChange('jobTitle', e.target.value)}
             icon={<HiBriefcase className="h-4 w-4 text-brand-600" />}
           />
         </FormField>
-        <FormField label="Department" htmlFor="department">
+        <FormField label="Department" htmlFor={`${idPrefix}department`}>
           <Input
-            id="department"
+            id={`${idPrefix}department`}
             value={form.department}
             onChange={(e) => onFieldChange('department', e.target.value)}
             icon={<HiRectangleGroup className="h-4 w-4 text-brand-600" />}
@@ -127,18 +111,18 @@ export const EmployeeEditForm = ({
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2">
-        <FormField label="Start date" htmlFor="startDate">
+        <FormField label="Start date" htmlFor={`${idPrefix}startDate`}>
           <Input
-            id="startDate"
+            id={`${idPrefix}startDate`}
             type="date"
             value={form.startDate}
             onChange={(e) => onFieldChange('startDate', e.target.value)}
             icon={<HiCalendarDays className="h-4 w-4 text-brand-600" />}
           />
         </FormField>
-        <FormField label="Manager" htmlFor="managerId">
+        <FormField label="Manager" htmlFor={`${idPrefix}managerId`}>
           <Select
-            id="managerId"
+            id={`${idPrefix}managerId`}
             value={form.managerId}
             onChange={(e) => onFieldChange('managerId', e.target.value)}
             icon={<HiUserGroup className="h-4 w-4 text-brand-600" />}
@@ -153,9 +137,9 @@ export const EmployeeEditForm = ({
         </FormField>
       </div>
 
-      <FormField label="Status" htmlFor="status">
+      <FormField label="Status" htmlFor={`${idPrefix}status`}>
         <Select
-          id="status"
+          id={`${idPrefix}status`}
           value={form.status}
           onChange={(e) => onFieldChange('status', e.target.value as EmployeeStatus)}
           className="max-w-xs"
@@ -168,28 +152,7 @@ export const EmployeeEditForm = ({
           ))}
         </Select>
       </FormField>
-
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <FormActions
-          submitLabel="Save changes"
-          loading={loading}
-          loadingText="Saving…"
-          submitDisabled={!hasChanges}
-        />
-        {showDeactivate && (
-          <Button
-            type="button"
-            variant="danger"
-            onClick={onDeactivate}
-            loading={loading}
-            loadingText="Deactivating…"
-            disabled={loading}
-          >
-            Deactivate employee
-          </Button>
-        )}
-      </div>
-    </form>
+    </>
   );
 };
 

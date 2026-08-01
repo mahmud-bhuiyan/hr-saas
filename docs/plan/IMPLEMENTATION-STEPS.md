@@ -8,7 +8,7 @@ Check off each step with the client/dev team before moving to the next.
 | **2** | Auth & tenant — register, login, JWT, RBAC, super admin, company onboarding | ✅ Complete |
 | **3** | App shell — layout, routing, design system, dashboard, profile | ✅ Complete |
 | **4** | Employee management — CRUD, directory, profile, direct reports | ✅ Ready for review |
-| **5** | Leave & absence — requests, approval, balance, calendar | ⬜ Pending |
+| **5** | Leave & absence — requests, approval, balance, calendar | ✅ Complete |
 | **6** | Document storage — S3 upload/download | ⬜ Pending |
 | **7** | Admin & settings — company, departments, users | ⬜ Pending |
 | **8** | Demo polish — seed data, staging deploy, bug fixes | ⬜ Pending |
@@ -103,13 +103,13 @@ Features added during implementation that extend the original step list. Keep th
 
 ## Step 5 — Done when
 
-- [ ] Leave types (annual, sick, unpaid)
-- [ ] Submit leave request API + employee UI
-- [ ] Approval queue for manager / HR
-- [ ] Leave balance per employee (fixed entitlement)
-- [ ] Team leave calendar (read-only month view)
-- [ ] Email notification on submit and approve/decline
-- [ ] `docs/openapi.yaml` and Postman collection updated
+- [x] Leave types (annual, sick, unpaid)
+- [x] Submit leave request API + employee UI
+- [x] Approval queue for manager / HR
+- [x] Leave balance per employee (fixed entitlement)
+- [x] Team leave calendar (read-only month view)
+- [x] Email notification on submit and approve/decline
+- [x] `docs/openapi.yaml` and Postman collection updated
 
 **Review:** Test leave flows before Step 6.
 

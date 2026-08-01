@@ -6,6 +6,8 @@ import {
 } from 'react-icons/hi2';
 import { Button } from '../../../components/ui/Button';
 import { Table } from '../../../components/ui/Table';
+import { TablePageSizeControl } from '../../../components/ui/TablePagination';
+import { usePagination } from '../../../hooks/usePagination';
 import type { RegistrationRequest } from '../../../types';
 import { adminDisplayName, formatDate } from '../utils';
 import { CompanyStatusBadge } from './CompanyStatusBadge';
@@ -31,12 +33,33 @@ export const PendingRegistrationsTable = ({
   approvePending,
   rejectPending,
 }: PendingRegistrationsTableProps) => {
+  const {
+    paginatedItems,
+    page,
+    pageSize,
+    setPage,
+    setPageSize,
+    total,
+    totalPages,
+    rangeStart,
+    rangeEnd,
+    pageSizeOptions,
+  } = usePagination(pending);
+
   return (
     <>
       {isError && (
         <p className="text-sm text-red-600">
           Failed to load pending registrations.
         </p>
+      )}
+
+      {!loading && total > 0 && (
+        <TablePageSizeControl
+          pageSize={pageSize}
+          onPageSizeChange={setPageSize}
+          pageSizeOptions={pageSizeOptions}
+        />
       )}
 
       <Table
@@ -114,11 +137,22 @@ export const PendingRegistrationsTable = ({
             ),
           },
         ]}
-        data={pending}
+        data={paginatedItems}
         getRowKey={(row) => row.tenantId}
         loading={loading}
         loadingMessage="Loading pending registrations…"
         emptyMessage="No pending company registrations. Use Add company to onboard one directly."
+        pagination={{
+          page,
+          pageSize,
+          total,
+          totalPages,
+          rangeStart,
+          rangeEnd,
+          onPageChange: setPage,
+          onPageSizeChange: setPageSize,
+          pageSizeOptions,
+        }}
       />
     </>
   );
@@ -145,12 +179,33 @@ export const RegisteredCompaniesTable = ({
   onActivate,
   companyActionPending,
 }: RegisteredCompaniesTableProps) => {
+  const {
+    paginatedItems,
+    page,
+    pageSize,
+    setPage,
+    setPageSize,
+    total,
+    totalPages,
+    rangeStart,
+    rangeEnd,
+    pageSizeOptions,
+  } = usePagination(registered);
+
   return (
     <>
       {isError && (
         <p className="text-sm text-red-600">
           Failed to load registered companies.
         </p>
+      )}
+
+      {!loading && total > 0 && (
+        <TablePageSizeControl
+          pageSize={pageSize}
+          onPageSizeChange={setPageSize}
+          pageSizeOptions={pageSizeOptions}
+        />
       )}
 
       <Table
@@ -247,11 +302,22 @@ export const RegisteredCompaniesTable = ({
             ),
           },
         ]}
-        data={registered}
+        data={paginatedItems}
         getRowKey={(row) => row.tenantId}
         loading={loading}
         loadingMessage="Loading registered companies…"
         emptyMessage="No registered companies yet. Approve a pending request or use Add company."
+        pagination={{
+          page,
+          pageSize,
+          total,
+          totalPages,
+          rangeStart,
+          rangeEnd,
+          onPageChange: setPage,
+          onPageSizeChange: setPageSize,
+          pageSizeOptions,
+        }}
       />
     </>
   );

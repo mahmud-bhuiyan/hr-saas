@@ -20,7 +20,7 @@ const navItems: Array<{
     roles: ['super_admin'],
   },
   { to: '/dashboard/employees', label: 'Employees', roles: ['company_admin', 'hr_manager', 'manager'] },
-  { to: '/dashboard/leave', label: 'Leave', disabled: true },
+  { to: '/dashboard/leave', label: 'Leave', roles: ['company_admin', 'hr_manager', 'manager', 'employee'] },
   { to: '/dashboard/documents', label: 'Documents', disabled: true },
   {
     to: '/dashboard/settings/branding',

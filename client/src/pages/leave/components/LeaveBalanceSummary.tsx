@@ -1,0 +1,48 @@
+import type { LeaveBalance } from '../../../types';
+
+interface LeaveBalanceSummaryProps {
+  balance: LeaveBalance | undefined;
+  loading: boolean;
+}
+
+export const LeaveBalanceSummary = ({ balance, loading }: LeaveBalanceSummaryProps) => {
+  if (loading) {
+    return (
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {[1, 2, 3, 4].map((i) => (
+          <div key={i} className="h-24 animate-pulse rounded-xl border border-slate-200 bg-slate-100" />
+        ))}
+      </div>
+    );
+  }
+
+  if (!balance) {
+    return (
+      <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+        No employee record linked to your account. Contact your administrator to request leave.
+      </div>
+    );
+  }
+
+  const cards = [
+    { label: 'Entitlement', value: balance.entitlement, note: `${balance.year} annual leave` },
+    { label: 'Taken', value: balance.taken, note: 'Approved days used' },
+    { label: 'Pending', value: balance.pending, note: 'Awaiting approval' },
+    { label: 'Remaining', value: balance.remaining, note: 'Available days' },
+  ];
+
+  return (
+    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      {cards.map((card) => (
+        <div
+          key={card.label}
+          className="rounded-xl border border-slate-200 bg-white px-4 py-4 shadow-sm"
+        >
+          <p className="text-sm font-medium text-slate-500">{card.label}</p>
+          <p className="mt-1 text-2xl font-semibold text-slate-900">{card.value}</p>
+          <p className="mt-1 text-xs text-slate-500">{card.note}</p>
+        </div>
+      ))}
+    </div>
+  );
+};

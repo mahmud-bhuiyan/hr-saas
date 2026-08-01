@@ -1,4 +1,4 @@
-import type { Employee, RegistrationRequest, UserRole } from '../../types';
+import type { Employee, LeaveBalance, RegistrationRequest, UserRole } from '../../types';
 
 export type DashboardCard = {
   label: string;
@@ -40,48 +40,58 @@ export const superAdminLinks = (): DashboardLink[] => [
 
 export const tenantAdminCards = (
   employees: Employee[],
-  departments: string[]
+  departments: string[],
+  pendingLeave: number
 ): DashboardCard[] => [
   { label: 'Total employees', value: employees.length, note: 'All records' },
   { label: 'Active employees', value: countByStatus(employees, 'active'), note: 'Currently working' },
-  { label: 'On leave', value: countByStatus(employees, 'on_leave'), note: 'Leave module coming soon' },
+  { label: 'Pending leave', value: pendingLeave, note: 'Awaiting approval' },
   { label: 'Departments', value: departments.length, note: 'Unique departments' },
 ];
 
 export const tenantAdminLinks = (canCreate: boolean): DashboardLink[] => [
   ...(canCreate ? [{ label: 'Add employee', to: '/dashboard/employees' }] : []),
   { label: 'View employees', to: '/dashboard/employees' },
+  { label: 'Review leave requests', to: '/dashboard/leave' },
   { label: 'Company branding', to: '/dashboard/settings/branding' },
   { label: 'Upload document', note: 'Coming in Step 6', disabled: true },
 ];
 
-export const managerCards = (team: Employee[]): DashboardCard[] => {
+export const managerCards = (team: Employee[], pendingLeave: number): DashboardCard[] => {
   const departments = new Set(team.map((member) => member.department).filter(Boolean));
 
   return [
     { label: 'Direct reports', value: team.length, note: 'Your team members' },
     { label: 'Active team', value: countByStatus(team, 'active'), note: 'Currently working' },
-    { label: 'On leave', value: countByStatus(team, 'on_leave'), note: 'Leave module coming soon' },
+    { label: 'Pending leave', value: pendingLeave, note: 'Team requests to review' },
     { label: 'Departments', value: departments.size, note: 'In your team' },
   ];
 };
 
 export const managerLinks = (): DashboardLink[] => [
   { label: 'View team', to: '/dashboard/employees' },
-  { label: 'Review leave requests', note: 'Coming in Step 5', disabled: true },
+  { label: 'Review leave requests', to: '/dashboard/leave' },
+  { label: 'Request leave', to: '/dashboard/leave' },
   { label: 'Upload document', note: 'Coming in Step 6', disabled: true },
 ];
 
-export const employeeCards = (companyName?: string): DashboardCard[] => [
+export const employeeCards = (
+  companyName?: string,
+  balance?: LeaveBalance
+): DashboardCard[] => [
   { label: 'Company', value: companyName ?? '—', note: 'Your organization' },
-  { label: 'Leave balance', value: '—', note: 'Coming in Step 5' },
+  {
+    label: 'Leave balance',
+    value: balance != null ? balance.remaining : '—',
+    note: balance != null ? `${balance.year} annual leave remaining` : 'View on Leave page',
+  },
   { label: 'Documents', value: '—', note: 'Coming in Step 6' },
-  { label: 'Team directory', value: '—', note: 'Coming soon' },
+  { label: 'My requests', value: balance != null ? balance.pending : '—', note: 'Pending approval' },
 ];
 
 export const employeeLinks = (): DashboardLink[] => [
   { label: 'My profile', to: '/dashboard/profile' },
-  { label: 'Request leave', note: 'Coming in Step 5', disabled: true },
+  { label: 'Request leave', to: '/dashboard/leave' },
   { label: 'Upload document', note: 'Coming in Step 6', disabled: true },
 ];
 

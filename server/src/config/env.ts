@@ -13,6 +13,8 @@ export interface ServerEnv {
   clientUrl: string;
   adminJwtSecret: string;
   imgbbApiKey: string;
+  sendgridApiKey: string;
+  emailFrom: string;
 }
 
 export const loadServerEnv = (): ServerEnv => {
@@ -23,5 +25,7 @@ export const loadServerEnv = (): ServerEnv => {
     clientUrl: process.env.CLIENT_URL ?? 'http://localhost:5173',
     adminJwtSecret: process.env.ADMIN_JWT_SECRET ?? '',
     imgbbApiKey: process.env.IMGBB_API_KEY ?? '',
+    sendgridApiKey: process.env.SENDGRID_API_KEY ?? '',
+    emailFrom: process.env.EMAIL_FROM ?? '',
   };
 }

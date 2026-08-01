@@ -15,6 +15,8 @@ export interface IEmployee {
   startDate?: Date;
   managerId?: mongoose.Types.ObjectId | null;
   status: EmployeeStatus;
+  createdBy?: mongoose.Types.ObjectId;
+  updatedBy?: mongoose.Types.ObjectId;
 }
 
 export interface IEmployeeDocument extends IEmployee, Document {
@@ -42,6 +44,8 @@ const employeeSchema = new Schema<IEmployeeDocument>(
       enum: ['active', 'on_leave', 'terminated'],
       default: 'active',
     },
+    createdBy: { type: Schema.Types.ObjectId, ref: 'User' },
+    updatedBy: { type: Schema.Types.ObjectId, ref: 'User' },
   },
   { timestamps: true }
 );

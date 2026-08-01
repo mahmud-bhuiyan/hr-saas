@@ -9,8 +9,10 @@ export const PERMISSIONS: Record<UserRole, string[]> = {
     'employee:update',
     'document:manage',
     'leave:approve',
+    'leave:create:own',
+    'leave:read:own',
   ],
-  manager: ['leave:approve:team', 'employee:read:team'],
+  manager: ['leave:approve:team', 'leave:create:own', 'leave:read:own', 'employee:read:team'],
   employee: ['leave:create:own', 'leave:read:own', 'profile:update:own'],
 };
 

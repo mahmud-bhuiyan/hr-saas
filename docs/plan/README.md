@@ -25,7 +25,8 @@ Planning documents for the HR SaaS platform. Use these to align with the client,
 | 2 | Auth & tenant (+ super admin, approval, add company) | ✅ Complete |
 | 3 | App shell (+ UI kit, profile, companies page) | ✅ Complete |
 | 4 | Employee management | ✅ Ready for review |
-| 5–6 | Leave, documents | ⬜ Pending |
+| 5 | Leave & absence | ✅ Complete |
+| 6 | Documents | ⬜ Pending |
 | 7 | Settings (branding complete; profile/depts/users pending) | 🟡 Partial |
 | 8 | Demo polish | ⬜ Pending |
 
@@ -60,7 +61,7 @@ Detailed plans live in `modules/`. Each file follows [modules/_template.md](./mo
 |--------|-----------|--------|--------|
 | Auth & Tenant | [modules/01-auth-tenant.md](./modules/01-auth-tenant.md) | ✅ | Done |
 | Employee Management | [modules/02-employees.md](./modules/02-employees.md) | ✅ | Ready for review |
-| Leave & Absence | [modules/03-leave.md](./modules/03-leave.md) | ✅ | Not started |
+| Leave & Absence | [modules/03-leave.md](./modules/03-leave.md) | ✅ | Complete |
 | Document Storage | [modules/04-documents.md](./modules/04-documents.md) | ✅ | Not started |
 | Admin & Settings | [modules/05-admin-settings.md](./modules/05-admin-settings.md) | ✅ (partial) | In progress |
 | Platform Site Settings | [modules/15-platform-site-settings.md](./modules/15-platform-site-settings.md) | ✅ (Step 7) | Complete |

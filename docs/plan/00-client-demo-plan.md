@@ -149,10 +149,10 @@ Be explicit with the client so expectations stay aligned.
 - [x] Direct reports on profile (simple org view)
 
 ### Leave
-- [ ] Request leave (employee)
-- [ ] My leave history & balance
-- [ ] Approval queue (manager / HR)
-- [ ] Team calendar
+- [x] Request leave (employee)
+- [x] My leave history & balance
+- [x] Approval queue (manager / HR)
+- [x] Team calendar
 
 ### Documents
 - [ ] Document list (by employee or company)
@@ -262,9 +262,9 @@ Full roadmap: [hr-saas-mern-project-plan.md](./hr-saas-mern-project-plan.md)
 | Auth & tenant (Step 2) | ✅ Complete | Includes approval workflow + super admin add company |
 | App shell (Step 3) | ✅ Complete | UI kit, profile, companies page |
 | Employees (Step 4) | ✅ Ready for review | User link deferred |
-| Leave (Step 5) | ⬜ Pending | |
+| Leave (Step 5) | ✅ Complete | Email via SendGrid; user→employee via email fallback |
 | Documents (Step 6) | ⬜ Pending | |
 | Settings (Step 7) | 🟡 Partial | Platform site settings + tenant branding done; company profile, departments, users pending |
 | Demo polish (Step 8) | ⬜ Pending | |
 
-**Next step:** Step 5 — Leave & absence. See [IMPLEMENTATION-STEPS.md](./IMPLEMENTATION-STEPS.md).
+**Next step:** Step 6 — Document storage. See [IMPLEMENTATION-STEPS.md](./IMPLEMENTATION-STEPS.md).

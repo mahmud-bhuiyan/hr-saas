@@ -48,7 +48,7 @@ npm run dev
 
 | App | File | Key variables |
 |-----|------|---------------|
-| **Server** | `server/.env.local` | `MONGODB_URI`, `CLIENT_URL`, `ADMIN_JWT_SECRET`, `IMGBB_API_KEY` (logo/favicon upload; optional: `PORT`, defaults to 5000) |
+| **Server** | `server/.env.local` | `MONGODB_URI`, `CLIENT_URL`, `ADMIN_JWT_SECRET`, `IMGBB_API_KEY` (logo/favicon upload), `SENDGRID_API_KEY`, `EMAIL_FROM` (leave notifications; optional: `PORT`, defaults to 5000) |
 | **Client** | `client/.env` | `VITE_API_URL` (backend URL) |
 
 ## Separate deployment

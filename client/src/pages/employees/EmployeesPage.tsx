@@ -5,20 +5,27 @@ import { HiPlus } from 'react-icons/hi2';
 import { Button } from '../../components/ui/Button';
 import { PageContainer } from '../../components/ui/PageContainer';
 import { PageHeader } from '../../components/ui/PageHeader';
+import { Tabs } from '../../components/ui/Tabs';
+import type { TableSortState } from '../../components/ui/Table';
 import { useAuth } from '../../contexts/AuthContext';
 import {
   ApiError,
   createEmployee,
   fetchEmployeeDepartments,
   fetchEmployees,
+  updateEmployee,
 } from '../../lib/api';
 import { toast } from 'react-toastify';
-import type { CreateEmployeeInput, EmployeeStatus } from '../../types';
+import type { CreateEmployeeInput, Employee, EmployeeSortField } from '../../types';
 import { areRequiredFieldsFilled } from '../../utils/form';
 import { hasPermission } from '../../utils/permissions';
+import { usePagination } from '../../hooks/usePagination';
 import { CreateEmployeeModal } from './components/CreateEmployeeModal';
+import { EmployeeEditModal } from './components/EmployeeEditModal';
 import { EmployeeFilters } from './components/EmployeeFilters';
 import { EmployeesTable } from './components/EmployeesTable';
+import { EmployeeViewModal } from './components/EmployeeViewModal';
+import { employeeName, isActiveEmployee, type EmployeesTab } from './utils';
 
 const emptyCreateForm: CreateEmployeeInput = {
   firstName: '',
@@ -36,21 +43,31 @@ export const EmployeesPage = () => {
 
   const [search, setSearch] = useState('');
   const [department, setDepartment] = useState('');
-  const [status, setStatus] = useState<EmployeeStatus | ''>('');
+  const [activeTab, setActiveTab] = useState<EmployeesTab>('active');
   const [createOpen, setCreateOpen] = useState(false);
   const [createForm, setCreateForm] = useState<CreateEmployeeInput>(emptyCreateForm);
+  const [deactivateLoadingId, setDeactivateLoadingId] = useState<string | null>(null);
+  const [activateLoadingId, setActivateLoadingId] = useState<string | null>(null);
+  const [viewEmployeeId, setViewEmployeeId] = useState<string | null>(null);
+  const [editEmployeeId, setEditEmployeeId] = useState<string | null>(null);
+  const [sort, setSort] = useState<TableSortState>({ key: 'name', direction: 'asc' });
 
   const canRead =
     user && (hasPermission(user.role, 'employee:read') || hasPermission(user.role, 'employee:read:team'));
   const canCreate = user && hasPermission(user.role, 'employee:create');
+  const canUpdate = user && hasPermission(user.role, 'employee:update');
+
+  const sortBy = sort.key as EmployeeSortField;
+  const sortOrder = sort.direction;
 
   const employeesQuery = useQuery({
-    queryKey: ['employees', { search, department, status }],
+    queryKey: ['employees', { search, department, sortBy, sortOrder }],
     queryFn: () =>
       fetchEmployees({
         search: search || undefined,
         department: department || undefined,
-        status: status || undefined,
+        sortBy,
+        sortOrder,
       }),
     enabled: Boolean(canRead),
   });
@@ -80,6 +97,40 @@ export const EmployeesPage = () => {
     },
   });
 
+  const deactivateMutation = useMutation({
+    mutationFn: (employeeId: string) => updateEmployee(employeeId, { status: 'terminated' }),
+    onMutate: (employeeId) => {
+      setDeactivateLoadingId(employeeId);
+    },
+    onSuccess: () => {
+      toast.success('Employee deactivated.');
+      void queryClient.invalidateQueries({ queryKey: ['employees'] });
+    },
+    onError: (err) => {
+      toast.error(err instanceof ApiError ? err.message : 'Failed to deactivate employee');
+    },
+    onSettled: () => {
+      setDeactivateLoadingId(null);
+    },
+  });
+
+  const activateMutation = useMutation({
+    mutationFn: (employeeId: string) => updateEmployee(employeeId, { status: 'active' }),
+    onMutate: (employeeId) => {
+      setActivateLoadingId(employeeId);
+    },
+    onSuccess: () => {
+      toast.success('Employee activated.');
+      void queryClient.invalidateQueries({ queryKey: ['employees'] });
+    },
+    onError: (err) => {
+      toast.error(err instanceof ApiError ? err.message : 'Failed to activate employee');
+    },
+    onSettled: () => {
+      setActivateLoadingId(null);
+    },
+  });
+
   const createRequiredKeys = ['firstName', 'lastName'] as const;
   const canSubmitCreate = areRequiredFieldsFilled(
     createForm as unknown as Record<string, unknown>,
@@ -90,6 +141,31 @@ export const EmployeesPage = () => {
     () => (managersQuery.data ?? []).filter((e) => e.status === 'active'),
     [managersQuery.data]
   );
+
+  const allEmployees = employeesQuery.data ?? [];
+  const activeEmployees = useMemo(
+    () => allEmployees.filter(isActiveEmployee),
+    [allEmployees]
+  );
+  const inactiveEmployees = useMemo(
+    () => allEmployees.filter((employee) => !isActiveEmployee(employee)),
+    [allEmployees]
+  );
+  const tabEmployees = activeTab === 'active' ? activeEmployees : inactiveEmployees;
+  const {
+    paginatedItems,
+    page,
+    pageSize,
+    setPage,
+    setPageSize,
+    total,
+    totalPages,
+    rangeStart,
+    rangeEnd,
+    pageSizeOptions,
+  } = usePagination(tabEmployees, {
+    resetKey: `${activeTab}-${search}-${department}-${sortBy}-${sortOrder}`,
+  });
 
   if (!canRead) {
     return <Navigate to="/dashboard" replace />;
@@ -124,12 +200,31 @@ export const EmployeesPage = () => {
     });
   }
 
+  const handleDeactivate = (employee: Employee) => {
+    const name = employeeName(employee);
+    if (!window.confirm(`Deactivate ${name}? Their status will be set to terminated.`)) {
+      return;
+    }
+
+    deactivateMutation.mutate(employee.id);
+  }
+
+  const handleActivate = (employee: Employee) => {
+    const name = employeeName(employee);
+    if (!window.confirm(`Activate ${name}? Their status will be set to active.`)) {
+      return;
+    }
+
+    activateMutation.mutate(employee.id);
+  }
+
   return (
     <PageContainer>
       <PageHeader
         label="People"
         title="Employees"
         description="Browse, search, and manage employee records for your company."
+        actionAlign="end"
         action={
           canCreate ? (
             <Button
@@ -147,15 +242,63 @@ export const EmployeesPage = () => {
         onSearchChange={setSearch}
         department={department}
         onDepartmentChange={setDepartment}
-        status={status}
-        onStatusChange={setStatus}
         departments={departmentsQuery.data ?? []}
+        pageSize={pageSize}
+        onPageSizeChange={setPageSize}
+        pageSizeOptions={pageSizeOptions}
       />
 
-      <EmployeesTable
-        employees={employeesQuery.data ?? []}
-        loading={employeesQuery.isLoading}
-      />
+      <section className="space-y-4">
+        <Tabs
+          activeId={activeTab}
+          onChange={(id) => setActiveTab(id as EmployeesTab)}
+          tabs={[
+            { id: 'active', label: 'Active employees', count: activeEmployees.length },
+            { id: 'inactive', label: 'Inactive employees', count: inactiveEmployees.length },
+          ]}
+        />
+
+        <EmployeesTable
+          employees={paginatedItems}
+          loading={employeesQuery.isLoading}
+          sort={sort}
+          onSortChange={setSort}
+          emptyMessage={
+            activeTab === 'active'
+              ? 'No active employees match your filters.'
+              : 'No inactive employees match your filters.'
+          }
+          pagination={{
+            page,
+            pageSize,
+            total,
+            totalPages,
+            rangeStart,
+            rangeEnd,
+            onPageChange: setPage,
+            onPageSizeChange: setPageSize,
+            pageSizeOptions,
+          }}
+          canUpdate={Boolean(canUpdate)}
+          showStatus={activeTab === 'inactive'}
+          onView={(employee) => {
+            setEditEmployeeId(null);
+            setViewEmployeeId(employee.id);
+          }}
+          onEdit={
+            canUpdate
+              ? (employee) => {
+                  setViewEmployeeId(null);
+                  setEditEmployeeId(employee.id);
+                }
+              : undefined
+          }
+          onDeactivate={activeTab === 'active' && canUpdate ? handleDeactivate : undefined}
+          onActivate={activeTab === 'inactive' && canUpdate ? handleActivate : undefined}
+          deactivateLoadingId={deactivateLoadingId}
+          activateLoadingId={activateLoadingId}
+        />
+      </section>
 
       <CreateEmployeeModal
         open={createOpen}
@@ -166,6 +309,17 @@ export const EmployeesPage = () => {
         managerOptions={managerOptions}
         loading={createMutation.isPending}
         submitDisabled={!canSubmitCreate}
+      />
+
+      <EmployeeViewModal
+        employeeId={viewEmployeeId}
+        onClose={() => setViewEmployeeId(null)}
+        onViewEmployee={(id) => setViewEmployeeId(id)}
+      />
+
+      <EmployeeEditModal
+        employeeId={editEmployeeId}
+        onClose={() => setEditEmployeeId(null)}
       />
     </PageContainer>
   );
