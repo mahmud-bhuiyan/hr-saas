@@ -1,10 +1,11 @@
 import { pathToFileURL } from 'node:url';
+import express from 'express';
 import { connectToDatabase } from './config/db.js';
 import { loadServerEnv } from './config/env.js';
 import { createApp } from './create-app.js';
 
 const env = loadServerEnv();
-const app = createApp();
+const app: express.Application = createApp();
 
 export default app;
 
