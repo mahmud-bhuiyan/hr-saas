@@ -1,4 +1,4 @@
-import jwt from 'jsonwebtoken';
+import jwt, { type Secret, type SignOptions } from 'jsonwebtoken';
 import type { UserRole } from '../types/index.js';
 
 export interface JwtPayload {
@@ -10,8 +10,8 @@ export interface JwtPayload {
 
 export function signAccessToken(
   payload: JwtPayload,
-  secret: string,
-  expiresIn = '15m'
+  secret: Secret,
+  expiresIn: SignOptions['expiresIn'] = '15m'
 ): string {
   return jwt.sign(payload, secret, { expiresIn });
 }
