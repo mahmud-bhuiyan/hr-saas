@@ -19,7 +19,7 @@ interface DropdownProps {
   menuClassName?: string;
 }
 
-export function Dropdown({ trigger, items, align = 'right', menuClassName = 'w-44' }: DropdownProps) {
+export const Dropdown = ({ trigger, items, align = 'right', menuClassName = 'w-44' }: DropdownProps) => {
   const [open, setOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -28,13 +28,13 @@ export function Dropdown({ trigger, items, align = 'right', menuClassName = 'w-4
       return;
     }
 
-    function handleClickOutside(event: MouseEvent) {
+    const handleClickOutside = (event: MouseEvent) => {
       if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
         setOpen(false);
       }
     }
 
-    function handleEscape(event: KeyboardEvent) {
+    const handleEscape = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
         setOpen(false);
       }
@@ -48,11 +48,11 @@ export function Dropdown({ trigger, items, align = 'right', menuClassName = 'w-4
     };
   }, [open]);
 
-  function closeMenu() {
+  const closeMenu = () => {
     setOpen(false);
   }
 
-  function renderItemContent(item: DropdownItem) {
+  const renderItemContent = (item: DropdownItem) => {
     return (
       <>
         {item.icon && (

@@ -4,7 +4,9 @@
 
 **Target companies:** SMEs with 5–100 employees (expand to 1,000 later).
 
-**Stack:** React + Node.js + MongoDB (MERN monorepo).
+**Stack:** React + Node.js + MongoDB — separate `client/` and `server/` apps (not a shared monorepo package).
+
+**Implementation tracker:** [IMPLEMENTATION-STEPS.md](./IMPLEMENTATION-STEPS.md) · Module details in [modules/](./modules/)
 
 ---
 
@@ -16,8 +18,9 @@ A live web app where a company admin can sign up, add staff, manage leave, and s
 
 | Step | Who | What happens |
 |------|-----|--------------|
-| 1 | Company admin | Registers company → lands on dashboard |
-| 2 | Company admin | Adds departments, invites or creates employee records |
+| 0 | Super admin | Creates company directly **or** approves self-registration request |
+| 1 | Company admin | Registers company (if self-serve) → approved → lands on dashboard |
+| 2 | Company admin | Adds employee records (departments as free text until Settings module) |
 | 3 | Company admin / HR | Opens employee directory → views profile → edits details |
 | 4 | Employee | Logs in → views own profile → submits leave request |
 | 5 | Manager | Sees approval queue → approves or declines leave |
@@ -33,9 +36,12 @@ This flow covers **signup → people → leave workflow → documents → settin
 
 ### 2.1 Authentication & Company Setup
 
-- Company registration (creates tenant + first admin user)
+- Company self-registration (creates tenant + first admin user, **pending super admin approval**)
+- Super admin: approve / reject registration requests
+- Super admin: add company directly (creates approved tenant + admin — no wait)
 - Login / logout
-- Forgot password (email-based reset)
+- User profile and change password
+- Forgot password (email-based reset) — **not started**
 - Secure sessions (short-lived access token + refresh cookie)
 - Each company’s data fully isolated from other companies
 
@@ -43,18 +49,19 @@ This flow covers **signup → people → leave workflow → documents → settin
 
 | Role | Can do in Demo 1 |
 |------|------------------|
-| **Company admin** | Everything in Demo 1 |
+| **Super admin** | Platform operator: approve/reject registrations, add companies, bootstrap admins |
+| **Company admin** | Everything in Demo 1 for their tenant |
 | **HR manager** | Manage employees, documents, approve leave |
 | **Manager** | View team, approve team leave |
 | **Employee** | View own profile, request leave, view own documents |
 
 ### 2.3 Employee Management
 
-- Employee directory (list, search, filter by department/status)
-- Add / edit / deactivate employee
-- Employee profile: personal details, job title, department, start date, manager, employment status
-- Simple org view (manager → direct reports list; full interactive org chart deferred)
-- Link employee record to login user (invite flow or admin-created account)
+- Employee directory (list, search, filter by department/status) — **done**
+- Add / edit / deactivate employee — **done**
+- Employee profile: personal details, job title, department, start date, manager, employment status — **done**
+- Simple org view (manager → direct reports list) — **done**
+- Link employee record to login user (invite flow or admin-created account) — **deferred**
 
 ### 2.4 Leave & Absence
 
@@ -82,9 +89,9 @@ This flow covers **signup → people → leave workflow → documents → settin
 
 ### 2.7 Platform Quality (required for demo credibility)
 
-- Responsive layout (desktop + tablet; mobile-friendly, not native app)
-- Consistent UI (design system — e.g. Tailwind + component library)
-- Loading states, error messages, empty states
+- Responsive layout (desktop + tablet; mobile-friendly, not native app) — **in progress**
+- Consistent UI (design system — Tailwind + reusable components in `client/src/components/ui/`) — **done**
+- Loading states, error messages, empty states — **done** on built screens
 - Audit log for sensitive changes (employee edits, document uploads) — backend only for Demo 1; UI in Stage 2
 
 ---
@@ -119,18 +126,24 @@ Be explicit with the client so expectations stay aligned.
 ## 4. Screens Checklist (Demo 1)
 
 ### Public
-- [ ] Login
-- [ ] Register company
+- [x] Login
+- [x] Register company
 - [ ] Forgot password / reset password
 
+### Super admin
+- [x] Companies — pending queue, approve/reject, add company directly
+
 ### Dashboard
-- [ ] Home dashboard (summary cards + quick links)
+- [x] Home dashboard (summary cards + quick links — **placeholders**; real counts in Step 7)
+
+### Account
+- [x] My profile (view / edit, change password)
 
 ### Employees
-- [ ] Employee directory
-- [ ] Add employee
-- [ ] Employee profile (view / edit tabs: details, leave, documents)
-- [ ] Team / org list view
+- [x] Employee directory
+- [x] Add employee (modal)
+- [x] Employee profile (view / edit; leave & document tabs — Step 5–6)
+- [x] Direct reports on profile (simple org view)
 
 ### Leave
 - [ ] Request leave (employee)
@@ -234,7 +247,21 @@ Full roadmap: [hr-saas-mern-project-plan.md](./hr-saas-mern-project-plan.md)
 | Scope creep during demo prep | This document is the contract; changes go to a change log |
 | Tenant data leak | Mandatory tenant middleware + code review on every query |
 | Demo feels “empty” | Seed realistic Acme Ltd data; polish dashboard counts |
+| Onboarding confusion | Two paths documented: self-register (pending) vs super admin add company (immediate) |
 
 ---
 
-**Next step:** Create detailed module plans in [modules/](./modules/) for each Demo 1 module before development starts.
+## 11. Implementation status (last updated: 2026-08-02)
+
+| Area | Status | Notes |
+|------|--------|-------|
+| Foundation (Step 1) | ✅ Complete | |
+| Auth & tenant (Step 2) | ✅ Complete | Includes approval workflow + super admin add company |
+| App shell (Step 3) | ✅ Complete | UI kit, profile, companies page |
+| Employees (Step 4) | ✅ Ready for review | User link deferred |
+| Leave (Step 5) | ⬜ Pending | |
+| Documents (Step 6) | ⬜ Pending | |
+| Settings (Step 7) | ⬜ Pending | |
+| Demo polish (Step 8) | ⬜ Pending | |
+
+**Next step:** Step 5 — Leave & absence. See [IMPLEMENTATION-STEPS.md](./IMPLEMENTATION-STEPS.md).

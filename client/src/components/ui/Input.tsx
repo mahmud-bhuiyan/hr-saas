@@ -5,7 +5,7 @@ interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   icon?: ReactNode;
 }
 
-export function Input({ error, className = '', id, icon, ...props }: InputProps) {
+export const Input = ({ error, className = '', id, icon, ...props }: InputProps) => {
   return (
     <div>
       <div className="relative">

@@ -7,14 +7,14 @@ interface PasswordInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>,
   icon?: ReactNode;
 }
 
-export function PasswordInput({
+export const PasswordInput = ({
   error,
   className = '',
   id,
   disabled,
   icon,
   ...props
-}: PasswordInputProps) {
+}: PasswordInputProps) => {
   const [visible, setVisible] = useState(false);
 
   return (

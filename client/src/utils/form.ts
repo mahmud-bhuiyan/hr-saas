@@ -2,11 +2,11 @@
  * Compare form values to original values and return only changed fields.
  * Empty strings and undefined are normalized for string comparison.
  */
-export function pickChangedFields<T extends Record<string, unknown>>(
+export const pickChangedFields = <T extends Record<string, unknown>,>(
   current: T,
   original: T,
   keys: Array<keyof T>
-): Partial<T> {
+): Partial<T> => {
   const changed: Partial<T> = {};
 
   for (const key of keys) {
@@ -21,18 +21,18 @@ export function pickChangedFields<T extends Record<string, unknown>>(
   return changed;
 }
 
-export function hasFormChanges<T extends Record<string, unknown>>(
+export const hasFormChanges = <T extends Record<string, unknown>,>(
   current: T,
   original: T,
   keys: Array<keyof T>
-): boolean {
+): boolean => {
   return Object.keys(pickChangedFields(current, original, keys)).length > 0;
 }
 
-export function areRequiredFieldsFilled<T extends Record<string, unknown>>(
+export const areRequiredFieldsFilled = <T extends Record<string, unknown>,>(
   values: T,
   requiredKeys: Array<keyof T>
-): boolean {
+): boolean => {
   return requiredKeys.every((key) => {
     const value = values[key];
     if (typeof value === 'string') {
@@ -42,7 +42,7 @@ export function areRequiredFieldsFilled<T extends Record<string, unknown>>(
   });
 }
 
-function normalizeFieldValue(value: unknown): string {
+const normalizeFieldValue = (value: unknown): string => {
   if (value === undefined || value === null) {
     return '';
   }

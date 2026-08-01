@@ -7,9 +7,39 @@ alwaysApply: true
 
 Read `AGENTS.md` for full instructions.
 
+## Arrow functions
+
+Use arrow functions for components and helpers — `export const MyPage = () => { … }`, not `export function MyPage()`. See `AGENTS.md` → Code style.
+
 ## Reuse before creating
 
-Check `client/src/components/ui/` first. Reuse `Button`, `Input`, `PasswordInput`, `FormField`, `FormActions`, `Modal`, `FormModal`, `Table`, `Dropdown`, and `Spinner`. Create a new file in that folder only when no existing component fits.
+Check `client/src/components/ui/` first. Reuse `Button`, `Input`, `PasswordInput`, `FormField`, `FormActions`, `Modal`, `FormModal`, `Table`, `Tabs`, `PageContainer`, `PageHeader`, `Dropdown`, and `Spinner`. Create a new file in that folder only when no existing component fits.
+
+## Page file organization
+
+Keep page entry files thin. Structure:
+
+- `client/src/pages/<feature>/<Feature>Page.tsx` — route entry: guards, queries/mutations, state, composition
+- `client/src/pages/<feature>/components/` — tables, filters, forms, modals, sections for that page
+- `client/src/pages/<feature>/utils.ts` — optional page-local pure helpers
+
+Extract UI into `components/` as the page grows. Reuse across features → `client/src/components/`. See `employees/EmployeesPage` and `registrations/RegistrationsPage` for reference.
+
+## Page layout
+
+New dashboard pages must match existing screens (`employees/EmployeesPage`, `registrations/RegistrationsPage`):
+
+- `PageContainer` → `PageHeader` (label, title, description, action button) → content
+- Data lists: `Table` with `loading` / `emptyMessage` (center-aligned by default; use `align` prop to override)
+- Create/edit: `FormModal` + `FormField`
+- Related list views: `Tabs` with a separate `Table` per tab
+
+## Table alignment
+
+- Default: **center** for headers and cells
+- Table-level: `<Table align="left" … />` sets default for all columns
+- Column-level: `{ align: 'right' }` on a column overrides the table default
+- Flex content in cells: use matching `justify-center` / `justify-start` / `justify-end` on inner flex wrappers
 
 ## Loading states
 
@@ -39,4 +69,16 @@ Use `PasswordInput` (show/hide toggle). Do not use raw `Input type="password"`.
 
 ## Icons
 
-Use `react-icons` with colorful Tailwind classes on buttons, dropdown items, and actions.
+Use `react-icons/hi2` with colorful Tailwind classes on buttons, dropdown items, and actions.
+
+## Form field icons (required)
+
+Pass `icon` to every `Input` and `PasswordInput` in forms (`h-5 w-5 text-brand-600`):
+
+- Company → `HiBuildingOffice2`
+- Name → `HiUser`
+- Email → `HiEnvelope`
+- Password → `HiLockClosed`
+- Search → `HiMagnifyingGlass`
+
+See `login/LoginPage` and `register/RegisterPage` for reference.

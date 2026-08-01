@@ -14,10 +14,18 @@ Read `AGENTS.md` for full instructions.
 - **No root node_modules**
 
 ## Client UI
-- Reuse components in `client/src/components/ui/` (Button, FormModal, Table, Dropdown, PasswordInput, etc.)
+- Reuse components in `client/src/components/ui/` (Button, FormModal, Table, Tabs, PageHeader, PasswordInput, etc.)
+- **Page components:** `client/src/pages/<feature>/components/` — extract tables, forms, modals from page entry files
+- New pages: folder per feature (`pages/<feature>/<Feature>Page.tsx` + `components/`); keep entry file thin
+- New pages layout: `PageContainer` + `PageHeader` + `Table` / `Tabs` + `FormModal` (match `employees/EmployeesPage`, `registrations/RegistrationsPage`)
+- Tables: center-aligned by default; use `Table` `align` prop or per-column `align` — never hardcode `text-left`/`text-right` on columns for alignment
+- Form inputs: pass `icon` on every `Input` / `PasswordInput` (see `login/LoginPage`, `register/RegisterPage`)
 - Create forms: save disabled until required fields filled; edit forms: save disabled until data changes
 - PATCH only changed fields; server applies partial updates
 - Password fields use `PasswordInput`; buttons show spinner while loading; use colorful `react-icons`
+
+## Code style
+- Use **arrow functions** everywhere in `client/src/` and `server/src/` — no `function` declarations (see `AGENTS.md` → Code style)
 
 ## Node.js
 - Minimum **Node 22+**

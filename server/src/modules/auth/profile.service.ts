@@ -26,7 +26,7 @@ export interface UpdateProfileResult {
   accessToken?: string;
 }
 
-async function toUserProfile(user: IUserDocument): Promise<UserProfile> {
+const toUserProfile = async (user: IUserDocument): Promise<UserProfile> => {
   let companyName: string | undefined;
 
   if (user.tenantId) {
@@ -48,7 +48,7 @@ async function toUserProfile(user: IUserDocument): Promise<UserProfile> {
   };
 }
 
-export async function getProfile(userId: string): Promise<UserProfile | null> {
+export const getProfile = async (userId: string): Promise<UserProfile | null> => {
   const user = await User.findById(userId);
   if (!user || !user.isActive) {
     return null;
@@ -56,11 +56,11 @@ export async function getProfile(userId: string): Promise<UserProfile | null> {
   return toUserProfile(user);
 }
 
-export async function updateProfile(
+export const updateProfile = async (
   userId: string,
   input: UpdateProfileInput,
   env: ServerEnv
-): Promise<UpdateProfileResult> {
+): Promise<UpdateProfileResult> => {
   const user = await User.findById(userId).select('+passwordHash');
   if (!user || !user.isActive) {
     throw new AuthServiceError('User not found or inactive', 404);

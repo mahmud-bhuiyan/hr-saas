@@ -39,7 +39,7 @@ export interface RegisterPendingResult {
   message: string;
 }
 
-function toAuthUser(user: IUserDocument): AuthUser {
+const toAuthUser = (user: IUserDocument): AuthUser => {
   return {
     id: user._id.toString(),
     email: user.email,
@@ -50,7 +50,7 @@ function toAuthUser(user: IUserDocument): AuthUser {
   };
 }
 
-function buildJwtPayload(user: IUserDocument): JwtPayload {
+const buildJwtPayload = (user: IUserDocument): JwtPayload => {
   return {
     sub: user._id.toString(),
     email: user.email,
@@ -59,7 +59,7 @@ function buildJwtPayload(user: IUserDocument): JwtPayload {
   };
 }
 
-function issueTokens(user: IUserDocument, env: ServerEnv): AuthTokens {
+const issueTokens = (user: IUserDocument, env: ServerEnv): AuthTokens => {
   const payload = buildJwtPayload(user);
   return {
     accessToken: signAccessToken(payload, env.adminJwtSecret),
@@ -67,7 +67,7 @@ function issueTokens(user: IUserDocument, env: ServerEnv): AuthTokens {
   };
 }
 
-async function assertUserCanAuthenticate(user: IUserDocument): Promise<void> {
+const assertUserCanAuthenticate = async (user: IUserDocument): Promise<void> => {
   if (user.role === 'super_admin') {
     if (!user.isActive) {
       throw new AuthServiceError('Account is inactive', 403);
@@ -106,7 +106,7 @@ async function assertUserCanAuthenticate(user: IUserDocument): Promise<void> {
   }
 }
 
-export async function registerCompany(input: RegisterInput): Promise<RegisterPendingResult> {
+export const registerCompany = async (input: RegisterInput): Promise<RegisterPendingResult> => {
   const existing = await findUserByEmail(input.email);
   if (existing) {
     throw new AuthServiceError('Email already in use', 409);
@@ -145,6 +145,10 @@ export async function registerCompany(input: RegisterInput): Promise<RegisterPen
       { session }
     );
 
+    tenant.createdBy = user._id;
+    tenant.updatedBy = user._id;
+    await tenant.save({ session });
+
     await session.commitTransaction();
 
     return {
@@ -163,7 +167,7 @@ export async function registerCompany(input: RegisterInput): Promise<RegisterPen
   }
 }
 
-export async function loginUser(input: LoginInput, env: ServerEnv): Promise<AuthResult> {
+export const loginUser = async (input: LoginInput, env: ServerEnv): Promise<AuthResult> => {
   const user = await User.findOne({ email: input.email }).select('+passwordHash');
 
   if (!user) {
@@ -183,7 +187,7 @@ export async function loginUser(input: LoginInput, env: ServerEnv): Promise<Auth
   };
 }
 
-export async function getUserById(userId: string): Promise<AuthUser | null> {
+export const getUserById = async (userId: string): Promise<AuthUser | null> => {
   const user = await User.findById(userId);
   if (!user) {
     return null;

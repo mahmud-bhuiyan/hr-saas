@@ -6,7 +6,7 @@ interface FormFieldProps extends LabelHTMLAttributes<HTMLLabelElement> {
   error?: string;
 }
 
-export function FormField({ label, children, error, htmlFor, className = '' }: FormFieldProps) {
+export const FormField = ({ label, children, error, htmlFor, className = '' }: FormFieldProps) => {
   return (
     <div className={className}>
       <label htmlFor={htmlFor} className="mb-1.5 block text-sm font-medium text-slate-700">

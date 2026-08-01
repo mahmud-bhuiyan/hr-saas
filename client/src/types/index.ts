@@ -68,6 +68,21 @@ export interface RegisterInput {
   lastName?: string;
 }
 
+export interface CreateCompanyInput {
+  companyName: string;
+  email: string;
+  password: string;
+  firstName?: string;
+  lastName?: string;
+}
+
+export interface UpdateCompanyInput {
+  companyName?: string;
+  adminEmail?: string;
+  adminFirstName?: string;
+  adminLastName?: string;
+}
+
 export interface RegisterPendingResponse {
   tenantId: string;
   companyName: string;
@@ -85,6 +100,67 @@ export interface RegistrationRequest {
   adminFirstName?: string;
   adminLastName?: string;
   status: TenantApprovalStatus;
+  isActive: boolean;
   submittedAt: string;
   rejectedReason?: string;
+  createdByName?: string;
+  updatedByName?: string;
+  updatedAt?: string;
+}
+
+export type EmployeeStatus = 'active' | 'on_leave' | 'terminated';
+
+export interface EmployeeManagerSummary {
+  id: string;
+  firstName: string;
+  lastName: string;
+}
+
+export interface Employee {
+  id: string;
+  employeeNumber: string;
+  firstName: string;
+  lastName: string;
+  email?: string;
+  phone?: string;
+  jobTitle?: string;
+  department?: string;
+  startDate?: string;
+  managerId?: string;
+  manager?: EmployeeManagerSummary;
+  status: EmployeeStatus;
+  userId?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateEmployeeInput {
+  firstName: string;
+  lastName: string;
+  email?: string;
+  phone?: string;
+  jobTitle?: string;
+  department?: string;
+  startDate?: string;
+  managerId?: string;
+  employeeNumber?: string;
+  status?: EmployeeStatus;
+}
+
+export interface UpdateEmployeeInput {
+  firstName?: string;
+  lastName?: string;
+  email?: string;
+  phone?: string;
+  jobTitle?: string;
+  department?: string;
+  startDate?: string;
+  managerId?: string | null;
+  status?: EmployeeStatus;
+}
+
+export interface ListEmployeesQuery {
+  search?: string;
+  department?: string;
+  status?: EmployeeStatus;
 }

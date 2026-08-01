@@ -2,27 +2,10 @@ import { useNavigate } from 'react-router-dom';
 import { HiArrowRightOnRectangle, HiUserCircle } from 'react-icons/hi2';
 import { useAuth } from '../contexts/AuthContext';
 import { logout } from '../lib/api';
-import type { AuthUser } from '../types';
+import { avatarLetter, displayName } from '../utils/user';
 import { Dropdown } from './ui/Dropdown';
 
-function displayName(user: AuthUser): string {
-  if (user.firstName || user.lastName) {
-    return [user.firstName, user.lastName].filter(Boolean).join(' ');
-  }
-  return user.email.split('@')[0] ?? 'User';
-}
-
-function avatarLetter(user: AuthUser): string {
-  if (user.firstName && user.lastName) {
-    return `${user.firstName[0]}${user.lastName[0]}`.toUpperCase();
-  }
-  if (user.firstName) {
-    return user.firstName[0]!.toUpperCase();
-  }
-  return (user.email[0] ?? 'U').toUpperCase();
-}
-
-export function UserMenu() {
+export const UserMenu = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
 
@@ -30,7 +13,7 @@ export function UserMenu() {
     return null;
   }
 
-  async function handleLogout() {
+  const handleLogout = async () => {
     await logout();
     navigate('/login', { replace: true });
   }

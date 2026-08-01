@@ -25,6 +25,8 @@ tags:
     description: Company registration, login, session refresh
   - name: Admin
     description: Platform admin user management and company registration approval
+  - name: Employees
+    description: Tenant-scoped employee directory and profiles
 
 paths:
   /:
@@ -348,6 +350,55 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         '403':
           $ref: '#/components/responses/Forbidden'
+    post:
+      tags: [Admin]
+      summary: Create company (super admin)
+      description: |
+        Creates an approved company and company admin account in one step.
+        The admin can sign in immediately — no approval step required.
+
+        Requires `super_admin` role.
+      operationId: createCompany
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCompanyRequest'
+            example:
+              companyName: Acme Ltd
+              email: admin@acme.com
+              password: TestPass123
+              firstName: Jane
+              lastName: Admin
+      responses:
+        '201':
+          description: Company created and approved
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, data]
+                properties:
+                  status:
+                    type: string
+                    enum: [ok]
+                  data:
+                    $ref: '#/components/schemas/RegistrationRequest'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          description: Email already in use
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
 
   /api/v1/admin/registrations/{tenantId}/approve:
     post:
@@ -442,6 +493,419 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
         '409':
           description: Registration already processed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/admin/registrations/{tenantId}:
+    patch:
+      tags: [Admin]
+      summary: Update approved company
+      description: Updates company name and/or company admin profile fields. Requires `super_admin`.
+      operationId: updateCompany
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: tenantId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateCompanyRequest'
+            example:
+              companyName: Acme Ltd
+              adminEmail: admin@acme.com
+              adminFirstName: Jane
+              adminLastName: Admin
+      responses:
+        '200':
+          description: Company updated
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, data]
+                properties:
+                  status:
+                    type: string
+                    enum: [ok]
+                  data:
+                    $ref: '#/components/schemas/RegistrationRequest'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          description: Company not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Email already in use or company not approved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/admin/registrations/{tenantId}/deactivate:
+    post:
+      tags: [Admin]
+      summary: Deactivate approved company
+      description: Sets tenant and all users to inactive. Requires `super_admin`.
+      operationId: deactivateCompany
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: tenantId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Company deactivated
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, data]
+                properties:
+                  status:
+                    type: string
+                    enum: [ok]
+                  data:
+                    $ref: '#/components/schemas/RegistrationRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          description: Company not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Company already inactive or not approved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/admin/registrations/{tenantId}/activate:
+    post:
+      tags: [Admin]
+      summary: Reactivate approved company
+      description: Sets tenant and all users to active. Requires `super_admin`.
+      operationId: activateCompany
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: tenantId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Company reactivated
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, data]
+                properties:
+                  status:
+                    type: string
+                    enum: [ok]
+                  data:
+                    $ref: '#/components/schemas/RegistrationRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          description: Company not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Company already active or not approved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/employees:
+    get:
+      tags: [Employees]
+      summary: List employees
+      description: |
+        Returns employees for the authenticated user's tenant.
+
+        **Permissions:** `employee:read` (all employees) or `employee:read:team` (direct reports only).
+      operationId: listEmployees
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: search
+          in: query
+          schema:
+            type: string
+          description: Filter by name, email, job title, or employee number
+        - name: department
+          in: query
+          schema:
+            type: string
+        - name: status
+          in: query
+          schema:
+            $ref: '#/components/schemas/EmployeeStatus'
+      responses:
+        '200':
+          description: Employee list
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, data]
+                properties:
+                  status:
+                    type: string
+                    enum: [ok]
+                  data:
+                    type: object
+                    required: [employees]
+                    properties:
+                      employees:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Employee'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+    post:
+      tags: [Employees]
+      summary: Create employee
+      description: Requires `employee:create` permission.
+      operationId: createEmployee
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateEmployeeRequest'
+            example:
+              firstName: Alex
+              lastName: Morgan
+              email: alex.morgan@acme.com
+              jobTitle: Software Engineer
+              department: Engineering
+              startDate: '2024-03-01'
+      responses:
+        '201':
+          description: Employee created
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, data]
+                properties:
+                  status:
+                    type: string
+                    enum: [ok]
+                  data:
+                    $ref: '#/components/schemas/Employee'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          description: Employee number or email already in use
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/employees/departments:
+    get:
+      tags: [Employees]
+      summary: List departments
+      description: Returns distinct department names used by employees in the tenant.
+      operationId: listEmployeeDepartments
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Department list
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, data]
+                properties:
+                  status:
+                    type: string
+                    enum: [ok]
+                  data:
+                    type: object
+                    required: [departments]
+                    properties:
+                      departments:
+                        type: array
+                        items:
+                          type: string
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /api/v1/employees/{id}:
+    get:
+      tags: [Employees]
+      summary: Get employee
+      operationId: getEmployee
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Employee details
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, data]
+                properties:
+                  status:
+                    type: string
+                    enum: [ok]
+                  data:
+                    $ref: '#/components/schemas/Employee'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          description: Employee not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    patch:
+      tags: [Employees]
+      summary: Update employee
+      description: Partial update — only fields present in the body are applied. Requires `employee:update`.
+      operationId: updateEmployee
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateEmployeeRequest'
+            example:
+              jobTitle: Senior Software Engineer
+              status: active
+      responses:
+        '200':
+          description: Employee updated
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, data]
+                properties:
+                  status:
+                    type: string
+                    enum: [ok]
+                  data:
+                    $ref: '#/components/schemas/Employee'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          description: Employee not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Email already in use
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/employees/{id}/reports:
+    get:
+      tags: [Employees]
+      summary: List direct reports
+      operationId: listEmployeeReports
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Direct reports
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, data]
+                properties:
+                  status:
+                    type: string
+                    enum: [ok]
+                  data:
+                    type: object
+                    required: [reports]
+                    properties:
+                      reports:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Employee'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          description: Employee not found
           content:
             application/json:
               schema:
@@ -605,6 +1069,26 @@ components:
         lastName:
           type: string
 
+    CreateCompanyRequest:
+      type: object
+      required: [companyName, email, password]
+      properties:
+        companyName:
+          type: string
+          minLength: 2
+        email:
+          type: string
+          format: email
+          description: Company admin login email
+        password:
+          type: string
+          minLength: 8
+          description: Initial password for the company admin
+        firstName:
+          type: string
+        lastName:
+          type: string
+
     LoginRequest:
       type: object
       required: [email, password]
@@ -658,7 +1142,7 @@ components:
 
     RegistrationRequest:
       type: object
-      required: [tenantId, companyName, adminEmail, status, submittedAt]
+      required: [tenantId, companyName, adminEmail, status, isActive, submittedAt]
       properties:
         tenantId:
           type: string
@@ -674,10 +1158,33 @@ components:
         status:
           type: string
           enum: [pending, approved, rejected]
+        isActive:
+          type: boolean
         submittedAt:
           type: string
           format: date-time
         rejectedReason:
+          type: string
+        createdByName:
+          type: string
+        updatedByName:
+          type: string
+        updatedAt:
+          type: string
+          format: date-time
+
+    UpdateCompanyRequest:
+      type: object
+      properties:
+        companyName:
+          type: string
+          minLength: 2
+        adminEmail:
+          type: string
+          format: email
+        adminFirstName:
+          type: string
+        adminLastName:
           type: string
 
     AuthSuccessResponse:
@@ -696,3 +1203,114 @@ components:
             accessToken:
               type: string
               description: JWT access token (15 min)
+
+    EmployeeStatus:
+      type: string
+      enum: [active, on_leave, terminated]
+
+    EmployeeManagerSummary:
+      type: object
+      required: [id, firstName, lastName]
+      properties:
+        id:
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+
+    Employee:
+      type: object
+      required: [id, employeeNumber, firstName, lastName, status, createdAt, updatedAt]
+      properties:
+        id:
+          type: string
+        employeeNumber:
+          type: string
+          example: EMP-0001
+        firstName:
+          type: string
+        lastName:
+          type: string
+        email:
+          type: string
+          format: email
+        phone:
+          type: string
+        jobTitle:
+          type: string
+        department:
+          type: string
+        startDate:
+          type: string
+          format: date
+          description: YYYY-MM-DD
+        managerId:
+          type: string
+        manager:
+          $ref: '#/components/schemas/EmployeeManagerSummary'
+        status:
+          $ref: '#/components/schemas/EmployeeStatus'
+        userId:
+          type: string
+          description: Linked login user, when set
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    CreateEmployeeRequest:
+      type: object
+      required: [firstName, lastName]
+      properties:
+        firstName:
+          type: string
+          minLength: 1
+        lastName:
+          type: string
+          minLength: 1
+        email:
+          type: string
+          format: email
+        phone:
+          type: string
+        jobTitle:
+          type: string
+        department:
+          type: string
+        startDate:
+          type: string
+          format: date
+        managerId:
+          type: string
+        employeeNumber:
+          type: string
+        status:
+          $ref: '#/components/schemas/EmployeeStatus'
+
+    UpdateEmployeeRequest:
+      type: object
+      properties:
+        firstName:
+          type: string
+        lastName:
+          type: string
+        email:
+          type: string
+          format: email
+        phone:
+          type: string
+        jobTitle:
+          type: string
+        department:
+          type: string
+        startDate:
+          type: string
+          format: date
+        managerId:
+          type: string
+          nullable: true
+        status:
+          $ref: '#/components/schemas/EmployeeStatus'

@@ -1,4 +1,5 @@
 import { useEffect, useRef, type ReactNode } from 'react';
+import { createPortal } from 'react-dom';
 
 interface ModalProps {
   open: boolean;
@@ -16,7 +17,7 @@ const sizes = {
   lg: 'max-w-2xl',
 };
 
-export function Modal({
+export const Modal = ({
   open,
   onClose,
   title,
@@ -24,7 +25,7 @@ export function Modal({
   children,
   footer,
   size = 'md',
-}: ModalProps) {
+}: ModalProps) => {
   const panelRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -32,7 +33,7 @@ export function Modal({
       return;
     }
 
-    function handleEscape(event: KeyboardEvent) {
+    const handleEscape = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
         onClose();
       }
@@ -51,7 +52,7 @@ export function Modal({
     return null;
   }
 
-  return (
+  return createPortal(
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <button
         type="button"
@@ -82,6 +83,7 @@ export function Modal({
 
         {footer && <div className="border-t border-slate-100 px-6 py-4">{footer}</div>}
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }

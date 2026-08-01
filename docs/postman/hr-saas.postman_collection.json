@@ -17,6 +17,10 @@
     {
       "key": "pendingTenantId",
       "value": ""
+    },
+    {
+      "key": "employeeId",
+      "value": ""
     }
   ],
   "item": [
@@ -200,7 +204,7 @@
       ]
     },
     {
-      "name": "Registrations (super_admin)",
+      "name": "Companies (super_admin)",
       "item": [
         {
           "name": "List Pending Registrations",
@@ -219,6 +223,35 @@
             "header": [],
             "url": "{{baseUrl}}/api/v1/admin/registrations?status=pending",
             "description": "Requires super_admin Bearer token."
+          },
+          "response": []
+        },
+        {
+          "name": "Create Company",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"companyName\": \"Acme Ltd\",\n  \"email\": \"admin@acme.com\",\n  \"password\": \"TestPass123\",\n  \"firstName\": \"Jane\",\n  \"lastName\": \"Admin\"\n}"
+            },
+            "url": "{{baseUrl}}/api/v1/admin/registrations",
+            "description": "Super admin creates an approved company and company admin. Admin can sign in immediately."
           },
           "response": []
         },
@@ -268,6 +301,75 @@
             },
             "url": "{{baseUrl}}/api/v1/admin/registrations/{{pendingTenantId}}/reject",
             "description": "Rejects pending company registration."
+          },
+          "response": []
+        },
+        {
+          "name": "Update Company",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"companyName\": \"Acme Ltd\",\n  \"adminEmail\": \"admin@acme.com\",\n  \"adminFirstName\": \"Jane\",\n  \"adminLastName\": \"Admin\"\n}"
+            },
+            "url": "{{baseUrl}}/api/v1/admin/registrations/{{tenantId}}",
+            "description": "Updates an approved company. Set tenantId from list registrations response."
+          },
+          "response": []
+        },
+        {
+          "name": "Deactivate Company",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/admin/registrations/{{tenantId}}/deactivate",
+            "description": "Deactivates an approved company and all tenant users."
+          },
+          "response": []
+        },
+        {
+          "name": "Activate Company",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/admin/registrations/{{tenantId}}/activate",
+            "description": "Reactivates a deactivated approved company."
           },
           "response": []
         }
@@ -321,6 +423,172 @@
             },
             "url": "{{baseUrl}}/api/v1/admins",
             "description": "Requires super_admin Bearer token when users already exist."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Employees",
+      "item": [
+        {
+          "name": "List Employees",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/employees?search=&department=&status=",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "employees"],
+              "query": [
+                { "key": "search", "value": "" },
+                { "key": "department", "value": "" },
+                { "key": "status", "value": "" }
+              ]
+            },
+            "description": "List employees for the authenticated tenant. Supports search, department, and status filters."
+          },
+          "response": []
+        },
+        {
+          "name": "List Departments",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/employees/departments",
+            "description": "Returns distinct department names for the tenant."
+          },
+          "response": []
+        },
+        {
+          "name": "Create Employee",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "  const json = pm.response.json();",
+                  "  pm.collectionVariables.set('employeeId', json.data.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"Alex\",\n  \"lastName\": \"Morgan\",\n  \"email\": \"alex.morgan@acme.com\",\n  \"jobTitle\": \"Software Engineer\",\n  \"department\": \"Engineering\",\n  \"startDate\": \"2024-03-01\"\n}"
+            },
+            "url": "{{baseUrl}}/api/v1/employees",
+            "description": "Requires company_admin or hr_manager (employee:create). Saves employeeId from response."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Employee",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/employees/{{employeeId}}",
+            "description": "Get employee by id."
+          },
+          "response": []
+        },
+        {
+          "name": "Update Employee",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"jobTitle\": \"Senior Software Engineer\"\n}"
+            },
+            "url": "{{baseUrl}}/api/v1/employees/{{employeeId}}",
+            "description": "Partial update — only changed fields in body."
+          },
+          "response": []
+        },
+        {
+          "name": "List Direct Reports",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/employees/{{employeeId}}/reports",
+            "description": "Returns employees who report to the given manager."
           },
           "response": []
         }

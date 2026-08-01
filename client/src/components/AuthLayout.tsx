@@ -9,7 +9,7 @@ interface AuthLayoutProps {
   footer?: ReactNode;
 }
 
-export function AuthLayout({ title, subtitle, children, footer }: AuthLayoutProps) {
+export const AuthLayout = ({ title, subtitle, children, footer }: AuthLayoutProps) => {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-slate-50 px-4 py-12">
       <div className="mb-8 text-center">

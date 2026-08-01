@@ -2,13 +2,15 @@ import { Navigate, Route, Routes } from "react-router-dom";
 import { AppShell } from "./components/AppShell";
 import { GuestRoute } from "./components/GuestRoute";
 import { ProtectedRoute } from "./components/ProtectedRoute";
-import { DashboardPage } from "./pages/DashboardPage";
-import { LoginPage } from "./pages/LoginPage";
-import { ProfilePage } from "./pages/ProfilePage";
-import { RegisterPage } from "./pages/RegisterPage";
-import { RegistrationsPage } from "./pages/RegistrationsPage";
+import { DashboardPage } from "./pages/dashboard/DashboardPage";
+import { EmployeeProfilePage } from "./pages/employees/EmployeeProfilePage";
+import { EmployeesPage } from "./pages/employees/EmployeesPage";
+import { LoginPage } from "./pages/login/LoginPage";
+import { ProfilePage } from "./pages/profile/ProfilePage";
+import { RegisterPage } from "./pages/register/RegisterPage";
+import { RegistrationsPage } from "./pages/registrations/RegistrationsPage";
 
-export default function App() {
+const App = () => {
   return (
     <Routes>
       <Route element={<GuestRoute />}>
@@ -24,6 +26,8 @@ export default function App() {
             path="/dashboard/registrations"
             element={<RegistrationsPage />}
           />
+          <Route path="/dashboard/employees" element={<EmployeesPage />} />
+          <Route path="/dashboard/employees/:id" element={<EmployeeProfilePage />} />
         </Route>
       </Route>
 
@@ -32,3 +36,6 @@ export default function App() {
     </Routes>
   );
 }
+
+export default App;
+
