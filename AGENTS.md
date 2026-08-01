@@ -12,7 +12,7 @@ Read this file at the start of any session.
 hr-saas/
 ├── client/       # React — own src/, .env, node_modules, deployment
 ├── server/       # Express — own src/, .env.local, node_modules, deployment
-└── docs/         # API registry + project plans (docs/plan/)
+└── docs/         # OpenAPI spec, Postman collection, project plans (docs/plan/)
 ```
 
 - **Do not create** `apps/` or `shared/` folders
@@ -48,11 +48,16 @@ For production:
 
 ---
 
-## API registry (mandatory)
+## API documentation (mandatory)
 
-### Every API → registry entry
+Every new or changed endpoint must update **both** files in the same change:
 
-1. Add row to [`docs/API-REGISTRY.md`](./docs/API-REGISTRY.md)
+1. [`docs/openapi.yaml`](./docs/openapi.yaml) — OpenAPI 3.0 spec (source of truth): path, method, request/response schemas, auth, roles, examples
+2. [`docs/postman/hr-saas.postman_collection.json`](./docs/postman/hr-saas.postman_collection.json) — matching Postman request with sample body and auth; add test script to save `accessToken` when the response includes one
+
+Do **not** use markdown for API docs. Do **not** create separate per-endpoint curl files — the Postman collection is the single runnable request catalog.
+
+Optional: update [`docs/postman/hr-saas.local.postman_environment.json`](./docs/postman/hr-saas.local.postman_environment.json) only when new collection variables are needed.
 
 ### README (keep current)
 
@@ -62,7 +67,7 @@ Update [`README.md`](./README.md) whenever a change affects how someone sets up,
 - Env vars, commands, URLs, or deployment steps
 - Notable new capabilities a developer needs to know on day one
 
-Do not duplicate detailed API or plan docs — link to `docs/API-REGISTRY.md` and `docs/plan/` instead.
+Do not duplicate detailed API or plan docs — link to `docs/openapi.yaml`, `docs/postman/`, and `docs/plan/` instead.
 
 ---
 
@@ -93,6 +98,7 @@ cd client && npm install && npm run dev
 - Create `apps/` or `shared/` folders
 - Add root `node_modules`
 - Share code via a common package (duplicate in client/server instead)
-- Add endpoints without `docs/API-REGISTRY.md` entry
+- Add endpoints without updating `docs/openapi.yaml` and `docs/postman/hr-saas.postman_collection.json`
+- Document APIs in markdown (use OpenAPI YAML + Postman collection only)
 - Change setup, env, commands, or deployment without updating `README.md`
 - Trust `tenantId` from the client

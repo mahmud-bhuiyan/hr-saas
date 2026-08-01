@@ -2,10 +2,12 @@ import type { NextFunction, Request, Response } from 'express';
 import type { ServerEnv } from '../config/env.js';
 import type { JwtPayload } from '../utils/jwt.js';
 import { verifyAccessToken } from '../utils/jwt.js';
+import { hasPermission } from '../utils/permissions.js';
 import type { UserRole } from '../types/index.js';
 
 export interface AuthenticatedRequest extends Request {
   user?: JwtPayload;
+  tenantId?: string;
 }
 
 export function authenticate(env: ServerEnv) {
@@ -57,6 +59,23 @@ export function optionalAuthenticate(env: ServerEnv) {
       req.user = verifyAccessToken(token, env.adminJwtSecret);
     } catch {
       // Ignore invalid token — route handler decides if auth is required
+    }
+
+    next();
+  };
+}
+
+export function authorizePermission(...permissions: string[]) {
+  return (req: AuthenticatedRequest, res: Response, next: NextFunction): void => {
+    if (!req.user) {
+      res.status(401).json({ status: 'error', message: 'Authentication required' });
+      return;
+    }
+
+    const allowed = permissions.some((p) => hasPermission(req.user!.role, p));
+    if (!allowed) {
+      res.status(403).json({ status: 'error', message: 'Insufficient permissions' });
+      return;
     }
 
     next();

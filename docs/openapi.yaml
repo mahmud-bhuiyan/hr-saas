@@ -1,0 +1,421 @@
+openapi: 3.0.3
+info:
+  title: HR SaaS API
+  description: |
+    Multi-tenant HR platform API. All business routes are versioned under `/api/v1`.
+
+    **Auth model:** JWT access token (15 min, Bearer header) + refresh token (7 days, httpOnly cookie on `/api/v1/auth`).
+
+    **Roles:** `super_admin`, `company_admin`, `hr_manager`, `manager`, `employee`
+  version: 0.0.1
+
+servers:
+  - url: http://localhost:5000
+    description: Local development
+  - url: https://{vercelProject}.vercel.app
+    description: Vercel deployment
+    variables:
+      vercelProject:
+        default: your-server-project
+
+tags:
+  - name: Health
+    description: Service health checks
+  - name: Auth
+    description: Company registration, login, session refresh
+  - name: Admin
+    description: Platform admin user management
+
+paths:
+  /:
+    get:
+      tags: [Health]
+      summary: Root
+      description: Confirms the server is running.
+      operationId: getRoot
+      responses:
+        '200':
+          description: Plain text confirmation
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: Server is running
+
+  /api/v1/health:
+    get:
+      tags: [Health]
+      summary: Health check
+      description: Returns service status and timestamp.
+      operationId: getHealth
+      responses:
+        '200':
+          description: Service is healthy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+
+  /api/v1/auth/register:
+    post:
+      tags: [Auth]
+      summary: Register company
+      description: |
+        Creates a new tenant and the first `company_admin` user.
+        Returns an access token and sets a refresh httpOnly cookie.
+      operationId: registerCompany
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+            example:
+              companyName: Acme Ltd
+              email: admin@acme.com
+              password: TestPass123
+              firstName: Jane
+              lastName: Admin
+      responses:
+        '201':
+          description: Company and admin user created
+          headers:
+            Set-Cookie:
+              description: Refresh token cookie (`refreshToken`)
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthSuccessResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '409':
+          description: Email already in use
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/auth/login:
+    post:
+      tags: [Auth]
+      summary: Login
+      description: |
+        Authenticates with email and password.
+        Returns an access token and sets a refresh httpOnly cookie.
+      operationId: login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+            example:
+              email: admin@acme.com
+              password: TestPass123
+      responses:
+        '200':
+          description: Login successful
+          headers:
+            Set-Cookie:
+              description: Refresh token cookie (`refreshToken`)
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthSuccessResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          description: Invalid email or password
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/auth/refresh:
+    post:
+      tags: [Auth]
+      summary: Refresh access token
+      description: |
+        Exchanges the refresh httpOnly cookie for a new access token.
+        Cookie path must be `/api/v1/auth`.
+      operationId: refreshToken
+      responses:
+        '200':
+          description: New access token issued
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthSuccessResponse'
+        '401':
+          description: Missing or invalid refresh token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/auth/logout:
+    post:
+      tags: [Auth]
+      summary: Logout
+      description: Clears the refresh token cookie.
+      operationId: logout
+      responses:
+        '200':
+          description: Logged out
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, data]
+                properties:
+                  status:
+                    type: string
+                    enum: [ok]
+                  data:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        example: Logged out
+
+  /api/v1/auth/me:
+    get:
+      tags: [Auth]
+      summary: Current user
+      description: Returns the authenticated user from the Bearer access token.
+      operationId: getCurrentUser
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Current user profile
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, data]
+                properties:
+                  status:
+                    type: string
+                    enum: [ok]
+                  data:
+                    type: object
+                    required: [user]
+                    properties:
+                      user:
+                        $ref: '#/components/schemas/AuthUser'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /api/v1/admins:
+    post:
+      tags: [Admin]
+      summary: Create admin user
+      description: |
+        Creates a platform or tenant admin user.
+
+        **Bootstrap:** When the database has zero users, unauthenticated requests may create the first `super_admin`.
+
+        **Otherwise:** Requires Bearer token with `super_admin` role.
+      operationId: createAdmin
+      security:
+        - bearerAuth: []
+        - {}
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateAdminRequest'
+            example:
+              email: superadmin@hr.com
+              password: User@123
+              role: super_admin
+              firstName: Super
+              lastName: Admin
+      responses:
+        '201':
+          description: Admin user created
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, data]
+                properties:
+                  status:
+                    type: string
+                    enum: [ok]
+                  data:
+                    $ref: '#/components/schemas/AdminUser'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          description: Email already in use
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Short-lived access token from login or register
+
+  responses:
+    BadRequest:
+      description: Validation error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Unauthorized:
+      description: Authentication required or token invalid
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Forbidden:
+      description: Insufficient permissions
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
+  schemas:
+    UserRole:
+      type: string
+      enum:
+        - super_admin
+        - company_admin
+        - hr_manager
+        - manager
+        - employee
+
+    HealthResponse:
+      type: object
+      required: [status, service, timestamp]
+      properties:
+        status:
+          type: string
+          enum: [ok]
+        service:
+          type: string
+          example: HR SaaS
+        timestamp:
+          type: string
+          format: date-time
+
+    ErrorResponse:
+      type: object
+      required: [status, message]
+      properties:
+        status:
+          type: string
+          enum: [error]
+        message:
+          type: string
+
+    AuthUser:
+      type: object
+      required: [id, email, role]
+      properties:
+        id:
+          type: string
+          example: 507f1f77bcf86cd799439011
+        email:
+          type: string
+          format: email
+        role:
+          $ref: '#/components/schemas/UserRole'
+        tenantId:
+          type: string
+          description: Omitted for super_admin
+        firstName:
+          type: string
+        lastName:
+          type: string
+
+    AdminUser:
+      allOf:
+        - $ref: '#/components/schemas/AuthUser'
+        - type: object
+          required: [isActive, createdAt]
+          properties:
+            isActive:
+              type: boolean
+            createdAt:
+              type: string
+              format: date-time
+
+    RegisterRequest:
+      type: object
+      required: [companyName, email, password]
+      properties:
+        companyName:
+          type: string
+          minLength: 2
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          minLength: 8
+        firstName:
+          type: string
+        lastName:
+          type: string
+
+    LoginRequest:
+      type: object
+      required: [email, password]
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+
+    CreateAdminRequest:
+      type: object
+      required: [email, password, role]
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          minLength: 8
+        role:
+          $ref: '#/components/schemas/UserRole'
+        firstName:
+          type: string
+        lastName:
+          type: string
+
+    AuthSuccessResponse:
+      type: object
+      required: [status, data]
+      properties:
+        status:
+          type: string
+          enum: [ok]
+        data:
+          type: object
+          required: [user, accessToken]
+          properties:
+            user:
+              $ref: '#/components/schemas/AuthUser'
+            accessToken:
+              type: string
+              description: JWT access token (15 min)

@@ -1,9 +1,9 @@
 ---
-description: API registry and README updates for all new code
+description: API docs and README updates for all new code
 alwaysApply: true
 ---
 
-# API registry (required)
+# API documentation (required)
 
 Read `AGENTS.md` for full instructions.
 
@@ -20,7 +20,9 @@ Read `AGENTS.md` for full instructions.
 - Duplicate types/utils in each app (no shared imports)
 
 ## Every API endpoint
-1. Document in `docs/API-REGISTRY.md`
+Update **both** in the same PR (no markdown API docs):
+1. `docs/openapi.yaml` — path, schemas, auth, examples
+2. `docs/postman/hr-saas.postman_collection.json` — runnable request; save `accessToken` in test script when returned
 
 ## README
-Update `README.md` when setup, env, commands, architecture, or deployment changes. Link to `docs/` for detailed API and plan docs — do not duplicate them.
+Update `README.md` when setup, env, commands, architecture, or deployment changes. Link to `docs/openapi.yaml` and `docs/postman/` for API details — do not duplicate them.

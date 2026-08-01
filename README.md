@@ -10,7 +10,7 @@ See [docs/plan/](./docs/plan/) for product docs.
 hr-saas/
 ├── client/          # React frontend (deploy to its own server)
 ├── server/          # Express API (deploy to its own server)
-├── docs/            # API registry + project plans
+├── docs/            # OpenAPI spec, Postman collection, project plans
 ├── .gitignore
 └── README.md
 ```
@@ -88,7 +88,9 @@ Config files: `client/vercel.json`, `server/vercel.json`, `server/src/index.ts` 
 
 ## API documentation
 
-- API list: [docs/API-REGISTRY.md](./docs/API-REGISTRY.md)
+- **OpenAPI spec:** [docs/openapi.yaml](./docs/openapi.yaml)
+- **Postman collection:** [docs/postman/hr-saas.postman_collection.json](./docs/postman/hr-saas.postman_collection.json) (import into Postman for all requests)
+- **Local env:** [docs/postman/hr-saas.local.postman_environment.json](./docs/postman/hr-saas.local.postman_environment.json)
 - Agent rules: [AGENTS.md](./AGENTS.md)
 
 **Keep this file current.** When setup, env, commands, or deployment change, update the README in the same PR. See [AGENTS.md](./AGENTS.md) for the full checklist.
