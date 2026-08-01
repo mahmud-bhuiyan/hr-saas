@@ -2,7 +2,6 @@
 
 ```
 server/tests/
-  unit/           # utils, services
   api/            # HTTP endpoints (Supertest)
 ```
 

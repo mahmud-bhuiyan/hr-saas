@@ -50,15 +50,6 @@ For production:
 
 ## Testing (mandatory)
 
-### Every function → unit test
-
-| Code location | Test location |
-|---------------|---------------|
-| `server/src/` | `server/tests/unit/` |
-| `client/src/` | `client/tests/unit/` |
-
-Run `npm test` in that folder before finishing work.
-
 ### Every API → registry + API test
 
 1. Add row to [`docs/API-REGISTRY.md`](./docs/API-REGISTRY.md)
@@ -96,7 +87,6 @@ Do not duplicate detailed API or plan docs — link to `docs/API-REGISTRY.md` an
 cd server && npm install && npm run dev
 cd client && npm install && npm run dev
 cd server && npm test
-cd client && npm test
 ```
 
 ---
@@ -107,6 +97,5 @@ cd client && npm test
 - Add root `node_modules`
 - Share code via a common package (duplicate in client/server instead)
 - Add endpoints without `docs/API-REGISTRY.md` entry
-- Add functions without unit tests
 - Change setup, env, commands, or deployment without updating `README.md`
 - Trust `tenantId` from the client

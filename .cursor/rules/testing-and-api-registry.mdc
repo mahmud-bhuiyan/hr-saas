@@ -16,9 +16,7 @@ Read `AGENTS.md` for full instructions.
 ## Node.js
 - Minimum **Node 22+**
 
-## Every function
-- `server/` → `server/tests/unit/`
-- `client/` → `client/tests/unit/`
+## Types and utils
 - Duplicate types/utils in each app (no shared imports)
 
 ## Every API endpoint

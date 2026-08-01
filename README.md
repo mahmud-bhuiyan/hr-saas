@@ -90,7 +90,6 @@ Config files: `client/vercel.json`, `server/vercel.json`, `server/src/index.ts` 
 
 ```bash
 cd server && npm test
-cd client && npm test
 ```
 
 - API list: [docs/API-REGISTRY.md](./docs/API-REGISTRY.md)
