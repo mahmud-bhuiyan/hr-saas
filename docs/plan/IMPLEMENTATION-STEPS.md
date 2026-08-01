@@ -5,8 +5,8 @@ Check off each step with the client/dev team before moving to the next.
 | Step | Scope | Status |
 |------|-------|--------|
 | **1** | Foundation — separate client & server apps, Docker, dev scripts | ✅ Complete |
-| **2** | Auth & tenant — register, login, JWT, RBAC middleware | ✅ Ready for review |
-| **3** | App shell — layout, routing, design system, dashboard placeholder | ⬜ Pending |
+| **2** | Auth & tenant — register, login, JWT, RBAC middleware | ✅ Complete |
+| **3** | App shell — layout, routing, design system, dashboard placeholder | ✅ Ready for review |
 | **4** | Employee management — CRUD, directory, profile | ⬜ Pending |
 | **5** | Leave & absence — requests, approval, balance, calendar | ⬜ Pending |
 | **6** | Document storage — S3 upload/download | ⬜ Pending |
@@ -31,14 +31,14 @@ Check off each step with the client/dev team before moving to the next.
 
 ## Step 2 — Done when
 
-- [ ] `POST /api/v1/auth/register` creates a tenant + company admin user
-- [ ] `POST /api/v1/auth/login` returns access token and sets refresh cookie
-- [ ] `POST /api/v1/auth/refresh` returns a new access token (with cookie)
-- [ ] `POST /api/v1/auth/logout` clears refresh cookie
-- [ ] `GET /api/v1/auth/me` returns current user when Bearer token is valid
-- [ ] JWT middleware rejects invalid/expired tokens (401)
-- [ ] RBAC `authorize()` and `authorizePermission()` middleware in place
-- [ ] Tenant middleware (`resolveTenant`, `requireTenant`) in place
+- [x] `POST /api/v1/auth/register` creates a tenant + company admin user
+- [x] `POST /api/v1/auth/login` returns access token and sets refresh cookie
+- [x] `POST /api/v1/auth/refresh` returns a new access token (with cookie)
+- [x] `POST /api/v1/auth/logout` clears refresh cookie
+- [x] `GET /api/v1/auth/me` returns current user when Bearer token is valid
+- [x] JWT middleware rejects invalid/expired tokens (401)
+- [x] RBAC `authorize()` and `authorizePermission()` middleware in place
+- [x] Tenant middleware (`resolveTenant`, `requireTenant`) in place
 - [x] `docs/openapi.yaml` and Postman collection updated with auth endpoints
 
 **Review:** Test auth flow manually (curl/Postman) before Step 3.
@@ -47,9 +47,21 @@ Check off each step with the client/dev team before moving to the next.
 
 ## Step 3 — Done when
 
-- [ ] React Router with protected routes
-- [ ] Login and register pages wired to auth API
-- [ ] Dashboard placeholder after login
-- [ ] Auth state persisted (access token + refresh on 401)
+- [x] React Router with protected routes
+- [x] Login and register pages wired to auth API
+- [x] Dashboard placeholder after login
+- [x] Auth state persisted (access token + refresh on 401)
 
 **Review:** Confirm UI shell and auth UX before Step 4.
+
+---
+
+## Step 4 — Done when
+
+- [ ] Employee CRUD API endpoints
+- [ ] Employee directory page (list, search, filter)
+- [ ] Add / edit employee forms
+- [ ] Employee profile page
+- [ ] `docs/openapi.yaml` and Postman collection updated
+
+**Review:** Test employee flows before Step 5.

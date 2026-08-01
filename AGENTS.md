@@ -81,6 +81,44 @@ Do not duplicate detailed API or plan docs — link to `docs/openapi.yaml`, `doc
 
 - `client/src/lib/api.ts` — API client (uses `VITE_API_URL`)
 - Build output: `client/dist/` → static hosting
+- **UI kit:** `client/src/components/ui/` — reusable primitives (see below)
+- **Form helpers:** `client/src/utils/form.ts` — change detection and required-field checks
+- **Icons:** [`react-icons`](https://react-icons.github.io/react-icons/) — use colorful icons where they aid UX
+
+### Reusable UI components (required)
+
+Before building custom markup, check `client/src/components/ui/`. **Reuse existing components; create a new one in that folder only if none fits.**
+
+| Component | File | Use for |
+|-----------|------|---------|
+| `Button` | `Button.tsx` | All actions; supports `loading`, `icon`, `disabled` |
+| `Spinner` | `Spinner.tsx` | Inline loading indicator (used by `Button`, `Table`) |
+| `Input` | `Input.tsx` | Text, email, etc. |
+| `PasswordInput` | `PasswordInput.tsx` | Password fields with show/hide toggle |
+| `FormField` | `FormField.tsx` | Label + control wrapper |
+| `FormActions` | `FormActions.tsx` | Form footer with submit/cancel |
+| `Modal` | `Modal.tsx` | Generic dialog shell |
+| `FormModal` | `FormModal.tsx` | Modal + form + footer actions |
+| `Table` | `Table.tsx` | Data tables with loading/empty states |
+| `Dropdown` | `Dropdown.tsx` | Menus (user menu, action menus) |
+
+Feature-specific composites (e.g. `ChangePasswordModal`) live in `client/src/components/` and compose the UI kit.
+
+### Form and save-button rules
+
+1. **Create forms:** Submit/save button stays **disabled** until all mandatory fields are filled (`areRequiredFieldsFilled` from `client/src/utils/form.ts`).
+2. **Edit forms:** Submit/save button stays **disabled** until at least one field differs from the loaded original (`hasFormChanges`).
+3. **All submit buttons** use `Button` with `loading` / `loadingText` while the mutation runs.
+4. **Patch/update APIs:** Send **only changed fields** to the server (`pickChangedFields`). Do not POST the full record on every save.
+5. **Server:** Update handlers should apply only fields present in the request body (partial update).
+
+### Password fields
+
+Always use `PasswordInput` (not `Input type="password"`). It includes a show/hide toggle with `react-icons`.
+
+### Icons
+
+Use `react-icons` (e.g. `react-icons/hi2`) with Tailwind color classes (`text-brand-600`, `text-red-500`, `text-amber-500`) for visual cues on buttons, dropdown items, and actions.
 
 ---
 

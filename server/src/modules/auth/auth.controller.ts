@@ -9,6 +9,8 @@ import {
   registerCompany,
 } from './auth.service.js';
 import { loginSchema, registerSchema } from './auth.validation.js';
+import { getProfile, updateProfile } from './profile.service.js';
+import { updateProfileSchema } from './profile.validation.js';
 
 const REFRESH_COOKIE = 'refreshToken';
 const REFRESH_MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000;
@@ -40,15 +42,11 @@ export function createRegisterHandler(env: ServerEnv) {
         return;
       }
 
-      const result = await registerCompany(parsed.data, env);
-      setRefreshCookie(res, result.tokens.refreshToken);
+      const result = await registerCompany(parsed.data);
 
       res.status(201).json({
         status: 'ok',
-        data: {
-          user: result.user,
-          accessToken: result.tokens.accessToken,
-        },
+        data: result,
       });
     } catch (error) {
       if (error instanceof AuthServiceError) {
@@ -143,14 +141,44 @@ export async function meHandler(req: AuthenticatedRequest, res: Response): Promi
       return;
     }
 
-    const user = await getUserById(req.user.sub);
-    if (!user) {
+    const profile = await getProfile(req.user.sub);
+    if (!profile) {
       res.status(401).json({ status: 'error', message: 'User not found or inactive' });
       return;
     }
 
-    res.json({ status: 'ok', data: { user } });
+    res.json({ status: 'ok', data: { user: profile } });
   } catch {
     res.status(500).json({ status: 'error', message: 'Internal server error' });
   }
+}
+
+export function createUpdateMeHandler(env: ServerEnv) {
+  return async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+    try {
+      if (!req.user) {
+        res.status(401).json({ status: 'error', message: 'Authentication required' });
+        return;
+      }
+
+      const parsed = updateProfileSchema.safeParse(req.body);
+      if (!parsed.success) {
+        validationError(res, parsed.error.issues[0]?.message ?? 'Invalid request body');
+        return;
+      }
+
+      const result = await updateProfile(req.user.sub, parsed.data, env);
+
+      res.json({
+        status: 'ok',
+        data: result,
+      });
+    } catch (error) {
+      if (error instanceof AuthServiceError) {
+        res.status(error.statusCode).json({ status: 'error', message: error.message });
+        return;
+      }
+      res.status(500).json({ status: 'error', message: 'Internal server error' });
+    }
+  };
 }

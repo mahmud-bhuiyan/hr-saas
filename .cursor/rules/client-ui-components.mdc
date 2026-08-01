@@ -1,0 +1,42 @@
+---
+description: Reusable client UI components, form behavior, and partial updates
+alwaysApply: true
+---
+
+# Client UI components (required)
+
+Read `AGENTS.md` for full instructions.
+
+## Reuse before creating
+
+Check `client/src/components/ui/` first. Reuse `Button`, `Input`, `PasswordInput`, `FormField`, `FormActions`, `Modal`, `FormModal`, `Table`, `Dropdown`, and `Spinner`. Create a new file in that folder only when no existing component fits.
+
+## Loading states
+
+- `Button`: always pass `loading` + `loadingText` during async actions
+- `Table`: use `loading` prop for list fetch states
+- Never show a clickable submit button without a spinner while saving
+
+## Save button activation
+
+| Form type | Submit enabled when |
+|-----------|---------------------|
+| **Create** | All required fields filled (`areRequiredFieldsFilled`) |
+| **Edit** | At least one field changed vs original (`hasFormChanges`) |
+
+Use `submitDisabled` on `FormActions` / `FormModal`, or `disabled` on `Button`.
+
+Helpers live in `client/src/utils/form.ts`: `areRequiredFieldsFilled`, `hasFormChanges`, `pickChangedFields`.
+
+## Partial updates (DB)
+
+- **Client:** PATCH/send only changed fields via `pickChangedFields`
+- **Server:** Apply only fields present in the request body
+
+## Password inputs
+
+Use `PasswordInput` (show/hide toggle). Do not use raw `Input type="password"`.
+
+## Icons
+
+Use `react-icons` with colorful Tailwind classes on buttons, dropdown items, and actions.

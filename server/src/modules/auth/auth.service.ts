@@ -31,6 +31,14 @@ export interface AuthResult {
   tokens: AuthTokens;
 }
 
+export interface RegisterPendingResult {
+  tenantId: string;
+  companyName: string;
+  email: string;
+  status: 'pending';
+  message: string;
+}
+
 function toAuthUser(user: IUserDocument): AuthUser {
   return {
     id: user._id.toString(),
@@ -59,10 +67,46 @@ function issueTokens(user: IUserDocument, env: ServerEnv): AuthTokens {
   };
 }
 
-export async function registerCompany(
-  input: RegisterInput,
-  env: ServerEnv
-): Promise<AuthResult> {
+async function assertUserCanAuthenticate(user: IUserDocument): Promise<void> {
+  if (user.role === 'super_admin') {
+    if (!user.isActive) {
+      throw new AuthServiceError('Account is inactive', 403);
+    }
+    return;
+  }
+
+  if (!user.tenantId) {
+    throw new AuthServiceError('Account is inactive', 403);
+  }
+
+  const tenant = await Tenant.findById(user.tenantId);
+  if (!tenant) {
+    throw new AuthServiceError('Company account not found', 403);
+  }
+
+  const approvalStatus =
+    tenant.approvalStatus ?? (tenant.isActive ? 'approved' : 'pending');
+
+  if (approvalStatus === 'pending') {
+    throw new AuthServiceError(
+      'Your company registration is pending super admin approval',
+      403
+    );
+  }
+
+  if (approvalStatus === 'rejected') {
+    throw new AuthServiceError(
+      tenant.rejectedReason ?? 'Your company registration was rejected',
+      403
+    );
+  }
+
+  if (!user.isActive || !tenant.isActive || approvalStatus !== 'approved') {
+    throw new AuthServiceError('Company account is not active', 403);
+  }
+}
+
+export async function registerCompany(input: RegisterInput): Promise<RegisterPendingResult> {
   const existing = await findUserByEmail(input.email);
   if (existing) {
     throw new AuthServiceError('Email already in use', 409);
@@ -74,7 +118,13 @@ export async function registerCompany(
     session.startTransaction();
 
     const [tenant] = await Tenant.create(
-      [{ name: input.companyName }],
+      [
+        {
+          name: input.companyName,
+          isActive: false,
+          approvalStatus: 'pending' as const,
+        },
+      ],
       { session }
     );
 
@@ -89,6 +139,7 @@ export async function registerCompany(
           tenantId: tenant._id,
           firstName: input.firstName,
           lastName: input.lastName,
+          isActive: false,
         },
       ],
       { session }
@@ -97,8 +148,12 @@ export async function registerCompany(
     await session.commitTransaction();
 
     return {
-      user: toAuthUser(user),
-      tokens: issueTokens(user, env),
+      tenantId: tenant._id.toString(),
+      companyName: tenant.name,
+      email: user.email,
+      status: 'pending',
+      message:
+        'Registration submitted. A super admin must approve your company before you can sign in.',
     };
   } catch (error) {
     await session.abortTransaction();
@@ -111,7 +166,7 @@ export async function registerCompany(
 export async function loginUser(input: LoginInput, env: ServerEnv): Promise<AuthResult> {
   const user = await User.findOne({ email: input.email }).select('+passwordHash');
 
-  if (!user || !user.isActive) {
+  if (!user) {
     throw new AuthServiceError('Invalid email or password', 401);
   }
 
@@ -119,6 +174,8 @@ export async function loginUser(input: LoginInput, env: ServerEnv): Promise<Auth
   if (!valid) {
     throw new AuthServiceError('Invalid email or password', 401);
   }
+
+  await assertUserCanAuthenticate(user);
 
   return {
     user: toAuthUser(user),
@@ -128,9 +185,16 @@ export async function loginUser(input: LoginInput, env: ServerEnv): Promise<Auth
 
 export async function getUserById(userId: string): Promise<AuthUser | null> {
   const user = await User.findById(userId);
-  if (!user || !user.isActive) {
+  if (!user) {
     return null;
   }
+
+  try {
+    await assertUserCanAuthenticate(user);
+  } catch {
+    return null;
+  }
+
   return toAuthUser(user);
 }
 

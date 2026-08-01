@@ -24,7 +24,7 @@ tags:
   - name: Auth
     description: Company registration, login, session refresh
   - name: Admin
-    description: Platform admin user management
+    description: Platform admin user management and company registration approval
 
 paths:
   /:
@@ -61,8 +61,9 @@ paths:
       tags: [Auth]
       summary: Register company
       description: |
-        Creates a new tenant and the first `company_admin` user.
-        Returns an access token and sets a refresh httpOnly cookie.
+        Submits a new company registration for super admin approval.
+        Creates a pending tenant and inactive `company_admin` user.
+        Does **not** return tokens — the company admin can sign in only after approval.
       operationId: registerCompany
       requestBody:
         required: true
@@ -78,16 +79,11 @@ paths:
               lastName: Admin
       responses:
         '201':
-          description: Company and admin user created
-          headers:
-            Set-Cookie:
-              description: Refresh token cookie (`refreshToken`)
-              schema:
-                type: string
+          description: Registration submitted — pending approval
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AuthSuccessResponse'
+                $ref: '#/components/schemas/RegisterPendingResponse'
         '400':
           $ref: '#/components/responses/BadRequest'
         '409':
@@ -130,6 +126,12 @@ paths:
           $ref: '#/components/responses/BadRequest'
         '401':
           description: Invalid email or password
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Company pending approval, rejected, or inactive
           content:
             application/json:
               schema:
@@ -207,9 +209,53 @@ paths:
                     required: [user]
                     properties:
                       user:
-                        $ref: '#/components/schemas/AuthUser'
+                        $ref: '#/components/schemas/UserProfile'
         '401':
           $ref: '#/components/responses/Unauthorized'
+
+    patch:
+      tags: [Auth]
+      summary: Update current user profile
+      description: |
+        Update the authenticated user's profile (name, email, password).
+        Returns a new access token when the email is changed.
+      operationId: updateCurrentUser
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateProfileRequest'
+            example:
+              firstName: Jane
+              lastName: Admin
+              email: admin@acme.com
+      responses:
+        '200':
+          description: Profile updated
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, data]
+                properties:
+                  status:
+                    type: string
+                    enum: [ok]
+                  data:
+                    $ref: '#/components/schemas/UpdateProfileResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '409':
+          description: Email already in use
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
 
   /api/v1/admins:
     post:
@@ -264,13 +310,150 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
 
+  /api/v1/admin/registrations:
+    get:
+      tags: [Admin]
+      summary: List company registrations
+      description: Lists company registration requests. Defaults to non-approved when `status` is omitted.
+      operationId: listRegistrations
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [pending, approved, rejected]
+      responses:
+        '200':
+          description: Registration list
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, data]
+                properties:
+                  status:
+                    type: string
+                    enum: [ok]
+                  data:
+                    type: object
+                    required: [registrations]
+                    properties:
+                      registrations:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/RegistrationRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /api/v1/admin/registrations/{tenantId}/approve:
+    post:
+      tags: [Admin]
+      summary: Approve company registration
+      description: Activates the tenant and company admin user.
+      operationId: approveRegistration
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: tenantId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Registration approved
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, data]
+                properties:
+                  status:
+                    type: string
+                    enum: [ok]
+                  data:
+                    $ref: '#/components/schemas/RegistrationRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          description: Registration not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Registration already processed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/admin/registrations/{tenantId}/reject:
+    post:
+      tags: [Admin]
+      summary: Reject company registration
+      operationId: rejectRegistration
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: tenantId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                reason:
+                  type: string
+                  maxLength: 500
+      responses:
+        '200':
+          description: Registration rejected
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, data]
+                properties:
+                  status:
+                    type: string
+                    enum: [ok]
+                  data:
+                    $ref: '#/components/schemas/RegistrationRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          description: Registration not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Registration already processed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
 components:
   securitySchemes:
     bearerAuth:
       type: http
       scheme: bearer
       bearerFormat: JWT
-      description: Short-lived access token from login or register
+      description: Short-lived access token from login
 
   responses:
     BadRequest:
@@ -346,6 +529,52 @@ components:
         lastName:
           type: string
 
+    UserProfile:
+      allOf:
+        - $ref: '#/components/schemas/AuthUser'
+        - type: object
+          required: [isActive, createdAt, updatedAt]
+          properties:
+            companyName:
+              type: string
+              description: Company name for tenant users
+            isActive:
+              type: boolean
+            createdAt:
+              type: string
+              format: date-time
+            updatedAt:
+              type: string
+              format: date-time
+
+    UpdateProfileRequest:
+      type: object
+      properties:
+        firstName:
+          type: string
+          maxLength: 100
+        lastName:
+          type: string
+          maxLength: 100
+        email:
+          type: string
+          format: email
+        currentPassword:
+          type: string
+        newPassword:
+          type: string
+          minLength: 8
+
+    UpdateProfileResponse:
+      type: object
+      required: [user]
+      properties:
+        user:
+          $ref: '#/components/schemas/UserProfile'
+        accessToken:
+          type: string
+          description: New JWT when email changed
+
     AdminUser:
       allOf:
         - $ref: '#/components/schemas/AuthUser'
@@ -401,6 +630,54 @@ components:
         firstName:
           type: string
         lastName:
+          type: string
+
+    RegisterPendingResponse:
+      type: object
+      required: [status, data]
+      properties:
+        status:
+          type: string
+          enum: [ok]
+        data:
+          type: object
+          required: [tenantId, companyName, email, status, message]
+          properties:
+            tenantId:
+              type: string
+            companyName:
+              type: string
+            email:
+              type: string
+              format: email
+            status:
+              type: string
+              enum: [pending]
+            message:
+              type: string
+
+    RegistrationRequest:
+      type: object
+      required: [tenantId, companyName, adminEmail, status, submittedAt]
+      properties:
+        tenantId:
+          type: string
+        companyName:
+          type: string
+        adminEmail:
+          type: string
+          format: email
+        adminFirstName:
+          type: string
+        adminLastName:
+          type: string
+        status:
+          type: string
+          enum: [pending, approved, rejected]
+        submittedAt:
+          type: string
+          format: date-time
+        rejectedReason:
           type: string
 
     AuthSuccessResponse:
