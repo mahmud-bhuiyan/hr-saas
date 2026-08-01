@@ -10,7 +10,7 @@ import {
   meHandler,
 } from './auth.controller.js';
 
-export function createAuthRoutes(env: ServerEnv): Router {
+export const createAuthRoutes = (env: ServerEnv): Router => {
   const router = Router();
 
   router.post('/register', createRegisterHandler(env));

@@ -13,13 +13,12 @@ interface FormModalProps {
   cancelLabel?: string;
   loading?: boolean;
   submitDisabled?: boolean;
-  error?: string;
   size?: 'sm' | 'md' | 'lg';
   submitVariant?: 'primary' | 'secondary' | 'ghost' | 'danger';
   formId?: string;
 }
 
-export function FormModal({
+export const FormModal = ({
   open,
   onClose,
   onSubmit,
@@ -30,11 +29,10 @@ export function FormModal({
   cancelLabel = 'Cancel',
   loading = false,
   submitDisabled = false,
-  error,
   size = 'md',
   submitVariant = 'primary',
   formId = 'form-modal',
-}: FormModalProps) {
+}: FormModalProps) => {
   return (
     <Modal
       open={open}
@@ -61,11 +59,6 @@ export function FormModal({
       }
     >
       <form id={formId} onSubmit={onSubmit} className="space-y-4">
-        {error && (
-          <div className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
-            {error}
-          </div>
-        )}
         {children}
       </form>
     </Modal>

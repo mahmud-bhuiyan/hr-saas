@@ -1,7 +1,7 @@
 import type { NextFunction, Response } from 'express';
 import type { AuthenticatedRequest } from './auth.js';
 
-export function resolveTenant() {
+export const resolveTenant = () => {
   return (req: AuthenticatedRequest, res: Response, next: NextFunction): void => {
     if (!req.user) {
       res.status(401).json({ status: 'error', message: 'Authentication required' });
@@ -24,7 +24,7 @@ export function resolveTenant() {
 }
 
 /** Requires a tenant on the request — blocks super_admin without tenantId. */
-export function requireTenant() {
+export const requireTenant = () => {
   return (req: AuthenticatedRequest, res: Response, next: NextFunction): void => {
     if (!req.user) {
       res.status(401).json({ status: 'error', message: 'Authentication required' });

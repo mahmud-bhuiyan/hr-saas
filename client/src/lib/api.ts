@@ -14,9 +14,16 @@ import type {
   RegisterInput,
   RegisterPendingResponse,
   RegistrationRequest,
+  TenantApprovalStatus,
+  CreateCompanyInput,
+  UpdateCompanyInput,
   UpdateProfileInput,
   UpdateProfileResponse,
   UserProfile,
+  Employee,
+  CreateEmployeeInput,
+  UpdateEmployeeInput,
+  ListEmployeesQuery,
 } from '../types';
 
 const apiBase = import.meta.env.VITE_API_URL || '';
@@ -31,11 +38,11 @@ export class ApiError extends Error {
   }
 }
 
-async function parseJson<T>(response: Response): Promise<T> {
+const parseJson = async <T,>(response: Response): Promise<T> => {
   return response.json() as Promise<T>;
 }
 
-async function refreshAccessToken(): Promise<string | null> {
+const refreshAccessToken = async (): Promise<string | null> => {
   const response = await fetch(`${apiBase}/api/v1/auth/refresh`, {
     method: 'POST',
     credentials: 'include',
@@ -50,10 +57,10 @@ async function refreshAccessToken(): Promise<string | null> {
   return json.data.accessToken;
 }
 
-export async function apiFetch<T>(
+export const apiFetch = async <T,>(
   path: string,
   options: RequestInit & { skipAuth?: boolean; _retried?: boolean } = {}
-): Promise<T> {
+): Promise<T> => {
   const { skipAuth, _retried, ...fetchOptions } = options;
   const headers = new Headers(fetchOptions.headers);
 
@@ -94,7 +101,7 @@ export async function apiFetch<T>(
   return parseJson<T>(response);
 }
 
-export async function fetchHealth(): Promise<ApiHealthResponse> {
+export const fetchHealth = async (): Promise<ApiHealthResponse> => {
   const response = await fetch(`${apiBase}/api/v1/health`);
   if (!response.ok) {
     throw new Error('Health check failed');
@@ -102,7 +109,7 @@ export async function fetchHealth(): Promise<ApiHealthResponse> {
   return response.json() as Promise<ApiHealthResponse>;
 }
 
-export async function login(input: LoginInput): Promise<AuthResponse> {
+export const login = async (input: LoginInput): Promise<AuthResponse> => {
   const json = await apiFetch<ApiSuccessResponse<AuthResponse>>('/api/v1/auth/login', {
     method: 'POST',
     body: JSON.stringify(input),
@@ -111,7 +118,7 @@ export async function login(input: LoginInput): Promise<AuthResponse> {
   return json.data;
 }
 
-export async function register(input: RegisterInput): Promise<RegisterPendingResponse> {
+export const register = async (input: RegisterInput): Promise<RegisterPendingResponse> => {
   const json = await apiFetch<ApiSuccessResponse<RegisterPendingResponse>>(
     '/api/v1/auth/register',
     {
@@ -123,14 +130,25 @@ export async function register(input: RegisterInput): Promise<RegisterPendingRes
   return json.data;
 }
 
-export async function fetchPendingRegistrations(): Promise<RegistrationRequest[]> {
+export const fetchRegistrations = async (
+  status?: TenantApprovalStatus
+): Promise<RegistrationRequest[]> => {
+  const qs = status ? `?status=${status}` : '';
   const json = await apiFetch<ApiSuccessResponse<{ registrations: RegistrationRequest[] }>>(
-    '/api/v1/admin/registrations?status=pending'
+    `/api/v1/admin/registrations${qs}`
   );
   return json.data.registrations;
 }
 
-export async function approveRegistration(tenantId: string): Promise<RegistrationRequest> {
+export const fetchPendingRegistrations = async (): Promise<RegistrationRequest[]> => {
+  return fetchRegistrations('pending');
+}
+
+export const fetchApprovedCompanies = async (): Promise<RegistrationRequest[]> => {
+  return fetchRegistrations('approved');
+}
+
+export const approveRegistration = async (tenantId: string): Promise<RegistrationRequest> => {
   const json = await apiFetch<ApiSuccessResponse<RegistrationRequest>>(
     `/api/v1/admin/registrations/${tenantId}/approve`,
     { method: 'POST' }
@@ -138,10 +156,10 @@ export async function approveRegistration(tenantId: string): Promise<Registratio
   return json.data;
 }
 
-export async function rejectRegistration(
+export const rejectRegistration = async (
   tenantId: string,
   reason?: string
-): Promise<RegistrationRequest> {
+): Promise<RegistrationRequest> => {
   const json = await apiFetch<ApiSuccessResponse<RegistrationRequest>>(
     `/api/v1/admin/registrations/${tenantId}/reject`,
     {
@@ -152,7 +170,48 @@ export async function rejectRegistration(
   return json.data;
 }
 
-export async function logout(): Promise<void> {
+export const createCompany = async (input: CreateCompanyInput): Promise<RegistrationRequest> => {
+  const json = await apiFetch<ApiSuccessResponse<RegistrationRequest>>(
+    '/api/v1/admin/registrations',
+    {
+      method: 'POST',
+      body: JSON.stringify(input),
+    }
+  );
+  return json.data;
+}
+
+export const updateCompany = async (
+  tenantId: string,
+  input: UpdateCompanyInput
+): Promise<RegistrationRequest> => {
+  const json = await apiFetch<ApiSuccessResponse<RegistrationRequest>>(
+    `/api/v1/admin/registrations/${tenantId}`,
+    {
+      method: 'PATCH',
+      body: JSON.stringify(input),
+    }
+  );
+  return json.data;
+}
+
+export const deactivateCompany = async (tenantId: string): Promise<RegistrationRequest> => {
+  const json = await apiFetch<ApiSuccessResponse<RegistrationRequest>>(
+    `/api/v1/admin/registrations/${tenantId}/deactivate`,
+    { method: 'POST' }
+  );
+  return json.data;
+}
+
+export const activateCompany = async (tenantId: string): Promise<RegistrationRequest> => {
+  const json = await apiFetch<ApiSuccessResponse<RegistrationRequest>>(
+    `/api/v1/admin/registrations/${tenantId}/activate`,
+    { method: 'POST' }
+  );
+  return json.data;
+}
+
+export const logout = async (): Promise<void> => {
   try {
     await apiFetch<ApiSuccessResponse<{ message: string }>>('/api/v1/auth/logout', {
       method: 'POST',
@@ -163,16 +222,16 @@ export async function logout(): Promise<void> {
   }
 }
 
-export async function fetchCurrentUser(): Promise<UserProfile> {
+export const fetchCurrentUser = async (): Promise<UserProfile> => {
   const json = await apiFetch<ApiSuccessResponse<{ user: UserProfile }>>('/api/v1/auth/me');
   return json.data.user;
 }
 
-export async function fetchProfile(): Promise<UserProfile> {
+export const fetchProfile = async (): Promise<UserProfile> => {
   return fetchCurrentUser();
 }
 
-export async function updateProfile(input: UpdateProfileInput): Promise<UpdateProfileResponse> {
+export const updateProfile = async (input: UpdateProfileInput): Promise<UpdateProfileResponse> => {
   const json = await apiFetch<ApiSuccessResponse<UpdateProfileResponse>>('/api/v1/auth/me', {
     method: 'PATCH',
     body: JSON.stringify(input),
@@ -180,7 +239,7 @@ export async function updateProfile(input: UpdateProfileInput): Promise<UpdatePr
   return json.data;
 }
 
-function profileToAuthUser(profile: UserProfile): AuthUser {
+const profileToAuthUser = (profile: UserProfile): AuthUser => {
   return {
     id: profile.id,
     email: profile.email,
@@ -191,7 +250,7 @@ function profileToAuthUser(profile: UserProfile): AuthUser {
   };
 }
 
-export async function bootstrapSession(): Promise<AuthUser | null> {
+export const bootstrapSession = async (): Promise<AuthUser | null> => {
   const { accessToken } = loadAuth();
 
   if (!accessToken) {
@@ -228,4 +287,58 @@ export async function bootstrapSession(): Promise<AuthUser | null> {
       return null;
     }
   }
+}
+
+const buildEmployeeQuery = (query: ListEmployeesQuery = {}): string => {
+  const params = new URLSearchParams();
+  if (query.search) params.set('search', query.search);
+  if (query.department) params.set('department', query.department);
+  if (query.status) params.set('status', query.status);
+  const qs = params.toString();
+  return qs ? `?${qs}` : '';
+}
+
+export const fetchEmployees = async (query: ListEmployeesQuery = {}): Promise<Employee[]> => {
+  const json = await apiFetch<ApiSuccessResponse<{ employees: Employee[] }>>(
+    `/api/v1/employees${buildEmployeeQuery(query)}`
+  );
+  return json.data.employees;
+}
+
+export const fetchEmployeeDepartments = async (): Promise<string[]> => {
+  const json = await apiFetch<ApiSuccessResponse<{ departments: string[] }>>(
+    '/api/v1/employees/departments'
+  );
+  return json.data.departments;
+}
+
+export const fetchEmployee = async (id: string): Promise<Employee> => {
+  const json = await apiFetch<ApiSuccessResponse<Employee>>(`/api/v1/employees/${id}`);
+  return json.data;
+}
+
+export const fetchEmployeeReports = async (id: string): Promise<Employee[]> => {
+  const json = await apiFetch<ApiSuccessResponse<{ reports: Employee[] }>>(
+    `/api/v1/employees/${id}/reports`
+  );
+  return json.data.reports;
+}
+
+export const createEmployee = async (input: CreateEmployeeInput): Promise<Employee> => {
+  const json = await apiFetch<ApiSuccessResponse<Employee>>('/api/v1/employees', {
+    method: 'POST',
+    body: JSON.stringify(input),
+  });
+  return json.data;
+}
+
+export const updateEmployee = async (
+  id: string,
+  input: UpdateEmployeeInput
+): Promise<Employee> => {
+  const json = await apiFetch<ApiSuccessResponse<Employee>>(`/api/v1/employees/${id}`, {
+    method: 'PATCH',
+    body: JSON.stringify(input),
+  });
+  return json.data;
 }

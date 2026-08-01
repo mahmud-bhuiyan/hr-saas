@@ -1,12 +1,16 @@
 import type { ButtonHTMLAttributes, ReactNode } from 'react';
 import { Spinner } from './Spinner';
 
+export type ButtonDisplay = 'both' | 'icon' | 'text';
+
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'primary' | 'secondary' | 'ghost' | 'danger';
   loading?: boolean;
   loadingText?: string;
   icon?: ReactNode;
   iconPosition?: 'left' | 'right';
+  /** Controls icon/text layout: `both`, `icon` only, or `text` only. Omit to show whatever is passed. */
+  display?: ButtonDisplay;
 }
 
 const variants = {
@@ -18,7 +22,7 @@ const variants = {
   danger: 'bg-red-600 text-white hover:bg-red-700 focus:ring-red-500 disabled:bg-red-300',
 };
 
-export function Button({
+export const Button = ({
   variant = 'primary',
   loading = false,
   loadingText,
@@ -28,25 +32,39 @@ export function Button({
   type = 'button',
   icon,
   iconPosition = 'left',
+  display,
+  'aria-label': ariaLabel,
+  title,
   ...props
-}: ButtonProps) {
-  const content = loading ? (loadingText ?? children) : children;
+}: ButtonProps) => {
+  const showIcon = Boolean(icon) && display !== 'text';
+  const showContent = display !== 'icon';
+  const isIconOnly = display === 'icon';
+  const textLabel = typeof children === 'string' ? children : undefined;
+
+  const content = loading
+    ? (loadingText ?? (showContent ? children : undefined))
+    : showContent
+      ? children
+      : undefined;
 
   return (
     <button
       type={type}
       disabled={disabled || loading}
-      className={`inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium transition focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60 ${variants[variant]} ${className}`}
+      aria-label={ariaLabel ?? (isIconOnly ? textLabel : undefined)}
+      title={title ?? (isIconOnly ? textLabel : undefined)}
+      className={`inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium transition focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60 ${variants[variant]} ${isIconOnly ? 'px-2.5' : ''} ${className}`}
       {...props}
     >
       {loading && <Spinner />}
-      {!loading && icon && iconPosition === 'left' && (
+      {!loading && showIcon && iconPosition === 'left' && (
         <span className="flex shrink-0 items-center justify-center">{icon}</span>
       )}
       {content}
-      {!loading && icon && iconPosition === 'right' && (
+      {!loading && showIcon && iconPosition === 'right' && (
         <span className="flex shrink-0 items-center justify-center">{icon}</span>
       )}
     </button>
   );
-}
+};

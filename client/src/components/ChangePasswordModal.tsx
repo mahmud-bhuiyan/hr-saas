@@ -3,6 +3,7 @@ import { FormEvent, useEffect, useMemo, useState } from 'react';
 import { HiLockClosed } from 'react-icons/hi2';
 import { useAuth } from '../contexts/AuthContext';
 import { ApiError, updateProfile } from '../lib/api';
+import { toast } from 'react-toastify';
 import { areRequiredFieldsFilled } from '../utils/form';
 import { FormField } from './ui/FormField';
 import { FormModal } from './ui/FormModal';
@@ -14,18 +15,16 @@ interface ChangePasswordModalProps {
   onSuccess?: () => void;
 }
 
-export function ChangePasswordModal({ open, onClose, onSuccess }: ChangePasswordModalProps) {
+export const ChangePasswordModal = ({ open, onClose, onSuccess }: ChangePasswordModalProps) => {
   const { setAuth, accessToken } = useAuth();
 
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
-  const [error, setError] = useState('');
 
   useEffect(() => {
     if (!open) {
       setCurrentPassword('');
       setNewPassword('');
-      setError('');
     }
   }, [open]);
 
@@ -58,13 +57,12 @@ export function ChangePasswordModal({ open, onClose, onSuccess }: ChangePassword
       onClose();
     },
     onError: (err) => {
-      setError(err instanceof ApiError ? err.message : 'Failed to change password');
+      toast.error(err instanceof ApiError ? err.message : 'Failed to change password');
     },
   });
 
-  function handleSubmit(e: FormEvent<HTMLFormElement>) {
+  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setError('');
 
     if (!canSubmit) {
       return;
@@ -83,7 +81,6 @@ export function ChangePasswordModal({ open, onClose, onSuccess }: ChangePassword
       submitLabel="Update password"
       loading={changePasswordMutation.isPending}
       submitDisabled={!canSubmit}
-      error={error}
       size="sm"
       formId="change-password-form"
     >

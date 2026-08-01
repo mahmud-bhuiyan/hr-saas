@@ -6,9 +6,10 @@ import { APP_NAME } from './constants/app.js';
 import { createAdminRoutes } from './modules/admin/admin.routes.js';
 import { createRegistrationRoutes } from './modules/admin/registration.routes.js';
 import { createAuthRoutes } from './modules/auth/auth.routes.js';
+import { createEmployeeRoutes } from './modules/employees/employee.routes.js';
 import type { ApiHealthResponse } from './types/index.js';
 
-export function createApp() {
+export const createApp = () => {
   const env = loadServerEnv();
   const app = express();
 
@@ -37,6 +38,7 @@ export function createApp() {
   app.use('/api/v1/auth', createAuthRoutes(env));
   app.use('/api/v1/admins', createAdminRoutes(env));
   app.use('/api/v1/admin/registrations', createRegistrationRoutes(env));
+  app.use('/api/v1/employees', createEmployeeRoutes(env));
 
   return app;
 }

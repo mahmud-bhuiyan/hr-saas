@@ -10,16 +10,16 @@ interface StoredAuth {
 type AuthListener = () => void;
 const listeners = new Set<AuthListener>();
 
-function notifyListeners(): void {
+const notifyListeners = (): void => {
   listeners.forEach((listener) => listener());
 }
 
-export function subscribeAuth(listener: AuthListener): () => void {
+export const subscribeAuth = (listener: AuthListener): () => void => {
   listeners.add(listener);
   return () => listeners.delete(listener);
 }
 
-export function loadAuth(): StoredAuth {
+export const loadAuth = (): StoredAuth => {
   try {
     const raw = localStorage.getItem(AUTH_STORAGE_KEY);
     if (!raw) {
@@ -43,7 +43,7 @@ export function loadAuth(): StoredAuth {
   }
 }
 
-export function saveAuth(accessToken: string | null, user: AuthUser | null): void {
+export const saveAuth = (accessToken: string | null, user: AuthUser | null): void => {
   if (!accessToken && !user) {
     localStorage.removeItem(AUTH_STORAGE_KEY);
   } else {
@@ -52,19 +52,19 @@ export function saveAuth(accessToken: string | null, user: AuthUser | null): voi
   notifyListeners();
 }
 
-export function getAccessToken(): string | null {
+export const getAccessToken = (): string | null => {
   return loadAuth().accessToken;
 }
 
-export function setAuthState(user: AuthUser, accessToken: string): void {
+export const setAuthState = (user: AuthUser, accessToken: string): void => {
   saveAuth(accessToken, user);
 }
 
-export function setUserState(user: AuthUser): void {
+export const setUserState = (user: AuthUser): void => {
   const { accessToken } = loadAuth();
   saveAuth(accessToken, user);
 }
 
-export function clearAuthState(): void {
+export const clearAuthState = (): void => {
   saveAuth(null, null);
 }

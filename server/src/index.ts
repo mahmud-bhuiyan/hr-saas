@@ -12,7 +12,7 @@ export default app;
 const isDirectRun = import.meta.url === pathToFileURL(process.argv[1] ?? '').href;
 
 if (isDirectRun) {
-  async function start(): Promise<void> {
+  const start = async (): Promise<void> => {
     if (env.mongodbUri) {
       await connectToDatabase(env.mongodbUri);
     }

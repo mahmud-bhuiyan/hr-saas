@@ -2,7 +2,7 @@ interface SpinnerProps {
   className?: string;
 }
 
-export function Spinner({ className = 'h-4 w-4' }: SpinnerProps) {
+export const Spinner = ({ className = 'h-4 w-4' }: SpinnerProps) => {
   return (
     <svg
       className={`animate-spin ${className}`}

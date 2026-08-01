@@ -15,7 +15,7 @@ import { updateProfileSchema } from './profile.validation.js';
 const REFRESH_COOKIE = 'refreshToken';
 const REFRESH_MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000;
 
-function setRefreshCookie(res: Response, token: string): void {
+const setRefreshCookie = (res: Response, token: string): void => {
   res.cookie(REFRESH_COOKIE, token, {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
@@ -25,15 +25,15 @@ function setRefreshCookie(res: Response, token: string): void {
   });
 }
 
-function clearRefreshCookie(res: Response): void {
+const clearRefreshCookie = (res: Response): void => {
   res.clearCookie(REFRESH_COOKIE, { path: '/api/v1/auth' });
 }
 
-function validationError(res: Response, message: string): void {
+const validationError = (res: Response, message: string): void => {
   res.status(400).json({ status: 'error', message });
 }
 
-export function createRegisterHandler(env: ServerEnv) {
+export const createRegisterHandler = (env: ServerEnv) => {
   return async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     try {
       const parsed = registerSchema.safeParse(req.body);
@@ -58,7 +58,7 @@ export function createRegisterHandler(env: ServerEnv) {
   };
 }
 
-export function createLoginHandler(env: ServerEnv) {
+export const createLoginHandler = (env: ServerEnv) => {
   return async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     try {
       const parsed = loginSchema.safeParse(req.body);
@@ -87,7 +87,7 @@ export function createLoginHandler(env: ServerEnv) {
   };
 }
 
-export function createRefreshHandler(env: ServerEnv) {
+export const createRefreshHandler = (env: ServerEnv) => {
   return async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     try {
       const token = req.cookies?.[REFRESH_COOKIE] as string | undefined;
@@ -127,14 +127,14 @@ export function createRefreshHandler(env: ServerEnv) {
   };
 }
 
-export function createLogoutHandler() {
+export const createLogoutHandler = () => {
   return (_req: AuthenticatedRequest, res: Response): void => {
     clearRefreshCookie(res);
     res.json({ status: 'ok', data: { message: 'Logged out' } });
   };
 }
 
-export async function meHandler(req: AuthenticatedRequest, res: Response): Promise<void> {
+export const meHandler = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
   try {
     if (!req.user) {
       res.status(401).json({ status: 'error', message: 'Authentication required' });
@@ -153,7 +153,7 @@ export async function meHandler(req: AuthenticatedRequest, res: Response): Promi
   }
 }
 
-export function createUpdateMeHandler(env: ServerEnv) {
+export const createUpdateMeHandler = (env: ServerEnv) => {
   return async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     try {
       if (!req.user) {

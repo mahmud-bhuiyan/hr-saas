@@ -10,7 +10,7 @@ export interface AuthenticatedRequest extends Request {
   tenantId?: string;
 }
 
-export function authenticate(env: ServerEnv) {
+export const authenticate = (env: ServerEnv) => {
   return (req: AuthenticatedRequest, res: Response, next: NextFunction): void => {
     const header = req.headers.authorization;
     if (!header?.startsWith('Bearer ')) {
@@ -29,7 +29,7 @@ export function authenticate(env: ServerEnv) {
   };
 }
 
-export function authorize(...roles: UserRole[]) {
+export const authorize = (...roles: UserRole[]) => {
   return (req: AuthenticatedRequest, res: Response, next: NextFunction): void => {
     if (!req.user) {
       res.status(401).json({ status: 'error', message: 'Authentication required' });
@@ -45,7 +45,7 @@ export function authorize(...roles: UserRole[]) {
   };
 }
 
-export function optionalAuthenticate(env: ServerEnv) {
+export const optionalAuthenticate = (env: ServerEnv) => {
   return (req: AuthenticatedRequest, _res: Response, next: NextFunction): void => {
     const header = req.headers.authorization;
     if (!header?.startsWith('Bearer ')) {
@@ -65,7 +65,7 @@ export function optionalAuthenticate(env: ServerEnv) {
   };
 }
 
-export function authorizePermission(...permissions: string[]) {
+export const authorizePermission = (...permissions: string[]) => {
   return (req: AuthenticatedRequest, res: Response, next: NextFunction): void => {
     if (!req.user) {
       res.status(401).json({ status: 'error', message: 'Authentication required' });

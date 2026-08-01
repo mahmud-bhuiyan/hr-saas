@@ -13,7 +13,7 @@ export interface AdminPublic {
   createdAt: string;
 }
 
-function toAdminPublic(user: IUserDocument): AdminPublic {
+const toAdminPublic = (user: IUserDocument): AdminPublic => {
   return {
     id: user._id.toString(),
     email: user.email,
@@ -25,23 +25,23 @@ function toAdminPublic(user: IUserDocument): AdminPublic {
   };
 }
 
-export async function countUsers(): Promise<number> {
+export const countUsers = async (): Promise<number> => {
   return User.countDocuments();
 }
 
-export async function countSuperAdmins(): Promise<number> {
+export const countSuperAdmins = async (): Promise<number> => {
   return User.countDocuments({ role: 'super_admin' });
 }
 
-export async function hasSuperAdmin(): Promise<boolean> {
+export const hasSuperAdmin = async (): Promise<boolean> => {
   return (await countSuperAdmins()) > 0;
 }
 
-export async function findUserByEmail(email: string): Promise<IUserDocument | null> {
+export const findUserByEmail = async (email: string): Promise<IUserDocument | null> => {
   return User.findOne({ email: email.toLowerCase().trim() });
 }
 
-export async function createAdmin(input: CreateAdminInput): Promise<AdminPublic> {
+export const createAdmin = async (input: CreateAdminInput): Promise<AdminPublic> => {
   const existing = await findUserByEmail(input.email);
   if (existing) {
     throw new AdminServiceError('Email already in use', 409);

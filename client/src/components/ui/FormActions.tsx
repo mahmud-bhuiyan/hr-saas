@@ -12,7 +12,7 @@ interface FormActionsProps {
   className?: string;
 }
 
-export function FormActions({
+export const FormActions = ({
   submitLabel = 'Save',
   cancelLabel = 'Cancel',
   loading = false,
@@ -21,7 +21,7 @@ export function FormActions({
   onCancel,
   children,
   className = '',
-}: FormActionsProps) {
+}: FormActionsProps) => {
   return (
     <div className={`flex flex-wrap justify-end gap-2 ${className}`}>
       {children}

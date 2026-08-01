@@ -7,10 +7,10 @@ import {
 } from './admin.service.js';
 import { createAdminSchema } from './admin.validation.js';
 
-export async function createAdminHandler(
+export const createAdminHandler = async (
   req: AuthenticatedRequest,
   res: Response
-): Promise<void> {
+): Promise<void> => {
   try {
     const parsed = createAdminSchema.safeParse(req.body);
     if (!parsed.success) {

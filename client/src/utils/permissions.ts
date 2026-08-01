@@ -14,7 +14,7 @@ export const PERMISSIONS: Record<UserRole, string[]> = {
   employee: ['leave:create:own', 'leave:read:own', 'profile:update:own'],
 };
 
-export function hasPermission(role: UserRole, permission: string): boolean {
+export const hasPermission = (role: UserRole, permission: string): boolean => {
   const rolePermissions = PERMISSIONS[role];
   if (rolePermissions.includes('*')) return true;
   return rolePermissions.includes(permission);

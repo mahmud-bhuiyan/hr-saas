@@ -9,6 +9,8 @@ export interface ITenant {
   rejectedReason?: string;
   approvedAt?: Date;
   approvedBy?: mongoose.Types.ObjectId;
+  createdBy?: mongoose.Types.ObjectId;
+  updatedBy?: mongoose.Types.ObjectId;
 }
 
 export interface ITenantDocument extends ITenant, Document {
@@ -29,6 +31,8 @@ const tenantSchema = new Schema<ITenantDocument>(
     rejectedReason: { type: String, trim: true },
     approvedAt: { type: Date },
     approvedBy: { type: Schema.Types.ObjectId, ref: 'User' },
+    createdBy: { type: Schema.Types.ObjectId, ref: 'User' },
+    updatedBy: { type: Schema.Types.ObjectId, ref: 'User' },
   },
   { timestamps: true }
 );

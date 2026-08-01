@@ -5,13 +5,30 @@ Check off each step with the client/dev team before moving to the next.
 | Step | Scope | Status |
 |------|-------|--------|
 | **1** | Foundation — separate client & server apps, Docker, dev scripts | ✅ Complete |
-| **2** | Auth & tenant — register, login, JWT, RBAC middleware | ✅ Complete |
-| **3** | App shell — layout, routing, design system, dashboard placeholder | ✅ Ready for review |
-| **4** | Employee management — CRUD, directory, profile | ⬜ Pending |
+| **2** | Auth & tenant — register, login, JWT, RBAC, super admin, company onboarding | ✅ Complete |
+| **3** | App shell — layout, routing, design system, dashboard, profile | ✅ Complete |
+| **4** | Employee management — CRUD, directory, profile, direct reports | ✅ Ready for review |
 | **5** | Leave & absence — requests, approval, balance, calendar | ⬜ Pending |
 | **6** | Document storage — S3 upload/download | ⬜ Pending |
 | **7** | Admin & settings — company, departments, users | ⬜ Pending |
 | **8** | Demo polish — seed data, staging deploy, bug fixes | ⬜ Pending |
+
+---
+
+## Out-of-plan additions (log)
+
+Features added during implementation that extend the original step list. Keep this section updated when scope grows mid-sprint.
+
+| Added | Step | Description |
+|-------|------|---------------|
+| Super admin role | 2 | Platform operator; bootstrap via `npm run seed:superadmin` or first-user `POST /api/v1/admins` |
+| Registration approval | 2 | Self-register creates **pending** tenant; super admin approves/rejects before login |
+| Super admin add company | 2 | `POST /api/v1/admin/registrations` — create approved company + admin in one step |
+| User profile & password | 2–3 | `GET/PATCH /api/v1/auth/me`, profile page, change-password modal |
+| UI component kit | 3 | Reusable primitives in `client/src/components/ui/` (Button, Table, Modal, FormModal, etc.) |
+| Companies page (super admin) | 3 | `/dashboard/registrations` — pending queue + add company |
+| Manager team-scoped employee read | 4 | Managers see direct reports only (`employee:read:team`) |
+| Direct reports org view | 4 | `GET /api/v1/employees/:id/reports` + profile section |
 
 ---
 
@@ -31,15 +48,19 @@ Check off each step with the client/dev team before moving to the next.
 
 ## Step 2 — Done when
 
-- [x] `POST /api/v1/auth/register` creates a tenant + company admin user
+- [x] `POST /api/v1/auth/register` creates a tenant + company admin user (**pending** approval)
 - [x] `POST /api/v1/auth/login` returns access token and sets refresh cookie
 - [x] `POST /api/v1/auth/refresh` returns a new access token (with cookie)
 - [x] `POST /api/v1/auth/logout` clears refresh cookie
 - [x] `GET /api/v1/auth/me` returns current user when Bearer token is valid
+- [x] `PATCH /api/v1/auth/me` updates profile and optional password
 - [x] JWT middleware rejects invalid/expired tokens (401)
 - [x] RBAC `authorize()` and `authorizePermission()` middleware in place
 - [x] Tenant middleware (`resolveTenant`, `requireTenant`) in place
-- [x] `docs/openapi.yaml` and Postman collection updated with auth endpoints
+- [x] Super admin bootstrap (`POST /api/v1/admins`, `npm run seed:superadmin`)
+- [x] Super admin: list / approve / reject pending registrations
+- [x] Super admin: create company directly (auto-approved)
+- [x] `docs/openapi.yaml` and Postman collection updated with auth + admin endpoints
 
 **Review:** Test auth flow manually (curl/Postman) before Step 3.
 
@@ -47,10 +68,14 @@ Check off each step with the client/dev team before moving to the next.
 
 ## Step 3 — Done when
 
-- [x] React Router with protected routes
+- [x] React Router with protected routes (`ProtectedRoute`, `GuestRoute`)
 - [x] Login and register pages wired to auth API
 - [x] Dashboard placeholder after login
 - [x] Auth state persisted (access token + refresh on 401)
+- [x] App shell with sidebar nav and role-based menu items
+- [x] Reusable UI component kit (`client/src/components/ui/`)
+- [x] User profile page (`/dashboard/profile`) with change password
+- [x] Companies page for super admin (`/dashboard/registrations`)
 
 **Review:** Confirm UI shell and auth UX before Step 4.
 
@@ -58,10 +83,63 @@ Check off each step with the client/dev team before moving to the next.
 
 ## Step 4 — Done when
 
-- [ ] Employee CRUD API endpoints
-- [ ] Employee directory page (list, search, filter)
-- [ ] Add / edit employee forms
-- [ ] Employee profile page
-- [ ] `docs/openapi.yaml` and Postman collection updated
+- [x] Employee CRUD API endpoints (`/api/v1/employees`)
+- [x] Employee directory page (list, search, filter by department/status)
+- [x] Add employee form (modal)
+- [x] Edit employee on profile page; deactivate via status
+- [x] Employee profile page with direct reports (simple org view)
+- [x] Permission-based access (`employee:create/read/update`, team read for managers)
+- [x] `docs/openapi.yaml` and Postman collection updated
+
+**Not in Step 4 (deferred):** Link employee record to login user (invite flow) — target Step 7 or later.
 
 **Review:** Test employee flows before Step 5.
+
+---
+
+## Step 5 — Done when
+
+- [ ] Leave types (annual, sick, unpaid)
+- [ ] Submit leave request API + employee UI
+- [ ] Approval queue for manager / HR
+- [ ] Leave balance per employee (fixed entitlement)
+- [ ] Team leave calendar (read-only month view)
+- [ ] Email notification on submit and approve/decline
+- [ ] `docs/openapi.yaml` and Postman collection updated
+
+**Review:** Test leave flows before Step 6.
+
+---
+
+## Step 6 — Done when
+
+- [ ] S3/R2 upload and download with permission checks
+- [ ] Document categories (contract, ID, certification, other)
+- [ ] Document list and upload UI
+- [ ] Optional expiry date on documents
+- [ ] `docs/openapi.yaml` and Postman collection updated
+
+**Review:** Test document flows before Step 7.
+
+---
+
+## Step 7 — Done when
+
+- [ ] Company profile settings (name, address, logo)
+- [ ] Departments CRUD (replace free-text department on employees)
+- [ ] User list with role assignment
+- [x] Dashboard summary cards wired to real counts (role-based: super admin, tenant admin, manager, employee)
+- [ ] `docs/openapi.yaml` and Postman collection updated
+
+**Review:** Test settings before Step 8.
+
+---
+
+## Step 8 — Done when
+
+- [ ] Demo seed data (Acme Ltd, sample employees, leave, documents)
+- [ ] Staging deployment (client + server)
+- [ ] Bug fixes on demo walkthrough path
+- [ ] Forgot password flow (if required for Demo 1 sign-off)
+
+**Review:** Client demo sign-off per [00-client-demo-plan.md](./00-client-demo-plan.md) Section 7.

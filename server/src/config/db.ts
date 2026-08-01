@@ -1,7 +1,7 @@
 import dns from 'node:dns';
 import mongoose from 'mongoose';
 
-function configureDnsForMongoSrv(uri: string): void {
+const configureDnsForMongoSrv = (uri: string): void => {
   if (!uri.startsWith('mongodb+srv://')) {
     return;
   }
@@ -11,7 +11,7 @@ function configureDnsForMongoSrv(uri: string): void {
   dns.setServers(servers?.length ? servers : ['8.8.8.8', '1.1.1.1']);
 }
 
-export async function connectToDatabase(uri: string): Promise<void> {
+export const connectToDatabase = async (uri: string): Promise<void> => {
   if (!uri) {
     throw new Error('MONGODB_URI is required');
   }
@@ -29,6 +29,6 @@ export async function connectToDatabase(uri: string): Promise<void> {
   await mongoose.connect(uri);
 }
 
-export async function disconnectFromDatabase(): Promise<void> {
+export const disconnectFromDatabase = async (): Promise<void> => {
   await mongoose.disconnect();
 }

@@ -11,7 +11,7 @@ dotenv.config({ path: path.resolve(__dirname, '../.env.local') });
 const SUPERADMIN_EMAIL = 'superadmin@hr.com';
 const SUPERADMIN_PASSWORD = 'User@123';
 
-async function seedSuperAdmin(): Promise<void> {
+const seedSuperAdmin = async (): Promise<void> => {
   const uri = process.env.MONGODB_URI;
   if (!uri) {
     throw new Error('MONGODB_URI is required');

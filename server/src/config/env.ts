@@ -14,7 +14,7 @@ export interface ServerEnv {
   adminJwtSecret: string;
 }
 
-export function loadServerEnv(): ServerEnv {
+export const loadServerEnv = (): ServerEnv => {
   return {
     port: Number(process.env.PORT) || 5000,
     mongodbUri: process.env.MONGODB_URI ?? '',
