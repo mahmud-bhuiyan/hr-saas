@@ -70,7 +70,7 @@ Create **two** Vercel projects from the same repo, each with a different root di
 | Project | Root directory | Build command | Output |
 |---------|----------------|---------------|--------|
 | **Client** | `client` | `npm run build` (auto-detected) | `dist` |
-| **Server** | `server` | (none — serverless) | — |
+| **Server** | `server` | (none — Vercel Express) | — |
 
 **Deploy server first**, then client (client needs the server URL for `VITE_API_URL`).
 
@@ -84,7 +84,7 @@ Create **two** Vercel projects from the same repo, each with a different root di
 
 3. **Update server** — Set `CLIENT_URL` to the client URL, then redeploy server (CORS).
 
-Config files: `client/vercel.json`, `server/vercel.json`, `server/api/index.ts` (Express serverless entry).
+Config files: `client/vercel.json`, `server/app.ts` (Vercel Express entry).
 
 ## Testing
 
