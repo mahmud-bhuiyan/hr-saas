@@ -1,7 +1,7 @@
 import { pathToFileURL } from 'node:url';
-import { createApp } from '../src/app.js';
-import { connectToDatabase } from '../src/config/db.js';
-import { loadServerEnv } from '../src/config/env.js';
+import { connectToDatabase } from './config/db.js';
+import { loadServerEnv } from './config/env.js';
+import { createApp } from './create-app.js';
 
 const env = loadServerEnv();
 const app = createApp();

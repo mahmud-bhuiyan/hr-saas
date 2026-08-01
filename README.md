@@ -84,7 +84,7 @@ Create **two** Vercel projects from the same repo, each with a different root di
 
 3. **Update server** — Set `CLIENT_URL` to the client URL, then redeploy server (CORS).
 
-Config files: `client/vercel.json`, `server/vercel.json`, `server/api/index.ts` (Vercel + dev entry).
+Config files: `client/vercel.json`, `server/vercel.json`, `server/src/index.ts` (Vercel Express + local entry; must default-export the Express app).
 
 ## Testing
 
