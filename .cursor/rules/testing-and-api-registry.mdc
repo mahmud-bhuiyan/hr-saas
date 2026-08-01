@@ -13,6 +13,12 @@ Read `AGENTS.md` for full instructions.
 - **No `apps/` folder** — use root `client/` and `server/`
 - **No root node_modules**
 
+## Client UI
+- Reuse components in `client/src/components/ui/` (Button, FormModal, Table, Dropdown, PasswordInput, etc.)
+- Create forms: save disabled until required fields filled; edit forms: save disabled until data changes
+- PATCH only changed fields; server applies partial updates
+- Password fields use `PasswordInput`; buttons show spinner while loading; use colorful `react-icons`
+
 ## Node.js
 - Minimum **Node 22+**
 

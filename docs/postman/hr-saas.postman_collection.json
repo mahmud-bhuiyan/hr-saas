@@ -2,7 +2,7 @@
   "info": {
     "_postman_id": "hr-saas-api-collection",
     "name": "HR SaaS API",
-    "description": "All API requests for the HR SaaS platform. Import into Postman or use with Newman.\n\n**Setup:** Import `hr-saas.local.postman_environment.json` or set collection variables `baseUrl` and `accessToken`.\n\n**Auth flow:** Run Register or Login — the test script saves `accessToken` automatically. Refresh/Logout use the cookie jar for the refresh token.",
+    "description": "All API requests for the HR SaaS platform. Import into Postman or use with Newman.\n\n**Setup:** Import `hr-saas.local.postman_environment.json` or set collection variables `baseUrl`, `accessToken`, and `pendingTenantId`.\n\n**Auth flow:** Register submits for approval (no token). Super admin approves, then company admin logs in. Login saves `accessToken` automatically.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
@@ -12,6 +12,10 @@
     },
     {
       "key": "accessToken",
+      "value": ""
+    },
+    {
+      "key": "pendingTenantId",
       "value": ""
     }
   ],
@@ -54,7 +58,7 @@
                 "exec": [
                   "if (pm.response.code === 201) {",
                   "  const json = pm.response.json();",
-                  "  pm.collectionVariables.set('accessToken', json.data.accessToken);",
+                  "  pm.collectionVariables.set('pendingTenantId', json.data.tenantId);",
                   "}"
                 ]
               }
@@ -73,7 +77,7 @@
               "raw": "{\n  \"companyName\": \"Acme Ltd\",\n  \"email\": \"admin@acme.com\",\n  \"password\": \"TestPass123\",\n  \"firstName\": \"Jane\",\n  \"lastName\": \"Admin\"\n}"
             },
             "url": "{{baseUrl}}/api/v1/auth/register",
-            "description": "Creates tenant + company_admin. Sets refresh cookie and returns accessToken."
+            "description": "Submits company for super admin approval. Returns pending status — no accessToken."
           },
           "response": []
         },
@@ -106,7 +110,7 @@
               "raw": "{\n  \"email\": \"admin@acme.com\",\n  \"password\": \"TestPass123\"\n}"
             },
             "url": "{{baseUrl}}/api/v1/auth/login",
-            "description": "Returns accessToken and sets refresh httpOnly cookie."
+            "description": "Returns accessToken after company is approved. Pending registrations get 403."
           },
           "response": []
         },
@@ -160,7 +164,110 @@
             "method": "GET",
             "header": [],
             "url": "{{baseUrl}}/api/v1/auth/me",
-            "description": "Returns the authenticated user. Requires Bearer accessToken."
+            "description": "Returns full profile for any authenticated role (super_admin, company_admin, etc.)."
+          },
+          "response": []
+        },
+        {
+          "name": "Update Profile (me)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"Jane\",\n  \"lastName\": \"Admin\",\n  \"email\": \"admin@acme.com\"\n}"
+            },
+            "url": "{{baseUrl}}/api/v1/auth/me",
+            "description": "Update own profile. Include currentPassword + newPassword to change password."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Registrations (super_admin)",
+      "item": [
+        {
+          "name": "List Pending Registrations",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/admin/registrations?status=pending",
+            "description": "Requires super_admin Bearer token."
+          },
+          "response": []
+        },
+        {
+          "name": "Approve Registration",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/admin/registrations/{{pendingTenantId}}/approve",
+            "description": "Approves pending company. Set pendingTenantId from Register response."
+          },
+          "response": []
+        },
+        {
+          "name": "Reject Registration",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reason\": \"Does not meet onboarding criteria\"\n}"
+            },
+            "url": "{{baseUrl}}/api/v1/admin/registrations/{{pendingTenantId}}/reject",
+            "description": "Rejects pending company registration."
           },
           "response": []
         }

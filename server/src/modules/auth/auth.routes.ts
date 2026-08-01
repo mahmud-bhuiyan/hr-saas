@@ -6,6 +6,7 @@ import {
   createLogoutHandler,
   createRefreshHandler,
   createRegisterHandler,
+  createUpdateMeHandler,
   meHandler,
 } from './auth.controller.js';
 
@@ -19,6 +20,7 @@ export function createAuthRoutes(env: ServerEnv): Router {
   router.get('/me', authenticate(env), (req, res) => {
     void meHandler(req, res);
   });
+  router.patch('/me', authenticate(env), createUpdateMeHandler(env));
 
   return router;
 }
