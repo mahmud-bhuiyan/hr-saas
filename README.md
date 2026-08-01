@@ -42,7 +42,7 @@ npm run dev
 |-----|-----|
 | Client | http://localhost:5173 |
 | Server | http://localhost:5000 |
-| Health | http://localhost:5000/api/health |
+| Health | http://localhost:5000/api/v1/health |
 
 ## Environment files
 
@@ -76,7 +76,7 @@ Create **two** Vercel projects from the same repo, each with a different root di
 
 1. **Server project** — Root: `server`
    - Env vars: `MONGODB_URI`, `CLIENT_URL` (set after client deploys), `ADMIN_JWT_SECRET`, `REDIS_URL`
-   - Health check: `https://<server-project>.vercel.app/api/health`
+   - Health check: `https://<server-project>.vercel.app/api/v1/health`
 
 2. **Client project** — Root: `client`
    - Env var: `VITE_API_URL` = server URL (e.g. `https://<server-project>.vercel.app`)
@@ -95,6 +95,8 @@ cd client && npm test
 
 - API list: [docs/API-REGISTRY.md](./docs/API-REGISTRY.md)
 - Agent rules: [AGENTS.md](./AGENTS.md)
+
+**Keep this file current.** When setup, env, commands, or deployment change, update the README in the same PR. See [AGENTS.md](./AGENTS.md) for the full checklist.
 
 ## Implementation progress
 

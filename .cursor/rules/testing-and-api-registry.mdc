@@ -1,5 +1,5 @@
 ---
-description: Mandatory unit tests and API registry for all new code
+description: Mandatory tests, API registry, and README updates for all new code
 alwaysApply: true
 ---
 
@@ -25,3 +25,6 @@ Read `AGENTS.md` for full instructions.
 1. Document in `docs/API-REGISTRY.md`
 2. Supertest test in `server/tests/api/<module>.test.ts`
 3. Run `cd server && npm test`
+
+## README
+Update `README.md` when setup, env, commands, architecture, or deployment changes. Link to `docs/` for detailed API and plan docs — do not duplicate them.

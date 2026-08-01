@@ -18,19 +18,22 @@ When you add, change, or remove an endpoint:
 
 ## Endpoints
 
+All API routes are versioned under `/api/v1`. Add future breaking changes under `/api/v2`, etc.
+
 ### Health
 
 | Method | Path | Auth | Roles | Description | Test file |
 |--------|------|------|-------|-------------|-----------|
-| GET | `/api/health` | No | — | Service health check | `server/tests/api/health.test.ts` |
+| GET | `/` | No | — | Root — confirms server is running | `server/tests/api/root.test.ts` |
+| GET | `/api/v1/health` | No | — | Service health check | `server/tests/api/health.test.ts` |
 
 ---
 
-### Auth *(Step 2 — not implemented yet)*
+### Auth *(Step 2 — in progress)*
 
 | Method | Path | Auth | Roles | Description | Test file |
 |--------|------|------|-------|-------------|-----------|
-| — | — | — | — | *Add rows when Step 2 is built* | — |
+| POST | `/api/v1/admins` | Bootstrap: No (first user only). Otherwise: Yes | super_admin | Create admin user. Bootstrap allows unauthenticated `super_admin` when DB has zero users. | `server/tests/api/admin.test.ts` |
 
 ---
 
@@ -45,5 +48,5 @@ When you add, change, or remove an endpoint:
 ## Template (copy for new endpoints)
 
 ```markdown
-| POST | `/api/example` | Yes | company_admin, hr_manager | Create example | `server/tests/api/example.test.ts` |
+| POST | `/api/v1/example` | Yes | company_admin, hr_manager | Create example | `server/tests/api/example.test.ts` |
 ```

@@ -38,8 +38,7 @@ export default function App() {
             )}
             {healthQuery.isSuccess && (
               <p className="mt-1 text-sm text-green-700">
-                {healthQuery.data.service} — {healthQuery.data.status} (
-                {healthQuery.data.timestamp})
+                Server is running — {healthQuery.data.service}
               </p>
             )}
           </div>

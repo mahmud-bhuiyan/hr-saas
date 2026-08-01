@@ -65,6 +65,16 @@ Run `npm test` in that folder before finishing work.
 2. Add Supertest test in `server/tests/api/<module>.test.ts` using `createApp()` from `server/src/app.ts`
 3. Run `cd server && npm test`
 
+### README (keep current)
+
+Update [`README.md`](./README.md) whenever a change affects how someone sets up, runs, tests, or deploys the project. Examples:
+
+- Prerequisites, folder structure, or architecture
+- Env vars, commands, URLs, or deployment steps
+- Notable new capabilities a developer needs to know on day one
+
+Do not duplicate detailed API or plan docs — link to `docs/API-REGISTRY.md` and `docs/plan/` instead.
+
 ---
 
 ## Server conventions
@@ -97,4 +107,5 @@ cd client && npm test
 - Share code via a common package (duplicate in client/server instead)
 - Add endpoints without `docs/API-REGISTRY.md` entry
 - Add functions without unit tests
+- Change setup, env, commands, or deployment without updating `README.md`
 - Trust `tenantId` from the client
