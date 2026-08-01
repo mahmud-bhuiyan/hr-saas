@@ -20,7 +20,7 @@ Check off each step with the client/dev team before moving to the next.
 - [ ] `npm install` succeeds at repo root
 - [ ] `npm run dev` starts client (port 5173) and server (port 4000)
 - [ ] Client shows HR SaaS welcome shell
-- [ ] `GET http://localhost:4000/api/health` returns `{ status: "ok" }`
+- [ ] `GET http://localhost:4000/api/v1/health` returns `{ status: "ok" }`
 - [ ] `docker compose up -d` starts MongoDB and Redis
 - [ ] `cd server && npm test` passes
 - [ ] `cd client && npm run build` succeeds
