@@ -5,6 +5,8 @@ import {
   fetchApprovedCompanies,
   fetchEmployeeDepartments,
   fetchEmployees,
+  fetchMyLeaveBalance,
+  fetchPendingLeaveCount,
   fetchPendingRegistrations,
   fetchProfile,
 } from '../../../lib/api';
@@ -37,6 +39,10 @@ export const useDashboardData = (): {
     (hasPermission(user.role, 'employee:read') || hasPermission(user.role, 'employee:read:team'));
   const canReadAllEmployees = !!user && hasPermission(user.role, 'employee:read');
   const canCreateEmployee = !!user && hasPermission(user.role, 'employee:create');
+  const canApproveLeave =
+    !!user &&
+    (hasPermission(user.role, 'leave:approve') || hasPermission(user.role, 'leave:approve:team'));
+  const canReadOwnLeave = !!user && hasPermission(user.role, 'leave:read:own');
   const isManager = role === 'manager';
   const isEmployee = role === 'employee';
 
@@ -70,6 +76,21 @@ export const useDashboardData = (): {
     enabled: isEmployee,
   });
 
+  const pendingLeaveQuery = useQuery({
+    queryKey: ['dashboard', 'leave', 'pending-count'],
+    queryFn: fetchPendingLeaveCount,
+    enabled: canApproveLeave && !isSuperAdmin,
+  });
+
+  const leaveBalanceQuery = useQuery({
+    queryKey: ['dashboard', 'leave', 'balance'],
+    queryFn: fetchMyLeaveBalance,
+    enabled: canReadOwnLeave && isEmployee,
+    retry: false,
+  });
+
+  const pendingLeaveCount = pendingLeaveQuery.data ?? 0;
+
   const cards = useMemo((): DashboardCard[] => {
     if (!role) {
       return [];
@@ -80,15 +101,22 @@ export const useDashboardData = (): {
     }
 
     if (canReadAllEmployees) {
-      return tenantAdminCards(employeesQuery.data ?? [], departmentsQuery.data ?? []);
+      return tenantAdminCards(
+        employeesQuery.data ?? [],
+        departmentsQuery.data ?? [],
+        pendingLeaveCount
+      );
     }
 
     if (isManager) {
-      return managerCards(employeesQuery.data ?? []);
+      return managerCards(employeesQuery.data ?? [], pendingLeaveCount);
     }
 
     if (isEmployee) {
-      return employeeCards(profileQuery.data?.companyName);
+      return employeeCards(
+        profileQuery.data?.companyName,
+        leaveBalanceQuery.isError ? undefined : leaveBalanceQuery.data
+      );
     }
 
     return [];
@@ -103,6 +131,9 @@ export const useDashboardData = (): {
     employeesQuery.data,
     departmentsQuery.data,
     profileQuery.data,
+    pendingLeaveCount,
+    leaveBalanceQuery.data,
+    leaveBalanceQuery.isError,
   ]);
 
   const links = useMemo((): DashboardLink[] => {
@@ -133,7 +164,8 @@ export const useDashboardData = (): {
     (isSuperAdmin && (pendingQuery.isLoading || approvedQuery.isLoading)) ||
     (canReadEmployees && !isSuperAdmin && employeesQuery.isLoading) ||
     (canReadAllEmployees && !isSuperAdmin && departmentsQuery.isLoading) ||
-    (isEmployee && profileQuery.isLoading);
+    (canApproveLeave && !isSuperAdmin && pendingLeaveQuery.isLoading) ||
+    (isEmployee && (profileQuery.isLoading || leaveBalanceQuery.isLoading));
 
   const description = role ? dashboardDescription(role) : 'Your HR workspace is ready.';
 

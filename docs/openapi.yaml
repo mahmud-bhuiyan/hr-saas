@@ -27,6 +27,8 @@ tags:
     description: Platform admin user management and company registration approval
   - name: Employees
     description: Tenant-scoped employee directory and profiles
+  - name: Leave
+    description: Leave requests, balances, approval, and team calendar
   - name: Platform
     description: Platform-wide site branding and configuration
   - name: Settings
@@ -675,6 +677,18 @@ paths:
           in: query
           schema:
             $ref: '#/components/schemas/EmployeeStatus'
+        - name: sortBy
+          in: query
+          schema:
+            type: string
+            enum: [name, employeeNumber, jobTitle, department, manager]
+          description: Sort field (default `name`)
+        - name: sortOrder
+          in: query
+          schema:
+            type: string
+            enum: [asc, desc]
+          description: Sort direction (default `asc`)
       responses:
         '200':
           description: Employee list
@@ -914,6 +928,392 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/leave/requests:
+    get:
+      tags: [Leave]
+      summary: List leave requests
+      description: |
+        Returns leave requests scoped by role: own (employee), team (manager), or all (HR/admin).
+      operationId: listLeaveRequests
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: status
+          in: query
+          schema:
+            $ref: '#/components/schemas/LeaveRequestStatus'
+        - name: employeeId
+          in: query
+          schema:
+            type: string
+        - name: from
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: to
+          in: query
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: Leave request list
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, data]
+                properties:
+                  status:
+                    type: string
+                    enum: [ok]
+                  data:
+                    type: object
+                    required: [requests]
+                    properties:
+                      requests:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/LeaveRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+    post:
+      tags: [Leave]
+      summary: Submit leave request
+      description: Requires `leave:create:own`. Resolves employee via userId or email fallback.
+      operationId: createLeaveRequest
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateLeaveRequest'
+            example:
+              type: annual
+              startDate: '2026-03-10'
+              endDate: '2026-03-12'
+              reason: Family holiday
+      responses:
+        '201':
+          description: Leave request created
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, data]
+                properties:
+                  status:
+                    type: string
+                    enum: [ok]
+                  data:
+                    $ref: '#/components/schemas/LeaveRequest'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          description: Overlapping leave request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/leave/requests/{id}:
+    get:
+      tags: [Leave]
+      summary: Get leave request
+      operationId: getLeaveRequest
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Leave request
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, data]
+                properties:
+                  status:
+                    type: string
+                    enum: [ok]
+                  data:
+                    $ref: '#/components/schemas/LeaveRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/v1/leave/requests/{id}/cancel:
+    post:
+      tags: [Leave]
+      summary: Cancel pending leave request
+      description: Employee can cancel own pending requests only.
+      operationId: cancelLeaveRequest
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Cancelled leave request
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, data]
+                properties:
+                  status:
+                    type: string
+                    enum: [ok]
+                  data:
+                    $ref: '#/components/schemas/LeaveRequest'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/v1/leave/requests/{id}/approve:
+    post:
+      tags: [Leave]
+      summary: Approve leave request
+      description: Requires `leave:approve` or `leave:approve:team` (direct reports only).
+      operationId: approveLeaveRequest
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Approved leave request
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, data]
+                properties:
+                  status:
+                    type: string
+                    enum: [ok]
+                  data:
+                    $ref: '#/components/schemas/LeaveRequest'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/v1/leave/requests/{id}/decline:
+    post:
+      tags: [Leave]
+      summary: Decline leave request
+      operationId: declineLeaveRequest
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeclineLeaveRequest'
+      responses:
+        '200':
+          description: Declined leave request
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, data]
+                properties:
+                  status:
+                    type: string
+                    enum: [ok]
+                  data:
+                    $ref: '#/components/schemas/LeaveRequest'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/v1/leave/balances/me:
+    get:
+      tags: [Leave]
+      summary: Get my annual leave balance
+      operationId: getMyLeaveBalance
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Leave balance for current year
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, data]
+                properties:
+                  status:
+                    type: string
+                    enum: [ok]
+                  data:
+                    $ref: '#/components/schemas/LeaveBalance'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /api/v1/leave/balances/{employeeId}:
+    get:
+      tags: [Leave]
+      summary: Get employee leave balance
+      description: Requires `leave:approve` (HR/admin).
+      operationId: getEmployeeLeaveBalance
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: employeeId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Employee leave balance
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, data]
+                properties:
+                  status:
+                    type: string
+                    enum: [ok]
+                  data:
+                    $ref: '#/components/schemas/LeaveBalance'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/v1/leave/calendar:
+    get:
+      tags: [Leave]
+      summary: Team leave calendar
+      description: Returns approved and pending leave for the given month (team or all).
+      operationId: getLeaveCalendar
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: year
+          in: query
+          required: true
+          schema:
+            type: integer
+            example: 2026
+        - name: month
+          in: query
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 12
+            example: 3
+      responses:
+        '200':
+          description: Calendar entries
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, data]
+                properties:
+                  status:
+                    type: string
+                    enum: [ok]
+                  data:
+                    type: object
+                    required: [entries]
+                    properties:
+                      entries:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/LeaveCalendarEntry'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /api/v1/leave/pending-count:
+    get:
+      tags: [Leave]
+      summary: Count pending leave requests
+      description: Scoped by role for dashboard cards.
+      operationId: countPendingLeave
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Pending count
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, data]
+                properties:
+                  status:
+                    type: string
+                    enum: [ok]
+                  data:
+                    type: object
+                    required: [count]
+                    properties:
+                      count:
+                        type: integer
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
 
   /api/v1/platform/site-config:
     get:
@@ -1185,6 +1585,12 @@ components:
             $ref: '#/components/schemas/ErrorResponse'
     Forbidden:
       description: Insufficient permissions
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    NotFound:
+      description: Resource not found
       content:
         application/json:
           schema:
@@ -1505,6 +1911,12 @@ components:
         userId:
           type: string
           description: Linked login user, when set
+        createdByName:
+          type: string
+          description: Display name of the user who created the record
+        updatedByName:
+          type: string
+          description: Display name of the user who last updated the record
         createdAt:
           type: string
           format: date-time
@@ -1731,3 +2143,133 @@ components:
           type: string
           nullable: true
           pattern: '^#[0-9A-Fa-f]{6}$'
+
+    LeaveType:
+      type: string
+      enum: [annual, sick, unpaid]
+
+    LeaveRequestStatus:
+      type: string
+      enum: [pending, approved, declined, cancelled]
+
+    LeaveEmployeeSummary:
+      type: object
+      required: [id, firstName, lastName]
+      properties:
+        id:
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+        email:
+          type: string
+          format: email
+
+    LeaveRequest:
+      type: object
+      required: [id, employeeId, employee, type, startDate, endDate, halfDay, days, status, createdAt, updatedAt]
+      properties:
+        id:
+          type: string
+        employeeId:
+          type: string
+        employee:
+          $ref: '#/components/schemas/LeaveEmployeeSummary'
+        type:
+          $ref: '#/components/schemas/LeaveType'
+        startDate:
+          type: string
+          format: date
+        endDate:
+          type: string
+          format: date
+        halfDay:
+          type: boolean
+        days:
+          type: number
+        reason:
+          type: string
+        status:
+          $ref: '#/components/schemas/LeaveRequestStatus'
+        approverId:
+          type: string
+        approvedAt:
+          type: string
+          format: date-time
+        declineReason:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    CreateLeaveRequest:
+      type: object
+      required: [type, startDate, endDate]
+      properties:
+        type:
+          $ref: '#/components/schemas/LeaveType'
+        startDate:
+          type: string
+          format: date
+        endDate:
+          type: string
+          format: date
+        halfDay:
+          type: boolean
+          default: false
+        reason:
+          type: string
+          maxLength: 500
+
+    DeclineLeaveRequest:
+      type: object
+      properties:
+        declineReason:
+          type: string
+          maxLength: 500
+
+    LeaveBalance:
+      type: object
+      required: [employeeId, year, entitlement, taken, pending, carriedOver, remaining]
+      properties:
+        employeeId:
+          type: string
+        year:
+          type: integer
+        entitlement:
+          type: number
+        taken:
+          type: number
+        pending:
+          type: number
+        carriedOver:
+          type: number
+        remaining:
+          type: number
+
+    LeaveCalendarEntry:
+      type: object
+      required: [id, employeeId, employeeName, type, startDate, endDate, halfDay, status]
+      properties:
+        id:
+          type: string
+        employeeId:
+          type: string
+        employeeName:
+          type: string
+        type:
+          $ref: '#/components/schemas/LeaveType'
+        startDate:
+          type: string
+          format: date
+        endDate:
+          type: string
+          format: date
+        halfDay:
+          type: boolean
+        status:
+          $ref: '#/components/schemas/LeaveRequestStatus'

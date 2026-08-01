@@ -42,7 +42,7 @@ export const FormModal = ({
       size={size}
       footer={
         <div className="flex justify-end gap-2">
-          <Button type="button" variant="ghost" onClick={onClose} disabled={loading}>
+          <Button type="button" variant="secondary" onClick={onClose} disabled={loading}>
             {cancelLabel}
           </Button>
           <Button

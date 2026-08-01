@@ -24,6 +24,11 @@ import type {
   CreateEmployeeInput,
   UpdateEmployeeInput,
   ListEmployeesQuery,
+  LeaveRequest,
+  LeaveBalance,
+  LeaveCalendarEntry,
+  CreateLeaveRequestInput,
+  ListLeaveRequestsQuery,
   SiteConfig,
   EffectiveBranding,
   PlatformSiteSettings,
@@ -302,6 +307,8 @@ const buildEmployeeQuery = (query: ListEmployeesQuery = {}): string => {
   if (query.search) params.set('search', query.search);
   if (query.department) params.set('department', query.department);
   if (query.status) params.set('status', query.status);
+  if (query.sortBy) params.set('sortBy', query.sortBy);
+  if (query.sortOrder) params.set('sortOrder', query.sortOrder);
   const qs = params.toString();
   return qs ? `?${qs}` : '';
 }
@@ -426,4 +433,94 @@ export const updateTenantBranding = async (
     body: JSON.stringify(input),
   });
   return json.data;
+};
+
+const buildLeaveQuery = (query: ListLeaveRequestsQuery = {}): string => {
+  const params = new URLSearchParams();
+  if (query.status) params.set('status', query.status);
+  if (query.employeeId) params.set('employeeId', query.employeeId);
+  if (query.from) params.set('from', query.from);
+  if (query.to) params.set('to', query.to);
+  const qs = params.toString();
+  return qs ? `?${qs}` : '';
+};
+
+export const fetchLeaveRequests = async (
+  query: ListLeaveRequestsQuery = {}
+): Promise<LeaveRequest[]> => {
+  const json = await apiFetch<ApiSuccessResponse<{ requests: LeaveRequest[] }>>(
+    `/api/v1/leave/requests${buildLeaveQuery(query)}`
+  );
+  return json.data.requests;
+};
+
+export const createLeaveRequest = async (
+  input: CreateLeaveRequestInput
+): Promise<LeaveRequest> => {
+  const json = await apiFetch<ApiSuccessResponse<LeaveRequest>>('/api/v1/leave/requests', {
+    method: 'POST',
+    body: JSON.stringify(input),
+  });
+  return json.data;
+};
+
+export const cancelLeaveRequest = async (id: string): Promise<LeaveRequest> => {
+  const json = await apiFetch<ApiSuccessResponse<LeaveRequest>>(
+    `/api/v1/leave/requests/${id}/cancel`,
+    { method: 'POST' }
+  );
+  return json.data;
+};
+
+export const approveLeaveRequest = async (id: string): Promise<LeaveRequest> => {
+  const json = await apiFetch<ApiSuccessResponse<LeaveRequest>>(
+    `/api/v1/leave/requests/${id}/approve`,
+    { method: 'POST' }
+  );
+  return json.data;
+};
+
+export const declineLeaveRequest = async (
+  id: string,
+  declineReason?: string
+): Promise<LeaveRequest> => {
+  const json = await apiFetch<ApiSuccessResponse<LeaveRequest>>(
+    `/api/v1/leave/requests/${id}/decline`,
+    {
+      method: 'POST',
+      body: JSON.stringify({ declineReason }),
+    }
+  );
+  return json.data;
+};
+
+export const fetchMyLeaveBalance = async (): Promise<LeaveBalance> => {
+  const json = await apiFetch<ApiSuccessResponse<LeaveBalance>>('/api/v1/leave/balances/me');
+  return json.data;
+};
+
+export const fetchEmployeeLeaveBalance = async (employeeId: string): Promise<LeaveBalance> => {
+  const json = await apiFetch<ApiSuccessResponse<LeaveBalance>>(
+    `/api/v1/leave/balances/${employeeId}`
+  );
+  return json.data;
+};
+
+export const fetchLeaveCalendar = async (
+  year: number,
+  month: number
+): Promise<LeaveCalendarEntry[]> => {
+  const params = new URLSearchParams({
+    year: String(year),
+    month: String(month),
+  });
+  const json = await apiFetch<ApiSuccessResponse<{ entries: LeaveCalendarEntry[] }>>(
+    `/api/v1/leave/calendar?${params.toString()}`
+  );
+  return json.data.entries;
+};
+
+export const fetchPendingLeaveCount = async (): Promise<number> => {
+  const json = await apiFetch<ApiSuccessResponse<{ count: number }>>('/api/v1/leave/pending-count');
+  return json.data.count;
 };

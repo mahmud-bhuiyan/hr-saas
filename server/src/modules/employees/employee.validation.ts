@@ -43,10 +43,22 @@ export const updateEmployeeSchema = z
     message: 'At least one field is required',
   });
 
+const employeeSortFieldSchema = z.enum([
+  'name',
+  'employeeNumber',
+  'jobTitle',
+  'department',
+  'manager',
+]);
+
+const sortOrderSchema = z.enum(['asc', 'desc']);
+
 export const listEmployeesQuerySchema = z.object({
   search: z.string().trim().optional(),
   department: z.string().trim().optional(),
   status: employeeStatusSchema.optional(),
+  sortBy: employeeSortFieldSchema.optional(),
+  sortOrder: sortOrderSchema.optional(),
 });
 
 export type CreateEmployeeInput = z.infer<typeof createEmployeeSchema>;

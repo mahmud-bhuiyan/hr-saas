@@ -1,24 +1,18 @@
-import { HiMagnifyingGlass, HiRectangleGroup, HiSignal } from 'react-icons/hi2';
+import { HiMagnifyingGlass, HiQueueList, HiRectangleGroup } from 'react-icons/hi2';
 import { FormField } from '../../../components/ui/FormField';
 import { Input } from '../../../components/ui/Input';
 import { Select } from '../../../components/ui/Select';
-import type { EmployeeStatus } from '../../../types';
-
-const STATUS_OPTIONS: Array<{ value: EmployeeStatus | ''; label: string }> = [
-  { value: '', label: 'All statuses' },
-  { value: 'active', label: 'Active' },
-  { value: 'on_leave', label: 'On leave' },
-  { value: 'terminated', label: 'Terminated' },
-];
+import { PAGE_SIZE_OPTIONS } from '../../../hooks/usePagination';
 
 interface EmployeeFiltersProps {
   search: string;
   onSearchChange: (value: string) => void;
   department: string;
   onDepartmentChange: (value: string) => void;
-  status: EmployeeStatus | '';
-  onStatusChange: (value: EmployeeStatus | '') => void;
   departments: string[];
+  pageSize: number;
+  onPageSizeChange: (pageSize: number) => void;
+  pageSizeOptions?: readonly number[];
 }
 
 export const EmployeeFilters = ({
@@ -26,12 +20,29 @@ export const EmployeeFilters = ({
   onSearchChange,
   department,
   onDepartmentChange,
-  status,
-  onStatusChange,
   departments,
+  pageSize,
+  onPageSizeChange,
+  pageSizeOptions = PAGE_SIZE_OPTIONS,
 }: EmployeeFiltersProps) => {
   return (
     <div className="flex flex-col gap-3 rounded-xl border border-slate-200 bg-white p-4 shadow-sm sm:flex-row sm:items-end">
+      <FormField label="Rows per page" htmlFor="employee-page-size">
+        <Select
+          id="employee-page-size"
+          value={String(pageSize)}
+          onChange={(e) => onPageSizeChange(Number(e.target.value))}
+          className="min-w-[5rem]"
+          icon={<HiQueueList className="h-4 w-4 text-brand-600" />}
+          aria-label="Rows per page"
+        >
+          {pageSizeOptions.map((option) => (
+            <option key={option} value={option}>
+              {option}
+            </option>
+          ))}
+        </Select>
+      </FormField>
       <FormField label="Search" htmlFor="employee-search" className="flex-1">
         <Input
           id="employee-search"
@@ -53,21 +64,6 @@ export const EmployeeFilters = ({
           {departments.map((dept) => (
             <option key={dept} value={dept}>
               {dept}
-            </option>
-          ))}
-        </Select>
-      </FormField>
-      <FormField label="Status" htmlFor="employee-status">
-        <Select
-          id="employee-status"
-          value={status}
-          onChange={(e) => onStatusChange(e.target.value as EmployeeStatus | '')}
-          className="min-w-[10rem]"
-          icon={<HiSignal className="h-4 w-4 text-brand-600" />}
-        >
-          {STATUS_OPTIONS.map((option) => (
-            <option key={option.value || 'all'} value={option.value}>
-              {option.label}
             </option>
           ))}
         </Select>

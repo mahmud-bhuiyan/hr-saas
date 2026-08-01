@@ -124,7 +124,7 @@ export const createEmployeeHandler = async (
       return;
     }
 
-    const employee = await createEmployee(req.tenantId!, parsed.data);
+    const employee = await createEmployee(req.tenantId!, parsed.data, req.user!.sub);
 
     res.status(201).json({ status: 'ok', data: employee });
   } catch (error) {
@@ -151,7 +151,12 @@ export const updateEmployeeHandler = async (
       return;
     }
 
-    const employee = await updateEmployee(req.tenantId!, req.params.id, parsed.data);
+    const employee = await updateEmployee(
+      req.tenantId!,
+      req.params.id,
+      parsed.data,
+      req.user!.sub
+    );
 
     res.json({ status: 'ok', data: employee });
   } catch (error) {

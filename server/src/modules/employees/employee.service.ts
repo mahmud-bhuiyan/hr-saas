@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 import type { UserRole } from '../../types/index.js';
 import { hasPermission } from '../../utils/permissions.js';
+import { User } from '../admin/user.model.js';
 import {
   Employee,
   type EmployeeStatus,
@@ -32,8 +33,16 @@ export interface EmployeePublic {
   manager?: EmployeeManagerSummary;
   status: EmployeeStatus;
   userId?: string;
+  createdByName?: string;
+  updatedByName?: string;
   createdAt: string;
   updatedAt: string;
+}
+
+interface AuditUserSummary {
+  firstName?: string;
+  lastName?: string;
+  email: string;
 }
 
 interface AccessContext {
@@ -41,10 +50,64 @@ interface AccessContext {
   role: UserRole;
 }
 
+const auditUserDisplayName = (user?: AuditUserSummary | null): string | undefined => {
+  if (!user) {
+    return undefined;
+  }
+
+  if (user.firstName || user.lastName) {
+    return [user.firstName, user.lastName].filter(Boolean).join(' ');
+  }
+
+  return user.email;
+};
+
+const loadAuditUsers = async (
+  employees: IEmployeeDocument[]
+): Promise<Map<string, AuditUserSummary>> => {
+  const userIds = new Set<string>();
+
+  for (const employee of employees) {
+    if (employee.createdBy) {
+      userIds.add(employee.createdBy.toString());
+    }
+    if (employee.updatedBy) {
+      userIds.add(employee.updatedBy.toString());
+    }
+  }
+
+  if (userIds.size === 0) {
+    return new Map();
+  }
+
+  const users = await User.find({ _id: { $in: [...userIds] } })
+    .select('email firstName lastName')
+    .lean();
+
+  return new Map(
+    users.map((user) => [
+      user._id.toString(),
+      {
+        email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName,
+      },
+    ])
+  );
+};
+
 const toEmployeePublic = (
   employee: IEmployeeDocument,
-  manager?: EmployeeManagerSummary | null
+  manager?: EmployeeManagerSummary | null,
+  auditUsers?: Map<string, AuditUserSummary>
 ): EmployeePublic => {
+  const createdBy = employee.createdBy
+    ? auditUsers?.get(employee.createdBy.toString())
+    : undefined;
+  const updatedBy = employee.updatedBy
+    ? auditUsers?.get(employee.updatedBy.toString())
+    : undefined;
+
   return {
     id: employee._id.toString(),
     employeeNumber: employee.employeeNumber,
@@ -59,6 +122,8 @@ const toEmployeePublic = (
     manager: manager ?? undefined,
     status: employee.status,
     userId: employee.userId?.toString(),
+    createdByName: auditUserDisplayName(createdBy),
+    updatedByName: auditUserDisplayName(updatedBy),
     createdAt: employee.createdAt.toISOString(),
     updatedAt: employee.updatedAt.toISOString(),
   };
@@ -115,10 +180,12 @@ const loadManagerSummaries = async (
 
 const toPublicList = async (employees: IEmployeeDocument[]): Promise<EmployeePublic[]> => {
   const managerMap = await loadManagerSummaries(employees);
+  const auditUsers = await loadAuditUsers(employees);
   return employees.map((employee) =>
     toEmployeePublic(
       employee,
-      employee.managerId ? managerMap.get(employee.managerId.toString()) : undefined
+      employee.managerId ? managerMap.get(employee.managerId.toString()) : undefined,
+      auditUsers
     )
   );
 }
@@ -215,6 +282,46 @@ const buildListFilter = (
   return filter;
 }
 
+const buildMongoSort = (
+  sortBy?: ListEmployeesQuery['sortBy'],
+  sortOrder?: ListEmployeesQuery['sortOrder']
+): Record<string, 1 | -1> => {
+  const dir: 1 | -1 = sortOrder === 'desc' ? -1 : 1;
+
+  switch (sortBy) {
+    case 'employeeNumber':
+      return { employeeNumber: dir };
+    case 'jobTitle':
+      return { jobTitle: dir, lastName: 1, firstName: 1 };
+    case 'department':
+      return { department: dir, lastName: 1, firstName: 1 };
+    case 'name':
+    default:
+      return { lastName: dir, firstName: dir };
+  }
+};
+
+const sortByManager = (
+  employees: EmployeePublic[],
+  sortOrder?: ListEmployeesQuery['sortOrder']
+): EmployeePublic[] => {
+  const dir = sortOrder === 'desc' ? -1 : 1;
+
+  return [...employees].sort((a, b) => {
+    const aName = a.manager ? `${a.manager.lastName} ${a.manager.firstName}` : '';
+    const bName = b.manager ? `${b.manager.lastName} ${b.manager.firstName}` : '';
+    const cmp = aName.localeCompare(bName, undefined, { sensitivity: 'base' });
+    if (cmp !== 0) {
+      return cmp * dir;
+    }
+
+    const nameCmp =
+      a.lastName.localeCompare(b.lastName, undefined, { sensitivity: 'base' }) ||
+      a.firstName.localeCompare(b.firstName, undefined, { sensitivity: 'base' });
+    return nameCmp * dir;
+  });
+};
+
 export const listEmployees = async (
   tenantId: string,
   query: ListEmployeesQuery,
@@ -235,12 +342,21 @@ export const listEmployees = async (
     teamManagerId = selfRecord._id.toString();
   }
 
-  const employees = await Employee.find(buildListFilter(tenantId, query, teamManagerId)).sort({
-    lastName: 1,
-    firstName: 1,
-  });
+  const filter = buildListFilter(tenantId, query, teamManagerId);
+  const sortBy = query.sortBy ?? 'name';
+  const sortOrder = query.sortOrder ?? 'asc';
 
-  return toPublicList(employees);
+  const employees = await Employee.find(filter).sort(
+    sortBy === 'manager' ? { lastName: 1, firstName: 1 } : buildMongoSort(sortBy, sortOrder)
+  );
+
+  const publicEmployees = await toPublicList(employees);
+
+  if (sortBy === 'manager') {
+    return sortByManager(publicEmployees, sortOrder);
+  }
+
+  return publicEmployees;
 }
 
 export const listDepartments = async (tenantId: string): Promise<string[]> => {
@@ -280,7 +396,7 @@ export const getEmployeeById = async (
     }
   }
 
-  return toEmployeePublic(employee, manager);
+  return toEmployeePublic(employee, manager, await loadAuditUsers([employee]));
 }
 
 export const listDirectReports = async (
@@ -309,7 +425,8 @@ export const listDirectReports = async (
 
 export const createEmployee = async (
   tenantId: string,
-  input: CreateEmployeeInput
+  input: CreateEmployeeInput,
+  createdByUserId: string
 ): Promise<EmployeePublic> => {
   await validateManagerId(tenantId, input.managerId);
 
@@ -337,6 +454,8 @@ export const createEmployee = async (
     }
   }
 
+  const actorId = new mongoose.Types.ObjectId(createdByUserId);
+
   const employee = await Employee.create({
     tenantId: new mongoose.Types.ObjectId(tenantId),
     employeeNumber,
@@ -349,6 +468,8 @@ export const createEmployee = async (
     startDate: input.startDate ? new Date(input.startDate) : undefined,
     managerId: input.managerId ? new mongoose.Types.ObjectId(input.managerId) : null,
     status: input.status ?? 'active',
+    createdBy: actorId,
+    updatedBy: actorId,
   });
 
   return getEmployeeById(tenantId, employee._id.toString(), {
@@ -360,7 +481,8 @@ export const createEmployee = async (
 export const updateEmployee = async (
   tenantId: string,
   employeeId: string,
-  input: UpdateEmployeeInput
+  input: UpdateEmployeeInput,
+  updatedByUserId: string
 ): Promise<EmployeePublic> => {
   const employee = await Employee.findOne({
     _id: new mongoose.Types.ObjectId(employeeId),
@@ -421,6 +543,8 @@ export const updateEmployee = async (
   if (input.status !== undefined) {
     employee.status = input.status;
   }
+
+  employee.updatedBy = new mongoose.Types.ObjectId(updatedByUserId);
 
   await employee.save();
 

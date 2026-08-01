@@ -10,6 +10,7 @@ import { createEmployeeRoutes } from './modules/employees/employee.routes.js';
 import { createPlatformAdminRoutes } from './modules/platform/platform-admin.routes.js';
 import { createPlatformRoutes } from './modules/platform/platform.routes.js';
 import { createSettingsRoutes } from './modules/settings/settings.routes.js';
+import { createLeaveRoutes } from './modules/leave/leave.routes.js';
 import type { ApiHealthResponse } from './types/index.js';
 
 export const createApp = () => {
@@ -45,6 +46,7 @@ export const createApp = () => {
   app.use('/api/v1/platform', createPlatformRoutes());
   app.use('/api/v1/admin/platform', createPlatformAdminRoutes(env));
   app.use('/api/v1/settings', createSettingsRoutes(env));
+  app.use('/api/v1/leave', createLeaveRoutes(env));
 
   return app;
 }

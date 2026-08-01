@@ -279,6 +279,7 @@ export const RegistrationsPage = () => {
         label="Super admin"
         title="Companies"
         description="Add a company directly or review self-registration requests before they can sign in."
+        actionAlign="end"
         action={
           <Button
             icon={<HiPlus className="h-4 w-4 text-white" />}
