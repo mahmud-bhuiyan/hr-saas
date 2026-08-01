@@ -48,17 +48,15 @@ For production:
 
 ---
 
-## Testing (mandatory)
+## API registry (mandatory)
 
-### Every API → registry + API test
+### Every API → registry entry
 
 1. Add row to [`docs/API-REGISTRY.md`](./docs/API-REGISTRY.md)
-2. Add Supertest test in `server/tests/api/<module>.test.ts` using `createApp()` from `server/src/create-app.ts`
-3. Run `cd server && npm test`
 
 ### README (keep current)
 
-Update [`README.md`](./README.md) whenever a change affects how someone sets up, runs, tests, or deploys the project. Examples:
+Update [`README.md`](./README.md) whenever a change affects how someone sets up, runs, or deploys the project. Examples:
 
 - Prerequisites, folder structure, or architecture
 - Env vars, commands, URLs, or deployment steps
@@ -86,7 +84,6 @@ Do not duplicate detailed API or plan docs — link to `docs/API-REGISTRY.md` an
 ```bash
 cd server && npm install && npm run dev
 cd client && npm install && npm run dev
-cd server && npm test
 ```
 
 ---

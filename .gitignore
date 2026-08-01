@@ -1,16 +1,43 @@
+# =============================================================================
+# Root — repo-wide ignores (client/ and server/ also have their own .gitignore)
+# =============================================================================
+
+# Dependencies must live only inside client/ and server/
+/node_modules/
 node_modules/
+
+# Forbidden / legacy layout (see AGENTS.md)
+/shared/
+apps/
+
+# Build output
 dist/
 build/
+
+# Environment / secrets (keep .env.example tracked)
 .env
 **/.env
+.env.local
 **/.env.local
+.env.*.local
+**/.env.*.local
+
+# Logs
 *.log
-.DS_Store
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Test / tooling cache
 coverage/
 .vite/
 *.tsbuildinfo
+.eslintcache
 
-# Dependencies live only inside client/ and server/
-/node_modules/
-/shared/
-apps/
+# Deploy platforms
+.vercel
+
+# OS
+.DS_Store
+Thumbs.db

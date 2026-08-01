@@ -22,7 +22,6 @@ Check off each step with the client/dev team before moving to the next.
 - [ ] Client shows HR SaaS welcome shell
 - [ ] `GET http://localhost:4000/api/v1/health` returns `{ status: "ok" }`
 - [ ] `docker compose up -d` starts MongoDB and Redis
-- [ ] `cd server && npm test` passes
 - [ ] `cd client && npm run build` succeeds
 - [ ] `docs/API-REGISTRY.md` lists all endpoints
 

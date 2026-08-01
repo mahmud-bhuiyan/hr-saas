@@ -1,5 +1,5 @@
 # =============================================================================
-# Server — Express API (redundant with root .gitignore by design)
+# Client — React + Vite (redundant with root .gitignore by design)
 # =============================================================================
 
 # Dependencies
@@ -8,6 +8,9 @@ node_modules/
 # Build output
 dist/
 build/
+
+# Vite dev cache
+.vite/
 
 # Environment / secrets (keep .env.example tracked)
 .env

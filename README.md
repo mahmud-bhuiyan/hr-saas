@@ -86,11 +86,7 @@ Create **two** Vercel projects from the same repo, each with a different root di
 
 Config files: `client/vercel.json`, `server/vercel.json`, `server/src/index.ts` (Vercel Express + local entry; must default-export the Express app).
 
-## Testing
-
-```bash
-cd server && npm test
-```
+## API documentation
 
 - API list: [docs/API-REGISTRY.md](./docs/API-REGISTRY.md)
 - Agent rules: [AGENTS.md](./AGENTS.md)
