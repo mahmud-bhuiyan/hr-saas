@@ -1,0 +1,223 @@
+{
+  "info": {
+    "_postman_id": "hr-saas-api-collection",
+    "name": "HR SaaS API",
+    "description": "All API requests for the HR SaaS platform. Import into Postman or use with Newman.\n\n**Setup:** Import `hr-saas.local.postman_environment.json` or set collection variables `baseUrl` and `accessToken`.\n\n**Auth flow:** Run Register or Login — the test script saves `accessToken` automatically. Refresh/Logout use the cookie jar for the refresh token.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5000"
+    },
+    {
+      "key": "accessToken",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "Health",
+      "item": [
+        {
+          "name": "Root",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/",
+            "description": "Confirms the server is running."
+          },
+          "response": []
+        },
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/health",
+            "description": "Returns `{ status: \"ok\", service, timestamp }`."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register Company",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "  const json = pm.response.json();",
+                  "  pm.collectionVariables.set('accessToken', json.data.accessToken);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"companyName\": \"Acme Ltd\",\n  \"email\": \"admin@acme.com\",\n  \"password\": \"TestPass123\",\n  \"firstName\": \"Jane\",\n  \"lastName\": \"Admin\"\n}"
+            },
+            "url": "{{baseUrl}}/api/v1/auth/register",
+            "description": "Creates tenant + company_admin. Sets refresh cookie and returns accessToken."
+          },
+          "response": []
+        },
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  const json = pm.response.json();",
+                  "  pm.collectionVariables.set('accessToken', json.data.accessToken);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@acme.com\",\n  \"password\": \"TestPass123\"\n}"
+            },
+            "url": "{{baseUrl}}/api/v1/auth/login",
+            "description": "Returns accessToken and sets refresh httpOnly cookie."
+          },
+          "response": []
+        },
+        {
+          "name": "Refresh Token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  const json = pm.response.json();",
+                  "  pm.collectionVariables.set('accessToken', json.data.accessToken);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/auth/refresh",
+            "description": "Requires refresh cookie from Login/Register. Postman cookie jar must be enabled."
+          },
+          "response": []
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/auth/logout",
+            "description": "Clears the refresh token cookie."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Current User (me)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/auth/me",
+            "description": "Returns the authenticated user. Requires Bearer accessToken."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Admin",
+      "item": [
+        {
+          "name": "Create Admin (bootstrap super_admin)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"superadmin@hr.com\",\n  \"password\": \"User@123\",\n  \"role\": \"super_admin\",\n  \"firstName\": \"Super\",\n  \"lastName\": \"Admin\"\n}"
+            },
+            "url": "{{baseUrl}}/api/v1/admins",
+            "description": "Bootstrap: works without auth when DB has zero users. Otherwise requires super_admin Bearer token."
+          },
+          "response": []
+        },
+        {
+          "name": "Create Admin (authenticated)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"hr@acme.com\",\n  \"password\": \"TestPass123\",\n  \"role\": \"hr_manager\",\n  \"firstName\": \"HR\",\n  \"lastName\": \"Manager\"\n}"
+            },
+            "url": "{{baseUrl}}/api/v1/admins",
+            "description": "Requires super_admin Bearer token when users already exist."
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}

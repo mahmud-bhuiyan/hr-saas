@@ -30,3 +30,17 @@ export interface AdminUser {
   isActive: boolean;
   createdAt: string;
 }
+
+export interface AuthUser {
+  id: string;
+  email: string;
+  role: UserRole;
+  tenantId?: string;
+  firstName?: string;
+  lastName?: string;
+}
+
+export interface AuthResponse {
+  user: AuthUser;
+  accessToken: string;
+}
