@@ -1,0 +1,16 @@
+node_modules/
+dist/
+build/
+.env
+**/.env
+**/.env.local
+*.log
+.DS_Store
+coverage/
+.vite/
+*.tsbuildinfo
+
+# Dependencies live only inside client/ and server/
+/node_modules/
+/shared/
+apps/

@@ -1,0 +1,21 @@
+import type { UserRole } from '../types';
+
+export const PERMISSIONS: Record<UserRole, string[]> = {
+  super_admin: ['*'],
+  company_admin: ['*'],
+  hr_manager: [
+    'employee:create',
+    'employee:read',
+    'employee:update',
+    'document:manage',
+    'leave:approve',
+  ],
+  manager: ['leave:approve:team', 'employee:read:team'],
+  employee: ['leave:create:own', 'leave:read:own', 'profile:update:own'],
+};
+
+export function hasPermission(role: UserRole, permission: string): boolean {
+  const rolePermissions = PERMISSIONS[role];
+  if (rolePermissions.includes('*')) return true;
+  return rolePermissions.includes(permission);
+}

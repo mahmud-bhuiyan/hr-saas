@@ -1,0 +1,27 @@
+---
+description: Mandatory unit tests and API registry for all new code
+alwaysApply: true
+---
+
+# Testing & API registry (required)
+
+Read `AGENTS.md` for full instructions.
+
+## Architecture
+- **Separate client & server** — deploy independently, no `shared/` folder
+- **Separate env:** `client/.env` and `server/.env.local` only
+- **No `apps/` folder** — use root `client/` and `server/`
+- **No root node_modules**
+
+## Node.js
+- Minimum **Node 22+**
+
+## Every function
+- `server/` → `server/tests/unit/`
+- `client/` → `client/tests/unit/`
+- Duplicate types/utils in each app (no shared imports)
+
+## Every API endpoint
+1. Document in `docs/API-REGISTRY.md`
+2. Supertest test in `server/tests/api/<module>.test.ts`
+3. Run `cd server && npm test`
