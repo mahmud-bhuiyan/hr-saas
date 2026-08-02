@@ -505,6 +505,40 @@ export interface PatchPayrollSettingsInput {
   payrollWeekStartDay?: number;
 }
 
+export type PayrollPeriodStatus = 'draft' | 'generated' | 'exported';
+
+export interface EmployeePayrollSummary {
+  employeeId: string;
+  employeeName: string;
+  payRate?: number;
+  payRateType?: PayRateType;
+  payCurrency?: string;
+  regularHours: number;
+  overtimeHours: number;
+  expenseTotal: number;
+  grossEstimate: number;
+  missingPayRate: boolean;
+}
+
+export interface PayrollPeriod {
+  id: string;
+  periodStart: string;
+  periodEnd: string;
+  status: PayrollPeriodStatus;
+  employeeSummaries: EmployeePayrollSummary[];
+  generatedAt?: string;
+  generatedBy?: string;
+  exportedAt?: string;
+  exportedBy?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreatePayrollPeriodInput {
+  periodStart: string;
+  periodEnd: string;
+}
+
 export interface TenantUser {
   id: string;
   email: string;

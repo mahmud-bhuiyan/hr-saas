@@ -4,6 +4,7 @@ import { authenticate, authorizePermission } from '../../middleware/auth.js';
 import { requireTenant } from '../../middleware/tenant.js';
 import {
   createPayrollPeriodHandler,
+  exportPayrollPeriodHandler,
   generatePayrollPeriodHandler,
   getPayrollPeriodHandler,
   listPayrollPeriodsHandler,
@@ -28,6 +29,10 @@ export const createPayrollRoutes = (env: ServerEnv): Router => {
 
   router.post('/periods/:id/generate', authorizePermission('payroll:generate'), (req, res) => {
     void generatePayrollPeriodHandler(req, res);
+  });
+
+  router.get('/periods/:id/export', authorizePermission('payroll:export'), (req, res) => {
+    void exportPayrollPeriodHandler(req, res);
   });
 
   return router;

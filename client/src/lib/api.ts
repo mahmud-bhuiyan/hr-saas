@@ -47,6 +47,8 @@ import type {
   PatchWorkLocationInput,
   PayrollSettings,
   PatchPayrollSettingsInput,
+  PayrollPeriod,
+  CreatePayrollPeriodInput,
   TenantUser,
   PatchTenantUserInput,
   UploadPlatformAssetInput,
@@ -648,6 +650,72 @@ export const patchPayrollSettings = async (
     body: JSON.stringify(input),
   });
   return json.data;
+};
+
+export const fetchPayrollPeriods = async (): Promise<PayrollPeriod[]> => {
+  const json = await apiFetch<ApiSuccessResponse<PayrollPeriod[]>>('/api/v1/payroll/periods');
+  return json.data;
+};
+
+export const fetchPayrollPeriod = async (periodId: string): Promise<PayrollPeriod> => {
+  const json = await apiFetch<ApiSuccessResponse<PayrollPeriod>>(
+    `/api/v1/payroll/periods/${periodId}`
+  );
+  return json.data;
+};
+
+export const createPayrollPeriod = async (
+  input: CreatePayrollPeriodInput
+): Promise<PayrollPeriod> => {
+  const json = await apiFetch<ApiSuccessResponse<PayrollPeriod>>('/api/v1/payroll/periods', {
+    method: 'POST',
+    body: JSON.stringify(input),
+  });
+  return json.data;
+};
+
+export const generatePayrollPeriod = async (periodId: string): Promise<PayrollPeriod> => {
+  const json = await apiFetch<ApiSuccessResponse<PayrollPeriod>>(
+    `/api/v1/payroll/periods/${periodId}/generate`,
+    { method: 'POST' }
+  );
+  return json.data;
+};
+
+export const exportPayrollPeriodCsv = async (periodId: string): Promise<void> => {
+  const token = getAccessToken();
+  const headers = new Headers();
+  if (token) {
+    headers.set('Authorization', `Bearer ${token}`);
+  }
+
+  const response = await fetch(`${apiBase}/api/v1/payroll/periods/${periodId}/export`, {
+    method: 'GET',
+    headers,
+    credentials: 'include',
+  });
+
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({
+      status: 'error' as const,
+      message: 'Export failed',
+    }));
+    throw new ApiError(error.message, response.status);
+  }
+
+  const disposition = response.headers.get('Content-Disposition');
+  const filenameMatch = disposition?.match(/filename="([^"]+)"/);
+  const filename = filenameMatch?.[1] ?? 'payroll-export.csv';
+
+  const blob = await response.blob();
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
 };
 
 export const fetchTenantUsers = async (): Promise<TenantUser[]> => {

@@ -1649,6 +1649,20 @@
             "description": "Aggregate approved timesheets and expenses with pay rates. Requires payroll:generate."
           },
           "response": []
+        },
+        {
+          "name": "Export Payroll Period CSV",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+            },
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/payroll/periods/{{payrollPeriodId}}/export",
+            "description": "Download payroll period CSV. Requires payroll:export. Period must be generated first."
+          },
+          "response": []
         }
       ]
     },

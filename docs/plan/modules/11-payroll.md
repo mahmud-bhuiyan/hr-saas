@@ -1,7 +1,7 @@
 # Module: Payroll Export
 
 **Stage:** Stage 3 (S3-1 settings → S3-4 backend → S3-5 UI → S3-6 integration)  
-**Status:** In development (S3-1 settings done; S3-4 backend done; S3-5 UI pending)  
+**Status:** In development (S3-1–S3-5 done; S3-6 integration pending)  
 **Depends on:** Stage 2 timesheets + expenses; S3-1 employee pay fields
 
 ---
@@ -183,13 +183,13 @@ HR creates period → generates → previews → exports CSV → (optional) sync
 - [x] Tenant payroll settings GET/PATCH (S3-1)
 - [x] Employee pay fields on model + PATCH (S3-1)
 - [x] PayrollPeriod model + aggregation (S3-4)
-- [ ] CSV export endpoint (S3-5)
+- [x] CSV export endpoint (S3-5)
 - [ ] Xero or QuickBooks OAuth + sync (S3-6)
 
 ### Frontend (S3-1 partial)
 - [x] Payroll settings page (S3-1)
 - [x] Employee pay section on profile (S3-1)
-- [ ] Payroll periods list + generate + export (S3-5)
+- [x] Payroll periods list + generate + export (S3-5)
 
 **Estimate:** 10 days total (2 + 3 + 3 + 2 integration)
 
@@ -207,6 +207,6 @@ HR creates period → generates → previews → exports CSV → (optional) sync
 - [x] Tenant payroll settings configurable
 - [x] HR can set employee pay rates with audit trail
 - [x] HR can generate payroll period from approved data
-- [ ] CSV export matches preview totals
+- [x] CSV export matches preview totals
 - [ ] No tax calculation in app
 - [ ] OpenAPI and Postman updated

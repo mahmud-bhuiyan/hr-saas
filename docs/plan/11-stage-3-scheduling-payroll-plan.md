@@ -196,9 +196,9 @@ The client approves Stage 3 completion when all of the following are true:
 | S3-2 | Rotas backend | ✅ Done |
 | S3-3 | Rotas UI | ✅ Done |
 | S3-4 | Payroll export backend | ✅ Done |
-| S3-5 | Payroll export UI | Not started |
+| S3-5 | Payroll export UI | ✅ Done |
 | S3-6 | Accounting integration | Not started |
 | S3-7 | Cross-module polish | Not started |
 | S3-8 | Sign-off | Not started |
 
-**Next step:** S3-5 — payroll export UI + CSV. See [STAGE-3-IMPLEMENTATION-STEPS.md](./STAGE-3-IMPLEMENTATION-STEPS.md).
+**Next step:** S3-6 — accounting integration (Xero or QuickBooks). See [STAGE-3-IMPLEMENTATION-STEPS.md](./STAGE-3-IMPLEMENTATION-STEPS.md).
