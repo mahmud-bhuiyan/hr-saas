@@ -42,6 +42,11 @@ import type {
   Department,
   CreateDepartmentInput,
   PatchDepartmentInput,
+  WorkLocation,
+  CreateWorkLocationInput,
+  PatchWorkLocationInput,
+  PayrollSettings,
+  PatchPayrollSettingsInput,
   TenantUser,
   PatchTenantUserInput,
   UploadPlatformAssetInput,
@@ -537,6 +542,53 @@ export const updateDepartment = async (
       body: JSON.stringify(input),
     }
   );
+  return json.data;
+};
+
+export const fetchWorkLocations = async (includeArchived = false): Promise<WorkLocation[]> => {
+  const qs = includeArchived ? '?includeArchived=true' : '';
+  const json = await apiFetch<ApiSuccessResponse<{ locations: WorkLocation[] }>>(
+    `/api/v1/locations${qs}`
+  );
+  return json.data.locations;
+};
+
+export const createWorkLocation = async (
+  input: CreateWorkLocationInput
+): Promise<WorkLocation> => {
+  const json = await apiFetch<ApiSuccessResponse<WorkLocation>>('/api/v1/locations', {
+    method: 'POST',
+    body: JSON.stringify(input),
+  });
+  return json.data;
+};
+
+export const updateWorkLocation = async (
+  locationId: string,
+  input: PatchWorkLocationInput
+): Promise<WorkLocation> => {
+  const json = await apiFetch<ApiSuccessResponse<WorkLocation>>(
+    `/api/v1/locations/${locationId}`,
+    {
+      method: 'PATCH',
+      body: JSON.stringify(input),
+    }
+  );
+  return json.data;
+};
+
+export const fetchPayrollSettings = async (): Promise<PayrollSettings> => {
+  const json = await apiFetch<ApiSuccessResponse<PayrollSettings>>('/api/v1/settings/payroll');
+  return json.data;
+};
+
+export const patchPayrollSettings = async (
+  input: PatchPayrollSettingsInput
+): Promise<PayrollSettings> => {
+  const json = await apiFetch<ApiSuccessResponse<PayrollSettings>>('/api/v1/settings/payroll', {
+    method: 'PATCH',
+    body: JSON.stringify(input),
+  });
   return json.data;
 };
 

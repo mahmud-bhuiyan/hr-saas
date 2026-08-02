@@ -1,7 +1,9 @@
 import {
   HiBriefcase,
+  HiBuildingOffice2,
   HiCalendarDays,
   HiEnvelope,
+  HiBanknotes,
   HiPhone,
   HiRectangleGroup,
   HiSignal,
@@ -11,7 +13,7 @@ import {
 import { FormField } from '../../../components/ui/FormField';
 import { Input } from '../../../components/ui/Input';
 import { Select } from '../../../components/ui/Select';
-import type { Employee, EmployeeStatus } from '../../../types';
+import type { Employee, EmployeeStatus, PayRateType, WorkLocation } from '../../../types';
 import { employeeName } from '../utils';
 
 const STATUS_OPTIONS: Array<{ value: EmployeeStatus; label: string }> = [
@@ -30,6 +32,11 @@ export interface EmployeeFormValues {
   startDate: string;
   managerId: string;
   status: EmployeeStatus;
+  payRate: string;
+  payRateType: PayRateType | '';
+  payCurrency: string;
+  fteFactor: string;
+  defaultLocationId: string;
 }
 
 interface EmployeeEditFieldsProps {
@@ -165,6 +172,92 @@ export const EmployeeEditFields = ({
   );
 };
 
+interface EmployeePayFieldsProps {
+  form: EmployeeFormValues;
+  onFieldChange: <K extends keyof EmployeeFormValues>(
+    key: K,
+    value: EmployeeFormValues[K]
+  ) => void;
+  locationOptions: WorkLocation[];
+  idPrefix?: string;
+}
+
+export const EmployeePayFields = ({
+  form,
+  onFieldChange,
+  locationOptions,
+  idPrefix = '',
+}: EmployeePayFieldsProps) => {
+  return (
+    <div className="space-y-4 border-t border-slate-100 pt-5 dark:border-slate-800">
+      <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100">Pay & scheduling</h3>
+      <div className="grid gap-4 sm:grid-cols-2">
+        <FormField label="Pay rate" htmlFor={`${idPrefix}payRate`}>
+          <Input
+            id={`${idPrefix}payRate`}
+            type="number"
+            min={0}
+            step="0.01"
+            value={form.payRate}
+            onChange={(e) => onFieldChange('payRate', e.target.value)}
+            icon={<HiBanknotes className="h-4 w-4 text-brand-600" />}
+          />
+        </FormField>
+        <FormField label="Pay rate type" htmlFor={`${idPrefix}payRateType`}>
+          <Select
+            id={`${idPrefix}payRateType`}
+            value={form.payRateType}
+            onChange={(e) => onFieldChange('payRateType', e.target.value as PayRateType | '')}
+            icon={<HiSignal className="h-4 w-4 text-brand-600" />}
+          >
+            <option value="">Not set</option>
+            <option value="hourly">Hourly</option>
+            <option value="salary">Salary</option>
+          </Select>
+        </FormField>
+      </div>
+      <div className="grid gap-4 sm:grid-cols-2">
+        <FormField label="Pay currency" htmlFor={`${idPrefix}payCurrency`}>
+          <Input
+            id={`${idPrefix}payCurrency`}
+            value={form.payCurrency}
+            onChange={(e) => onFieldChange('payCurrency', e.target.value.toUpperCase())}
+            maxLength={3}
+            icon={<HiBanknotes className="h-4 w-4 text-brand-600" />}
+          />
+        </FormField>
+        <FormField label="FTE factor" htmlFor={`${idPrefix}fteFactor`}>
+          <Input
+            id={`${idPrefix}fteFactor`}
+            type="number"
+            min={0}
+            max={1}
+            step="0.01"
+            value={form.fteFactor}
+            onChange={(e) => onFieldChange('fteFactor', e.target.value)}
+            icon={<HiUser className="h-4 w-4 text-brand-600" />}
+          />
+        </FormField>
+      </div>
+      <FormField label="Default work location" htmlFor={`${idPrefix}defaultLocationId`}>
+        <Select
+          id={`${idPrefix}defaultLocationId`}
+          value={form.defaultLocationId}
+          onChange={(e) => onFieldChange('defaultLocationId', e.target.value)}
+          icon={<HiBuildingOffice2 className="h-4 w-4 text-brand-600" />}
+        >
+          <option value="">No default location</option>
+          {locationOptions.map((location) => (
+            <option key={location.id} value={location.id}>
+              {location.name}
+            </option>
+          ))}
+        </Select>
+      </FormField>
+    </div>
+  );
+};
+
 export const toEmployeeFormValues = (employee: Employee): EmployeeFormValues => {
   return {
     firstName: employee.firstName,
@@ -176,5 +269,10 @@ export const toEmployeeFormValues = (employee: Employee): EmployeeFormValues => 
     startDate: employee.startDate ?? '',
     managerId: employee.managerId ?? '',
     status: employee.status,
+    payRate: employee.payRate != null ? String(employee.payRate) : '',
+    payRateType: employee.payRateType ?? '',
+    payCurrency: employee.payCurrency ?? '',
+    fteFactor: employee.fteFactor != null ? String(employee.fteFactor) : '1',
+    defaultLocationId: employee.defaultLocationId ?? '',
   };
 };

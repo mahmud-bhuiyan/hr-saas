@@ -8,6 +8,8 @@ import {
   HiClock,
   HiCalendarDays,
   HiCreditCard,
+  HiMapPin,
+  HiBanknotes,
 } from 'react-icons/hi2';
 import { PageContainer } from '../../components/ui/PageContainer';
 import { PageHeader } from '../../components/ui/PageHeader';
@@ -43,6 +45,20 @@ const settingsLinks: SettingsLink[] = [
     description: 'Manage departments used when assigning employees.',
     icon: HiRectangleGroup,
     roles: ['company_admin', 'hr_manager'],
+  },
+  {
+    to: '/dashboard/settings/locations',
+    label: 'Work locations',
+    description: 'Manage sites for shift scheduling and rota planning.',
+    icon: HiMapPin,
+    roles: ['company_admin', 'hr_manager'],
+  },
+  {
+    to: '/dashboard/settings/payroll',
+    label: 'Payroll settings',
+    description: 'Pay period type, currency, and week start for payroll export.',
+    icon: HiBanknotes,
+    roles: ['company_admin'],
   },
   {
     to: '/dashboard/settings/audit-log',

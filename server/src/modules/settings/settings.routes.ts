@@ -16,6 +16,10 @@ import {
   patchCompanyProfileHandler,
 } from './company.controller.js';
 import {
+  getPayrollSettingsHandler,
+  patchPayrollSettingsHandler,
+} from './payroll-settings.controller.js';
+import {
   createDepartmentHandler,
   listDepartmentsHandler,
   patchDepartmentHandler,
@@ -96,6 +100,14 @@ export const createSettingsRoutes = (env: ServerEnv): Router => {
 
   router.patch('/leave', requireTenant(), authorize('company_admin'), (req, res) => {
     void patchLeaveSettingsHandler(req, res);
+  });
+
+  router.get('/payroll', requireTenant(), authorize('company_admin'), (req, res) => {
+    void getPayrollSettingsHandler(req, res);
+  });
+
+  router.patch('/payroll', requireTenant(), authorize('company_admin'), (req, res) => {
+    void patchPayrollSettingsHandler(req, res);
   });
 
   return router;

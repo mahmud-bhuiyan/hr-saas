@@ -19,6 +19,10 @@ import {
   listActiveDepartmentNames,
 } from '../settings/department.service.js';
 import {
+  assertActiveWorkLocation,
+  LocationServiceError,
+} from '../locations/location.service.js';
+import {
   Employee,
   type EmployeeStatus,
   type IEmployeeDocument,
@@ -50,6 +54,11 @@ export interface EmployeePublic {
   manager?: EmployeeManagerSummary;
   status: EmployeeStatus;
   userId?: string;
+  payRate?: number;
+  payRateType?: 'hourly' | 'salary';
+  payCurrency?: string;
+  fteFactor?: number;
+  defaultLocationId?: string;
   createdByName?: string;
   updatedByName?: string;
   createdAt: string;
@@ -113,10 +122,13 @@ const loadAuditUsers = async (
   );
 };
 
+const canViewPayFields = (role: UserRole): boolean => hasPermission(role, 'payroll:read');
+
 const toEmployeePublic = (
   employee: IEmployeeDocument,
   manager?: EmployeeManagerSummary | null,
-  auditUsers?: Map<string, AuditUserSummary>
+  auditUsers?: Map<string, AuditUserSummary>,
+  includePayFields = false
 ): EmployeePublic => {
   const createdBy = employee.createdBy
     ? auditUsers?.get(employee.createdBy.toString())
@@ -139,6 +151,15 @@ const toEmployeePublic = (
     manager: manager ?? undefined,
     status: employee.status,
     userId: employee.userId?.toString(),
+    ...(includePayFields
+      ? {
+          payRate: employee.payRate,
+          payRateType: employee.payRateType,
+          payCurrency: employee.payCurrency,
+          fteFactor: employee.fteFactor,
+          defaultLocationId: employee.defaultLocationId?.toString(),
+        }
+      : {}),
     createdByName: auditUserDisplayName(createdBy),
     updatedByName: auditUserDisplayName(updatedBy),
     createdAt: employee.createdAt.toISOString(),
@@ -296,14 +317,18 @@ const loadManagerSummaries = async (
   return map;
 }
 
-const toPublicList = async (employees: IEmployeeDocument[]): Promise<EmployeePublic[]> => {
+const toPublicList = async (
+  employees: IEmployeeDocument[],
+  includePayFields = false
+): Promise<EmployeePublic[]> => {
   const managerMap = await loadManagerSummaries(employees);
   const auditUsers = await loadAuditUsers(employees);
   return employees.map((employee) =>
     toEmployeePublic(
       employee,
       employee.managerId ? managerMap.get(employee.managerId.toString()) : undefined,
-      auditUsers
+      auditUsers,
+      includePayFields
     )
   );
 }
@@ -461,7 +486,7 @@ export const listEmployees = async (
     sortBy === 'manager' ? { firstName: 1, lastName: 1 } : buildMongoSort(sortBy, sortOrder)
   );
 
-  const publicEmployees = await toPublicList(employees);
+  const publicEmployees = await toPublicList(employees, canViewPayFields(access.role));
 
   if (sortBy === 'manager') {
     return sortByManager(publicEmployees, sortOrder);
@@ -475,6 +500,20 @@ const validateDepartment = async (tenantId: string, department?: string): Promis
     await assertActiveDepartmentName(tenantId, department);
   } catch (error) {
     if (error instanceof DepartmentServiceError) {
+      throw new EmployeeServiceError(error.message, error.statusCode);
+    }
+    throw error;
+  }
+};
+
+const validateDefaultLocation = async (
+  tenantId: string,
+  locationId?: string | null
+): Promise<void> => {
+  try {
+    await assertActiveWorkLocation(tenantId, locationId ?? undefined);
+  } catch (error) {
+    if (error instanceof LocationServiceError) {
       throw new EmployeeServiceError(error.message, error.statusCode);
     }
     throw error;
@@ -513,7 +552,12 @@ export const getEmployeeById = async (
     }
   }
 
-  return toEmployeePublic(employee, manager, await loadAuditUsers([employee]));
+  return toEmployeePublic(
+    employee,
+    manager,
+    await loadAuditUsers([employee]),
+    canViewPayFields(access.role)
+  );
 }
 
 export const listDirectReports = async (
@@ -537,7 +581,7 @@ export const listDirectReports = async (
     managerId: employee._id,
   }).sort({ lastName: 1, firstName: 1 });
 
-  return toPublicList(reports);
+  return toPublicList(reports, canViewPayFields(access.role));
 }
 
 export const createEmployee = async (
@@ -677,6 +721,29 @@ export const updateEmployee = async (
 
   if (input.status !== undefined) {
     employee.status = input.status;
+  }
+
+  if (input.payRate !== undefined) {
+    employee.payRate = input.payRate ?? undefined;
+  }
+
+  if (input.payRateType !== undefined) {
+    employee.payRateType = input.payRateType ?? undefined;
+  }
+
+  if (input.payCurrency !== undefined) {
+    employee.payCurrency = input.payCurrency ? input.payCurrency.toUpperCase() : undefined;
+  }
+
+  if (input.fteFactor !== undefined) {
+    employee.fteFactor = input.fteFactor;
+  }
+
+  if (input.defaultLocationId !== undefined) {
+    await validateDefaultLocation(tenantId, input.defaultLocationId);
+    employee.defaultLocationId = input.defaultLocationId
+      ? new mongoose.Types.ObjectId(input.defaultLocationId)
+      : null;
   }
 
   const statusChanged =

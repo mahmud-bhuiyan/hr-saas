@@ -1950,6 +1950,133 @@
           "response": []
         },
         {
+          "name": "Get Payroll Settings",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/settings/payroll",
+            "description": "Company admin only. Pay period type, currency, week start."
+          },
+          "response": []
+        },
+        {
+          "name": "Update Payroll Settings",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"payPeriodType\": \"weekly\",\n  \"defaultPayCurrency\": \"GBP\",\n  \"payrollWeekStartDay\": 1\n}"
+            },
+            "url": "{{baseUrl}}/api/v1/settings/payroll",
+            "description": "Company admin only. Partial update of payroll settings."
+          },
+          "response": []
+        },
+        {
+          "name": "List Work Locations",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/locations?includeArchived=true",
+            "description": "HR manager or company admin."
+          },
+          "response": []
+        },
+        {
+          "name": "Create Work Location",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Main Office\",\n  \"address\": \"1 High Street, London\",\n  \"timezone\": \"Europe/London\"\n}"
+            },
+            "url": "{{baseUrl}}/api/v1/locations",
+            "description": "HR manager or company admin."
+          },
+          "response": []
+        },
+        {
+          "name": "Update Work Location",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"HQ Office\"\n}"
+            },
+            "url": "{{baseUrl}}/api/v1/locations/{{locationId}}",
+            "description": "HR manager or company admin. Rename, update address/timezone, or archive."
+          },
+          "response": []
+        },
+        {
           "name": "List Tenant Users",
           "request": {
             "auth": {

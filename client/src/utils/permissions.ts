@@ -25,6 +25,15 @@ export const PERMISSIONS: Record<UserRole, string[]> = {
     'expense:approve',
     'expense:export',
     'report:read',
+    'location:read',
+    'location:manage',
+    'rota:read',
+    'rota:manage',
+    'rota:read:own',
+    'rota:claim:own',
+    'payroll:read',
+    'payroll:generate',
+    'payroll:export',
   ],
   manager: [
     'leave:approve:team',
@@ -41,6 +50,10 @@ export const PERMISSIONS: Record<UserRole, string[]> = {
     'expense:create:own',
     'expense:read:own',
     'expense:approve:team',
+    'rota:read',
+    'rota:manage',
+    'rota:read:own',
+    'rota:claim:own',
   ],
   employee: [
     'leave:create:own',
@@ -54,6 +67,8 @@ export const PERMISSIONS: Record<UserRole, string[]> = {
     'timesheet:submit:own',
     'expense:create:own',
     'expense:read:own',
+    'rota:read:own',
+    'rota:claim:own',
   ],
 };
 

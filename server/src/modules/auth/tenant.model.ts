@@ -2,6 +2,10 @@ import mongoose, { Schema, type Document, type Model } from 'mongoose';
 
 export type TenantApprovalStatus = 'pending' | 'approved' | 'rejected';
 
+export type PayPeriodType = 'weekly' | 'biweekly' | 'monthly';
+
+export type PayRateType = 'hourly' | 'salary';
+
 export interface TenantBranding {
   logoUrl: string | null;
   primaryColor: string | null;
@@ -25,6 +29,9 @@ export interface ITenant {
   maxCarryOverDays?: number;
   multiStepApprovalEnabled?: boolean;
   billingExempt?: boolean;
+  payPeriodType?: PayPeriodType;
+  defaultPayCurrency?: string;
+  payrollWeekStartDay?: number;
 }
 
 export interface ITenantDocument extends ITenant, Document {
@@ -59,6 +66,13 @@ const tenantSchema = new Schema<ITenantDocument>(
     maxCarryOverDays: { type: Number, default: 5, min: 0, max: 365 },
     multiStepApprovalEnabled: { type: Boolean, default: false },
     billingExempt: { type: Boolean, default: false },
+    payPeriodType: {
+      type: String,
+      enum: ['weekly', 'biweekly', 'monthly'],
+      default: 'weekly',
+    },
+    defaultPayCurrency: { type: String, default: 'GBP', trim: true, uppercase: true },
+    payrollWeekStartDay: { type: Number, default: 1, min: 0, max: 6 },
   },
   { timestamps: true }
 );
