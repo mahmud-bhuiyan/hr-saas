@@ -1663,6 +1663,62 @@
             "description": "Download payroll period CSV. Requires payroll:export. Period must be generated first."
           },
           "response": []
+        },
+        {
+          "name": "Sync Payroll Period to Xero",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+            },
+            "method": "POST",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/payroll/periods/{{payrollPeriodId}}/sync",
+            "description": "Push payroll period to Xero as draft manual journal. Requires payroll:export and Xero OAuth connection."
+          },
+          "response": []
+        },
+        {
+          "name": "Accounting Connection Status",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+            },
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/payroll/accounting/status",
+            "description": "Xero connection status. Requires payroll:export."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Xero Connect URL",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+            },
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/payroll/accounting/connect",
+            "description": "Company admin only. Returns Xero OAuth URL — open in browser to connect."
+          },
+          "response": []
+        },
+        {
+          "name": "Disconnect Xero",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/payroll/accounting/disconnect",
+            "description": "Company admin only. Removes Xero OAuth connection."
+          },
+          "response": []
         }
       ]
     },
@@ -2237,7 +2293,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"payPeriodType\": \"weekly\",\n  \"defaultPayCurrency\": \"GBP\",\n  \"payrollWeekStartDay\": 1\n}"
+              "raw": "{\n  \"payPeriodType\": \"weekly\",\n  \"defaultPayCurrency\": \"GBP\",\n  \"payrollWeekStartDay\": 1,\n  \"xeroExpenseAccountCode\": \"477\",\n  \"xeroPayableAccountCode\": \"804\"\n}"
             },
             "url": "{{baseUrl}}/api/v1/settings/payroll",
             "description": "Company admin only. Partial update of payroll settings."

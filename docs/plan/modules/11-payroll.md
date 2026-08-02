@@ -1,7 +1,7 @@
 # Module: Payroll Export
 
 **Stage:** Stage 3 (S3-1 settings → S3-4 backend → S3-5 UI → S3-6 integration)  
-**Status:** In development (S3-1–S3-5 done; S3-6 integration pending)  
+**Status:** Done (S3-1–S3-6 complete)  
 **Depends on:** Stage 2 timesheets + expenses; S3-1 employee pay fields
 
 ---
@@ -92,7 +92,10 @@ Pay fields on employees (`payRate`, etc.) editable by hr_manager and company_adm
 | POST | `/api/v1/payroll/periods/:id/generate` | `payroll:generate` | Run aggregation |
 | GET | `/api/v1/payroll/periods/:id` | `payroll:read` | Period detail + summaries |
 | GET | `/api/v1/payroll/periods/:id/export` | `payroll:export` | CSV download |
-| POST | `/api/v1/payroll/periods/:id/sync` | `payroll:export` | Push to Xero/QB (S3-6) |
+| POST | `/api/v1/payroll/periods/:id/sync` | `payroll:export` | Push to Xero (S3-6) |
+| GET | `/api/v1/payroll/accounting/status` | `payroll:export` | Xero connection status |
+| GET | `/api/v1/payroll/accounting/connect` | company_admin | OAuth connect URL |
+| DELETE | `/api/v1/payroll/accounting/disconnect` | company_admin | Disconnect Xero |
 
 ### Request / response examples
 
@@ -184,12 +187,13 @@ HR creates period → generates → previews → exports CSV → (optional) sync
 - [x] Employee pay fields on model + PATCH (S3-1)
 - [x] PayrollPeriod model + aggregation (S3-4)
 - [x] CSV export endpoint (S3-5)
-- [ ] Xero or QuickBooks OAuth + sync (S3-6)
+- [x] Xero OAuth + sync (S3-6)
 
 ### Frontend (S3-1 partial)
 - [x] Payroll settings page (S3-1)
 - [x] Employee pay section on profile (S3-1)
 - [x] Payroll periods list + generate + export (S3-5)
+- [x] Xero connect on payroll settings + sync on payroll page (S3-6)
 
 **Estimate:** 10 days total (2 + 3 + 3 + 2 integration)
 
@@ -197,7 +201,7 @@ HR creates period → generates → previews → exports CSV → (optional) sync
 
 ## 11. Open Questions
 
-- [ ] Xero or QuickBooks for S3-6?
+- [x] Xero for S3-6 (QuickBooks deferred)
 - [ ] Include unapproved timesheets in preview with warning?
 
 ---
@@ -208,5 +212,5 @@ HR creates period → generates → previews → exports CSV → (optional) sync
 - [x] HR can set employee pay rates with audit trail
 - [x] HR can generate payroll period from approved data
 - [x] CSV export matches preview totals
-- [ ] No tax calculation in app
-- [ ] OpenAPI and Postman updated
+- [x] Xero OAuth connect and payroll sync to manual journals
+- [x] OpenAPI and Postman updated

@@ -55,6 +55,10 @@ export interface PayrollPeriodPublic {
   generatedBy?: string;
   exportedAt?: string;
   exportedBy?: string;
+  accountingProvider?: 'xero';
+  accountingReference?: string;
+  accountingSyncedAt?: string;
+  accountingSyncedBy?: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -88,6 +92,10 @@ const toPeriodPublic = (period: IPayrollPeriodDocument): PayrollPeriodPublic => 
   generatedBy: period.generatedBy?.toString(),
   exportedAt: period.exportedAt?.toISOString(),
   exportedBy: period.exportedBy?.toString(),
+  accountingProvider: period.accountingProvider ?? undefined,
+  accountingReference: period.accountingReference ?? undefined,
+  accountingSyncedAt: period.accountingSyncedAt?.toISOString(),
+  accountingSyncedBy: period.accountingSyncedBy?.toString(),
   createdAt: period.createdAt.toISOString(),
   updatedAt: period.updatedAt.toISOString(),
 });

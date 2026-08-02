@@ -18,11 +18,16 @@ export interface TenantPayrollSettings {
   payPeriodType: PayPeriodType;
   defaultPayCurrency: string;
   payrollWeekStartDay: number;
+  xeroExpenseAccountCode: string;
+  xeroPayableAccountCode: string;
 }
 
 export const DEFAULT_PAY_PERIOD_TYPE: PayPeriodType = 'weekly';
 export const DEFAULT_PAY_CURRENCY = 'GBP';
 export const DEFAULT_PAYROLL_WEEK_START_DAY = 1;
+
+export const DEFAULT_XERO_EXPENSE_ACCOUNT = '477';
+export const DEFAULT_XERO_PAYABLE_ACCOUNT = '804';
 
 export const getPayrollSettings = async (tenantId: string): Promise<TenantPayrollSettings> => {
   const tenant = await Tenant.findById(tenantId);
@@ -34,6 +39,8 @@ export const getPayrollSettings = async (tenantId: string): Promise<TenantPayrol
     payPeriodType: tenant.payPeriodType ?? DEFAULT_PAY_PERIOD_TYPE,
     defaultPayCurrency: tenant.defaultPayCurrency ?? DEFAULT_PAY_CURRENCY,
     payrollWeekStartDay: tenant.payrollWeekStartDay ?? DEFAULT_PAYROLL_WEEK_START_DAY,
+    xeroExpenseAccountCode: tenant.xeroExpenseAccountCode ?? DEFAULT_XERO_EXPENSE_ACCOUNT,
+    xeroPayableAccountCode: tenant.xeroPayableAccountCode ?? DEFAULT_XERO_PAYABLE_ACCOUNT,
   };
 };
 
@@ -55,6 +62,12 @@ export const patchPayrollSettings = async (
   }
   if (input.payrollWeekStartDay !== undefined) {
     tenant.payrollWeekStartDay = input.payrollWeekStartDay;
+  }
+  if (input.xeroExpenseAccountCode !== undefined) {
+    tenant.xeroExpenseAccountCode = input.xeroExpenseAccountCode;
+  }
+  if (input.xeroPayableAccountCode !== undefined) {
+    tenant.xeroPayableAccountCode = input.xeroPayableAccountCode;
   }
 
   tenant.updatedBy = new mongoose.Types.ObjectId(userId);

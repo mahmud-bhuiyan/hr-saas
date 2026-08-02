@@ -1,4 +1,4 @@
-import { HiArrowDownTray, HiBolt } from 'react-icons/hi2';
+import { HiArrowDownTray, HiArrowPath, HiBolt } from 'react-icons/hi2';
 import { Button } from '../../../components/ui/Button';
 import { Table } from '../../../components/ui/Table';
 import type { PayrollPeriod } from '../../../types';
@@ -11,9 +11,11 @@ interface PayrollPeriodsTableProps {
   actionLoadingId: string | null;
   canGenerate: boolean;
   canExport: boolean;
+  canSync: boolean;
   onSelect: (period: PayrollPeriod) => void;
   onGenerate: (period: PayrollPeriod) => void;
   onExport: (period: PayrollPeriod) => void;
+  onSync: (period: PayrollPeriod) => void;
 }
 
 export const PayrollPeriodsTable = ({
@@ -23,9 +25,11 @@ export const PayrollPeriodsTable = ({
   actionLoadingId,
   canGenerate,
   canExport,
+  canSync,
   onSelect,
   onGenerate,
   onExport,
+  onSync,
 }: PayrollPeriodsTableProps) => {
   return (
     <Table
@@ -99,6 +103,19 @@ export const PayrollPeriodsTable = ({
                   onClick={() => onExport(period)}
                 >
                   CSV
+                </Button>
+              )}
+              {canSync && period.status !== 'draft' && (
+                <Button
+                  type="button"
+                  variant="secondary"
+                  className="px-3 py-1.5"
+                  icon={<HiArrowPath className="h-4 w-4 text-emerald-600" />}
+                  loading={actionLoadingId === `${period.id}-sync`}
+                  loadingText="Syncing…"
+                  onClick={() => onSync(period)}
+                >
+                  {period.accountingReference ? 'Re-sync' : 'Sync Xero'}
                 </Button>
               )}
             </div>

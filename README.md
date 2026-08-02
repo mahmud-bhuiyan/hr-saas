@@ -79,6 +79,16 @@ stripe listen --forward-to localhost:5000/api/v1/billing/webhook
 
 Set demo/staging tenants `billingExempt: true` on the Tenant document to skip payment gates.
 
+### Xero accounting integration (optional — S3-6)
+
+Set in `server/.env.local`:
+
+- `XERO_CLIENT_ID` — from [Xero Developer Portal](https://developer.xero.com/app/manage)
+- `XERO_CLIENT_SECRET` — OAuth 2.0 client secret
+- `XERO_REDIRECT_URI` — must match the Xero app redirect URI exactly (e.g. `http://localhost:5000/api/v1/payroll/accounting/callback`)
+
+Company admins connect Xero under **Settings → Payroll settings**. HR can then sync generated payroll periods to Xero as draft manual journals from **Payroll export**.
+
 ### Super admin bootstrap
 
 After MongoDB is running and `server/.env.local` has `MONGODB_URI`:
@@ -94,7 +104,7 @@ Demo/staging company data is created manually via the app or super-admin registr
 
 | App | File | Key variables |
 |-----|------|---------------|
-| **Server** | `server/.env.local` | `MONGODB_URI`, `CLIENT_URL`, `ADMIN_JWT_SECRET`, `REDIS_URL` (optional; sync email fallback without Redis), `IMGBB_API_KEY` (logo/favicon upload), `SENDGRID_API_KEY`, `EMAIL_FROM` (leave notifications), `S3_*` (document storage), `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `STRIPE_PRICE_ID` (billing; optional: `PORT`, defaults to 5000) |
+| **Server** | `server/.env.local` | `MONGODB_URI`, `CLIENT_URL`, `ADMIN_JWT_SECRET`, `REDIS_URL` (optional; sync email fallback without Redis), `IMGBB_API_KEY` (logo/favicon upload), `SENDGRID_API_KEY`, `EMAIL_FROM` (leave notifications), `S3_*` (document storage), `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `STRIPE_PRICE_ID` (billing; optional: `PORT`, defaults to 5000), `XERO_CLIENT_ID`, `XERO_CLIENT_SECRET`, `XERO_REDIRECT_URI` (payroll sync; optional) |
 | **Client** | `client/.env` | `VITE_API_URL` (backend URL) |
 
 ## Separate deployment

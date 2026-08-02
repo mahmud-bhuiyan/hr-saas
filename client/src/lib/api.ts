@@ -49,6 +49,8 @@ import type {
   PatchPayrollSettingsInput,
   PayrollPeriod,
   CreatePayrollPeriodInput,
+  AccountingConnectionStatus,
+  PayrollSyncResult,
   TenantUser,
   PatchTenantUserInput,
   UploadPlatformAssetInput,
@@ -716,6 +718,34 @@ export const exportPayrollPeriodCsv = async (periodId: string): Promise<void> =>
   link.click();
   link.remove();
   URL.revokeObjectURL(url);
+};
+
+export const fetchAccountingConnectionStatus = async (): Promise<AccountingConnectionStatus> => {
+  const json = await apiFetch<ApiSuccessResponse<AccountingConnectionStatus>>(
+    '/api/v1/payroll/accounting/status'
+  );
+  return json.data;
+};
+
+export const fetchAccountingConnectUrl = async (): Promise<string> => {
+  const json = await apiFetch<ApiSuccessResponse<{ url: string }>>(
+    '/api/v1/payroll/accounting/connect'
+  );
+  return json.data.url;
+};
+
+export const disconnectAccounting = async (): Promise<void> => {
+  await apiFetch('/api/v1/payroll/accounting/disconnect', { method: 'DELETE' });
+};
+
+export const syncPayrollPeriodToAccounting = async (
+  periodId: string
+): Promise<PayrollSyncResult> => {
+  const json = await apiFetch<ApiSuccessResponse<PayrollSyncResult>>(
+    `/api/v1/payroll/periods/${periodId}/sync`,
+    { method: 'POST' }
+  );
+  return json.data;
 };
 
 export const fetchTenantUsers = async (): Promise<TenantUser[]> => {

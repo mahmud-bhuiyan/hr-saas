@@ -11,10 +11,12 @@ import {
   ApiError,
   createPayrollPeriod,
   exportPayrollPeriodCsv,
+  fetchAccountingConnectionStatus,
   fetchPayrollPeriod,
   fetchPayrollPeriods,
   fetchPayrollSettings,
   generatePayrollPeriod,
+  syncPayrollPeriodToAccounting,
 } from '../../lib/api';
 import type { PayrollPeriod } from '../../types';
 import { areRequiredFieldsFilled } from '../../utils/form';
@@ -56,6 +58,14 @@ export const PayrollPage = () => {
     queryFn: fetchPayrollPeriods,
     enabled: Boolean(canAccess),
   });
+
+  const accountingQuery = useQuery({
+    queryKey: ['payroll', 'accounting', 'status'],
+    queryFn: fetchAccountingConnectionStatus,
+    enabled: Boolean(canAccess && canExport),
+  });
+
+  const canSync = Boolean(canExport && accountingQuery.data?.connected);
 
   const selectedPeriodQuery = useQuery({
     queryKey: ['payroll', 'periods', selectedPeriodId],
@@ -137,6 +147,19 @@ export const PayrollPage = () => {
     },
   });
 
+  const syncMutation = useMutation({
+    mutationFn: syncPayrollPeriodToAccounting,
+    onSuccess: (result) => {
+      toast.success(`Synced to Xero (journal ${result.externalReference.slice(0, 8)}…).`);
+      setActionLoadingId(null);
+      invalidatePayroll();
+    },
+    onError: (error: unknown) => {
+      toast.error(error instanceof ApiError ? error.message : 'Failed to sync payroll to Xero');
+      setActionLoadingId(null);
+    },
+  });
+
   const handleCreateSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     createMutation.mutate(createForm);
@@ -154,6 +177,12 @@ export const PayrollPage = () => {
     exportMutation.mutate(period.id);
   };
 
+  const handleSync = (period: PayrollPeriod) => {
+    setSelectedPeriodId(period.id);
+    setActionLoadingId(`${period.id}-sync`);
+    syncMutation.mutate(period.id);
+  };
+
   if (!canAccess) {
     return <Navigate to="/dashboard" replace />;
   }
@@ -169,7 +198,7 @@ export const PayrollPage = () => {
       <PageHeader
         label="Operations"
         title="Payroll export"
-        description="Create payroll periods, generate summaries from approved timesheets and expenses, and export CSV for finance."
+        description="Create payroll periods, generate summaries from approved timesheets and expenses, export CSV, or sync to Xero."
         action={
           canGenerate ? (
             <Button
@@ -190,9 +219,11 @@ export const PayrollPage = () => {
           actionLoadingId={actionLoadingId}
           canGenerate={Boolean(canGenerate)}
           canExport={Boolean(canExport)}
+          canSync={canSync}
           onSelect={(period) => setSelectedPeriodId(period.id)}
           onGenerate={handleGenerate}
           onExport={handleExport}
+          onSync={handleSync}
         />
       </div>
 

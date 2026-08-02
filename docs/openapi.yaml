@@ -3544,6 +3544,8 @@ paths:
               payPeriodType: weekly
               defaultPayCurrency: GBP
               payrollWeekStartDay: 1
+              xeroExpenseAccountCode: '477'
+              xeroPayableAccountCode: '804'
       responses:
         '200':
           description: Updated payroll settings
@@ -4203,6 +4205,188 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/payroll/periods/{id}/sync:
+    post:
+      tags: [Payroll]
+      summary: Sync payroll period to Xero
+      description: |
+        HR manager or company admin. Pushes the generated payroll period to Xero as a draft manual journal.
+        Requires Xero OAuth connection (company admin connects in payroll settings) and `payroll:export`.
+        Sets status to `exported` on first sync (same as CSV export) and records the Xero manual journal id.
+      operationId: syncPayrollPeriod
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Payroll synced to Xero
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, data]
+                properties:
+                  status:
+                    type: string
+                    enum: [ok]
+                  data:
+                    $ref: '#/components/schemas/PayrollSyncResult'
+              example:
+                status: ok
+                data:
+                  periodId: 64f1a2b3c4d5e6f7a8b9c0d1
+                  provider: xero
+                  externalReference: a1b2c3d4-e5f6-7890-abcd-ef1234567890
+                  syncedAt: '2026-08-03T12:00:00.000Z'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: Period is draft, Xero not connected, or no gross amounts
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '503':
+          description: Xero integration not configured on server
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/payroll/accounting/status:
+    get:
+      tags: [Payroll]
+      summary: Get accounting connection status
+      description: |
+        HR manager or company admin. Returns Xero connection status for the tenant.
+        Requires `payroll:export`. Connect/disconnect is company admin only.
+      operationId: getAccountingConnectionStatus
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Accounting connection status
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, data]
+                properties:
+                  status:
+                    type: string
+                    enum: [ok]
+                  data:
+                    $ref: '#/components/schemas/AccountingConnectionStatus'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /api/v1/payroll/accounting/connect:
+    get:
+      tags: [Payroll]
+      summary: Get Xero OAuth connect URL
+      description: |
+        Company admin only. Returns the Xero authorization URL. Redirect the user's browser to this URL
+        to start the OAuth flow. Callback is handled by the server at `/api/v1/payroll/accounting/callback`.
+      operationId: getAccountingConnectUrl
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Xero authorization URL
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, data]
+                properties:
+                  status:
+                    type: string
+                    enum: [ok]
+                  data:
+                    type: object
+                    required: [url]
+                    properties:
+                      url:
+                        type: string
+                        format: uri
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '503':
+          description: Xero integration not configured on server
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/payroll/accounting/callback:
+    get:
+      tags: [Payroll]
+      summary: Xero OAuth callback
+      description: |
+        Public OAuth redirect target (no Bearer auth). Xero redirects here with `code` and `state`.
+        Exchanges the code for tokens, stores the connection, and redirects to the client payroll settings page.
+      operationId: accountingOAuthCallback
+      security: []
+      parameters:
+        - name: code
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: state
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '302':
+          description: Redirect to client payroll settings with `?xero=connected` or `?xero=error`
+
+  /api/v1/payroll/accounting/disconnect:
+    delete:
+      tags: [Payroll]
+      summary: Disconnect Xero
+      description: Company admin only. Removes the stored Xero OAuth connection for the tenant.
+      operationId: disconnectAccounting
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Xero disconnected
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, data]
+                properties:
+                  status:
+                    type: string
+                    enum: [ok]
+                  data:
+                    type: object
+                    required: [disconnected]
+                    properties:
+                      disconnected:
+                        type: boolean
+                        enum: [true]
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
 
   /api/v1/settings/departments:
     get:
@@ -5672,7 +5856,12 @@ components:
 
     PayrollSettings:
       type: object
-      required: [payPeriodType, defaultPayCurrency, payrollWeekStartDay]
+      required:
+        - payPeriodType
+        - defaultPayCurrency
+        - payrollWeekStartDay
+        - xeroExpenseAccountCode
+        - xeroPayableAccountCode
       properties:
         payPeriodType:
           type: string
@@ -5687,6 +5876,14 @@ components:
           minimum: 0
           maximum: 6
           description: 0=Sunday through 6=Saturday
+        xeroExpenseAccountCode:
+          type: string
+          example: '477'
+          description: Xero chart of accounts code for wages expense (manual journal debit lines)
+        xeroPayableAccountCode:
+          type: string
+          example: '804'
+          description: Xero chart of accounts code for wages payable (manual journal credit line)
 
     PatchPayrollSettingsRequest:
       type: object
@@ -5703,6 +5900,14 @@ components:
           type: integer
           minimum: 0
           maximum: 6
+        xeroExpenseAccountCode:
+          type: string
+          minLength: 1
+          maxLength: 10
+        xeroPayableAccountCode:
+          type: string
+          minLength: 1
+          maxLength: 10
 
     EmployeePayrollSummary:
       type: object
@@ -5781,6 +5986,17 @@ components:
           format: date-time
         exportedBy:
           type: string
+        accountingProvider:
+          type: string
+          enum: [xero]
+        accountingReference:
+          type: string
+          description: External id (e.g. Xero manual journal id)
+        accountingSyncedAt:
+          type: string
+          format: date-time
+        accountingSyncedBy:
+          type: string
         createdAt:
           type: string
           format: date-time
@@ -5800,6 +6016,49 @@ components:
           type: string
           format: date
           description: Inclusive period end (YYYY-MM-DD)
+
+    AccountingConnectionStatus:
+      type: object
+      required:
+        - provider
+        - configured
+        - connected
+        - expenseAccountCode
+        - payableAccountCode
+      properties:
+        provider:
+          type: string
+          enum: [xero]
+        configured:
+          type: boolean
+          description: True when server has Xero OAuth env vars set
+        connected:
+          type: boolean
+        organisationName:
+          type: string
+        connectedAt:
+          type: string
+          format: date-time
+        expenseAccountCode:
+          type: string
+        payableAccountCode:
+          type: string
+
+    PayrollSyncResult:
+      type: object
+      required: [periodId, provider, externalReference, syncedAt]
+      properties:
+        periodId:
+          type: string
+        provider:
+          type: string
+          enum: [xero]
+        externalReference:
+          type: string
+          description: Xero manual journal id
+        syncedAt:
+          type: string
+          format: date-time
 
     WorkLocation:
       type: object

@@ -44,7 +44,7 @@ Stage 2 also extends **01-auth-tenant** (forgot password), **02-employees** (inv
 | # | Module | File | Step | Status |
 |---|--------|------|------|--------|
 | 08 | Shifts & Rotas | [08-rotas.md](./08-rotas.md) | S3-1–S3-2 | S3-1–S3-2 done |
-| 11 | Payroll Export | [11-payroll.md](./11-payroll.md) | S3-1, S3-4–S3-6 | S3-1–S3-5 done |
+| 11 | Payroll Export | [11-payroll.md](./11-payroll.md) | S3-1, S3-4–S3-6 | ✅ Done |
 
 Stage 3 also extends **02-employees** (pay fields) — see [11-payroll.md](./11-payroll.md).
 
