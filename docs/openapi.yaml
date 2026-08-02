@@ -49,6 +49,10 @@ tags:
     description: In-app notifications for authenticated users
   - name: Billing
     description: Per-seat Stripe subscriptions for company admins
+  - name: Locations
+    description: Work locations for shift scheduling
+  - name: Rotas
+    description: Weekly shift rotas — draft, publish, and team scheduling
 
 paths:
   /:
@@ -3694,6 +3698,232 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
 
+  /api/v1/rotas/{weekOf}:
+    get:
+      tags: [Rotas]
+      summary: Get shifts for a week
+      description: |
+        Returns shifts for the ISO week starting on `weekOf` (must be a Monday, YYYY-MM-DD).
+
+        **Scope:** HR/company admin see all shifts; managers see direct reports and open shifts;
+        employees see only their own assigned shifts (`rota:read:own`).
+      operationId: getRotaWeek
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: weekOf
+          in: path
+          required: true
+          schema:
+            type: string
+            format: date
+            example: '2026-08-04'
+      responses:
+        '200':
+          description: Weekly rota
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, data]
+                properties:
+                  status:
+                    type: string
+                    enum: [ok]
+                  data:
+                    $ref: '#/components/schemas/WeekRota'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /api/v1/rotas/shifts:
+    post:
+      tags: [Rotas]
+      summary: Create shift
+      description: HR manager, company admin, or manager (team-scoped). Creates a draft shift.
+      operationId: createShift
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateShiftRequest'
+            example:
+              employeeId: '507f1f77bcf86cd799439011'
+              date: '2026-08-04'
+              startTime: '09:00'
+              endTime: '17:00'
+              locationId: '507f1f77bcf86cd799439012'
+              role: Floor
+      responses:
+        '201':
+          description: Shift created
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, data]
+                properties:
+                  status:
+                    type: string
+                    enum: [ok]
+                  data:
+                    $ref: '#/components/schemas/Shift'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          description: Leave conflict or overlapping shift
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/rotas/shifts/{id}:
+    patch:
+      tags: [Rotas]
+      summary: Update shift
+      description: HR manager, company admin, or manager (team-scoped). Updates a draft or published shift.
+      operationId: patchShift
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchShiftRequest'
+            example:
+              startTime: '10:00'
+              endTime: '18:00'
+      responses:
+        '200':
+          description: Updated shift
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, data]
+                properties:
+                  status:
+                    type: string
+                    enum: [ok]
+                  data:
+                    $ref: '#/components/schemas/Shift'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: Leave conflict or overlapping shift
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    delete:
+      tags: [Rotas]
+      summary: Delete draft shift
+      description: HR manager, company admin, or manager (team-scoped). Only draft shifts can be deleted.
+      operationId: deleteShift
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Shift deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, data]
+                properties:
+                  status:
+                    type: string
+                    enum: [ok]
+                  data:
+                    type: object
+                    required: [deleted]
+                    properties:
+                      deleted:
+                        type: boolean
+                        enum: [true]
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/v1/rotas/publish:
+    post:
+      tags: [Rotas]
+      summary: Publish weekly rota
+      description: |
+        Publishes all draft shifts for the week starting on `weekOf`.
+        Assigned shifts become `published`; unassigned shifts become `open`.
+      operationId: publishRotaWeek
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PublishRotaRequest'
+            example:
+              weekOf: '2026-08-04'
+      responses:
+        '200':
+          description: Rota published
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, data]
+                properties:
+                  status:
+                    type: string
+                    enum: [ok]
+                  data:
+                    $ref: '#/components/schemas/PublishRotaResult'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          description: Leave conflict on a draft shift
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
   /api/v1/settings/departments:
     get:
       tags: [Settings]
@@ -5247,6 +5477,157 @@ components:
           maxLength: 64
         isArchived:
           type: boolean
+
+    ShiftStatus:
+      type: string
+      enum: [draft, published, open]
+
+    ShiftEmployeeSummary:
+      type: object
+      required: [id, firstName, lastName]
+      properties:
+        id:
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+        email:
+          type: string
+          format: email
+
+    ShiftLocationSummary:
+      type: object
+      required: [id, name]
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+
+    Shift:
+      type: object
+      required: [id, employeeId, date, startTime, endTime, locationId, status, createdAt, updatedAt]
+      properties:
+        id:
+          type: string
+        employeeId:
+          type: string
+          nullable: true
+        employee:
+          $ref: '#/components/schemas/ShiftEmployeeSummary'
+        date:
+          type: string
+          format: date
+          example: '2026-08-04'
+        startTime:
+          type: string
+          example: '09:00'
+        endTime:
+          type: string
+          example: '17:00'
+        role:
+          type: string
+        locationId:
+          type: string
+        location:
+          $ref: '#/components/schemas/ShiftLocationSummary'
+        status:
+          $ref: '#/components/schemas/ShiftStatus'
+        publishedAt:
+          type: string
+          format: date-time
+        claimedBy:
+          type: string
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    WeekRota:
+      type: object
+      required: [weekOf, shifts]
+      properties:
+        weekOf:
+          type: string
+          format: date
+          example: '2026-08-04'
+        shifts:
+          type: array
+          items:
+            $ref: '#/components/schemas/Shift'
+
+    CreateShiftRequest:
+      type: object
+      required: [date, startTime, endTime, locationId]
+      properties:
+        employeeId:
+          type: string
+          nullable: true
+        date:
+          type: string
+          format: date
+        startTime:
+          type: string
+          pattern: '^([01]\d|2[0-3]):([0-5]\d)$'
+        endTime:
+          type: string
+          pattern: '^([01]\d|2[0-3]):([0-5]\d)$'
+        role:
+          type: string
+          maxLength: 100
+        locationId:
+          type: string
+        status:
+          type: string
+          enum: [draft]
+
+    PatchShiftRequest:
+      type: object
+      minProperties: 1
+      properties:
+        employeeId:
+          type: string
+          nullable: true
+        date:
+          type: string
+          format: date
+        startTime:
+          type: string
+          pattern: '^([01]\d|2[0-3]):([0-5]\d)$'
+        endTime:
+          type: string
+          pattern: '^([01]\d|2[0-3]):([0-5]\d)$'
+        role:
+          type: string
+          maxLength: 100
+        locationId:
+          type: string
+        status:
+          $ref: '#/components/schemas/ShiftStatus'
+
+    PublishRotaRequest:
+      type: object
+      required: [weekOf]
+      properties:
+        weekOf:
+          type: string
+          format: date
+          description: Monday of the week to publish (YYYY-MM-DD)
+
+    PublishRotaResult:
+      type: object
+      required: [weekOf, publishedCount]
+      properties:
+        weekOf:
+          type: string
+          format: date
+        publishedCount:
+          type: integer
+          minimum: 0
 
     TenantUser:
       type: object

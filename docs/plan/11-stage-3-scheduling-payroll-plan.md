@@ -208,7 +208,7 @@ Full roadmap: [hr-saas-mern-project-plan.md](./hr-saas-mern-project-plan.md)
 | Step | Scope | Status |
 |------|-------|--------|
 | S3-1 | Foundations | ✅ Done |
-| S3-2 | Rotas backend | Not started |
+| S3-2 | Rotas backend | ✅ Done |
 | S3-3 | Rotas UI | Not started |
 | S3-4 | Payroll export backend | Not started |
 | S3-5 | Payroll export UI | Not started |
@@ -216,4 +216,4 @@ Full roadmap: [hr-saas-mern-project-plan.md](./hr-saas-mern-project-plan.md)
 | S3-7 | Cross-module polish | Not started |
 | S3-8 | Sign-off | Not started |
 
-**Next step:** S3-2 — rotas backend. See [STAGE-3-IMPLEMENTATION-STEPS.md](./STAGE-3-IMPLEMENTATION-STEPS.md).
+**Next step:** S3-3 — rotas UI. See [STAGE-3-IMPLEMENTATION-STEPS.md](./STAGE-3-IMPLEMENTATION-STEPS.md).
