@@ -143,9 +143,9 @@ Employee uploads receipt → fills form → submits → Manager approves
 
 ---
 
-## 9. Demo 1 vs Stage 2
+## 9. Stage 1 vs Stage 2
 
-| Feature | Demo 1 | Stage 2 |
+| Feature | Stage 1 | Stage 2 |
 |---------|--------|---------|
 | Expense claims | — | ✅ |
 | Receipt OCR | — | Stage 3+ |

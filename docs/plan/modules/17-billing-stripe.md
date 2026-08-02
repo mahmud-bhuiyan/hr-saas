@@ -2,7 +2,7 @@
 
 **Stage:** Stage 2 (S2-7)  
 **Status:** Done  
-**Depends on:** Auth & Tenant (Demo 1), Employee Management (seat count source)
+**Depends on:** Auth & Tenant (Stage 1), Employee Management (seat count source)
 
 ---
 
@@ -125,9 +125,9 @@ Company admin opens billing → Subscribe → Stripe Checkout → webhook activa
 
 ---
 
-## 9. Demo 1 vs Stage 2
+## 9. Stage 1 vs Stage 2
 
-| Feature | Demo 1 | Stage 2 |
+| Feature | Stage 1 | Stage 2 |
 |---------|--------|---------|
 | Stripe billing | — | ✅ |
 | Free demo tenants | ✅ | ✅ via billingExempt |

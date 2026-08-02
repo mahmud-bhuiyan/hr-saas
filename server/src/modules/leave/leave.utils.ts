@@ -1,4 +1,4 @@
-/** Default annual leave entitlement for Demo 1 */
+/** Default annual leave entitlement for Stage 1 */
 export const DEFAULT_ANNUAL_ENTITLEMENT = 25;
 
 export const DEFAULT_MAX_CARRY_OVER_DAYS = 5;

@@ -1,7 +1,7 @@
 # Module: Employee Management
 
-**Stage:** Demo 1 (done) · Stage 2 extensions (S2-1, S2-6)  
-**Status:** Ready for review (Demo 1) · S2-6 CSV import done  
+**Stage:** Stage 1 (done) · Stage 2 extensions (S2-1, S2-6)  
+**Status:** Ready for review (Stage 1) · S2-6 CSV import done  
 **Depends on:** Auth & Tenant (Step 2)
 
 ---
@@ -92,9 +92,9 @@ HR records for each person in a company: directory, profile, manager hierarchy, 
 
 ---
 
-## 9. Demo 1 vs Later
+## 9. Stage 1 vs Later
 
-| Feature | Demo 1 | Status |
+| Feature | Stage 1 | Status |
 |---------|--------|--------|
 | Directory, CRUD, deactivate | ✅ | Done |
 | Search / filter | ✅ | Done |

@@ -22,6 +22,7 @@ import { createExpenseRoutes } from './modules/expenses/expense.routes.js';
 import { createReportRoutes } from './modules/reports/report.routes.js';
 import { createLocationRoutes } from './modules/locations/location.routes.js';
 import { createRotaRoutes } from './modules/rotas/rota.routes.js';
+import { createPayrollRoutes } from './modules/payroll/payroll.routes.js';
 
 export const createApp = () => {
   const env = loadServerEnv();
@@ -69,6 +70,7 @@ export const createApp = () => {
   app.use('/api/v1/reports', createReportRoutes(env));
   app.use('/api/v1/locations', createLocationRoutes(env));
   app.use('/api/v1/rotas', createRotaRoutes(env));
+  app.use('/api/v1/payroll', createPayrollRoutes(env));
   app.use('/api/v1/billing', createBillingRoutes(env));
 
   return app;

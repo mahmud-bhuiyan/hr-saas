@@ -1,4 +1,4 @@
-# HR SaaS — Demo 1 Plan (Client Presentation)
+# HR SaaS — Stage 1 Plan (Client Presentation)
 
 **Purpose:** Deliver a working first demo that proves the platform direction, core UX, and multi-tenant foundation — enough for the client to validate the product before committing to later stages.
 
@@ -6,7 +6,7 @@
 
 **Stack:** React + Node.js + MongoDB — separate `client/` and `server/` apps (not a shared monorepo package).
 
-**Implementation tracker:** [IMPLEMENTATION-STEPS.md](./IMPLEMENTATION-STEPS.md) · Module details in [modules/](./modules/)
+**Implementation tracker:** [STAGE-1-IMPLEMENTATION-STEPS.md](./STAGE-1-IMPLEMENTATION-STEPS.md) · Module details in [modules/](./modules/)
 
 ---
 
@@ -32,7 +32,7 @@ This flow covers **signup → people → leave workflow → documents → settin
 
 ---
 
-## 2. In Scope — Demo 1
+## 2. In Scope — Stage 1
 
 ### 2.1 Authentication & Company Setup
 
@@ -45,12 +45,12 @@ This flow covers **signup → people → leave workflow → documents → settin
 - Secure sessions (short-lived access token + refresh cookie)
 - Each company’s data fully isolated from other companies
 
-### 2.2 Roles (Demo 1 subset)
+### 2.2 Roles (Stage 1 subset)
 
-| Role | Can do in Demo 1 |
+| Role | Can do in Stage 1 |
 |------|------------------|
 | **Super admin** | Platform operator: approve/reject registrations, add companies, bootstrap admins, customize platform site (name, theme color, logo, favicon) |
-| **Company admin** | Everything in Demo 1 for their tenant |
+| **Company admin** | Everything in Stage 1 for their tenant |
 | **HR manager** | Manage employees, documents, approve leave |
 | **Manager** | View team, approve team leave |
 | **Employee** | View own profile, request leave, view own documents |
@@ -65,10 +65,10 @@ This flow covers **signup → people → leave workflow → documents → settin
 
 ### 2.4 Leave & Absence
 
-- Leave types: annual, sick, unpaid (fixed list for Demo 1)
+- Leave types: annual, sick, unpaid (fixed list for Stage 1)
 - Submit leave request (date range, optional half-day, reason)
 - Single-step approval (manager or HR approves/declines)
-- Leave balance per employee (fixed annual entitlement for Demo 1 — no complex accrual engine yet)
+- Leave balance per employee (fixed annual entitlement for Stage 1 — no complex accrual engine yet)
 - Team leave calendar (read-only month view)
 - Email notification on submit and on approve/decline (basic templates)
 
@@ -93,11 +93,11 @@ This flow covers **signup → people → leave workflow → documents → settin
 - Responsive layout (desktop + tablet; mobile-friendly, not native app) — **in progress**
 - Consistent UI (design system — Tailwind + reusable components in `client/src/components/ui/`) — **done**
 - Loading states, error messages, empty states — **done** on built screens
-- Audit log for sensitive changes (employee edits, document uploads) — backend only for Demo 1; UI in Stage 2
+- Audit log for sensitive changes (employee edits, document uploads) — backend only for Stage 1; UI in Stage 2
 
 ---
 
-## 3. Out of Scope — Demo 1 (Later Stages)
+## 3. Out of Scope — Stage 1 (Later Stages)
 
 Be explicit with the client so expectations stay aligned.
 
@@ -108,19 +108,19 @@ Be explicit with the client so expectations stay aligned.
 | Timesheets & overtime | Stage 2 | Built on attendance |
 | Expense claims | Stage 2 | Receipt upload + approval |
 | Payroll calculation | Stage 3 | Export to Xero/QuickBooks instead of building tax engine |
-| Stripe billing / per-seat pricing | Stage 2 | Free demo tenants for Demo 1 |
-| Bulk CSV employee import | Stage 2 | Manual add only in Demo 1 |
-| Advanced leave rules (accrual, carry-over, Bradford Factor) | Stage 2–3 | Fixed entitlement in Demo 1 |
-| Multi-step approval chains | Stage 2 | Single approver in Demo 1 |
+| Stripe billing / per-seat pricing | Stage 2 | Free demo tenants for Stage 1 |
+| Bulk CSV employee import | Stage 2 | Manual add only in Stage 1 |
+| Advanced leave rules (accrual, carry-over, Bradford Factor) | Stage 2–3 | Fixed entitlement in Stage 1 |
+| Multi-step approval chains | Stage 2 | Single approver in Stage 1 |
 | Reporting dashboards & exports | Stage 2 | Basic counts on dashboard only |
-| SMS notifications | Stage 2 | Email only in Demo 1 |
+| SMS notifications | Stage 2 | Email only in Stage 1 |
 | GPS on clock-in | Stage 2 | |
 | SSO / Microsoft Google login | Stage 3+ | |
-| Per-tenant white-label (each company’s own theme/logo) | Demo 1 (partial) | Logo + primary color override for company admin; full profile in Step 7 |
+| Per-tenant white-label (each company’s own theme/logo) | Stage 1 (partial) | Logo + primary color override for company admin; full profile in Step 7 |
 
 ---
 
-## 4. Screens Checklist (Demo 1)
+## 4. Screens Checklist (Stage 1)
 
 ### Public
 - [x] Login
@@ -175,7 +175,7 @@ Assumes **1–2 full-stack developers** working focused hours.
 | **7** | Documents | Upload/download, categories, S3 integration |
 | **8** | Polish | Settings, dashboard, bug fixes, demo seed data, deploy staging |
 
-**Total: ~8 weeks** to client-ready Demo 1.
+**Total: ~8 weeks** to client-ready Stage 1.
 
 Solo developer: plan **12–14 weeks**.
 
@@ -198,7 +198,7 @@ Solo developer: plan **12–14 weeks**.
 
 ---
 
-## 7. Success Criteria — Demo 1 Sign-off
+## 7. Success Criteria — Stage 1 Sign-off
 
 The client approves moving to Stage 2 when all of the following are true:
 
@@ -208,11 +208,11 @@ The client approves moving to Stage 2 when all of the following are true:
 4. HR can upload and download a document on an employee record
 5. UI is clean and usable on desktop and tablet
 6. No critical bugs in the demo walkthrough path (Section 1)
-7. Client confirms Demo 1 scope matches what was agreed (Section 2 vs Section 3)
+7. Client confirms Stage 1 scope matches what was agreed (Section 2 vs Section 3)
 
 ---
 
-## 8. After Demo 1 — Stage Preview (for client conversation)
+## 8. After Stage 1 — Stage Preview (for client conversation)
 
 Brief teaser only; detailed plans will be separate documents.
 
@@ -231,7 +231,7 @@ Full roadmap: [hr-saas-mern-project-plan.md](./hr-saas-mern-project-plan.md)
 
 | Item | Owner | Needed by |
 |------|-------|-----------|
-| Brand name, logo (optional for Demo 1) | Client | Week 7 |
+| Brand name, logo (optional for Stage 1) | Client | Week 7 |
 | Leave policy defaults (days per year, types) | Client | Week 5 |
 | Sample document types / categories | Client | Week 6 |
 | Staging domain or subdomain | Client / Dev | Week 8 |
@@ -240,11 +240,11 @@ Full roadmap: [hr-saas-mern-project-plan.md](./hr-saas-mern-project-plan.md)
 
 ---
 
-## 10. Risks & Mitigations (Demo 1)
+## 10. Risks & Mitigations (Stage 1)
 
 | Risk | Mitigation |
 |------|------------|
-| Leave rules more complex than expected | Demo 1 uses fixed entitlement; document Stage 2 for accrual |
+| Leave rules more complex than expected | Stage 1 uses fixed entitlement; document Stage 2 for accrual |
 | Scope creep during demo prep | This document is the contract; changes go to a change log |
 | Tenant data leak | Mandatory tenant middleware + code review on every query |
 | Demo feels “empty” | Seed realistic Acme Ltd data; polish dashboard counts |

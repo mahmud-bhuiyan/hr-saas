@@ -1,6 +1,6 @@
 # Module: Platform Site Settings
 
-**Stage:** Demo 1 (Step 7)  
+**Stage:** Stage 1 (Step 7)  
 **Status:** Complete (URL-only assets; tenant overrides shipped early)  
 **Depends on:** Auth & Tenant (Step 2); optional asset upload from Document Storage (Step 6)
 
@@ -10,7 +10,7 @@
 
 Let the **super admin** customize the **platform-wide** site identity visible to all users — login, register, app shell, and browser tab. Replaces hardcoded values in `client/src/constants/app.ts`, `client/tailwind.config.js`, and `client/index.html`.
 
-Per-tenant white-label overrides (logo + primary color) are implemented in Demo 1 — see [05-admin-settings.md](./05-admin-settings.md). Full company profile, departments, and users remain Step 7 follow-ups.
+Per-tenant white-label overrides (logo + primary color) are implemented in Stage 1 — see [05-admin-settings.md](./05-admin-settings.md). Full company profile, departments, and users remain Step 7 follow-ups.
 
 ---
 
@@ -141,7 +141,7 @@ Super admin opens Site settings → edits name/color/logo/favicon → saves
 
 ## 7. Notifications
 
-None for Demo 1.
+None for Stage 1.
 
 ---
 
@@ -152,9 +152,9 @@ None for Demo 1.
 
 ---
 
-## 9. Demo 1 vs Later
+## 9. Stage 1 vs Later
 
-| Feature | Demo 1 | Later |
+| Feature | Stage 1 | Later |
 |---------|--------|-------|
 | Platform site name | ✅ | |
 | Platform primary color | ✅ | |
@@ -205,7 +205,7 @@ None for Demo 1.
 
 ## 11. Open Questions
 
-- [x] Asset upload in Step 7 before S3? **ImgBB upload + URL fields (Demo 1)**
+- [x] Asset upload in Step 7 before S3? **ImgBB upload + URL fields (Stage 1)**
 - [ ] Cache headers on public `site-config` (e.g. `Cache-Control: public, max-age=300`)?
 
 ---

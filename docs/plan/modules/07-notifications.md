@@ -2,7 +2,7 @@
 
 **Stage:** Stage 2 (S2-1)  
 **Status:** Done  
-**Depends on:** Foundation (Demo 1), Redis in docker-compose
+**Depends on:** Foundation (Stage 1), Redis in docker-compose
 
 ---
 
@@ -67,7 +67,7 @@ All users receive notifications scoped to their `userId`. No cross-user notifica
 
 1. In-app notifications always created for the target user before or with email dispatch.
 2. Email jobs processed by `npm run worker` — API enqueues, worker sends via existing SendGrid service.
-3. When `SENDGRID_API_KEY` unset, log email to console (same as Demo 1 leave emails).
+3. When `SENDGRID_API_KEY` unset, log email to console (same as Stage 1 leave emails).
 4. Worker must connect to same Redis as configured in `REDIS_URL`.
 5. Failed jobs retry 3 times with exponential backoff; dead-letter log on final failure.
 6. Notification types are string constants duplicated in client for icon/label mapping.
@@ -108,9 +108,9 @@ Existing leave emails migrate to queue gradually; new Stage 2 modules use queue 
 
 ---
 
-## 9. Demo 1 vs Stage 2
+## 9. Stage 1 vs Stage 2
 
-| Feature | Demo 1 | Stage 2 |
+| Feature | Stage 1 | Stage 2 |
 |---------|--------|---------|
 | Email (SendGrid, sync) | ✅ Leave only | Queued via BullMQ |
 | In-app notifications | — | ✅ |

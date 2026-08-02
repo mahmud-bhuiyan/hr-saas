@@ -4,7 +4,7 @@
 
 **Prerequisite:** Stage 2 sign-off per [10-stage-2-operations-plan.md](./10-stage-2-operations-plan.md) Section 7.
 
-**Target companies:** Same as Demo 1 / Stage 2 — SMEs with 5–100 employees.
+**Target companies:** Same as Stage 1 / Stage 2 — SMEs with 5–100 employees.
 
 **Stack:** React + Node.js + MongoDB + Redis (BullMQ) — separate `client/` and `server/` apps.
 
@@ -195,10 +195,10 @@ The client approves Stage 3 completion when all of the following are true:
 | S3-1 | Foundations | ✅ Done |
 | S3-2 | Rotas backend | ✅ Done |
 | S3-3 | Rotas UI | ✅ Done |
-| S3-4 | Payroll export backend | Not started |
+| S3-4 | Payroll export backend | ✅ Done |
 | S3-5 | Payroll export UI | Not started |
 | S3-6 | Accounting integration | Not started |
 | S3-7 | Cross-module polish | Not started |
 | S3-8 | Sign-off | Not started |
 
-**Next step:** S3-4 — payroll export backend. See [STAGE-3-IMPLEMENTATION-STEPS.md](./STAGE-3-IMPLEMENTATION-STEPS.md).
+**Next step:** S3-5 — payroll export UI + CSV. See [STAGE-3-IMPLEMENTATION-STEPS.md](./STAGE-3-IMPLEMENTATION-STEPS.md).

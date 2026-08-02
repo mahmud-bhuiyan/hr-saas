@@ -2,11 +2,11 @@
 
 One detailed plan file per business module. Use these for sprint planning and as the source of truth for scope before coding.
 
-**When shipping features:** Update the module file and [IMPLEMENTATION-STEPS.md](../IMPLEMENTATION-STEPS.md), [STAGE-2-IMPLEMENTATION-STEPS.md](../STAGE-2-IMPLEMENTATION-STEPS.md), or [STAGE-3-IMPLEMENTATION-STEPS.md](../STAGE-3-IMPLEMENTATION-STEPS.md) so plans stay aligned with the codebase.
+**When shipping features:** Update the module file and [STAGE-1-IMPLEMENTATION-STEPS.md](../STAGE-1-IMPLEMENTATION-STEPS.md), [STAGE-2-IMPLEMENTATION-STEPS.md](../STAGE-2-IMPLEMENTATION-STEPS.md), or [STAGE-3-IMPLEMENTATION-STEPS.md](../STAGE-3-IMPLEMENTATION-STEPS.md) so plans stay aligned with the codebase.
 
 ---
 
-## Demo 1 modules
+## Stage 1 modules
 
 | # | Module | File | Status |
 |---|--------|------|--------|
@@ -16,6 +16,8 @@ One detailed plan file per business module. Use these for sprint planning and as
 | 04 | Document Storage | [04-documents.md](./04-documents.md) | Ready for review |
 | 05 | Admin & Settings | [05-admin-settings.md](./05-admin-settings.md) | Ready for review |
 | 15 | Platform Site Settings | [15-platform-site-settings.md](./15-platform-site-settings.md) | Complete |
+
+**Stage 1 tracker:** [STAGE-1-IMPLEMENTATION-STEPS.md](../STAGE-1-IMPLEMENTATION-STEPS.md) · **Client plan:** [00-stage-1-core-hr-plan.md](../00-stage-1-core-hr-plan.md)
 
 ---
 
@@ -42,7 +44,7 @@ Stage 2 also extends **01-auth-tenant** (forgot password), **02-employees** (inv
 | # | Module | File | Step | Status |
 |---|--------|------|------|--------|
 | 08 | Shifts & Rotas | [08-rotas.md](./08-rotas.md) | S3-1–S3-2 | S3-1–S3-2 done |
-| 11 | Payroll Export | [11-payroll.md](./11-payroll.md) | S3-1, S3-4–S3-6 | S3-1 settings done |
+| 11 | Payroll Export | [11-payroll.md](./11-payroll.md) | S3-1, S3-4–S3-6 | S3-1 + S3-4 backend done |
 
 Stage 3 also extends **02-employees** (pay fields) — see [11-payroll.md](./11-payroll.md).
 
@@ -54,14 +56,14 @@ Stage 3 also extends **02-employees** (pay fields) — see [11-payroll.md](./11-
 
 1. Copy [_template.md](./_template.md) to the numbered filename above.
 2. Fill every section; leave `Open Questions` for client decisions.
-3. Link acceptance criteria to [00-client-demo-plan.md](../00-client-demo-plan.md), [10-stage-2-operations-plan.md](../10-stage-2-operations-plan.md), or [11-stage-3-scheduling-payroll-plan.md](../11-stage-3-scheduling-payroll-plan.md) where applicable.
+3. Link acceptance criteria to [00-stage-1-core-hr-plan.md](../00-stage-1-core-hr-plan.md), [10-stage-2-operations-plan.md](../10-stage-2-operations-plan.md), or [11-stage-3-scheduling-payroll-plan.md](../11-stage-3-scheduling-payroll-plan.md) where applicable.
 4. Update the Status column in this README when a plan is ready for development or done.
 
 ---
 
 ## Out-of-plan additions (log)
 
-Features not in the original Demo 1 write-up but implemented — also tracked in [IMPLEMENTATION-STEPS.md](../IMPLEMENTATION-STEPS.md).
+Features not in the original Stage 1 write-up but implemented — also tracked in [STAGE-1-IMPLEMENTATION-STEPS.md](../STAGE-1-IMPLEMENTATION-STEPS.md).
 
 | Feature | Module | Added |
 |---------|--------|-------|

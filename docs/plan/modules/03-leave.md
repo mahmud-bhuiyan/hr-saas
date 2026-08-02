@@ -1,14 +1,14 @@
 # Module: Leave & Absence
 
-**Stage:** Demo 1 (done) · Stage 2 enhancements (S2-5)  
-**Status:** Complete (Demo 1) · Stage 2 complete (S2-5)  
+**Stage:** Stage 1 (done) · Stage 2 enhancements (S2-5)  
+**Status:** Complete (Stage 1) · Stage 2 complete (S2-5)  
 **Depends on:** Auth & Tenant (Step 2), Employee Management (Step 4)
 
 ---
 
 ## 1. Purpose
 
-Employees submit leave requests; managers and HR approve or decline them. Tracks annual leave balance with a fixed entitlement for Demo 1. Unblocks the core demo narrative: request → approval → balance update.
+Employees submit leave requests; managers and HR approve or decline them. Tracks annual leave balance with a fixed entitlement for Stage 1. Unblocks the core demo narrative: request → approval → balance update.
 
 ---
 
@@ -67,7 +67,7 @@ Employees submit leave requests; managers and HR approve or decline them. Tracks
   entitlement: Number,   // default 25
   taken: Number,
   pending: Number,
-  carriedOver: Number    // 0 for Demo 1
+  carriedOver: Number    // 0 for Stage 1
 }
 ```
 
@@ -102,7 +102,7 @@ Employees submit leave requests; managers and HR approve or decline them. Tracks
 7. Approve moves annual days `pending → taken`; decline/cancel reverses `pending`.
 8. Reject overlapping pending/approved requests for same employee.
 9. Reject annual submit if insufficient balance.
-10. Default entitlement: 25 days/year (hardcoded for Demo 1).
+10. Default entitlement: 25 days/year (hardcoded for Stage 1).
 
 ---
 
@@ -126,9 +126,9 @@ Employees submit leave requests; managers and HR approve or decline them. Tracks
 
 ---
 
-## 9. Demo 1 vs Later
+## 9. Stage 1 vs Later
 
-| Feature | Demo 1 | Later |
+| Feature | Stage 1 | Later |
 |---------|--------|-------|
 | Fixed entitlement | ✅ | Accrual engine (S2-5) |
 | Single approver | ✅ | Multi-step chains (S2-5) |

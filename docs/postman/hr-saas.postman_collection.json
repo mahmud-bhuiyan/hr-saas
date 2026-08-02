@@ -53,6 +53,10 @@
     {
       "key": "rotaWeekOf",
       "value": "2026-08-04"
+    },
+    {
+      "key": "payrollPeriodId",
+      "value": ""
     }
   ],
   "item": [
@@ -1562,6 +1566,87 @@
             "header": [],
             "url": "{{baseUrl}}/api/v1/rotas/shifts/{{shiftId}}/claim",
             "description": "Claim an open shift. Requires rota:claim:own."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Payroll",
+      "item": [
+        {
+          "name": "List Payroll Periods",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+            },
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/payroll/periods",
+            "description": "HR manager or company admin. Requires payroll:read."
+          },
+          "response": []
+        },
+        {
+          "name": "Create Payroll Period",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "  const json = pm.response.json();",
+                  "  if (json.data && json.data.id) {",
+                  "    pm.collectionVariables.set('payrollPeriodId', json.data.id);",
+                  "  }",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+            },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"periodStart\": \"2026-08-01\",\n  \"periodEnd\": \"2026-08-07\"\n}"
+            },
+            "url": "{{baseUrl}}/api/v1/payroll/periods",
+            "description": "Creates a draft payroll period. Requires payroll:generate."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Payroll Period",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+            },
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/payroll/periods/{{payrollPeriodId}}",
+            "description": "Period detail with employee summaries. Requires payroll:read."
+          },
+          "response": []
+        },
+        {
+          "name": "Generate Payroll Period",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+            },
+            "method": "POST",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/payroll/periods/{{payrollPeriodId}}/generate",
+            "description": "Aggregate approved timesheets and expenses with pay rates. Requires payroll:generate."
           },
           "response": []
         }

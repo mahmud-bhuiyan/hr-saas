@@ -2,13 +2,13 @@
 
 **Stage:** Stage 2 (S2-1)  
 **Status:** Done  
-**Depends on:** Auth & Tenant (Demo 1)
+**Depends on:** Auth & Tenant (Stage 1)
 
 ---
 
 ## 1. Purpose
 
-Immutable-style audit trail for sensitive HR data changes. Supports GDPR accountability (who changed what, when) and gives HR/admins a viewer UI. Referenced in Demo 1 as backend-only; Stage 2 ships the full module.
+Immutable-style audit trail for sensitive HR data changes. Supports GDPR accountability (who changed what, when) and gives HR/admins a viewer UI. Referenced in Stage 1 as backend-only; Stage 2 ships the full module.
 
 ---
 
@@ -109,9 +109,9 @@ None for audit log itself.
 
 ---
 
-## 9. Demo 1 vs Stage 2
+## 9. Stage 1 vs Stage 2
 
-| Feature | Demo 1 | Stage 2 |
+| Feature | Stage 1 | Stage 2 |
 |---------|--------|---------|
 | createdBy/updatedBy on records | ✅ | ✅ |
 | Central AuditLog collection | — | ✅ |
