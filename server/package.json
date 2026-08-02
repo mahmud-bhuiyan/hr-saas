@@ -13,8 +13,7 @@
     "start": "tsx src/index.ts",
     "worker": "tsx src/worker.ts",
     "seed:superadmin": "tsx scripts/seed-superadmin.ts",
-    "seed:demo": "tsx scripts/seed-demo.ts",
-    "seed:demo-employees": "tsx scripts/seed-demo-employees.ts"
+    "verify:staging": "tsx scripts/verify-staging-env.ts"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1101.0",

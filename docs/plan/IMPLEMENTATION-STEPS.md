@@ -11,7 +11,7 @@ Check off each step with the client/dev team before moving to the next.
 | **5** | Leave & absence — requests, approval, balance, calendar | ✅ Complete |
 | **6** | Document storage — S3 upload/download | ✅ Ready for review |
 | **7** | Admin & settings — company, departments, users | ✅ Ready for review |
-| **8** | Demo polish — seed data, staging deploy, bug fixes | 🔄 In progress |
+| **8** | Demo polish — seed data, staging deploy, bug fixes | 🔄 In progress (sign-off pending) |
 
 ---
 
@@ -151,10 +151,10 @@ Features added during implementation that extend the original step list. Keep th
 
 ## Step 8 — Done when
 
-- [x] Demo seed data (Acme Ltd, sample employees, leave, documents) — seeded on staging
+- [x] Demo seed data — manual setup / staging data (automated seed scripts removed after manual test)
 - [x] Staging deployment (client + server)
-- [ ] Bug fixes on demo walkthrough path
-- [ ] Forgot password flow (if required for Demo 1 sign-off)
+- [x] Bug fixes on demo walkthrough path (Stage 2 path addressed in S2-8)
+- [x] Forgot password flow — shipped in S2-1 (`/forgot-password`, `/reset-password`)
 
 **Review:** Client demo sign-off per [00-client-demo-plan.md](./00-client-demo-plan.md) Section 7.
 

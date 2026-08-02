@@ -56,7 +56,7 @@ const settingsLinks: SettingsLink[] = [
     label: 'Attendance',
     description: 'Configure GPS tracking and attendance policies.',
     icon: HiClock,
-    roles: ['company_admin', 'hr_manager'],
+    roles: ['company_admin'],
   },
   {
     to: '/dashboard/settings/leave',

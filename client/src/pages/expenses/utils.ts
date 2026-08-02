@@ -1,4 +1,5 @@
 import type { ExpenseCategory, ExpenseStatus } from '../../types';
+import { todayLocalDate } from '../../utils/date';
 
 export type ExpensesTab = 'my-expenses' | 'approval-queue';
 
@@ -74,7 +75,7 @@ export const emptyExpenseForm = () => ({
   category: 'travel' as ExpenseCategory,
   amount: '',
   currency: 'GBP',
-  date: new Date().toISOString().slice(0, 10),
+  date: todayLocalDate(),
   description: '',
   file: null as File | null,
 });

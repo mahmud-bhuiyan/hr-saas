@@ -41,7 +41,7 @@ This flow covers **signup → people → leave workflow → documents → settin
 - Super admin: add company directly (creates approved tenant + admin — no wait)
 - Login / logout
 - User profile and change password
-- Forgot password (email-based reset) — **not started**
+- Forgot password (email-based reset) — **done** (S2-1: `/forgot-password`, `/reset-password`)
 - Secure sessions (short-lived access token + refresh cookie)
 - Each company’s data fully isolated from other companies
 
@@ -188,7 +188,7 @@ Solo developer: plan **12–14 weeks**.
 ## 6. Demo Environment
 
 - **Staging URL** for client (e.g. `demo.hr-platform.com`)
-- Pre-seeded demo company: *Acme Ltd* with 8–10 fake employees, 2–3 pending leave requests, sample documents
+- Pre-seeded demo company: *Acme Ltd* with sample employees, leave, documents — set up manually on staging
 - Demo accounts:
 
 | Role | Email (example) | Purpose |
@@ -268,6 +268,6 @@ Full roadmap: [hr-saas-mern-project-plan.md](./hr-saas-mern-project-plan.md)
 | Leave (Step 5) | ✅ Complete | Email via SendGrid; user→employee via email fallback |
 | Documents (Step 6) | ✅ Ready for review | MinIO for local dev; AWS S3 or Cloudflare R2 in production |
 | Settings (Step 7) | ✅ Ready for review | Company profile, departments CRUD, users/roles; branding was done earlier |
-| Demo polish (Step 8) | 🔄 In progress | Seed + staging deploy done; walkthrough polish + optional forgot password remain |
+| Demo polish (Step 8) | 🔄 In progress | Manual demo data on staging; client sign-off remains |
 
 **Next step:** Step 8 — walkthrough bug fixes and Demo 1 sign-off. See [IMPLEMENTATION-STEPS.md](./IMPLEMENTATION-STEPS.md).

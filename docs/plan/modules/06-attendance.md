@@ -170,7 +170,7 @@ HR opens employee history → corrects missed punch → audit log entry
 - [ ] GPS consent banner (conditional)
 
 ### Integration
-- [ ] Seed sample attendance sessions in `seed-demo.ts`
+- [x] Sample attendance sessions on staging (manual setup)
 - [ ] OpenAPI + Postman
 
 **Estimate:** 5 days

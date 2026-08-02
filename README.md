@@ -79,6 +79,17 @@ stripe listen --forward-to localhost:5000/api/v1/billing/webhook
 
 Set demo/staging tenants `billingExempt: true` on the Tenant document to skip payment gates.
 
+### Super admin bootstrap
+
+After MongoDB is running and `server/.env.local` has `MONGODB_URI`:
+
+```bash
+cd server
+npm run seed:superadmin   # once — platform super admin (superadmin@hr.com / User@123)
+```
+
+Demo/staging company data is created manually via the app or super-admin registration flows.
+
 ## Environment files
 
 | App | File | Key variables |
@@ -119,7 +130,35 @@ Create **two** Vercel projects from the same repo, each with a different root di
 
 3. **Update server** — Set `CLIENT_URL` to the client URL, then redeploy server (CORS).
 
-Config files: `client/vercel.json`, `server/vercel.json`, `server/src/index.ts` (Vercel Express + local entry; must default-export the Express app).
+Config files: `client/vercel.json`, `server/vercel.json`, `server/render.yaml` (notification worker), `server/src/index.ts` (Vercel Express + local entry; must default-export the Express app).
+
+### Staging / demo environment (Stage 2)
+
+Use **three** services for a full Stage 2 staging stack:
+
+| Service | Host | Notes |
+|---------|------|-------|
+| **API** | Vercel (`server/`) | Express app; set all server env vars |
+| **Client** | Vercel (`client/`) | `VITE_API_URL` → API URL |
+| **Worker** | Render or Railway (`server/`, `npm run worker`) | BullMQ + scheduled jobs; **not** supported on Vercel serverless |
+
+**Managed Redis (recommended for staging):** [Upstash](https://upstash.com/) — set `REDIS_URL` on both API and worker.
+
+**Stripe (test mode on staging):**
+
+1. Set `STRIPE_SECRET_KEY`, `STRIPE_PRICE_ID`, `STRIPE_WEBHOOK_SECRET` on the API project.
+2. Stripe Dashboard → Webhooks → endpoint `https://<api>/api/v1/billing/webhook` — events: `checkout.session.completed`, `customer.subscription.*`, `invoice.*`.
+3. Set `billingExempt: true` on demo/staging tenants in MongoDB to skip payment during walkthroughs.
+
+**Verify before demo:**
+
+```bash
+cd server
+npm run verify:staging   # checks required env + MongoDB/Redis connectivity
+curl https://<api>/api/v1/health   # expect checks.mongodb ok, checks.redis ok
+```
+
+After deploy, run `npm run seed:superadmin` once against the staging `MONGODB_URI` if needed.
 
 ## API documentation
 
