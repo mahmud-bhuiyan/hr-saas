@@ -14,7 +14,7 @@ Check off each step with the client/dev team before moving to the next.
 | **S3-4** | Payroll export backend — `PayrollPeriod`, aggregate timesheets + expenses + pay rates | ✅ Done |
 | **S3-5** | Payroll export UI — generate, preview, CSV download | ✅ Done |
 | **S3-6** | Accounting integration — Xero OAuth push (manual journals) | ✅ Done |
-| **S3-7** | Cross-module polish — rota/leave clash warnings, optional break deductions | Not started |
+| **S3-7** | Cross-module polish — rota/leave clash warnings, optional break deductions | ✅ Done |
 | **S3-8** | Stage 3 polish, staging walkthrough, client sign-off | Not started |
 
 ---
@@ -27,6 +27,8 @@ Features added during Stage 3 implementation that extend the original step list.
 |-------|------|-------------|
 | Open-shift auto-assign on claim | S3-3 | Claim assigns shift immediately (no manager approval queue) |
 | Xero chosen over QuickBooks for S3-6 | S3-6 | Client default GBP market; OAuth + manual journal sync |
+| Leave approval rota clash warnings | S3-7 | `conflictingShifts` on approver leave list + confirm modal on approve |
+| FTE factor in leave accrual | S3-7 | `calculateProRataEntitlement` scales by employee `fteFactor` |
 
 ---
 
@@ -137,10 +139,10 @@ Features added during Stage 3 implementation that extend the original step list.
 
 ## S3-7 — Done when
 
-- [ ] Rota/leave clash warnings on shift create and leave approval
-- [ ] Optional break deductions on timesheets (if client wants — else defer)
-- [ ] Employee `fteFactor` used in leave accrual (if not already)
-- [ ] Bug fixes from internal walkthrough
+- [x] Rota/leave clash warnings on shift create and leave approval
+- [x] Optional break deductions on timesheets — deferred (client decision)
+- [x] Employee `fteFactor` used in leave accrual
+- [x] Bug fixes from internal walkthrough
 
 **Review:** Cross-module regression before S3-8.
 

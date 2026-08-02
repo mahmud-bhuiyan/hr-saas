@@ -10,6 +10,7 @@ import { Textarea } from '../../../components/ui/Textarea';
 import type { LeaveRequest } from '../../../types';
 import { formatDateRange, leaveTypeLabel, approvalStepLabel } from '../utils';
 import { LeaveOverlapIndicator } from './LeaveOverlapIndicator';
+import { LeaveShiftConflictIndicator } from './LeaveShiftConflictIndicator';
 
 interface LeaveApprovalQueueProps {
   requests: LeaveRequest[];
@@ -30,6 +31,7 @@ export const LeaveApprovalQueue = ({
 }: LeaveApprovalQueueProps) => {
   const [declineTarget, setDeclineTarget] = useState<LeaveRequest | null>(null);
   const [declineReason, setDeclineReason] = useState('');
+  const [approveTarget, setApproveTarget] = useState<LeaveRequest | null>(null);
   const {
     paginatedItems,
     page,
@@ -48,6 +50,21 @@ export const LeaveApprovalQueue = ({
     onDecline(declineTarget, declineReason.trim() || undefined);
     setDeclineTarget(null);
     setDeclineReason('');
+  };
+
+  const handleApproveClick = (request: LeaveRequest) => {
+    if (request.conflictingShifts?.length) {
+      setApproveTarget(request);
+      return;
+    }
+
+    onApprove(request);
+  };
+
+  const handleApproveConfirm = () => {
+    if (!approveTarget) return;
+    onApprove(approveTarget);
+    setApproveTarget(null);
   };
 
   return (
@@ -115,6 +132,14 @@ export const LeaveApprovalQueue = ({
             ),
           },
           {
+            key: 'shifts',
+            header: 'Rota clash',
+            align: 'left',
+            render: (row: LeaveRequest) => (
+              <LeaveShiftConflictIndicator conflicts={row.conflictingShifts} />
+            ),
+          },
+          {
             key: 'actions',
             header: 'Actions',
             align: 'right',
@@ -126,7 +151,7 @@ export const LeaveApprovalQueue = ({
                   icon={<HiCheck className="h-4 w-4 text-white" />}
                   loading={actionLoadingId === row.id}
                   loadingText={row.approvalStep === 2 ? 'Approving…' : 'Approving…'}
-                  onClick={() => onApprove(row)}
+                  onClick={() => handleApproveClick(row)}
                 >
                   {multiStepApprovalEnabled && row.approvalStep === 2
                     ? 'Final approve'
@@ -200,6 +225,37 @@ export const LeaveApprovalQueue = ({
             icon={<HiChatBubbleLeftEllipsis className="h-4 w-4 text-brand-600" />}
           />
         </FormField>
+      </Modal>
+
+      <Modal
+        open={Boolean(approveTarget)}
+        onClose={() => setApproveTarget(null)}
+        title="Approve leave with rota clash"
+        description={
+          approveTarget
+            ? `${approveTarget.employee.firstName} ${approveTarget.employee.lastName} has scheduled shifts during this leave. Reassign or remove those shifts after approval.`
+            : undefined
+        }
+        footer={
+          <div className="flex justify-end gap-2">
+            <Button type="button" variant="secondary" onClick={() => setApproveTarget(null)}>
+              Cancel
+            </Button>
+            <Button
+              type="button"
+              icon={<HiCheck className="h-4 w-4 text-white" />}
+              loading={Boolean(approveTarget && actionLoadingId === approveTarget.id)}
+              loadingText="Approving…"
+              onClick={handleApproveConfirm}
+            >
+              Approve anyway
+            </Button>
+          </div>
+        }
+      >
+        {approveTarget?.conflictingShifts?.length ? (
+          <LeaveShiftConflictIndicator conflicts={approveTarget.conflictingShifts} />
+        ) : null}
       </Modal>
     </>
   );

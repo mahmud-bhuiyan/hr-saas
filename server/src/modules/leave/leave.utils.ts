@@ -10,36 +10,37 @@ export const getDaysInYear = (year: number): number =>
 /**
  * Pro-rata annual entitlement from employee start date within a calendar year.
  * Full entitlement when start date is on or before Jan 1; zero if after Dec 31.
+ * Scaled by FTE factor (default 1.0) for part-time employees.
  */
 export const calculateProRataEntitlement = (
   annualEntitlement: number,
   startDate: Date | undefined | null,
-  year: number
+  year: number,
+  fteFactor = 1
 ): number => {
   const daysInYear = getDaysInYear(year);
   const yearStart = Date.UTC(year, 0, 1);
   const yearEnd = Date.UTC(year, 11, 31);
+  const normalizedFte = Math.min(1, Math.max(0, fteFactor));
 
-  if (!startDate) {
-    return annualEntitlement;
+  let baseEntitlement = annualEntitlement;
+
+  if (startDate) {
+    const startMs = Date.UTC(
+      startDate.getUTCFullYear(),
+      startDate.getUTCMonth(),
+      startDate.getUTCDate()
+    );
+
+    if (startMs > yearEnd) {
+      baseEntitlement = 0;
+    } else if (startMs > yearStart) {
+      const employedDays = Math.floor((yearEnd - startMs) / (1000 * 60 * 60 * 24)) + 1;
+      baseEntitlement = (annualEntitlement * employedDays) / daysInYear;
+    }
   }
 
-  const startMs = Date.UTC(
-    startDate.getUTCFullYear(),
-    startDate.getUTCMonth(),
-    startDate.getUTCDate()
-  );
-
-  if (startMs <= yearStart) {
-    return annualEntitlement;
-  }
-
-  if (startMs > yearEnd) {
-    return 0;
-  }
-
-  const employedDays = Math.floor((yearEnd - startMs) / (1000 * 60 * 60 * 24)) + 1;
-  const entitlement = (annualEntitlement * employedDays) / daysInYear;
+  const entitlement = baseEntitlement * normalizedFte;
   return Math.round(entitlement * 10) / 10;
 };
 

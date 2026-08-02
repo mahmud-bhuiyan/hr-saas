@@ -226,6 +226,15 @@ export interface LeaveOverlapSummary {
   reason?: string;
 }
 
+export interface LeaveShiftConflictSummary {
+  id: string;
+  date: string;
+  startTime: string;
+  endTime: string;
+  status: 'draft' | 'published' | 'open';
+  locationName: string;
+}
+
 export interface LeaveRequest {
   id: string;
   employeeId: string;
@@ -244,6 +253,7 @@ export interface LeaveRequest {
   createdAt: string;
   updatedAt: string;
   overlappingRequests?: LeaveOverlapSummary[];
+  conflictingShifts?: LeaveShiftConflictSummary[];
 }
 
 export interface CreateLeaveRequestInput {

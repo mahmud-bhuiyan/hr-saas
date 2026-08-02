@@ -265,4 +265,4 @@ Full roadmap: [hr-saas-mern-project-plan.md](./hr-saas-mern-project-plan.md)
 | Settings (Step 7) | ✅ Ready for review | Company profile, departments CRUD, users/roles; branding was done earlier |
 | Demo polish (Step 8) | ✅ Complete | Manual staging data only; automated seeds/tests removed |
 
-**Next step:** Stage 3 — S3-3 rotas UI. See [11-stage-3-scheduling-payroll-plan.md](./11-stage-3-scheduling-payroll-plan.md).
+**Next step:** Stage 3 — S3-8 sign-off. See [STAGE-3-IMPLEMENTATION-STEPS.md](./STAGE-3-IMPLEMENTATION-STEPS.md).

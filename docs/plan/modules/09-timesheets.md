@@ -181,7 +181,7 @@ Week ends → Employee clicks Generate → reviews draft → submits
 ## 11. Open Questions
 
 - [ ] Allow future-week draft editing or current/past only?
-- [ ] Break deductions in Stage 2 or Stage 3?
+- [x] Break deductions — deferred (client decision; not in S3-7 scope)
 
 ---
 
