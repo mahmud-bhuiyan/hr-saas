@@ -69,7 +69,16 @@ export const LoginForm = ({
           />
         </FormField>
 
-        <div className="text-right">
+        <div className="flex items-center justify-between">
+          <label className="flex cursor-pointer items-center gap-2 text-sm text-slate-600">
+            <input
+              type="checkbox"
+              checked={saveForLater}
+              onChange={(e) => onSaveForLaterChange(e.target.checked)}
+              className="h-4 w-4 rounded border-slate-300 text-brand-600 focus:ring-brand-500"
+            />
+            Remember me
+          </label>
           <Link
             to="/forgot-password"
             className="text-sm font-medium text-brand-600 hover:text-brand-700"
@@ -77,16 +86,6 @@ export const LoginForm = ({
             Forgot password?
           </Link>
         </div>
-
-        <label className="flex cursor-pointer items-center gap-2 text-sm text-slate-600">
-          <input
-            type="checkbox"
-            checked={saveForLater}
-            onChange={(e) => onSaveForLaterChange(e.target.checked)}
-            className="h-4 w-4 rounded border-slate-300 text-brand-600 focus:ring-brand-500"
-          />
-          Save for later
-        </label>
 
         <Button
           type="submit"

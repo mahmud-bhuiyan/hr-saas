@@ -13,6 +13,7 @@
     "start": "tsx src/index.ts",
     "worker": "tsx src/worker.ts",
     "seed:superadmin": "tsx scripts/seed-superadmin.ts",
+    "seed:test-data": "tsx scripts/seed-test-data.ts",
     "verify:staging": "tsx scripts/verify-staging-env.ts"
   },
   "dependencies": {

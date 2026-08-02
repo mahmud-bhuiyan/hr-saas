@@ -11,7 +11,6 @@ import { hasFormChanges, pickChangedFields } from '../../../utils/form';
 import type { PatchPlatformSiteSettingsInput, PlatformSiteSettings } from '../../../types';
 import {
   SiteSettingsForm,
-  SiteSettingsPreview,
   type SiteSettingsFormValues,
 } from './components/SiteSettingsForm';
 
@@ -211,27 +210,24 @@ export const PlatformSiteSettingsPage = () => {
         description="Customize platform-wide branding visible on login, register, and the app shell."
       />
 
-      <div className="grid gap-6 lg:grid-cols-2">
-        <SiteSettingsForm
-          values={values}
-          savedLogoUrl={original.logoUrl}
-          savedFaviconUrl={original.faviconUrl}
-          savedPrimaryColor={original.primaryColor}
-          onChange={(field, value) =>
-            setValues((prev) => (prev ? { ...prev, [field]: value } : prev))
-          }
-          onLogoSave={handleLogoSave}
-          onFaviconSave={handleFaviconSave}
-          onApplyColor={handleApplyColor}
-          onSubmit={handleSubmit}
-          loading={updateMutation.isPending && saveAction === 'settings'}
-          logoSaving={updateMutation.isPending && saveAction === 'logo'}
-          faviconSaving={updateMutation.isPending && saveAction === 'favicon'}
-          colorSaving={updateMutation.isPending && saveAction === 'color'}
-          hasSettingsChanges={hasSettingsChanges}
-        />
-        <SiteSettingsPreview values={values} />
-      </div>
+      <SiteSettingsForm
+        values={values}
+        savedLogoUrl={original.logoUrl}
+        savedFaviconUrl={original.faviconUrl}
+        savedPrimaryColor={original.primaryColor}
+        onChange={(field, value) =>
+          setValues((prev) => (prev ? { ...prev, [field]: value } : prev))
+        }
+        onLogoSave={handleLogoSave}
+        onFaviconSave={handleFaviconSave}
+        onApplyColor={handleApplyColor}
+        onSubmit={handleSubmit}
+        loading={updateMutation.isPending && saveAction === 'settings'}
+        logoSaving={updateMutation.isPending && saveAction === 'logo'}
+        faviconSaving={updateMutation.isPending && saveAction === 'favicon'}
+        colorSaving={updateMutation.isPending && saveAction === 'color'}
+        hasSettingsChanges={hasSettingsChanges}
+      />
     </PageContainer>
   );
 };
