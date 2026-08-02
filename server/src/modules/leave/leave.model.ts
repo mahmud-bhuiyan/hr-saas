@@ -15,6 +15,7 @@ export interface ILeaveRequest {
   approverId?: mongoose.Types.ObjectId | null;
   approvedAt?: Date | null;
   declineReason?: string;
+  approvalStep?: number;
 }
 
 export interface ILeaveRequestDocument extends ILeaveRequest, Document {
@@ -61,6 +62,7 @@ const leaveRequestSchema = new Schema<ILeaveRequestDocument>(
     approverId: { type: Schema.Types.ObjectId, ref: 'User', default: null },
     approvedAt: { type: Date, default: null },
     declineReason: { type: String, trim: true },
+    approvalStep: { type: Number, default: 1, min: 1, max: 2 },
   },
   { timestamps: true }
 );

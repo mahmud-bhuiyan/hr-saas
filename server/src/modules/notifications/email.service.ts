@@ -53,10 +53,12 @@ export const sendLeaveSubmittedEmail = async (
     startDate: string;
     endDate: string;
     reason?: string;
+    subjectPrefix?: string;
+    introText?: string;
   }
 ): Promise<void> => {
   const text = [
-    `${params.employeeName} has submitted a leave request.`,
+    params.introText ?? `${params.employeeName} has submitted a leave request.`,
     '',
     `Type: ${params.leaveType}`,
     `Dates: ${params.startDate} to ${params.endDate}`,
@@ -69,7 +71,7 @@ export const sendLeaveSubmittedEmail = async (
 
   await sendEmail(env, {
     to: params.to,
-    subject: `Leave request from ${params.employeeName}`,
+    subject: `${params.subjectPrefix ?? ''}Leave request from ${params.employeeName}`,
     text,
   });
 };
@@ -279,6 +281,33 @@ export const sendExpenseDeclinedEmail = async (
   await sendEmail(env, {
     to: params.to,
     subject: 'Expense claim declined',
+    text,
+  });
+};
+
+export const sendDocumentExpiryReminderEmail = async (
+  env: ServerEnv,
+  params: {
+    to: string;
+    documents: Array<{ fileName: string; expiryDate: string; employeeName?: string }>;
+  }
+): Promise<void> => {
+  const lines = params.documents.map(
+    (doc) =>
+      `- ${doc.fileName}${doc.employeeName ? ` (${doc.employeeName})` : ''} — expires ${doc.expiryDate}`
+  );
+
+  const text = [
+    'The following HR documents expire within the next 30 days:',
+    '',
+    ...lines,
+    '',
+    'Please review and renew or archive them in the HR platform.',
+  ].join('\n');
+
+  await sendEmail(env, {
+    to: params.to,
+    subject: `Document expiry reminder (${params.documents.length})`,
     text,
   });
 };

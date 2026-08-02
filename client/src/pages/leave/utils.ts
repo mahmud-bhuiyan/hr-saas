@@ -52,6 +52,24 @@ export const formatDateRange = (startDate: string, endDate: string, halfDay: boo
   return `${startDate} – ${endDate}`;
 };
 
+export const approvalStepLabel = (
+  request: {
+    status: LeaveRequestStatus;
+    approvalStep?: number;
+  },
+  multiStepEnabled = false
+): string | null => {
+  if (!multiStepEnabled || request.status !== 'pending') {
+    return null;
+  }
+
+  const step = request.approvalStep ?? 1;
+  if (step >= 2) {
+    return 'Awaiting HR (step 2)';
+  }
+  return 'Awaiting manager (step 1)';
+};
+
 export type LeaveTab = 'my-leave' | 'employee-leave' | 'approvals' | 'calendar';
 
 export const emptyLeaveForm = {

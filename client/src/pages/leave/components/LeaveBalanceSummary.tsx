@@ -36,6 +36,9 @@ export const LeaveBalanceSummary = ({
 
   const cards = [
     { label: 'Entitlement', value: balance.entitlement, note: `${balance.year} annual leave` },
+    ...(balance.carriedOver > 0
+      ? [{ label: 'Carried over', value: balance.carriedOver, note: 'From previous year' }]
+      : []),
     { label: 'Taken', value: balance.taken, note: 'Approved days used' },
     { label: 'Pending', value: balance.pending, note: 'Awaiting approval' },
     { label: 'Remaining', value: balance.remaining, note: 'Available days' },

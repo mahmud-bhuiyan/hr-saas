@@ -216,6 +216,7 @@ export interface LeaveRequest {
   approverId?: string;
   approvedAt?: string;
   declineReason?: string;
+  approvalStep?: number;
   createdAt: string;
   updatedAt: string;
   overlappingRequests?: LeaveOverlapSummary[];
@@ -245,6 +246,18 @@ export interface LeaveBalance {
   pending: number;
   carriedOver: number;
   remaining: number;
+}
+
+export interface LeaveSettings {
+  annualEntitlement: number;
+  maxCarryOverDays: number;
+  multiStepApprovalEnabled: boolean;
+}
+
+export interface PatchLeaveSettingsInput {
+  annualEntitlement?: number;
+  maxCarryOverDays?: number;
+  multiStepApprovalEnabled?: boolean;
 }
 
 export interface LeaveCalendarEntry {

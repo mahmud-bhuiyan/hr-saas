@@ -1,7 +1,7 @@
 # Module: Leave & Absence
 
 **Stage:** Demo 1 (done) · Stage 2 enhancements (S2-5)  
-**Status:** Complete (Demo 1) · Stage 2 not started  
+**Status:** Complete (Demo 1) · Stage 2 complete (S2-5)  
 **Depends on:** Auth & Tenant (Step 2), Employee Management (Step 4)
 
 ---
@@ -171,13 +171,13 @@ Decline at any step → status `declined`, reverse pending balance.
 
 ### Tasks
 
-- [ ] Tenant leave settings model + endpoints
-- [ ] Accrual calculation in balance service
-- [ ] Carry-over job (BullMQ cron on Jan 1 or manual)
-- [ ] Multi-step approve handler updates
-- [ ] Policy settings UI
-- [ ] Approval queue step indicators
-- [ ] OpenAPI + Postman
+- [x] Tenant leave settings model + endpoints
+- [x] Accrual calculation in balance service
+- [x] Carry-over job (BullMQ cron on Jan 1 or manual)
+- [x] Multi-step approve handler updates
+- [x] Policy settings UI
+- [x] Approval queue step indicators
+- [x] OpenAPI + Postman
 
 **Estimate:** 5 days (part of S2-5)
 
@@ -192,6 +192,6 @@ Decline at any step → status `declined`, reverse pending balance.
 - [x] Team calendar shows approved + pending leave for the month
 - [x] Email sent on submit, approve, decline (SendGrid)
 - [x] OpenAPI and Postman updated
-- [ ] Pro-rata accrual reflects employee start date (Stage 2 S2-5)
-- [ ] Multi-step approval manager → HR when enabled (Stage 2 S2-5)
-- [ ] Carry-over applied per tenant policy (Stage 2 S2-5)
+- [x] Pro-rata accrual reflects employee start date (Stage 2 S2-5)
+- [x] Multi-step approval manager → HR when enabled (Stage 2 S2-5)
+- [x] Carry-over applied per tenant policy (Stage 2 S2-5)

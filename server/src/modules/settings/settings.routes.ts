@@ -3,6 +3,10 @@ import type { ServerEnv } from '../../config/env.js';
 import { authenticate, authorize } from '../../middleware/auth.js';
 import { requireTenant, resolveTenant } from '../../middleware/tenant.js';
 import {
+  getLeaveSettingsHandler,
+  patchLeaveSettingsHandler,
+} from '../leave/leave-settings.controller.js';
+import {
   getEffectiveBrandingHandler,
   getTenantBrandingSettingsHandler,
   patchTenantBrandingHandler,
@@ -79,6 +83,19 @@ export const createSettingsRoutes = (env: ServerEnv): Router => {
 
   router.patch('/users/:id', requireTenant(), authorize('company_admin'), (req, res) => {
     void patchTenantUserHandler(req, res);
+  });
+
+  router.get(
+    '/leave',
+    requireTenant(),
+    authorize('company_admin', 'hr_manager', 'manager'),
+    (req, res) => {
+      void getLeaveSettingsHandler(req, res);
+    }
+  );
+
+  router.patch('/leave', requireTenant(), authorize('company_admin'), (req, res) => {
+    void patchLeaveSettingsHandler(req, res);
   });
 
   return router;

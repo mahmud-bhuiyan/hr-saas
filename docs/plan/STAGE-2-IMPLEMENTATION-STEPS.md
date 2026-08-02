@@ -12,7 +12,7 @@ Check off each step with the client/dev team before moving to the next.
 | **S2-2** | Attendance — clock in/out, history, live board, HR corrections | ✅ Done |
 | **S2-3** | Timesheets — weekly grid, auto-generate, submit/approve, overtime | ✅ Done |
 | **S2-4** | Expenses — submit with receipt, approval, CSV export | ✅ Done |
-| **S2-5** | Leave enhancements — accrual, carry-over, multi-step approval, doc expiry emails | ⬜ Not started |
+| **S2-5** | Leave enhancements — accrual, carry-over, multi-step approval, doc expiry emails | ✅ Done |
 | **S2-6** | Employee ops & reporting — CSV import, headcount + absence reports | ⬜ Not started |
 | **S2-7** | Stripe billing — checkout, portal, webhooks, seat metering | ⬜ Not started |
 | **S2-8** | Stage 2 polish — extended seed, deploy, bug fixes, sign-off | ⬜ Not started |
@@ -117,15 +117,15 @@ Features added during Stage 2 implementation that extend the original step list.
 
 ## S2-5 — Done when
 
-- [ ] Tenant leave settings: `annualEntitlement`, `maxCarryOverDays`, `multiStepApprovalEnabled`
-- [ ] Pro-rata accrual: entitlement prorated from employee `startDate` within calendar year
-- [ ] Carry-over: apply unused annual leave up to `maxCarryOverDays` on year boundary (job or on-demand)
-- [ ] Multi-step approval: `approvalStep` on `LeaveRequest` (manager → HR when enabled)
-- [ ] Updated approve/decline handlers respect approval step and role
-- [ ] BullMQ cron job: document expiry reminders (30 days ahead) → email HR
-- [ ] Leave policy settings UI for company admin
-- [ ] Multi-step status indicators on approval queue
-- [ ] `docs/openapi.yaml` and Postman collection updated
+- [x] Tenant leave settings: `annualEntitlement`, `maxCarryOverDays`, `multiStepApprovalEnabled`
+- [x] Pro-rata accrual: entitlement prorated from employee `startDate` within calendar year
+- [x] Carry-over: apply unused annual leave up to `maxCarryOverDays` on year boundary (job or on-demand)
+- [x] Multi-step approval: `approvalStep` on `LeaveRequest` (manager → HR when enabled)
+- [x] Updated approve/decline handlers respect approval step and role
+- [x] BullMQ cron job: document expiry reminders (30 days ahead) → email HR
+- [x] Leave policy settings UI for company admin
+- [x] Multi-step status indicators on approval queue
+- [x] `docs/openapi.yaml` and Postman collection updated
 
 **Review:** Test accrual for mid-year starter and two-step leave approval before S2-6.
 

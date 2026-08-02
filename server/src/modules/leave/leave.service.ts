@@ -29,10 +29,13 @@ import type {
 import {
   calculateLeaveDays,
   dateRangesOverlap,
-  DEFAULT_ANNUAL_ENTITLEMENT,
   formatDateString,
   parseDateString,
 } from './leave.utils.js';
+import {
+  ensureLeaveBalanceForYear,
+  getTenantLeaveSettings,
+} from './leave-settings.service.js';
 
 export class LeaveServiceError extends Error {
   constructor(
@@ -71,6 +74,7 @@ export interface LeaveRequestPublic {
   approverId?: string;
   approvedAt?: string;
   declineReason?: string;
+  approvalStep?: number;
   createdAt: string;
   updatedAt: string;
   overlappingRequests?: LeaveOverlapSummary[];
@@ -186,6 +190,7 @@ const toLeaveRequestPublic = async (
     approverId: request.approverId?.toString(),
     approvedAt: request.approvedAt?.toISOString(),
     declineReason: request.declineReason,
+    approvalStep: request.approvalStep ?? 1,
     createdAt: request.createdAt.toISOString(),
     updatedAt: request.updatedAt.toISOString(),
     overlappingRequests: [],
@@ -244,30 +249,8 @@ const getOrCreateBalance = async (
   tenantId: string,
   employeeId: string,
   year: number
-): Promise<InstanceType<typeof LeaveBalance>> => {
-  const tenantObjectId = new mongoose.Types.ObjectId(tenantId);
-  const employeeObjectId = new mongoose.Types.ObjectId(employeeId);
-
-  let balance = await LeaveBalance.findOne({
-    tenantId: tenantObjectId,
-    employeeId: employeeObjectId,
-    year,
-  });
-
-  if (!balance) {
-    balance = await LeaveBalance.create({
-      tenantId: tenantObjectId,
-      employeeId: employeeObjectId,
-      year,
-      entitlement: DEFAULT_ANNUAL_ENTITLEMENT,
-      taken: 0,
-      pending: 0,
-      carriedOver: 0,
-    });
-  }
-
-  return balance;
-};
+): Promise<InstanceType<typeof LeaveBalance>> =>
+  ensureLeaveBalanceForYear(tenantId, employeeId, year);
 
 const toBalancePublic = (balance: InstanceType<typeof LeaveBalance>): LeaveBalancePublic => ({
   employeeId: balance.employeeId.toString(),
@@ -329,8 +312,19 @@ const buildListFilter = async (
     tenantId: new mongoose.Types.ObjectId(tenantId),
   };
 
+  const settings = await getTenantLeaveSettings(tenantId);
+
   if (query.status) {
     filter.status = query.status;
+
+    if (
+      query.status === 'pending' &&
+      settings.multiStepApprovalEnabled &&
+      canApproveTeam(access.role) &&
+      !canApproveAll(access.role)
+    ) {
+      filter.approvalStep = 1;
+    }
   }
 
   if (query.from) {
@@ -428,6 +422,41 @@ const assertCanApproveRequest = async (
     throw new LeaveServiceError('Only pending requests can be approved or declined', 400);
   }
 
+  const settings = await getTenantLeaveSettings(tenantId);
+  const step = request.approvalStep ?? 1;
+
+  if (settings.multiStepApprovalEnabled && step >= 2) {
+    if (!canApproveAll(access.role)) {
+      throw new LeaveServiceError('Insufficient permissions', 403);
+    }
+    return;
+  }
+
+  if (settings.multiStepApprovalEnabled && step === 1) {
+    if (canApproveTeam(access.role)) {
+      const selfRecord = await resolveEmployeeForUser(tenantId, access.userId, access.userEmail);
+      const employee = await Employee.findById(request.employeeId);
+
+      if (!employee) {
+        throw new LeaveServiceError('Employee not found', 404);
+      }
+
+      const isDirectReport = employee.managerId?.toString() === selfRecord._id.toString();
+      if (isDirectReport) {
+        return;
+      }
+    }
+
+    if (canApproveAll(access.role)) {
+      const employee = await Employee.findById(request.employeeId);
+      if (!employee?.managerId) {
+        return;
+      }
+    }
+
+    throw new LeaveServiceError('Insufficient permissions', 403);
+  }
+
   if (canApproveAll(access.role)) {
     return;
   }
@@ -450,6 +479,15 @@ const assertCanApproveRequest = async (
   throw new LeaveServiceError('Insufficient permissions', 403);
 };
 
+const findHrRecipientEmail = async (tenantId: string): Promise<string | null> => {
+  const hrUser = await User.findOne({
+    tenantId: new mongoose.Types.ObjectId(tenantId),
+    role: { $in: ['hr_manager', 'company_admin'] },
+  }).sort({ createdAt: 1 });
+
+  return hrUser?.email ?? null;
+};
+
 const findApproverRecipientEmail = async (
   tenantId: string,
   employee: IEmployeeDocument
@@ -464,12 +502,7 @@ const findApproverRecipientEmail = async (
     }
   }
 
-  const hrUser = await User.findOne({
-    tenantId: new mongoose.Types.ObjectId(tenantId),
-    role: { $in: ['hr_manager', 'company_admin'] },
-  }).sort({ createdAt: 1 });
-
-  return hrUser?.email ?? null;
+  return findHrRecipientEmail(tenantId);
 };
 
 export const listLeaveRequests = async (
@@ -575,6 +608,7 @@ export const createLeaveRequest = async (
     halfDay: input.halfDay ?? false,
     reason: input.reason,
     status: 'pending',
+    approvalStep: 1,
   });
 
   const recipientEmail = await findApproverRecipientEmail(tenantId, employee);
@@ -673,6 +707,44 @@ export const approveLeaveRequest = async (
   await assertCanApproveRequest(tenantId, request, access);
 
   const beforeSnapshot = leaveRequestAuditSnapshot(request);
+  const settings = await getTenantLeaveSettings(tenantId);
+  const step = request.approvalStep ?? 1;
+
+  if (settings.multiStepApprovalEnabled && step === 1) {
+    request.approvalStep = 2;
+    request.approverId = new mongoose.Types.ObjectId(access.userId);
+    await request.save();
+
+    const employee = await Employee.findById(request.employeeId);
+    const approver = await User.findById(access.userId);
+    const hrEmail = await findHrRecipientEmail(tenantId);
+
+    if (hrEmail && employee) {
+      void sendLeaveSubmittedEmail(env, {
+        to: hrEmail,
+        employeeName: `${employee.firstName} ${employee.lastName}`,
+        leaveType: request.type,
+        startDate: formatDateString(request.startDate),
+        endDate: formatDateString(request.endDate),
+        reason: request.reason,
+        subjectPrefix: 'HR approval needed: ',
+        introText: `${approver ? `${approver.firstName ?? ''} ${approver.lastName ?? ''}`.trim() || approver.email : 'Manager'} approved step 1. Final HR approval is required.`,
+      });
+    }
+
+    void writeAuditLog({
+      tenantId,
+      userId: access.userId,
+      action: 'update',
+      entityType: 'LeaveRequest',
+      entityId: request._id.toString(),
+      before: beforeSnapshot,
+      after: leaveRequestAuditSnapshot(request),
+      context: audit,
+    });
+
+    return toLeaveRequestPublic(request);
+  }
 
   if (request.type === 'annual') {
     const days = calculateLeaveDays(request.startDate, request.endDate, request.halfDay);
