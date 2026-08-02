@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import type { ServerEnv } from '../../config/env.js';
 import type { UserRole } from '../../types/index.js';
 import { hasPermission } from '../../utils/permissions.js';
 import { shiftAuditSnapshot } from '../../utils/audit-snapshot.js';
@@ -11,8 +12,14 @@ import {
   LocationServiceError,
 } from '../locations/location.service.js';
 import { WorkLocation } from '../locations/location.model.js';
+import { User } from '../admin/user.model.js';
+import {
+  sendRotaPublishedEmail,
+  sendShiftClaimedEmail,
+} from '../notifications/email.service.js';
+import { createInAppNotification } from '../notifications/notification.service.js';
 import { Shift, type IShiftDocument, type ShiftStatus } from './shift.model.js';
-import type { CreateShiftInput, PatchShiftInput } from './rota.validation.js';
+import type { CopyWeekInput, CreateShiftInput, PatchShiftInput } from './rota.validation.js';
 import {
   formatDateOnly,
   getWeekDateStrings,
@@ -74,6 +81,11 @@ export interface WeekRotaPublic {
 export interface PublishRotaResult {
   weekOf: string;
   publishedCount: number;
+}
+
+export interface CopyRotaResult {
+  weekOf: string;
+  copiedCount: number;
 }
 
 const canReadAll = (role: UserRole): boolean => hasPermission(role, 'rota:read');
@@ -275,7 +287,15 @@ const buildWeekFilter = async (
 
   try {
     const selfRecord = await resolveEmployeeForUser(tenantId, access.userId, access.userEmail);
-    filter.employeeId = selfRecord._id;
+
+    if (hasPermission(access.role, 'rota:claim:own')) {
+      filter.$or = [
+        { employeeId: selfRecord._id },
+        { status: 'open', employeeId: null },
+      ];
+    } else {
+      filter.employeeId = selfRecord._id;
+    }
   } catch (error) {
     if (error instanceof LeaveServiceError) {
       filter._id = new mongoose.Types.ObjectId('000000000000000000000000');
@@ -548,6 +568,7 @@ export const publishRotaWeek = async (
   weekOfStr: string,
   userId: string,
   access: AccessContext,
+  env: ServerEnv,
   audit?: AuditContext
 ): Promise<PublishRotaResult> => {
   if (!hasPermission(access.role, 'rota:manage')) {
@@ -583,6 +604,8 @@ export const publishRotaWeek = async (
 
   const publishedAt = new Date();
   let publishedCount = 0;
+  const publishedByEmployee = new Map<string, number>();
+  const openShifts: IShiftDocument[] = [];
 
   for (const shift of draftShifts) {
     const beforeSnapshot = shiftAuditSnapshot(shift);
@@ -592,6 +615,13 @@ export const publishRotaWeek = async (
     shift.updatedBy = new mongoose.Types.ObjectId(userId);
     await shift.save();
     publishedCount += 1;
+
+    if (shift.employeeId) {
+      const employeeKey = shift.employeeId.toString();
+      publishedByEmployee.set(employeeKey, (publishedByEmployee.get(employeeKey) ?? 0) + 1);
+    } else {
+      openShifts.push(shift);
+    }
 
     void writeAuditLog({
       tenantId,
@@ -605,5 +635,275 @@ export const publishRotaWeek = async (
     });
   }
 
+  if (publishedCount > 0) {
+    void notifyRotaPublished(tenantId, weekOf, publishedByEmployee, openShifts, env);
+  }
+
   return { weekOf, publishedCount };
+};
+
+const findApproverUserIds = async (
+  tenantId: string,
+  employee: IEmployeeDocument
+): Promise<string[]> => {
+  if (employee.managerId) {
+    const manager = await Employee.findOne({
+      _id: employee.managerId,
+      tenantId: new mongoose.Types.ObjectId(tenantId),
+    });
+    if (manager?.userId) {
+      return [manager.userId.toString()];
+    }
+  }
+
+  const hrUsers = await User.find({
+    tenantId: new mongoose.Types.ObjectId(tenantId),
+    role: { $in: ['hr_manager', 'company_admin'] },
+    isActive: true,
+  }).select('_id');
+
+  return hrUsers.map((user) => user._id.toString());
+};
+
+const findActiveEmployeeUserIds = async (tenantId: string): Promise<string[]> => {
+  const employees = await Employee.find({
+    tenantId: new mongoose.Types.ObjectId(tenantId),
+    status: 'active',
+    userId: { $ne: null },
+  }).select('userId email');
+
+  return employees
+    .filter((employee) => employee.userId)
+    .map((employee) => employee.userId!.toString());
+};
+
+const notifyRotaPublished = async (
+  tenantId: string,
+  weekOf: string,
+  publishedByEmployee: Map<string, number>,
+  openShifts: IShiftDocument[],
+  env: ServerEnv
+): Promise<void> => {
+  const employeeIds = [...publishedByEmployee.keys()];
+  const employees = employeeIds.length
+    ? await Employee.find({ _id: { $in: employeeIds } })
+    : [];
+
+  for (const employee of employees) {
+    if (!employee.userId) {
+      continue;
+    }
+
+    const shiftCount = publishedByEmployee.get(employee._id.toString()) ?? 0;
+    void createInAppNotification({
+      tenantId,
+      userId: employee.userId.toString(),
+      type: 'rota_published',
+      title: 'Rota published',
+      body: `Your shifts for week of ${weekOf} are now available (${shiftCount} shift${shiftCount === 1 ? '' : 's'}).`,
+      metadata: { weekOf, shiftCount },
+    });
+
+    if (employee.email) {
+      void sendRotaPublishedEmail(env, {
+        to: employee.email,
+        weekOf,
+        shiftCount,
+      });
+    }
+  }
+
+  if (openShifts.length === 0) {
+    return;
+  }
+
+  const employeeUserIds = await findActiveEmployeeUserIds(tenantId);
+
+  if (employeeUserIds.length > 0) {
+    const openCount = openShifts.length;
+    const summaryBody =
+      openCount === 1
+        ? `1 open shift is available for week of ${weekOf} — claim it in Rotas.`
+        : `${openCount} open shifts are available for week of ${weekOf} — claim them in Rotas.`;
+
+    for (const userId of employeeUserIds) {
+      void createInAppNotification({
+        tenantId,
+        userId,
+        type: 'open_shift_available',
+        title: 'Open shifts available',
+        body: summaryBody,
+        metadata: { weekOf, openCount },
+      });
+    }
+  }
+};
+
+export const claimShift = async (
+  tenantId: string,
+  shiftId: string,
+  access: AccessContext,
+  env: ServerEnv,
+  audit?: AuditContext
+): Promise<ShiftPublic> => {
+  if (!hasPermission(access.role, 'rota:claim:own')) {
+    throw new RotaServiceError('Forbidden', 403);
+  }
+
+  const shift = await Shift.findOne({
+    _id: new mongoose.Types.ObjectId(shiftId),
+    tenantId: new mongoose.Types.ObjectId(tenantId),
+  });
+
+  if (!shift) {
+    throw new RotaServiceError('Shift not found', 404);
+  }
+
+  if (shift.status !== 'open' || shift.employeeId) {
+    throw new RotaServiceError('Shift is not available to claim', 400);
+  }
+
+  const employee = await resolveEmployeeForUser(tenantId, access.userId, access.userEmail);
+  const beforeSnapshot = shiftAuditSnapshot(shift);
+
+  await assertNoLeaveConflict(tenantId, employee._id.toString(), shift.date);
+  await assertNoDoubleBooking(
+    tenantId,
+    employee._id.toString(),
+    shift.date,
+    shift.startTime,
+    shift.endTime,
+    shiftId
+  );
+
+  shift.employeeId = employee._id;
+  shift.claimedBy = employee._id;
+  shift.status = 'published';
+  shift.updatedBy = new mongoose.Types.ObjectId(access.userId);
+  await shift.save();
+
+  void writeAuditLog({
+    tenantId,
+    userId: access.userId,
+    action: 'update',
+    entityType: 'Shift',
+    entityId: shift._id.toString(),
+    before: beforeSnapshot,
+    after: shiftAuditSnapshot(shift),
+    context: audit,
+  });
+
+  const location = await WorkLocation.findById(shift.locationId).select('_id name');
+  const locationName = location?.name ?? 'Unknown location';
+  const employeeName = `${employee.firstName} ${employee.lastName}`;
+
+  const approverUserIds = await findApproverUserIds(tenantId, employee);
+  for (const approverUserId of approverUserIds) {
+    void createInAppNotification({
+      tenantId,
+      userId: approverUserId,
+      type: 'shift_claimed',
+      title: 'Shift claimed',
+      body: `${employeeName} claimed ${shift.date} ${shift.startTime}–${shift.endTime} at ${locationName}.`,
+      metadata: { shiftId: shift._id.toString(), employeeId: employee._id.toString() },
+    });
+  }
+
+  const hrUsers = await User.find({
+    tenantId: new mongoose.Types.ObjectId(tenantId),
+    role: { $in: ['hr_manager', 'company_admin'] },
+    isActive: true,
+    email: { $exists: true, $ne: '' },
+  }).select('email');
+
+  for (const hrUser of hrUsers) {
+    if (!hrUser.email) {
+      continue;
+    }
+
+    void sendShiftClaimedEmail(env, {
+      to: hrUser.email,
+      employeeName,
+      date: shift.date,
+      startTime: shift.startTime,
+      endTime: shift.endTime,
+      locationName,
+    });
+  }
+
+  return toShiftPublic(shift, employee, location);
+};
+
+export const copyRotaWeek = async (
+  tenantId: string,
+  input: CopyWeekInput,
+  userId: string,
+  access: AccessContext,
+  audit?: AuditContext
+): Promise<CopyRotaResult> => {
+  if (!hasPermission(access.role, 'rota:manage')) {
+    throw new RotaServiceError('Forbidden', 403);
+  }
+
+  let weekOf: string;
+
+  try {
+    weekOf = formatDateOnly(parseWeekOf(input.weekOf));
+  } catch {
+    throw new RotaServiceError('weekOf must be a Monday (YYYY-MM-DD)', 400);
+  }
+
+  const targetDates = getWeekDateStrings(weekOf);
+  const sourceMonday = parseWeekOf(weekOf);
+  sourceMonday.setUTCDate(sourceMonday.getUTCDate() - 7);
+  const sourceWeekOf = formatDateOnly(sourceMonday);
+  const sourceDates = getWeekDateStrings(sourceWeekOf);
+  const dateMap = new Map(sourceDates.map((date, index) => [date, targetDates[index]!]));
+
+  const sourceShifts = await Shift.find({
+    tenantId: new mongoose.Types.ObjectId(tenantId),
+    date: { $in: sourceDates },
+  }).sort({ date: 1, startTime: 1 });
+
+  let copiedCount = 0;
+
+  for (const source of sourceShifts) {
+    await assertCanManageEmployee(
+      tenantId,
+      access,
+      source.employeeId?.toString() ?? null
+    );
+
+    const targetDate = dateMap.get(source.date);
+    if (!targetDate) {
+      continue;
+    }
+
+    const shift = await Shift.create({
+      tenantId: new mongoose.Types.ObjectId(tenantId),
+      employeeId: source.employeeId ?? null,
+      date: targetDate,
+      startTime: source.startTime,
+      endTime: source.endTime,
+      role: source.role,
+      locationId: source.locationId,
+      status: 'draft',
+      createdBy: new mongoose.Types.ObjectId(userId),
+      updatedBy: new mongoose.Types.ObjectId(userId),
+    });
+
+    copiedCount += 1;
+
+    void writeAuditLog({
+      tenantId,
+      userId,
+      action: 'create',
+      entityType: 'Shift',
+      entityId: shift._id.toString(),
+      after: shiftAuditSnapshot(shift),
+      context: audit,
+    });
+  }
+
+  return { weekOf, copiedCount };
 };

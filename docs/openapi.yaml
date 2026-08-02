@@ -3924,6 +3924,91 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
 
+  /api/v1/rotas/copy-week:
+    post:
+      tags: [Rotas]
+      summary: Copy previous week rota
+      description: |
+        Copies all shifts from the previous ISO week into the target week as new draft shifts.
+        Dates are offset by 7 days; status is reset to draft.
+      operationId: copyRotaWeek
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CopyWeekRequest'
+            example:
+              weekOf: '2026-08-04'
+      responses:
+        '200':
+          description: Week copied
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, data]
+                properties:
+                  status:
+                    type: string
+                    enum: [ok]
+                  data:
+                    $ref: '#/components/schemas/CopyRotaResult'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /api/v1/rotas/shifts/{id}/claim:
+    post:
+      tags: [Rotas]
+      summary: Claim open shift
+      description: |
+        Employee claims an open shift (`status: open`, no assignee).
+        Auto-assigns the shift to the caller's employee record and sets status to `published`.
+        Leave and double-booking conflicts return 409.
+      operationId: claimShift
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Shift claimed
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, data]
+                properties:
+                  status:
+                    type: string
+                    enum: [ok]
+                  data:
+                    $ref: '#/components/schemas/Shift'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: Leave conflict or overlapping shift
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
   /api/v1/settings/departments:
     get:
       tags: [Settings]
@@ -5626,6 +5711,26 @@ components:
           type: string
           format: date
         publishedCount:
+          type: integer
+          minimum: 0
+
+    CopyWeekRequest:
+      type: object
+      required: [weekOf]
+      properties:
+        weekOf:
+          type: string
+          format: date
+          description: Monday of the target week to copy into (YYYY-MM-DD)
+
+    CopyRotaResult:
+      type: object
+      required: [weekOf, copiedCount]
+      properties:
+        weekOf:
+          type: string
+          format: date
+        copiedCount:
           type: integer
           minimum: 0
 

@@ -104,8 +104,8 @@ None for audit log itself.
 
 - Primary GDPR artifact for accountability
 - Supports Subject Access Request — include audit entries where user is actor or subject
-- Retention: configurable per tenant (default 7 years for HR); cron purge in Stage 4 if needed
-- Do not log read/access events in S2-1 (volume); consider Stage 4
+- Retention: configurable per tenant (default 7 years for HR); cron purge if needed later
+- Do not log read/access events in S2-1 (volume); consider if volume requires it
 
 ---
 
@@ -116,7 +116,7 @@ None for audit log itself.
 | createdBy/updatedBy on records | ✅ | ✅ |
 | Central AuditLog collection | — | ✅ |
 | Audit log UI | — | ✅ |
-| SAR export | — | Stage 4 |
+| SAR export | — | Future |
 
 ---
 

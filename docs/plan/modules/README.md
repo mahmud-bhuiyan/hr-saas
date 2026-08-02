@@ -50,16 +50,6 @@ Stage 3 also extends **02-employees** (pay fields) — see [11-payroll.md](./11-
 
 ---
 
-## Later stages (Stage 4+)
-
-| # | Module | File | Stage |
-|---|--------|------|-------|
-| 12 | Reporting (full) | [12-reporting.md](./12-reporting.md) | Stage 4 (S2-6 is thin slice) |
-| 13 | Performance | [13-performance.md](./13-performance.md) | Stage 4 |
-| 14 | Recruitment (ATS) | [14-recruitment.md](./14-recruitment.md) | Stage 4 |
-
----
-
 ## How to write a module plan
 
 1. Copy [_template.md](./_template.md) to the numbered filename above.

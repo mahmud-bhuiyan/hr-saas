@@ -160,7 +160,7 @@ HR creates period → generates → previews → exports CSV → (optional) sync
 
 - Pay field changes on Employee → `AuditLog`
 - Payroll generate and export → `AuditLog`
-- Payroll data is sensitive — HR/admin access only; include in SAR export (Stage 4)
+- Payroll data is sensitive — HR/admin access only; include in SAR export when implemented
 - **Explicit non-goals:** NI, tax, pension, RTI — client uses accounting software
 
 ---

@@ -3,6 +3,8 @@ import type { ServerEnv } from '../../config/env.js';
 import { authenticate, authorizePermission } from '../../middleware/auth.js';
 import { requireTenant } from '../../middleware/tenant.js';
 import {
+  claimShiftHandler,
+  copyWeekHandler,
   createShiftHandler,
   deleteShiftHandler,
   getRotaWeekHandler,
@@ -16,7 +18,11 @@ export const createRotaRoutes = (env: ServerEnv): Router => {
   router.use(authenticate(env), requireTenant());
 
   router.post('/publish', authorizePermission('rota:manage'), (req, res) => {
-    void publishRotaHandler(req, res);
+    void publishRotaHandler(env)(req, res);
+  });
+
+  router.post('/copy-week', authorizePermission('rota:manage'), (req, res) => {
+    void copyWeekHandler(req, res);
   });
 
   router.post('/shifts', authorizePermission('rota:manage'), (req, res) => {
@@ -29,6 +35,10 @@ export const createRotaRoutes = (env: ServerEnv): Router => {
 
   router.delete('/shifts/:id', authorizePermission('rota:manage'), (req, res) => {
     void deleteShiftHandler(req, res);
+  });
+
+  router.post('/shifts/:id/claim', authorizePermission('rota:claim:own'), (req, res) => {
+    void claimShiftHandler(env)(req, res);
   });
 
   router.get(

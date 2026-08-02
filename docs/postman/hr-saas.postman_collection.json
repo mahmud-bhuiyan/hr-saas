@@ -1532,6 +1532,38 @@
             "description": "Publish all draft shifts for the week. Requires rota:manage."
           },
           "response": []
+        },
+        {
+          "name": "Copy Previous Week",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+            },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"weekOf\": \"{{rotaWeekOf}}\"\n}"
+            },
+            "url": "{{baseUrl}}/api/v1/rotas/copy-week",
+            "description": "Copy shifts from the previous week into the target week as drafts. Requires rota:manage."
+          },
+          "response": []
+        },
+        {
+          "name": "Claim Open Shift",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+            },
+            "method": "POST",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/rotas/shifts/{{shiftId}}/claim",
+            "description": "Claim an open shift. Requires rota:claim:own."
+          },
+          "response": []
         }
       ]
     },

@@ -1,7 +1,7 @@
 # Module: Shifts & Rotas
 
-**Stage:** Stage 3 (S3-1 foundations → S3-2 backend ✅ → S3-3 UI)  
-**Status:** S3-2 backend complete — S3-3 UI next  
+**Stage:** Stage 3 (S3-1 foundations → S3-2 backend → S3-3 UI ✅)  
+**Status:** Complete — S3-1 through S3-3 done  
 **Depends on:** Stage 2 complete (attendance, timesheets, leave); S3-1 WorkLocation
 
 ---
@@ -182,7 +182,7 @@ Employee claims open shift → notification to manager
 | Weekly rota | — | ✅ |
 | Work locations | — | ✅ S3-1 |
 | Open shift claim | — | ✅ S3-3 |
-| Drag-and-drop grid | — | Stage 4 optional |
+| Drag-and-drop grid | — | Optional future enhancement |
 
 ---
 
@@ -193,11 +193,13 @@ Employee claims open shift → notification to manager
 - [x] Shift + RotaTemplate models (S3-2)
 - [x] Conflict detection service (S3-2)
 - [x] Rota routes + RBAC (S3-2)
+- [x] Claim shift + copy-week endpoints (S3-3)
+- [x] Publish/claim notifications (S3-3)
 
 ### Frontend (S3-1 partial)
 - [x] Locations settings page (S3-1)
-- [ ] Rota weekly grid (S3-3)
-- [ ] My shifts + open shifts (S3-3)
+- [x] Rota weekly grid (S3-3)
+- [x] My shifts + open shifts (S3-3)
 
 **Estimate:** 12 days total (3 + 4 + 5)
 
@@ -206,14 +208,14 @@ Employee claims open shift → notification to manager
 ## 11. Open Questions
 
 - [ ] Manager approval required on open-shift claim, or auto-assign?
-- [ ] Table grid vs `@dnd-kit` drag-drop for v1?
+- [x] Table grid vs `@dnd-kit` drag-drop for v1? — **Table grid chosen for v1**
 
 ---
 
 ## 12. Acceptance Criteria
 
 - [x] HR can CRUD work locations
-- [ ] HR can create, publish, and copy weekly rotas
-- [ ] Employees see assigned shifts and can claim open shifts
+- [x] HR can create, publish, and copy weekly rotas
+- [x] Employees see assigned shifts and can claim open shifts
 - [x] Leave conflicts detected on overlapping shifts
 - [x] OpenAPI and Postman updated

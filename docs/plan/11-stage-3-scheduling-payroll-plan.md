@@ -86,14 +86,9 @@ This flow covers **scheduling → staff visibility → payroll handoff**, buildi
 | Feature | Planned stage | Notes |
 |---------|---------------|-------|
 | Native payroll / tax / RTI calculation | Never (integrate) | Export only — liability too high |
-| Advanced reporting (Bradford, turnover) | Stage 4 | S2-6 thin slice exists |
-| Performance reviews & goals | Stage 4 | |
-| Recruitment / ATS | Stage 4 | |
-| E-learning / LMS | Stage 4 | |
 | SSO / Microsoft Google login | Stage 3+ | |
 | Receipt OCR | Stage 3+ deferred | Manual upload in Stage 2 |
-| Native mobile apps | Stage 4+ | Responsive web |
-| Full drag-and-drop rota (v1 = table grid) | S3-3 v1 | Enhance in Stage 4 if needed |
+| Full drag-and-drop rota (v1 = table grid) | S3-3 v1 | Table grid v1; enhancements optional later |
 
 ---
 
@@ -107,9 +102,9 @@ This flow covers **scheduling → staff visibility → payroll handoff**, buildi
 - [x] Pay rate section on employee profile (HR/admin)
 
 ### Rotas
-- [ ] Weekly rota grid (`/dashboard/rotas`) — HR/manager
-- [ ] My shifts tab — employee
-- [ ] Open shifts / claim flow
+- [x] Weekly rota grid (`/dashboard/rotas`) — HR/manager
+- [x] My shifts tab — employee
+- [x] Open shifts / claim flow
 
 ### Payroll
 - [ ] Payroll periods list (`/dashboard/payroll`)
@@ -153,7 +148,7 @@ S3-2 and S3-4 can overlap after S3-1. S3-3 requires S3-2. S3-6 requires S3-5.
 
 ## 7. Success Criteria — Stage 3 Sign-off
 
-The client approves moving to Stage 4 when all of the following are true:
+The client approves Stage 3 completion when all of the following are true:
 
 1. HR can create work locations and set employee pay rates
 2. HR can build and publish a weekly rota; employees see their shifts
@@ -167,17 +162,7 @@ The client approves moving to Stage 4 when all of the following are true:
 
 ---
 
-## 8. After Stage 3 — Stage Preview
-
-| Stage | Focus | Indicative duration |
-|-------|-------|---------------------|
-| **Stage 4 — Growth** | Advanced reporting, performance, recruitment, LMS | Ongoing |
-
-Full roadmap: [hr-saas-mern-project-plan.md](./hr-saas-mern-project-plan.md)
-
----
-
-## 9. Assumptions & Client Dependencies
+## 8. Assumptions & Client Dependencies
 
 | Item | Owner | Needed by |
 |------|-------|-----------|
@@ -191,7 +176,7 @@ Full roadmap: [hr-saas-mern-project-plan.md](./hr-saas-mern-project-plan.md)
 
 ---
 
-## 10. Risks & Mitigations
+## 9. Risks & Mitigations
 
 | Risk | Mitigation |
 |------|------------|
@@ -203,17 +188,17 @@ Full roadmap: [hr-saas-mern-project-plan.md](./hr-saas-mern-project-plan.md)
 
 ---
 
-## 11. Implementation status (last updated: 2026-08-02)
+## 10. Implementation status (last updated: 2026-08-02)
 
 | Step | Scope | Status |
 |------|-------|--------|
 | S3-1 | Foundations | ✅ Done |
 | S3-2 | Rotas backend | ✅ Done |
-| S3-3 | Rotas UI | Not started |
+| S3-3 | Rotas UI | ✅ Done |
 | S3-4 | Payroll export backend | Not started |
 | S3-5 | Payroll export UI | Not started |
 | S3-6 | Accounting integration | Not started |
 | S3-7 | Cross-module polish | Not started |
 | S3-8 | Sign-off | Not started |
 
-**Next step:** S3-3 — rotas UI. See [STAGE-3-IMPLEMENTATION-STEPS.md](./STAGE-3-IMPLEMENTATION-STEPS.md).
+**Next step:** S3-4 — payroll export backend. See [STAGE-3-IMPLEMENTATION-STEPS.md](./STAGE-3-IMPLEMENTATION-STEPS.md).

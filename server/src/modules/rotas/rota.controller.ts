@@ -1,7 +1,10 @@
 import type { Response } from 'express';
+import type { ServerEnv } from '../../config/env.js';
 import type { AuthenticatedRequest } from '../../middleware/auth.js';
 import {
   RotaServiceError,
+  claimShift,
+  copyRotaWeek,
   createShift,
   deleteShift,
   getRotaWeek,
@@ -9,6 +12,7 @@ import {
   publishRotaWeek,
 } from './rota.service.js';
 import {
+  copyWeekSchema,
   createShiftSchema,
   patchShiftSchema,
   publishRotaSchema,
@@ -150,7 +154,75 @@ export const deleteShiftHandler = async (
   }
 };
 
-export const publishRotaHandler = async (
+export const publishRotaHandler = (env: ServerEnv) => {
+  return async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+    try {
+      if (!req.user || !req.tenantId) {
+        res.status(403).json({ status: 'error', message: 'Tenant context required' });
+        return;
+      }
+
+      const parsed = publishRotaSchema.safeParse(req.body ?? {});
+      if (!parsed.success) {
+        res.status(400).json({
+          status: 'error',
+          message: parsed.error.issues[0]?.message ?? 'Invalid request body',
+        });
+        return;
+      }
+
+      const result = await publishRotaWeek(
+        req.tenantId,
+        parsed.data.weekOf,
+        req.user.sub,
+        getAccessContext(req),
+        env,
+        {
+          ip: req.ip,
+          userAgent: req.get('user-agent') ?? undefined,
+        }
+      );
+      res.json({ status: 'ok', data: result });
+    } catch (error) {
+      if (error instanceof RotaServiceError) {
+        res.status(error.statusCode).json({ status: 'error', message: error.message });
+        return;
+      }
+      res.status(500).json({ status: 'error', message: 'Internal server error' });
+    }
+  };
+};
+
+export const claimShiftHandler = (env: ServerEnv) => {
+  return async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+    try {
+      if (!req.user || !req.tenantId) {
+        res.status(403).json({ status: 'error', message: 'Tenant context required' });
+        return;
+      }
+
+      const shift = await claimShift(
+        req.tenantId,
+        req.params.id,
+        getAccessContext(req),
+        env,
+        {
+          ip: req.ip,
+          userAgent: req.get('user-agent') ?? undefined,
+        }
+      );
+      res.json({ status: 'ok', data: shift });
+    } catch (error) {
+      if (error instanceof RotaServiceError) {
+        res.status(error.statusCode).json({ status: 'error', message: error.message });
+        return;
+      }
+      res.status(500).json({ status: 'error', message: 'Internal server error' });
+    }
+  };
+};
+
+export const copyWeekHandler = async (
   req: AuthenticatedRequest,
   res: Response
 ): Promise<void> => {
@@ -160,7 +232,7 @@ export const publishRotaHandler = async (
       return;
     }
 
-    const parsed = publishRotaSchema.safeParse(req.body ?? {});
+    const parsed = copyWeekSchema.safeParse(req.body ?? {});
     if (!parsed.success) {
       res.status(400).json({
         status: 'error',
@@ -169,9 +241,9 @@ export const publishRotaHandler = async (
       return;
     }
 
-    const result = await publishRotaWeek(
+    const result = await copyRotaWeek(
       req.tenantId,
-      parsed.data.weekOf,
+      parsed.data,
       req.user.sub,
       getAccessContext(req),
       {
