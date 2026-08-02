@@ -324,6 +324,35 @@
           "response": []
         },
         {
+          "name": "Upload Profile Avatar",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"imageBase64\": \"data:image/png;base64,iVBORw0KGgo=\",\n  \"filename\": \"avatar.png\"\n}"
+            },
+            "url": "{{baseUrl}}/api/v1/auth/me/avatar",
+            "description": "Upload profile photo (PNG, JPEG, or WebP up to 1 MB). Updates avatarUrl on the user."
+          },
+          "response": []
+        },
+        {
           "name": "Forgot Password",
           "request": {
             "method": "POST",
@@ -618,7 +647,27 @@
                 { "key": "sortOrder", "value": "asc" }
               ]
             },
-            "description": "List employees for the authenticated tenant. Supports search, department, status, and sort filters."
+            "description": "List employees for the authenticated tenant. Supports search (first/last/full name, email, phone, job title, department, employee number), department, status, and sort filters."
+          },
+          "response": []
+        },
+        {
+          "name": "Get My Employee",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/employees/me",
+            "description": "Returns the employee record linked to the authenticated user. 404 when no employee is linked."
           },
           "response": []
         },

@@ -1,12 +1,14 @@
 import type { ServerEnv } from '../../config/env.js';
-import type { ColorScheme, UserRole } from '../../types/index.js';
+import type { ColorScheme, ThemeColor, UserRole } from '../../types/index.js';
 import { findUserByEmail } from '../admin/admin.service.js';
 import { User, type IUserDocument } from '../admin/user.model.js';
 import { hashPassword, comparePassword } from '../../utils/password.js';
 import { signAccessToken } from '../../utils/jwt.js';
+import { ImgbbServiceError, uploadAvatarToImgbb } from '../platform/imgbb.service.js';
+import { stripDataUrlPrefix } from '../platform/platform-settings.validation.js';
 import { AuthServiceError } from './auth.service.js';
 import { Tenant } from './tenant.model.js';
-import type { UpdateProfileInput } from './profile.validation.js';
+import type { UpdateProfileInput, UploadAvatarInput } from './profile.validation.js';
 
 export interface UserProfile {
   id: string;
@@ -14,9 +16,11 @@ export interface UserProfile {
   role: UserRole;
   firstName?: string;
   lastName?: string;
+  avatarUrl?: string;
   tenantId?: string;
   companyName?: string;
   colorScheme: ColorScheme;
+  themeColor: ThemeColor;
   isActive: boolean;
   createdAt: string;
   updatedAt: string;
@@ -41,9 +45,11 @@ const toUserProfile = async (user: IUserDocument): Promise<UserProfile> => {
     role: user.role,
     firstName: user.firstName,
     lastName: user.lastName,
+    avatarUrl: user.avatarUrl,
     tenantId: user.tenantId?.toString(),
     companyName,
     colorScheme: user.colorScheme ?? 'light',
+    themeColor: user.themeColor ?? 'green',
     isActive: user.isActive,
     createdAt: user.createdAt.toISOString(),
     updatedAt: user.updatedAt.toISOString(),
@@ -86,8 +92,16 @@ export const updateProfile = async (
     user.lastName = input.lastName || undefined;
   }
 
+  if (input.avatarUrl !== undefined) {
+    user.avatarUrl = input.avatarUrl || undefined;
+  }
+
   if (input.colorScheme !== undefined) {
     user.colorScheme = input.colorScheme;
+  }
+
+  if (input.themeColor !== undefined) {
+    user.themeColor = input.themeColor;
   }
 
   if (input.currentPassword && input.newPassword) {
@@ -116,4 +130,32 @@ export const updateProfile = async (
   }
 
   return result;
+}
+
+export const uploadProfileAvatar = async (
+  userId: string,
+  input: UploadAvatarInput,
+  env: ServerEnv
+): Promise<UpdateProfileResult> => {
+  const user = await User.findById(userId);
+  if (!user || !user.isActive) {
+    throw new AuthServiceError('User not found or inactive', 404);
+  }
+
+  const base64 = stripDataUrlPrefix(input.imageBase64.trim());
+  let avatarUrl: string;
+
+  try {
+    avatarUrl = await uploadAvatarToImgbb(env, base64, input.filename);
+  } catch (error) {
+    if (error instanceof ImgbbServiceError) {
+      throw new AuthServiceError(error.message, error.statusCode);
+    }
+    throw error;
+  }
+
+  user.avatarUrl = avatarUrl;
+  await user.save();
+
+  return { user: await toUserProfile(user) };
 }

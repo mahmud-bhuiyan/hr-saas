@@ -7,6 +7,7 @@ import {
   createRefreshHandler,
   createRegisterHandler,
   createUpdateMeHandler,
+  createUploadAvatarHandler,
   createForgotPasswordHandler,
   createResetPasswordHandler,
   meHandler,
@@ -25,6 +26,7 @@ export const createAuthRoutes = (env: ServerEnv): Router => {
     void meHandler(req, res);
   });
   router.patch('/me', authenticate(env), createUpdateMeHandler(env));
+  router.post('/me/avatar', authenticate(env), createUploadAvatarHandler(env));
 
   return router;
 }

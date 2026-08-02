@@ -19,8 +19,10 @@ import type {
   UpdateCompanyInput,
   UpdateProfileInput,
   UpdateProfileResponse,
+  UploadProfileAvatarInput,
   UserProfile,
   Employee,
+  MyEmployeeProfile,
   CreateEmployeeInput,
   UpdateEmployeeInput,
   ListEmployeesQuery,
@@ -321,8 +323,26 @@ export const updateProfile = async (input: UpdateProfileInput): Promise<UpdatePr
   return json.data;
 }
 
+export const uploadProfileAvatar = async (
+  input: UploadProfileAvatarInput
+): Promise<UpdateProfileResponse> => {
+  const json = await apiFetch<ApiSuccessResponse<UpdateProfileResponse>>(
+    '/api/v1/auth/me/avatar',
+    {
+      method: 'POST',
+      body: JSON.stringify(input),
+    }
+  );
+  return json.data;
+}
+
 export const updateColorScheme = async (colorScheme: AuthUser['colorScheme']): Promise<UserProfile> => {
   const result = await updateProfile({ colorScheme });
+  return result.user;
+}
+
+export const updateThemeColor = async (themeColor: AuthUser['themeColor']): Promise<UserProfile> => {
+  const result = await updateProfile({ themeColor });
   return result.user;
 }
 
@@ -334,7 +354,9 @@ const profileToAuthUser = (profile: UserProfile): AuthUser => {
     tenantId: profile.tenantId,
     firstName: profile.firstName,
     lastName: profile.lastName,
+    avatarUrl: profile.avatarUrl,
     colorScheme: profile.colorScheme,
+    themeColor: profile.themeColor,
   };
 }
 
@@ -405,6 +427,13 @@ export const fetchEmployeeDepartments = async (): Promise<string[]> => {
 export const fetchEmployee = async (id: string): Promise<Employee> => {
   const json = await apiFetch<ApiSuccessResponse<Employee>>(`/api/v1/employees/${id}`);
   return json.data;
+}
+
+export const fetchMyEmployee = async (): Promise<MyEmployeeProfile> => {
+  const json = await apiFetch<ApiSuccessResponse<{ employee: MyEmployeeProfile }>>(
+    '/api/v1/employees/me'
+  );
+  return json.data.employee;
 }
 
 export const fetchEmployeeReports = async (id: string): Promise<Employee[]> => {

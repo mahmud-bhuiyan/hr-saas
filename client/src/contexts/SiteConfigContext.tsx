@@ -64,9 +64,11 @@ export const SiteConfigProvider = ({ children }: { children: ReactNode }) => {
   }, [isAuthenticated, publicQuery.data, effectiveQuery.data]);
 
   useEffect(() => {
-    applyBrandShades(config.primaryColor);
+    if (!isAuthenticated) {
+      applyBrandShades(config.primaryColor);
+    }
     void applyDocumentBranding(config.siteName, config.faviconUrl, config.faviconDisplay);
-  }, [config]);
+  }, [config, isAuthenticated]);
 
   const refresh = useCallback(async () => {
     await queryClient.invalidateQueries({ queryKey: ['platform', 'site-config'] });

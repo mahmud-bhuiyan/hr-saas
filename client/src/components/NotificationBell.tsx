@@ -49,7 +49,7 @@ export const NotificationBell = () => {
       <button
         type="button"
         onClick={() => setOpen((value) => !value)}
-        className="relative rounded-lg p-2 text-slate-600 transition hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white"
+        className="relative rounded-lg p-2 text-white/90 transition hover:bg-white/10 hover:text-white"
         aria-label="Notifications"
       >
         <HiBell className="h-5 w-5" />

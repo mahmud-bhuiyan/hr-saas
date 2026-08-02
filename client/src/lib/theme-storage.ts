@@ -1,5 +1,10 @@
 import { loadAuth } from './auth-storage';
-import type { ColorScheme } from '../types';
+import type { ColorScheme, ThemeColor } from '../types';
+import {
+  applyThemeColor,
+  DEFAULT_THEME_COLOR,
+  resolveThemeColor,
+} from '../utils/theme-colors';
 
 export type { ColorScheme };
 
@@ -7,12 +12,16 @@ const THEME_STORAGE_KEY = 'hr-saas-theme';
 
 interface ThemePreferences {
   byUser: Record<string, ColorScheme>;
+  themeColorByUser: Record<string, ThemeColor>;
   guest: ColorScheme;
+  guestThemeColor: ThemeColor;
 }
 
 const defaultPreferences = (): ThemePreferences => ({
   byUser: {},
+  themeColorByUser: {},
   guest: 'light',
+  guestThemeColor: DEFAULT_THEME_COLOR,
 });
 
 const readPreferences = (): ThemePreferences => {
@@ -25,7 +34,9 @@ const readPreferences = (): ThemePreferences => {
     const parsed = JSON.parse(raw) as Partial<ThemePreferences>;
     return {
       byUser: parsed.byUser ?? {},
+      themeColorByUser: parsed.themeColorByUser ?? {},
       guest: parsed.guest ?? 'light',
+      guestThemeColor: parsed.guestThemeColor ?? DEFAULT_THEME_COLOR,
     };
   } catch {
     return defaultPreferences();
@@ -65,6 +76,32 @@ export const saveColorSchemeForUser = (
   writePreferences(preferences);
 };
 
+export const loadThemeColorForUser = (userId: string | null | undefined): ThemeColor => {
+  const preferences = readPreferences();
+
+  if (userId && preferences.themeColorByUser[userId]) {
+    return resolveThemeColor(preferences.themeColorByUser[userId]);
+  }
+
+  return resolveThemeColor(preferences.guestThemeColor);
+};
+
+export const saveThemeColorForUser = (
+  userId: string | null | undefined,
+  themeColor: ThemeColor
+): void => {
+  const preferences = readPreferences();
+  const resolved = resolveThemeColor(themeColor);
+
+  if (userId) {
+    preferences.themeColorByUser[userId] = resolved;
+  } else {
+    preferences.guestThemeColor = resolved;
+  }
+
+  writePreferences(preferences);
+};
+
 export const resolveColorScheme = (
   userId: string | null | undefined,
   serverColorScheme?: ColorScheme
@@ -76,7 +113,23 @@ export const resolveColorScheme = (
   return loadColorSchemeForUser(userId);
 };
 
+export const resolveUserThemeColor = (
+  userId: string | null | undefined,
+  serverThemeColor?: ThemeColor
+): ThemeColor => {
+  if (userId && serverThemeColor) {
+    return resolveThemeColor(serverThemeColor);
+  }
+
+  return loadThemeColorForUser(userId);
+};
+
 export const initColorSchemeFromStorage = (): void => {
   const { user } = loadAuth();
   applyColorScheme(resolveColorScheme(user?.id, user?.colorScheme));
+  if (user?.id) {
+    applyThemeColor(resolveUserThemeColor(user.id, user.themeColor));
+  }
 };
+
+export { applyThemeColor };

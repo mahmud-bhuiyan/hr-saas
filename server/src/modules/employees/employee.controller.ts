@@ -10,6 +10,7 @@ import {
   EmployeeServiceError,
   createEmployee,
   getEmployeeById,
+  getMyEmployee,
   inviteEmployee,
   listDepartments,
   listDirectReports,
@@ -71,6 +72,24 @@ export const listDepartmentsHandler = async (
   try {
     const departments = await listDepartments(req.tenantId!);
     res.json({ status: 'ok', data: { departments } });
+  } catch (error) {
+    if (error instanceof EmployeeServiceError) {
+      res.status(error.statusCode).json({ status: 'error', message: error.message });
+      return;
+    }
+
+    res.status(500).json({ status: 'error', message: 'Internal server error' });
+  }
+}
+
+export const getMyEmployeeHandler = async (
+  req: AuthenticatedRequest,
+  res: Response
+): Promise<void> => {
+  try {
+    const employee = await getMyEmployee(req.tenantId!, req.user!.sub);
+
+    res.json({ status: 'ok', data: { employee } });
   } catch (error) {
     if (error instanceof EmployeeServiceError) {
       res.status(error.statusCode).json({ status: 'error', message: error.message });
