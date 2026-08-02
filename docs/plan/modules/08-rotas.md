@@ -218,4 +218,5 @@ Employee claims open shift → notification to manager
 - [x] HR can create, publish, and copy weekly rotas
 - [x] Employees see assigned shifts and can claim open shifts
 - [x] Leave conflicts detected on overlapping shifts
+- [x] Leave approval queue shows rota clashes (`conflictingShifts`) with confirm modal
 - [x] OpenAPI and Postman updated

@@ -36,6 +36,9 @@ import {
   ensureLeaveBalanceForYear,
   getTenantLeaveSettings,
 } from './leave-settings.service.js';
+import { Shift } from '../rotas/shift.model.js';
+import { WorkLocation } from '../locations/location.model.js';
+import type { ShiftStatus } from '../rotas/shift.model.js';
 
 export class LeaveServiceError extends Error {
   constructor(
@@ -78,6 +81,16 @@ export interface LeaveRequestPublic {
   createdAt: string;
   updatedAt: string;
   overlappingRequests?: LeaveOverlapSummary[];
+  conflictingShifts?: LeaveShiftConflictSummary[];
+}
+
+export interface LeaveShiftConflictSummary {
+  id: string;
+  date: string;
+  startTime: string;
+  endTime: string;
+  status: ShiftStatus;
+  locationName: string;
 }
 
 export interface LeaveOverlapSummary {
@@ -194,7 +207,71 @@ const toLeaveRequestPublic = async (
     createdAt: request.createdAt.toISOString(),
     updatedAt: request.updatedAt.toISOString(),
     overlappingRequests: [],
+    conflictingShifts: [],
   };
+};
+
+const loadShiftConflictMap = async (
+  tenantId: string,
+  requests: ILeaveRequestDocument[]
+): Promise<Map<string, LeaveShiftConflictSummary[]>> => {
+  const conflictMap = new Map<string, LeaveShiftConflictSummary[]>();
+
+  if (requests.length === 0) {
+    return conflictMap;
+  }
+
+  const employeeIds = [...new Set(requests.map((request) => request.employeeId.toString()))];
+  const minDate = formatDateString(
+    requests.reduce(
+      (earliest, request) => (request.startDate < earliest ? request.startDate : earliest),
+      requests[0].startDate
+    )
+  );
+  const maxDate = formatDateString(
+    requests.reduce(
+      (latest, request) => (request.endDate > latest ? request.endDate : latest),
+      requests[0].endDate
+    )
+  );
+
+  const shifts = await Shift.find({
+    tenantId: new mongoose.Types.ObjectId(tenantId),
+    employeeId: { $in: employeeIds.map((id) => new mongoose.Types.ObjectId(id)) },
+    date: { $gte: minDate, $lte: maxDate },
+  });
+
+  const locationIds = [...new Set(shifts.map((shift) => shift.locationId.toString()))];
+  const locations = await WorkLocation.find({ _id: { $in: locationIds } }).select('_id name');
+  const locationMap = new Map(
+    locations.map((location) => [location._id.toString(), location.name])
+  );
+
+  for (const request of requests) {
+    const requestStart = formatDateString(request.startDate);
+    const requestEnd = formatDateString(request.endDate);
+    const employeeId = request.employeeId.toString();
+
+    const conflicts = shifts
+      .filter(
+        (shift) =>
+          shift.employeeId?.toString() === employeeId &&
+          shift.date >= requestStart &&
+          shift.date <= requestEnd
+      )
+      .map((shift) => ({
+        id: shift._id.toString(),
+        date: shift.date,
+        startTime: shift.startTime,
+        endTime: shift.endTime,
+        status: shift.status,
+        locationName: locationMap.get(shift.locationId.toString()) ?? 'Unknown location',
+      }));
+
+    conflictMap.set(request._id.toString(), conflicts);
+  }
+
+  return conflictMap;
 };
 
 const loadOverlapPool = async (
@@ -519,9 +596,11 @@ export const listLeaveRequests = async (
 
   let overlapPool: ILeaveRequestDocument[] = [];
   let employeeNameMap = new Map<string, string>();
+  let shiftConflictMap = new Map<string, LeaveShiftConflictSummary[]>();
 
   if (includeOverlaps && requests.length > 0) {
     overlapPool = await loadOverlapPool(tenantId, access);
+    shiftConflictMap = await loadShiftConflictMap(tenantId, requests);
     const employeeIds = [...new Set(overlapPool.map((entry) => entry.employeeId.toString()))];
     const employees = await Employee.find({ _id: { $in: employeeIds } }).select('firstName lastName');
     employeeNameMap = new Map(
@@ -542,6 +621,7 @@ export const listLeaveRequests = async (
           overlapPool,
           employeeNameMap
         );
+        leaveRequest.conflictingShifts = shiftConflictMap.get(request._id.toString()) ?? [];
       }
 
       return leaveRequest;

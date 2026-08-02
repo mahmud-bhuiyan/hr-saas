@@ -22,6 +22,7 @@ import {
   assertActiveWorkLocation,
   LocationServiceError,
 } from '../locations/location.service.js';
+import { refreshBalanceEntitlement } from '../leave/leave-settings.service.js';
 import {
   Employee,
   type EmployeeStatus,
@@ -766,6 +767,14 @@ export const updateEmployee = async (
 
   if (statusChanged) {
     void syncSeatCount(tenantId);
+  }
+
+  const entitlementFieldsChanged =
+    input.startDate !== undefined || input.fteFactor !== undefined;
+
+  if (entitlementFieldsChanged) {
+    const year = new Date().getUTCFullYear();
+    void refreshBalanceEntitlement(tenantId, employeeId, year);
   }
 
   return getEmployeeById(tenantId, employeeId, {

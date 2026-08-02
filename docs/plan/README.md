@@ -61,10 +61,10 @@ Planning documents for the HR SaaS platform. Use these to align with the client,
 | S3-4 | Payroll export backend | ✅ Done |
 | S3-5 | Payroll export UI + CSV | ✅ Done |
 | S3-6 | Accounting integration (Xero) | ✅ Done |
-| S3-7 | Cross-module polish | Not started |
+| S3-7 | Cross-module polish | ✅ Done |
 | S3-8 | Stage 3 sign-off | Not started |
 
-**Next step:** S3-7 — cross-module polish. See [STAGE-3-IMPLEMENTATION-STEPS.md](./STAGE-3-IMPLEMENTATION-STEPS.md).
+**Next step:** S3-8 — staging walkthrough and client sign-off. See [STAGE-3-IMPLEMENTATION-STEPS.md](./STAGE-3-IMPLEMENTATION-STEPS.md).
 
 ---
 
@@ -98,10 +98,10 @@ Detailed plans live in `modules/`. Each file follows [modules/_template.md](./mo
 | Admin & Settings | [modules/05-admin-settings.md](./modules/05-admin-settings.md) | Stage 1 | Ready for review |
 | Attendance | [modules/06-attendance.md](./modules/06-attendance.md) | Stage 2 | Done |
 | Notifications | [modules/07-notifications.md](./modules/07-notifications.md) | Stage 2 | Done |
-| Shifts & Rotas | [modules/08-rotas.md](./modules/08-rotas.md) | Stage 3 | ✅ Done (S3-1–S3-3) |
+| Shifts & Rotas | [modules/08-rotas.md](./modules/08-rotas.md) | Stage 3 | ✅ Done |
 | Timesheets | [modules/09-timesheets.md](./modules/09-timesheets.md) | Stage 2 | Done |
 | Expenses | [modules/10-expenses.md](./modules/10-expenses.md) | Stage 2 | Done |
-| Payroll Export | [modules/11-payroll.md](./modules/11-payroll.md) | Stage 3 | ✅ Done (S3-1–S3-6) |
+| Payroll Export | [modules/11-payroll.md](./modules/11-payroll.md) | Stage 3 | ✅ Done |
 | Reporting | [modules/12-reporting.md](./modules/12-reporting.md) | Stage 2 | Done (S2-6 thin slice) |
 | Platform Site Settings | [modules/15-platform-site-settings.md](./modules/15-platform-site-settings.md) | Stage 1 | Complete |
 | Audit Log | [modules/16-audit-log.md](./modules/16-audit-log.md) | Stage 2 | Done |

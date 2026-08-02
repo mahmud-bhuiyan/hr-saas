@@ -106,7 +106,8 @@ export const ensureLeaveBalanceForYear = async (
   const entitlement = calculateProRataEntitlement(
     settings.annualEntitlement,
     employee?.startDate,
-    year
+    year,
+    employee?.fteFactor ?? 1
   );
 
   return LeaveBalance.create({
@@ -145,7 +146,8 @@ export const refreshBalanceEntitlement = async (
   balance.entitlement = calculateProRataEntitlement(
     settings.annualEntitlement,
     employee?.startDate,
-    year
+    year,
+    employee?.fteFactor ?? 1
   );
   await balance.save();
 };

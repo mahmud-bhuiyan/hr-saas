@@ -134,7 +134,7 @@ Employees submit leave requests; managers and HR approve or decline them. Tracks
 | Single approver | ✅ | Multi-step chains (S2-5) |
 | Annual balance only | ✅ | Sick/unpaid balances (Stage 3) |
 | Email notifications | ✅ | Queued via BullMQ (S2-1) |
-| Team clash detection | — | Stage 3 |
+| Team clash detection | — | ✅ S3-7 (approver queue shows `conflictingShifts`) |
 | Document expiry reminders | — | S2-5 (email HR) |
 
 ---
@@ -145,7 +145,7 @@ Employees submit leave requests; managers and HR approve or decline them. Tracks
 
 - Entitlement for calendar year = `annualEntitlement × (days employed in year / days in year)`.
 - Mid-year starters get prorated entitlement on first balance access or via cron.
-- Part-time FTE factor (default 1.0) — optional field on Employee in S2-5 or Stage 3.
+- Part-time FTE factor (default 1.0) — ✅ scales entitlement in `calculateProRataEntitlement` (S3-7).
 
 ### Carry-over
 
