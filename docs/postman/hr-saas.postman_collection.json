@@ -25,6 +25,10 @@
     {
       "key": "leaveRequestId",
       "value": ""
+    },
+    {
+      "key": "documentId",
+      "value": ""
     }
   ],
   "item": [
@@ -747,6 +751,122 @@
             "header": [],
             "url": "{{baseUrl}}/api/v1/leave/pending-count",
             "description": "Count pending requests for dashboard."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Documents",
+      "item": [
+        {
+          "name": "List Documents",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+            },
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/documents",
+            "description": "List documents scoped by role."
+          },
+          "response": []
+        },
+        {
+          "name": "Presign Document Upload",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+            },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fileName\": \"contract.pdf\",\n  \"mimeType\": \"application/pdf\",\n  \"fileSize\": 102400,\n  \"category\": \"contract\",\n  \"employeeId\": \"{{employeeId}}\",\n  \"expiryDate\": \"2027-01-31\"\n}"
+            },
+            "url": "{{baseUrl}}/api/v1/documents/presign",
+            "description": "Returns presigned PUT URL and fileKey. Upload file to uploadUrl, then call Create Document."
+          },
+          "response": []
+        },
+        {
+          "name": "Create Document",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "  const json = pm.response.json();",
+                  "  pm.collectionVariables.set('documentId', json.data.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+            },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fileKey\": \"tenant-id/documents/uuid/contract.pdf\",\n  \"fileName\": \"contract.pdf\",\n  \"mimeType\": \"application/pdf\",\n  \"fileSize\": 102400,\n  \"category\": \"contract\",\n  \"employeeId\": \"{{employeeId}}\",\n  \"expiryDate\": \"2027-01-31\"\n}"
+            },
+            "url": "{{baseUrl}}/api/v1/documents",
+            "description": "Save metadata after S3 upload. Replace fileKey with value from presign response."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Document Download URL",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+            },
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/documents/{{documentId}}/download",
+            "description": "Returns presigned download URL."
+          },
+          "response": []
+        },
+        {
+          "name": "List Expiring Documents",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/documents/expiring?days=30",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "documents", "expiring"],
+              "query": [{ "key": "days", "value": "30" }]
+            },
+            "description": "HR/admin only. Documents expiring within N days."
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Document",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/documents/{{documentId}}",
+            "description": "HR/admin only. Deletes metadata and storage object."
           },
           "response": []
         }

@@ -29,6 +29,8 @@ tags:
     description: Tenant-scoped employee directory and profiles
   - name: Leave
     description: Leave requests, balances, approval, and team calendar
+  - name: Documents
+    description: HR document storage with S3 presigned upload and download
   - name: Platform
     description: Platform-wide site branding and configuration
   - name: Settings
@@ -682,7 +684,7 @@ paths:
           schema:
             type: string
             enum: [name, employeeNumber, jobTitle, department, manager]
-          description: Sort field (default `name`)
+          description: Sort field (default `name`; `name` and `manager` sort by first name, then last name)
         - name: sortOrder
           in: query
           schema:
@@ -1314,6 +1316,283 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         '403':
           $ref: '#/components/responses/Forbidden'
+
+  /api/v1/documents:
+    get:
+      tags: [Documents]
+      summary: List documents
+      description: |
+        Returns documents scoped by role: own employee folder (employee) or all tenant documents (HR/admin).
+      operationId: listDocuments
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: employeeId
+          in: query
+          schema:
+            type: string
+        - name: category
+          in: query
+          schema:
+            $ref: '#/components/schemas/DocumentCategory'
+        - name: expiringWithinDays
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 365
+      responses:
+        '200':
+          description: Document list
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, data]
+                properties:
+                  status:
+                    type: string
+                    enum: [ok]
+                  data:
+                    type: object
+                    required: [documents]
+                    properties:
+                      documents:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/HrDocument'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+    post:
+      tags: [Documents]
+      summary: Save document metadata
+      description: |
+        Creates a document record after the file has been uploaded to storage via presigned URL.
+        Requires `document:manage` or `document:read:own` (employee uploads to own folder).
+      operationId: createDocument
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateDocument'
+            example:
+              fileKey: 664a1b2c3d4e5f6789012345/documents/uuid/contract.pdf
+              fileName: contract.pdf
+              mimeType: application/pdf
+              fileSize: 102400
+              category: contract
+              employeeId: 664a1b2c3d4e5f6789012346
+              expiryDate: '2027-01-31'
+      responses:
+        '201':
+          description: Document created
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, data]
+                properties:
+                  status:
+                    type: string
+                    enum: [ok]
+                  data:
+                    $ref: '#/components/schemas/HrDocument'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '503':
+          description: Storage not configured
+
+  /api/v1/documents/presign:
+    post:
+      tags: [Documents]
+      summary: Get presigned upload URL
+      description: Returns a short-lived S3 PUT URL and tenant-scoped file key.
+      operationId: presignDocumentUpload
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PresignDocument'
+      responses:
+        '200':
+          description: Presigned upload URL
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, data]
+                properties:
+                  status:
+                    type: string
+                    enum: [ok]
+                  data:
+                    $ref: '#/components/schemas/PresignDocumentResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '503':
+          description: Storage not configured
+
+  /api/v1/documents/expiring:
+    get:
+      tags: [Documents]
+      summary: List expiring documents
+      description: Requires `document:manage`. Documents with expiry within N days (default 30).
+      operationId: listExpiringDocuments
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: days
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 365
+            default: 30
+      responses:
+        '200':
+          description: Expiring documents
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, data]
+                properties:
+                  status:
+                    type: string
+                    enum: [ok]
+                  data:
+                    type: object
+                    required: [documents]
+                    properties:
+                      documents:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/HrDocument'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /api/v1/documents/{id}:
+    get:
+      tags: [Documents]
+      summary: Get document
+      operationId: getDocument
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Document metadata
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, data]
+                properties:
+                  status:
+                    type: string
+                    enum: [ok]
+                  data:
+                    $ref: '#/components/schemas/HrDocument'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          description: Document not found
+    delete:
+      tags: [Documents]
+      summary: Delete document
+      description: Requires `document:manage`. Removes metadata and storage object.
+      operationId: deleteDocument
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Document deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, data]
+                properties:
+                  status:
+                    type: string
+                    enum: [ok]
+                  data:
+                    type: object
+                    required: [deleted]
+                    properties:
+                      deleted:
+                        type: boolean
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          description: Document not found
+
+  /api/v1/documents/{id}/download:
+    get:
+      tags: [Documents]
+      summary: Get presigned download URL
+      operationId: downloadDocument
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Presigned download URL
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, data]
+                properties:
+                  status:
+                    type: string
+                    enum: [ok]
+                  data:
+                    $ref: '#/components/schemas/DocumentDownloadResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          description: Document not found
 
   /api/v1/platform/site-config:
     get:
@@ -2273,3 +2552,106 @@ components:
           type: boolean
         status:
           $ref: '#/components/schemas/LeaveRequestStatus'
+
+    DocumentCategory:
+      type: string
+      enum: [contract, id, certification, other]
+
+    DocumentEmployeeSummary:
+      type: object
+      required: [id, firstName, lastName]
+      properties:
+        id:
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+
+    DocumentUploaderSummary:
+      type: object
+      required: [id, name, email]
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        email:
+          type: string
+
+    HrDocument:
+      type: object
+      required: [id, category, fileName, mimeType, fileSize, uploadedBy, createdAt, updatedAt]
+      properties:
+        id:
+          type: string
+        employeeId:
+          type: string
+        employee:
+          $ref: '#/components/schemas/DocumentEmployeeSummary'
+        category:
+          $ref: '#/components/schemas/DocumentCategory'
+        fileName:
+          type: string
+        mimeType:
+          type: string
+        fileSize:
+          type: integer
+        uploadedBy:
+          $ref: '#/components/schemas/DocumentUploaderSummary'
+        expiryDate:
+          type: string
+          format: date
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    PresignDocument:
+      type: object
+      required: [fileName, mimeType, fileSize, category]
+      properties:
+        fileName:
+          type: string
+        mimeType:
+          type: string
+        fileSize:
+          type: integer
+        category:
+          $ref: '#/components/schemas/DocumentCategory'
+        employeeId:
+          type: string
+        expiryDate:
+          type: string
+          format: date
+
+    PresignDocumentResponse:
+      type: object
+      required: [uploadUrl, fileKey]
+      properties:
+        uploadUrl:
+          type: string
+          format: uri
+        fileKey:
+          type: string
+
+    CreateDocument:
+      allOf:
+        - $ref: '#/components/schemas/PresignDocument'
+        - type: object
+          required: [fileKey]
+          properties:
+            fileKey:
+              type: string
+
+    DocumentDownloadResponse:
+      type: object
+      required: [downloadUrl, fileName]
+      properties:
+        downloadUrl:
+          type: string
+          format: uri
+        fileName:
+          type: string

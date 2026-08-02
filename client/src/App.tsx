@@ -3,6 +3,8 @@ import { AppShell } from "./components/AppShell";
 import { GuestRoute } from "./components/GuestRoute";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { DashboardPage } from "./pages/dashboard/DashboardPage";
+import { EmployeeEditPage } from "./pages/employees/EmployeeEditPage";
+import { EmployeeViewPage } from "./pages/employees/EmployeeViewPage";
 import { EmployeesPage } from "./pages/employees/EmployeesPage";
 import { LoginPage } from "./pages/login/LoginPage";
 import { ProfilePage } from "./pages/profile/ProfilePage";
@@ -11,6 +13,7 @@ import { RegistrationsPage } from "./pages/registrations/RegistrationsPage";
 import { PlatformSiteSettingsPage } from "./pages/platform/site-settings/PlatformSiteSettingsPage";
 import { TenantBrandingPage } from "./pages/settings/branding/TenantBrandingPage";
 import { LeavePage } from "./pages/leave/LeavePage";
+import { DocumentsPage } from "./pages/documents/DocumentsPage";
 
 const App = () => {
   return (
@@ -29,11 +32,10 @@ const App = () => {
             element={<RegistrationsPage />}
           />
           <Route path="/dashboard/employees" element={<EmployeesPage />} />
-          <Route
-            path="/dashboard/employees/:id"
-            element={<Navigate to="/dashboard/employees" replace />}
-          />
+          <Route path="/dashboard/employees/:id/edit" element={<EmployeeEditPage />} />
+          <Route path="/dashboard/employees/:id" element={<EmployeeViewPage />} />
           <Route path="/dashboard/leave" element={<LeavePage />} />
+          <Route path="/dashboard/documents" element={<DocumentsPage />} />
           <Route
             path="/dashboard/platform/site-settings"
             element={<PlatformSiteSettingsPage />}

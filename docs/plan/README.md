@@ -26,7 +26,7 @@ Planning documents for the HR SaaS platform. Use these to align with the client,
 | 3 | App shell (+ UI kit, profile, companies page) | ✅ Complete |
 | 4 | Employee management | ✅ Ready for review |
 | 5 | Leave & absence | ✅ Complete |
-| 6 | Documents | ⬜ Pending |
+| 6 | Documents | ✅ Ready for review |
 | 7 | Settings (branding complete; profile/depts/users pending) | 🟡 Partial |
 | 8 | Demo polish | ⬜ Pending |
 
@@ -62,7 +62,7 @@ Detailed plans live in `modules/`. Each file follows [modules/_template.md](./mo
 | Auth & Tenant | [modules/01-auth-tenant.md](./modules/01-auth-tenant.md) | ✅ | Done |
 | Employee Management | [modules/02-employees.md](./modules/02-employees.md) | ✅ | Ready for review |
 | Leave & Absence | [modules/03-leave.md](./modules/03-leave.md) | ✅ | Complete |
-| Document Storage | [modules/04-documents.md](./modules/04-documents.md) | ✅ | Not started |
+| Document Storage | [modules/04-documents.md](./modules/04-documents.md) | ✅ | Ready for review |
 | Admin & Settings | [modules/05-admin-settings.md](./modules/05-admin-settings.md) | ✅ (partial) | In progress |
 | Platform Site Settings | [modules/15-platform-site-settings.md](./modules/15-platform-site-settings.md) | ✅ (Step 7) | Complete |
 | Attendance | [modules/06-attendance.md](./modules/06-attendance.md) | — | Stage 2 |

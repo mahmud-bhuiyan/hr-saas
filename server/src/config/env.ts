@@ -15,6 +15,12 @@ export interface ServerEnv {
   imgbbApiKey: string;
   sendgridApiKey: string;
   emailFrom: string;
+  s3Endpoint: string;
+  s3Region: string;
+  s3Bucket: string;
+  s3AccessKeyId: string;
+  s3SecretAccessKey: string;
+  s3ForcePathStyle: boolean;
 }
 
 export const loadServerEnv = (): ServerEnv => {
@@ -27,5 +33,11 @@ export const loadServerEnv = (): ServerEnv => {
     imgbbApiKey: process.env.IMGBB_API_KEY ?? '',
     sendgridApiKey: process.env.SENDGRID_API_KEY ?? '',
     emailFrom: process.env.EMAIL_FROM ?? '',
+    s3Endpoint: process.env.S3_ENDPOINT ?? '',
+    s3Region: process.env.S3_REGION ?? 'us-east-1',
+    s3Bucket: process.env.S3_BUCKET ?? '',
+    s3AccessKeyId: process.env.S3_ACCESS_KEY_ID ?? '',
+    s3SecretAccessKey: process.env.S3_SECRET_ACCESS_KEY ?? '',
+    s3ForcePathStyle: process.env.S3_FORCE_PATH_STYLE === 'true',
   };
 }

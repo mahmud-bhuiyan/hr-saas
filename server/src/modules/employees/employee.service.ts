@@ -297,7 +297,7 @@ const buildMongoSort = (
       return { department: dir, lastName: 1, firstName: 1 };
     case 'name':
     default:
-      return { lastName: dir, firstName: dir };
+      return { firstName: dir, lastName: dir };
   }
 };
 
@@ -308,16 +308,16 @@ const sortByManager = (
   const dir = sortOrder === 'desc' ? -1 : 1;
 
   return [...employees].sort((a, b) => {
-    const aName = a.manager ? `${a.manager.lastName} ${a.manager.firstName}` : '';
-    const bName = b.manager ? `${b.manager.lastName} ${b.manager.firstName}` : '';
+    const aName = a.manager ? `${a.manager.firstName} ${a.manager.lastName}` : '';
+    const bName = b.manager ? `${b.manager.firstName} ${b.manager.lastName}` : '';
     const cmp = aName.localeCompare(bName, undefined, { sensitivity: 'base' });
     if (cmp !== 0) {
       return cmp * dir;
     }
 
     const nameCmp =
-      a.lastName.localeCompare(b.lastName, undefined, { sensitivity: 'base' }) ||
-      a.firstName.localeCompare(b.firstName, undefined, { sensitivity: 'base' });
+      a.firstName.localeCompare(b.firstName, undefined, { sensitivity: 'base' }) ||
+      a.lastName.localeCompare(b.lastName, undefined, { sensitivity: 'base' });
     return nameCmp * dir;
   });
 };
@@ -347,7 +347,7 @@ export const listEmployees = async (
   const sortOrder = query.sortOrder ?? 'asc';
 
   const employees = await Employee.find(filter).sort(
-    sortBy === 'manager' ? { lastName: 1, firstName: 1 } : buildMongoSort(sortBy, sortOrder)
+    sortBy === 'manager' ? { firstName: 1, lastName: 1 } : buildMongoSort(sortBy, sortOrder)
   );
 
   const publicEmployees = await toPublicList(employees);

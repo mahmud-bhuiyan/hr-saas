@@ -155,9 +155,9 @@ Be explicit with the client so expectations stay aligned.
 - [x] Team calendar
 
 ### Documents
-- [ ] Document list (by employee or company)
-- [ ] Upload document
-- [ ] Download document
+- [x] Document list (by employee or company)
+- [x] Upload document
+- [x] Download document
 
 ### Settings
 - [ ] Company profile
@@ -263,8 +263,8 @@ Full roadmap: [hr-saas-mern-project-plan.md](./hr-saas-mern-project-plan.md)
 | App shell (Step 3) | ✅ Complete | UI kit, profile, companies page |
 | Employees (Step 4) | ✅ Ready for review | User link deferred |
 | Leave (Step 5) | ✅ Complete | Email via SendGrid; user→employee via email fallback |
-| Documents (Step 6) | ⬜ Pending | |
+| Documents (Step 6) | ✅ Ready for review | MinIO for local dev; AWS S3 or Cloudflare R2 in production |
 | Settings (Step 7) | 🟡 Partial | Platform site settings + tenant branding done; company profile, departments, users pending |
 | Demo polish (Step 8) | ⬜ Pending | |
 
-**Next step:** Step 6 — Document storage. See [IMPLEMENTATION-STEPS.md](./IMPLEMENTATION-STEPS.md).
+**Next step:** Step 7 — finish Admin & settings (company profile, departments, users). See [IMPLEMENTATION-STEPS.md](./IMPLEMENTATION-STEPS.md).
