@@ -1,7 +1,7 @@
 # Module: Shifts & Rotas
 
-**Stage:** Stage 3 (S3-1 foundations → S3-2 backend → S3-3 UI)  
-**Status:** In planning (S3-1 WorkLocation in progress)  
+**Stage:** Stage 3 (S3-1 foundations → S3-2 backend ✅ → S3-3 UI)  
+**Status:** S3-2 backend complete — S3-3 UI next  
 **Depends on:** Stage 2 complete (attendance, timesheets, leave); S3-1 WorkLocation
 
 ---
@@ -190,9 +190,9 @@ Employee claims open shift → notification to manager
 
 ### Backend (S3-1 partial)
 - [x] WorkLocation model + CRUD (S3-1)
-- [ ] Shift + RotaTemplate models (S3-2)
-- [ ] Conflict detection service (S3-2)
-- [ ] Rota routes + RBAC (S3-2)
+- [x] Shift + RotaTemplate models (S3-2)
+- [x] Conflict detection service (S3-2)
+- [x] Rota routes + RBAC (S3-2)
 
 ### Frontend (S3-1 partial)
 - [x] Locations settings page (S3-1)
@@ -212,8 +212,8 @@ Employee claims open shift → notification to manager
 
 ## 12. Acceptance Criteria
 
-- [ ] HR can CRUD work locations
+- [x] HR can CRUD work locations
 - [ ] HR can create, publish, and copy weekly rotas
 - [ ] Employees see assigned shifts and can claim open shifts
-- [ ] Leave conflicts detected on overlapping shifts
-- [ ] OpenAPI and Postman updated
+- [x] Leave conflicts detected on overlapping shifts
+- [x] OpenAPI and Postman updated

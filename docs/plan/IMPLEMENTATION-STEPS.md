@@ -173,4 +173,4 @@ Demo 1 Steps 1–8 are complete. Stage 2 is complete. Stage 3 planning and build
 | [11-stage-3-scheduling-payroll-plan.md](./11-stage-3-scheduling-payroll-plan.md) | Stage 3 client-facing scope |
 | [STAGE-3-IMPLEMENTATION-STEPS.md](./STAGE-3-IMPLEMENTATION-STEPS.md) | Dev checklist — Steps S3-1 through S3-8 |
 
-**Next step:** S3-1 — Stage 3 foundations. See [STAGE-3-IMPLEMENTATION-STEPS.md](./STAGE-3-IMPLEMENTATION-STEPS.md).
+**Next step:** S3-3 — Rotas UI. See [STAGE-3-IMPLEMENTATION-STEPS.md](./STAGE-3-IMPLEMENTATION-STEPS.md).

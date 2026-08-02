@@ -41,6 +41,18 @@
     {
       "key": "expenseId",
       "value": ""
+    },
+    {
+      "key": "locationId",
+      "value": ""
+    },
+    {
+      "key": "shiftId",
+      "value": ""
+    },
+    {
+      "key": "rotaWeekOf",
+      "value": "2026-08-04"
     }
   ],
   "item": [
@@ -1415,6 +1427,109 @@
               ]
             },
             "description": "Approved leave days by type and department for date range. Requires report:read."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Rotas",
+      "item": [
+        {
+          "name": "Get Rota Week",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+            },
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/rotas/{{rotaWeekOf}}",
+            "description": "Shifts for ISO week starting Monday (YYYY-MM-DD). Requires rota:read or rota:read:own."
+          },
+          "response": []
+        },
+        {
+          "name": "Create Shift",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "  const json = pm.response.json();",
+                  "  if (json.data && json.data.id) {",
+                  "    pm.collectionVariables.set('shiftId', json.data.id);",
+                  "  }",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+            },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"employeeId\": \"{{employeeId}}\",\n  \"date\": \"2026-08-04\",\n  \"startTime\": \"09:00\",\n  \"endTime\": \"17:00\",\n  \"locationId\": \"{{locationId}}\",\n  \"role\": \"Floor\"\n}"
+            },
+            "url": "{{baseUrl}}/api/v1/rotas/shifts",
+            "description": "Create a draft shift. Requires rota:manage."
+          },
+          "response": []
+        },
+        {
+          "name": "Update Shift",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+            },
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"startTime\": \"10:00\",\n  \"endTime\": \"18:00\"\n}"
+            },
+            "url": "{{baseUrl}}/api/v1/rotas/shifts/{{shiftId}}",
+            "description": "Update a shift. Requires rota:manage."
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Shift",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/rotas/shifts/{{shiftId}}",
+            "description": "Delete a draft shift only. Requires rota:manage."
+          },
+          "response": []
+        },
+        {
+          "name": "Publish Rota Week",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+            },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"weekOf\": \"{{rotaWeekOf}}\"\n}"
+            },
+            "url": "{{baseUrl}}/api/v1/rotas/publish",
+            "description": "Publish all draft shifts for the week. Requires rota:manage."
           },
           "response": []
         }

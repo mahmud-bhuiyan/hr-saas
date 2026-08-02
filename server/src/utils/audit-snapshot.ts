@@ -63,6 +63,29 @@ export const employeeAuditSnapshot = (employee: {
     defaultLocationId: employee.defaultLocationId,
   }) ?? {};
 
+export const shiftAuditSnapshot = (shift: {
+  employeeId?: unknown;
+  date?: string;
+  startTime?: string;
+  endTime?: string;
+  role?: string;
+  locationId?: unknown;
+  status?: string;
+  publishedAt?: Date | null;
+  claimedBy?: unknown;
+}): Record<string, unknown> =>
+  sanitizeAuditPayload({
+    employeeId: shift.employeeId,
+    date: shift.date,
+    startTime: shift.startTime,
+    endTime: shift.endTime,
+    role: shift.role,
+    locationId: shift.locationId,
+    status: shift.status,
+    publishedAt: shift.publishedAt,
+    claimedBy: shift.claimedBy,
+  }) ?? {};
+
 export const locationAuditSnapshot = (location: {
   name?: string;
   address?: string;

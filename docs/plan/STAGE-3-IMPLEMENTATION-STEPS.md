@@ -9,7 +9,7 @@ Check off each step with the client/dev team before moving to the next.
 | Step | Scope | Status |
 |------|-------|--------|
 | **S3-1** | Foundations — work locations, employee pay fields, tenant payroll settings, permissions | ✅ Done |
-| **S3-2** | Rotas backend — `Shift`, `RotaTemplate`, week CRUD, leave conflict detection | Not started |
+| **S3-2** | Rotas backend — `Shift`, `RotaTemplate`, week CRUD, leave conflict detection | ✅ Done |
 | **S3-3** | Rotas UI — weekly grid, publish, employee shift view, open-shift claim | Not started |
 | **S3-4** | Payroll export backend — `PayrollPeriod`, aggregate timesheets + expenses + pay rates | Not started |
 | **S3-5** | Payroll export UI — generate, preview, CSV download | Not started |
@@ -51,15 +51,15 @@ Features added during Stage 3 implementation that extend the original step list.
 
 ## S3-2 — Done when
 
-- [ ] `Shift` model with `{ tenantId, employeeId?, date, startTime, endTime, role?, locationId, status, publishedAt?, claimedBy? }`
-- [ ] `RotaTemplate` model for recurring weekly patterns
-- [ ] `GET /api/v1/rotas/:weekOf` — shifts for week
-- [ ] `POST /api/v1/rotas/shifts`, `PATCH /api/v1/rotas/shifts/:id`, `DELETE /api/v1/rotas/shifts/:id`
-- [ ] `POST /api/v1/rotas/publish` — publish draft shifts for a week
-- [ ] Leave conflict detection — warn/block shift overlapping approved leave
-- [ ] Double-booking prevention for same employee
-- [ ] Audit log on shift create/update/delete/publish
-- [ ] `docs/openapi.yaml` and Postman collection updated
+- [x] `Shift` model with `{ tenantId, employeeId?, date, startTime, endTime, role?, locationId, status, publishedAt?, claimedBy? }`
+- [x] `RotaTemplate` model for recurring weekly patterns
+- [x] `GET /api/v1/rotas/:weekOf` — shifts for week
+- [x] `POST /api/v1/rotas/shifts`, `PATCH /api/v1/rotas/shifts/:id`, `DELETE /api/v1/rotas/shifts/:id`
+- [x] `POST /api/v1/rotas/publish` — publish draft shifts for a week
+- [x] Leave conflict detection — block shift overlapping approved leave
+- [x] Double-booking prevention for same employee
+- [x] Audit log on shift create/update/delete/publish
+- [x] `docs/openapi.yaml` and Postman collection updated
 
 **Review:** Test shift CRUD and conflict rules via API before S3-3.
 
