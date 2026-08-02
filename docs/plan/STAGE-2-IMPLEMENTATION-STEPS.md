@@ -9,7 +9,7 @@ Check off each step with the client/dev team before moving to the next.
 | Step | Scope | Status |
 |------|-------|--------|
 | **S2-1** | Platform foundations — audit log, notifications, forgot password, employee invite | ✅ Done |
-| **S2-2** | Attendance — clock in/out, history, live board, HR corrections | ⬜ Not started |
+| **S2-2** | Attendance — clock in/out, history, live board, HR corrections | ✅ Done |
 | **S2-3** | Timesheets — weekly grid, auto-generate, submit/approve, overtime | ⬜ Not started |
 | **S2-4** | Expenses — submit with receipt, approval, CSV export | ⬜ Not started |
 | **S2-5** | Leave enhancements — accrual, carry-over, multi-step approval, doc expiry emails | ⬜ Not started |
@@ -55,19 +55,19 @@ Features added during Stage 2 implementation that extend the original step list.
 
 ## S2-2 — Done when
 
-- [ ] `AttendanceLog` model (`clockIn`, `clockOut`, `method`, optional `location`, `employeeId`)
-- [ ] `POST /api/v1/attendance/clock-in`, `POST /api/v1/attendance/clock-out`
-- [ ] `GET /api/v1/attendance/me` (history with pagination)
-- [ ] `GET /api/v1/attendance/team/live` — currently clocked-in employees (manager/HR)
-- [ ] `PATCH /api/v1/attendance/:id` — HR correction of missed punches
-- [ ] One open session per employee enforced (409 if already clocked in)
-- [ ] Tenant setting `attendanceGpsEnabled` (default false); consent banner when enabled
-- [ ] Attendance page `/dashboard/attendance` with clock button + history
-- [ ] Live team board `/dashboard/attendance/team` for manager/HR
-- [ ] HR correction modal
-- [ ] Attendance mutations write to audit log
-- [ ] Permissions: `attendance:clock:own`, `attendance:read:team`, `attendance:manage`
-- [ ] `docs/openapi.yaml` and Postman collection updated
+- [x] `AttendanceLog` model (`clockIn`, `clockOut`, `method`, optional `location`, `employeeId`)
+- [x] `POST /api/v1/attendance/clock-in`, `POST /api/v1/attendance/clock-out`
+- [x] `GET /api/v1/attendance/me` (history with pagination)
+- [x] `GET /api/v1/attendance/team/live` — currently clocked-in employees (manager/HR)
+- [x] `PATCH /api/v1/attendance/:id` — HR correction of missed punches
+- [x] One open session per employee enforced (409 if already clocked in)
+- [x] Tenant setting `attendanceGpsEnabled` (default false); consent banner when enabled
+- [x] Attendance page `/dashboard/attendance` with clock button + history
+- [x] Live team board tab on attendance page for manager/HR
+- [x] HR correction modal
+- [x] Attendance mutations write to audit log
+- [x] Permissions: `attendance:clock:own`, `attendance:read:team`, `attendance:manage`
+- [x] `docs/openapi.yaml` and Postman collection updated
 
 **Review:** Test clock-in/out cycle and manager live board before S2-3.
 

@@ -57,6 +57,13 @@ import type {
   ResetPasswordInput,
   MessageResponse,
   InviteEmployeeInput,
+  AttendanceLog,
+  AttendanceStatus,
+  AttendanceSettings,
+  PaginatedAttendanceLogs,
+  ClockInInput,
+  PatchAttendanceInput,
+  PatchAttendanceSettingsInput,
 } from '../types';
 
 const apiBase = import.meta.env.VITE_API_URL || '';
@@ -770,5 +777,74 @@ export const inviteEmployee = async (
       body: JSON.stringify(input),
     }
   );
+  return json.data;
+};
+
+export const fetchAttendanceSettings = async (): Promise<AttendanceSettings> => {
+  const json = await apiFetch<ApiSuccessResponse<AttendanceSettings>>('/api/v1/attendance/settings');
+  return json.data;
+};
+
+export const patchAttendanceSettings = async (
+  input: PatchAttendanceSettingsInput
+): Promise<AttendanceSettings> => {
+  const json = await apiFetch<ApiSuccessResponse<AttendanceSettings>>('/api/v1/attendance/settings', {
+    method: 'PATCH',
+    body: JSON.stringify(input),
+  });
+  return json.data;
+};
+
+export const clockIn = async (input: ClockInInput = {}): Promise<AttendanceLog> => {
+  const json = await apiFetch<ApiSuccessResponse<AttendanceLog>>('/api/v1/attendance/clock-in', {
+    method: 'POST',
+    body: JSON.stringify(input),
+  });
+  return json.data;
+};
+
+export const clockOut = async (): Promise<AttendanceLog> => {
+  const json = await apiFetch<ApiSuccessResponse<AttendanceLog>>('/api/v1/attendance/clock-out', {
+    method: 'POST',
+  });
+  return json.data;
+};
+
+export const fetchMyAttendanceStatus = async (): Promise<AttendanceStatus> => {
+  const json = await apiFetch<ApiSuccessResponse<AttendanceStatus>>('/api/v1/attendance/me/status');
+  return json.data;
+};
+
+export const fetchMyAttendance = async (page = 1, limit = 20): Promise<PaginatedAttendanceLogs> => {
+  const json = await apiFetch<ApiSuccessResponse<PaginatedAttendanceLogs>>(
+    `/api/v1/attendance/me?page=${page}&limit=${limit}`
+  );
+  return json.data;
+};
+
+export const fetchEmployeeAttendance = async (
+  employeeId: string,
+  page = 1,
+  limit = 20
+): Promise<PaginatedAttendanceLogs> => {
+  const json = await apiFetch<ApiSuccessResponse<PaginatedAttendanceLogs>>(
+    `/api/v1/attendance/employee/${employeeId}?page=${page}&limit=${limit}`
+  );
+  return json.data;
+};
+
+export const fetchTeamLiveAttendance = async (): Promise<AttendanceLog[]> => {
+  const json = await apiFetch<ApiSuccessResponse<AttendanceLog[]>>('/api/v1/attendance/team/live');
+  return json.data;
+};
+
+export const patchAttendanceLog = async (
+  id: string,
+  input: PatchAttendanceInput
+): Promise<AttendanceLog> => {
+  const json = await apiFetch<ApiSuccessResponse<AttendanceLog>>(`/api/v1/attendance/${id}`, {
+    method: 'PATCH',
+    body: JSON.stringify(input),
+  });
   return json.data;
 };

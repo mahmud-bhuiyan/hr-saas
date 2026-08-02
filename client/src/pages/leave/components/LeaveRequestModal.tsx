@@ -25,6 +25,7 @@ const typeOptions: Array<{ value: LeaveType; label: string }> = [
   { value: 'annual', label: 'Annual leave' },
   { value: 'sick', label: 'Sick leave' },
   { value: 'unpaid', label: 'Unpaid leave' },
+  { value: 'planned', label: 'Planned leave' },
 ];
 
 export const LeaveRequestModal = ({
@@ -49,13 +50,14 @@ export const LeaveRequestModal = ({
       loading={loading}
       submitDisabled={submitDisabled}
     >
-      <FormField label="Leave type" htmlFor="leave-type">
+      <FormField label="Leave type" htmlFor="leave-type" required>
         <Select
           id="leave-type"
           value={form.type}
           onChange={(e) =>
             onFormChange((f) => ({ ...f, type: e.target.value as LeaveType }))
           }
+          required
           icon={<HiSignal className="h-4 w-4 text-brand-600" />}
         >
           {typeOptions.map((opt) => (
@@ -67,7 +69,7 @@ export const LeaveRequestModal = ({
       </FormField>
 
       <div className="grid gap-4 sm:grid-cols-2">
-        <FormField label="Start date" htmlFor="leave-startDate">
+        <FormField label="Start date" htmlFor="leave-startDate" required>
           <Input
             id="leave-startDate"
             type="date"
@@ -77,7 +79,7 @@ export const LeaveRequestModal = ({
             icon={<HiCalendarDays className="h-4 w-4 text-brand-600" />}
           />
         </FormField>
-        <FormField label="End date" htmlFor="leave-endDate">
+        <FormField label="End date" htmlFor="leave-endDate" required>
           <Input
             id="leave-endDate"
             type="date"
@@ -104,12 +106,13 @@ export const LeaveRequestModal = ({
         </FormField>
       )}
 
-      <FormField label="Reason (optional)" htmlFor="leave-reason">
+      <FormField label="Reason" htmlFor="leave-reason" required>
         <Textarea
           id="leave-reason"
-          value={form.reason ?? ''}
+          value={form.reason}
           onChange={(e) => onFormChange((f) => ({ ...f, reason: e.target.value }))}
           rows={3}
+          required
           icon={<HiChatBubbleLeftEllipsis className="h-4 w-4 text-brand-600" />}
         />
       </FormField>

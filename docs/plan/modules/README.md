@@ -10,7 +10,7 @@ One detailed plan file per business module. Use these for sprint planning and as
 
 | # | Module | File | Status |
 |---|--------|------|--------|
-| 01 | Auth & Tenant | [01-auth-tenant.md](./01-auth-tenant.md) | Done (S2-1 extensions planned) |
+| 01 | Auth & Tenant | [01-auth-tenant.md](./01-auth-tenant.md) | Done (S2-1 forgot password done) |
 | 02 | Employee Management | [02-employees.md](./02-employees.md) | Ready for review |
 | 03 | Leave & Absence | [03-leave.md](./03-leave.md) | Complete (S2-5 enhancements planned) |
 | 04 | Document Storage | [04-documents.md](./04-documents.md) | Ready for review |
@@ -23,8 +23,8 @@ One detailed plan file per business module. Use these for sprint planning and as
 
 | # | Module | File | Step | Status |
 |---|--------|------|------|--------|
-| 16 | Audit Log | [16-audit-log.md](./16-audit-log.md) | S2-1 | Not started |
-| 07 | Notifications | [07-notifications.md](./07-notifications.md) | S2-1 | Not started |
+| 16 | Audit Log | [16-audit-log.md](./16-audit-log.md) | S2-1 | Done |
+| 07 | Notifications | [07-notifications.md](./07-notifications.md) | S2-1 | Done |
 | 06 | Attendance | [06-attendance.md](./06-attendance.md) | S2-2 | Not started |
 | 09 | Timesheets | [09-timesheets.md](./09-timesheets.md) | S2-3 | Not started |
 | 10 | Expenses | [10-expenses.md](./10-expenses.md) | S2-4 | Not started |

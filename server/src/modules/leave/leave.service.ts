@@ -7,6 +7,7 @@ import {
 } from '../../utils/audit-snapshot.js';
 import { writeAuditLog, type AuditContext } from '../audit/audit.service.js';
 import { Employee, type IEmployeeDocument } from '../employees/employee.model.js';
+import { ensureEmployeeRecordForUser } from '../employees/employee.service.js';
 import { User } from '../admin/user.model.js';
 import {
   sendLeaveApprovedEmail,
@@ -132,14 +133,28 @@ export const resolveEmployeeForUser = async (
     });
   }
 
-  if (!employee) {
-    throw new LeaveServiceError(
-      'No employee record linked to your account. Contact your administrator.',
-      403
-    );
+  if (employee) {
+    return employee;
   }
 
-  return employee;
+  const user = await User.findOne({
+    _id: new mongoose.Types.ObjectId(userId),
+    tenantId: tenantObjectId,
+  });
+
+  if (user && user.role !== 'super_admin') {
+    return ensureEmployeeRecordForUser(tenantId, {
+      userId: user._id.toString(),
+      email: user.email,
+      firstName: user.firstName,
+      lastName: user.lastName,
+    });
+  }
+
+  throw new LeaveServiceError(
+    'No employee record linked to your account. Contact your administrator.',
+    403
+  );
 };
 
 const toEmployeeSummary = (employee: IEmployeeDocument): LeaveEmployeeSummary => ({

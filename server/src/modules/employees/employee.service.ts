@@ -163,6 +163,107 @@ const findEmployeeRecordForUser = async (
   });
 }
 
+export interface EnsureEmployeeForUserInput {
+  userId: string;
+  email: string;
+  firstName?: string;
+  lastName?: string;
+}
+
+const deriveEmployeeNames = (user: EnsureEmployeeForUserInput): { firstName: string; lastName: string } => {
+  const firstName = user.firstName?.trim();
+  const lastName = user.lastName?.trim();
+
+  if (firstName && lastName) {
+    return { firstName, lastName };
+  }
+
+  if (firstName) {
+    return { firstName, lastName: 'User' };
+  }
+
+  if (lastName) {
+    return { firstName: 'User', lastName };
+  }
+
+  const localPart = user.email.split('@')[0] || 'user';
+  return { firstName: localPart, lastName: 'User' };
+}
+
+const generateEmployeeNumber = async (tenantId: string): Promise<string> => {
+  const count = await Employee.countDocuments({
+    tenantId: new mongoose.Types.ObjectId(tenantId),
+  });
+  return `EMP-${String(count + 1).padStart(4, '0')}`;
+}
+
+/** Ensures a tenant user has a linked employee record (create or link by email). */
+export const ensureEmployeeRecordForUser = async (
+  tenantId: string,
+  user: EnsureEmployeeForUserInput,
+  options?: { createdByUserId?: string; audit?: AuditContext }
+): Promise<IEmployeeDocument> => {
+  const tenantObjectId = new mongoose.Types.ObjectId(tenantId);
+  const userObjectId = new mongoose.Types.ObjectId(user.userId);
+
+  const linked = await Employee.findOne({
+    tenantId: tenantObjectId,
+    userId: userObjectId,
+  });
+
+  if (linked) {
+    return linked;
+  }
+
+  const normalizedEmail = user.email.toLowerCase().trim();
+
+  const byEmail = await Employee.findOne({
+    tenantId: tenantObjectId,
+    email: normalizedEmail,
+  });
+
+  if (byEmail) {
+    if (!byEmail.userId) {
+      byEmail.userId = userObjectId;
+      byEmail.updatedBy = options?.createdByUserId
+        ? new mongoose.Types.ObjectId(options.createdByUserId)
+        : userObjectId;
+      await byEmail.save();
+    }
+
+    return byEmail;
+  }
+
+  const { firstName, lastName } = deriveEmployeeNames(user);
+  const actorId = options?.createdByUserId
+    ? new mongoose.Types.ObjectId(options.createdByUserId)
+    : userObjectId;
+
+  const employee = await Employee.create({
+    tenantId: tenantObjectId,
+    userId: userObjectId,
+    employeeNumber: await generateEmployeeNumber(tenantId),
+    firstName,
+    lastName,
+    email: normalizedEmail,
+    status: 'active',
+    createdBy: actorId,
+    updatedBy: actorId,
+  });
+
+  void writeAuditLog({
+    tenantId,
+    userId: options?.createdByUserId ?? user.userId,
+    action: 'create',
+    entityType: 'Employee',
+    entityId: employee._id.toString(),
+    after: employeeAuditSnapshot(employee),
+    context: options?.audit,
+  });
+
+  return employee;
+}
+
 const loadManagerSummaries = async (
   employees: IEmployeeDocument[]
 ): Promise<Map<string, EmployeeManagerSummary>> => {
@@ -204,13 +305,6 @@ const toPublicList = async (employees: IEmployeeDocument[]): Promise<EmployeePub
       auditUsers
     )
   );
-}
-
-const generateEmployeeNumber = async (tenantId: string): Promise<string> => {
-  const count = await Employee.countDocuments({
-    tenantId: new mongoose.Types.ObjectId(tenantId),
-  });
-  return `EMP-${String(count + 1).padStart(4, '0')}`;
 }
 
 const validateManagerId = async (

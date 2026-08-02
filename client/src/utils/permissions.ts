@@ -13,6 +13,10 @@ export const PERMISSIONS: Record<UserRole, string[]> = {
     'leave:read:own',
     'audit:read',
     'notification:read:own',
+    'attendance:clock:own',
+    'attendance:read:own',
+    'attendance:read:team',
+    'attendance:manage',
   ],
   manager: [
     'leave:approve:team',
@@ -20,6 +24,9 @@ export const PERMISSIONS: Record<UserRole, string[]> = {
     'leave:read:own',
     'employee:read:team',
     'notification:read:own',
+    'attendance:clock:own',
+    'attendance:read:own',
+    'attendance:read:team',
   ],
   employee: [
     'leave:create:own',
@@ -27,6 +34,8 @@ export const PERMISSIONS: Record<UserRole, string[]> = {
     'document:read:own',
     'profile:update:own',
     'notification:read:own',
+    'attendance:clock:own',
+    'attendance:read:own',
   ],
 };
 

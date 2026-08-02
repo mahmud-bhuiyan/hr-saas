@@ -38,7 +38,7 @@ Planning documents for the HR SaaS platform. Use these to align with the client,
 
 | Step | Scope | Status |
 |------|-------|--------|
-| S2-1 | Platform foundations | ⬜ Not started |
+| S2-1 | Platform foundations | ✅ Done |
 | S2-2 | Attendance | ⬜ Not started |
 | S2-3 | Timesheets | ⬜ Not started |
 | S2-4 | Expenses | ⬜ Not started |
@@ -47,7 +47,7 @@ Planning documents for the HR SaaS platform. Use these to align with the client,
 | S2-7 | Stripe billing | ⬜ Not started |
 | S2-8 | Polish & sign-off | ⬜ Not started |
 
-**Start Stage 2 after Demo 1 client sign-off.** See [10-stage-2-operations-plan.md](./10-stage-2-operations-plan.md).
+**Next step:** S2-2 — attendance. See [STAGE-2-IMPLEMENTATION-STEPS.md](./STAGE-2-IMPLEMENTATION-STEPS.md).
 
 ---
 
@@ -78,7 +78,7 @@ Detailed plans live in `modules/`. Each file follows [modules/_template.md](./mo
 
 | Module | Plan file | Stage | Status |
 |--------|-----------|-------|--------|
-| Auth & Tenant | [modules/01-auth-tenant.md](./modules/01-auth-tenant.md) | Demo 1 + S2-1 | Done / S2 planned |
+| Auth & Tenant | [modules/01-auth-tenant.md](./modules/01-auth-tenant.md) | Demo 1 + S2-1 | Done |
 | Employee Management | [modules/02-employees.md](./modules/02-employees.md) | Demo 1 + S2 | Ready for review |
 | Leave & Absence | [modules/03-leave.md](./modules/03-leave.md) | Demo 1 + S2-5 | Complete / S2 planned |
 | Document Storage | [modules/04-documents.md](./modules/04-documents.md) | Demo 1 | Ready for review |
@@ -93,7 +93,8 @@ Detailed plans live in `modules/`. Each file follows [modules/_template.md](./mo
 | Performance | [modules/13-performance.md](./modules/13-performance.md) | Stage 4 | Not started |
 | Recruitment (ATS) | [modules/14-recruitment.md](./modules/14-recruitment.md) | Stage 4 | Not started |
 | Platform Site Settings | [modules/15-platform-site-settings.md](./modules/15-platform-site-settings.md) | Demo 1 | Complete |
-| Audit Log | [modules/16-audit-log.md](./modules/16-audit-log.md) | Stage 2 | Not started |
+| Audit Log | [modules/16-audit-log.md](./modules/16-audit-log.md) | Stage 2 | Done |
+| Notifications | [modules/07-notifications.md](./modules/07-notifications.md) | Stage 2 | Done |
 | Billing (Stripe) | [modules/17-billing-stripe.md](./modules/17-billing-stripe.md) | Stage 2 | Not started |
 
 ---

@@ -167,4 +167,4 @@ Demo 1 Steps 1–8 above are complete (or in final polish). Stage 2 planning and
 | [10-stage-2-operations-plan.md](./10-stage-2-operations-plan.md) | Client-facing scope, screens, timeline, sign-off |
 | [STAGE-2-IMPLEMENTATION-STEPS.md](./STAGE-2-IMPLEMENTATION-STEPS.md) | Dev checklist — Steps S2-1 through S2-8 |
 
-**Next step after Demo 1 sign-off:** S2-1 — platform foundations (audit log, notifications, forgot password, employee invite).
+**Next step after Demo 1 sign-off:** S2-2 — attendance (clock in/out, live board). S2-1 platform foundations are complete.

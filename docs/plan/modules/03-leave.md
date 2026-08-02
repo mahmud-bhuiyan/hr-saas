@@ -31,7 +31,7 @@ Employees submit leave requests; managers and HR approve or decline them. Tracks
 {
   tenantId: ObjectId,
   employeeId: ObjectId,
-  type: 'annual' | 'sick' | 'unpaid',
+  type: 'annual' | 'sick' | 'unpaid' | 'planned',
   startDate: Date,
   endDate: Date,
   halfDay: Boolean,
@@ -95,9 +95,9 @@ Employees submit leave requests; managers and HR approve or decline them. Tracks
 
 1. All queries scoped by `tenantId` from JWT.
 2. User → employee resolution: `Employee.userId` first, then email fallback (`User.email` = `Employee.email`).
-3. Leave types: `annual`, `sick`, `unpaid` (fixed list).
+3. Leave types: `annual`, `sick`, `unpaid`, `planned` (fixed list).
 4. Day count: `(endDate - startDate) + 1`; half-day = 0.5 (single-day only).
-5. Only **annual** leave affects `LeaveBalance`; sick/unpaid are tracked but don't deduct.
+5. Only **annual** leave affects `LeaveBalance`; sick, unpaid, and planned are tracked but don't deduct.
 6. Submit creates `pending`; annual increments `pending` on balance.
 7. Approve moves annual days `pending → taken`; decline/cancel reverses `pending`.
 8. Reject overlapping pending/approved requests for same employee.

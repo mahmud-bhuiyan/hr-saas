@@ -29,6 +29,8 @@ tags:
     description: Tenant-scoped employee directory and profiles
   - name: Leave
     description: Leave requests, balances, approval, and team calendar
+  - name: Attendance
+    description: Clock in/out, attendance history, live team board, and HR corrections
   - name: Documents
     description: HR document storage with S3 presigned upload and download
   - name: Platform
@@ -1448,6 +1450,337 @@ paths:
         '403':
           $ref: '#/components/responses/Forbidden'
 
+  /api/v1/attendance/settings:
+    get:
+      tags: [Attendance]
+      summary: Get attendance settings
+      description: Returns tenant attendance options. Requires `attendance:clock:own`.
+      operationId: getAttendanceSettings
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Attendance settings
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, data]
+                properties:
+                  status:
+                    type: string
+                    enum: [ok]
+                  data:
+                    $ref: '#/components/schemas/AttendanceSettings'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+    patch:
+      tags: [Attendance]
+      summary: Update attendance settings
+      description: Company admin only. Toggle GPS on clock-in.
+      operationId: patchAttendanceSettings
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchAttendanceSettingsRequest'
+            example:
+              attendanceGpsEnabled: true
+      responses:
+        '200':
+          description: Updated settings
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, data]
+                properties:
+                  status:
+                    type: string
+                    enum: [ok]
+                  data:
+                    $ref: '#/components/schemas/AttendanceSettings'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /api/v1/attendance/clock-in:
+    post:
+      tags: [Attendance]
+      summary: Clock in
+      description: |
+        Starts an open attendance session for the authenticated user's employee record.
+        Returns 409 if already clocked in. Optional GPS location when tenant setting enabled.
+      operationId: clockIn
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ClockInRequest'
+      responses:
+        '201':
+          description: Attendance session started
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, data]
+                properties:
+                  status:
+                    type: string
+                    enum: [ok]
+                  data:
+                    $ref: '#/components/schemas/AttendanceLog'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          description: Already clocked in
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/attendance/clock-out:
+    post:
+      tags: [Attendance]
+      summary: Clock out
+      description: Ends the open attendance session for the authenticated user's employee record.
+      operationId: clockOut
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Attendance session ended
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, data]
+                properties:
+                  status:
+                    type: string
+                    enum: [ok]
+                  data:
+                    $ref: '#/components/schemas/AttendanceLog'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/v1/attendance/me/status:
+    get:
+      tags: [Attendance]
+      summary: Get my clock status
+      description: Returns whether the user is clocked in and the open session if any.
+      operationId: getMyAttendanceStatus
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Current clock status
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, data]
+                properties:
+                  status:
+                    type: string
+                    enum: [ok]
+                  data:
+                    $ref: '#/components/schemas/AttendanceStatus'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /api/v1/attendance/me:
+    get:
+      tags: [Attendance]
+      summary: List my attendance history
+      description: Paginated attendance logs for the authenticated user's employee record.
+      operationId: listMyAttendance
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+      responses:
+        '200':
+          description: Paginated attendance history
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, data]
+                properties:
+                  status:
+                    type: string
+                    enum: [ok]
+                  data:
+                    $ref: '#/components/schemas/PaginatedAttendanceLogs'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /api/v1/attendance/employee/{employeeId}:
+    get:
+      tags: [Attendance]
+      summary: List employee attendance history
+      description: |
+        Paginated history for a specific employee. Requires `attendance:manage` or
+        `attendance:read:team` (direct reports only for managers).
+      operationId: listEmployeeAttendance
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: employeeId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: page
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+      responses:
+        '200':
+          description: Paginated attendance history
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, data]
+                properties:
+                  status:
+                    type: string
+                    enum: [ok]
+                  data:
+                    $ref: '#/components/schemas/PaginatedAttendanceLogs'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/v1/attendance/team/live:
+    get:
+      tags: [Attendance]
+      summary: Live team attendance board
+      description: Employees currently clocked in, scoped by role (team or all for HR/admin).
+      operationId: listTeamLiveAttendance
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Currently clocked-in employees
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, data]
+                properties:
+                  status:
+                    type: string
+                    enum: [ok]
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/AttendanceLog'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /api/v1/attendance/{id}:
+    patch:
+      tags: [Attendance]
+      summary: Correct attendance record
+      description: |
+        HR correction of clock times with required notes. Writes to audit log.
+        Requires `attendance:manage`.
+      operationId: patchAttendanceLog
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchAttendanceRequest'
+            example:
+              clockIn: '2026-08-02T09:00:00.000Z'
+              clockOut: '2026-08-02T17:30:00.000Z'
+              notes: Forgot to clock out — corrected from manager report
+      responses:
+        '200':
+          description: Updated attendance log
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, data]
+                properties:
+                  status:
+                    type: string
+                    enum: [ok]
+                  data:
+                    $ref: '#/components/schemas/AttendanceLog'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
   /api/v1/documents:
     get:
       tags: [Documents]
@@ -2266,7 +2599,7 @@ paths:
           in: query
           schema:
             type: string
-            enum: [Employee, HrDocument, User, LeaveRequest]
+            enum: [Employee, HrDocument, User, LeaveRequest, AttendanceLog]
         - name: entityId
           in: query
           schema:
@@ -3224,7 +3557,7 @@ components:
 
     LeaveType:
       type: string
-      enum: [annual, sick, unpaid]
+      enum: [annual, sick, unpaid, planned]
 
     LeaveRequestStatus:
       type: string
@@ -3314,7 +3647,7 @@ components:
 
     CreateLeaveRequest:
       type: object
-      required: [type, startDate, endDate]
+      required: [type, startDate, endDate, reason]
       properties:
         type:
           $ref: '#/components/schemas/LeaveType'
@@ -3329,6 +3662,7 @@ components:
           default: false
         reason:
           type: string
+          minLength: 1
           maxLength: 500
 
     DeclineLeaveRequest:
@@ -3482,3 +3816,137 @@ components:
           format: uri
         fileName:
           type: string
+
+    AttendanceMethod:
+      type: string
+      enum: [web, app, kiosk]
+
+    AttendanceEmployeeSummary:
+      type: object
+      required: [id, firstName, lastName]
+      properties:
+        id:
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+        email:
+          type: string
+          format: email
+        jobTitle:
+          type: string
+        department:
+          type: string
+
+    AttendanceLog:
+      type: object
+      required: [id, employeeId, clockIn, clockOut, method, durationMinutes, createdAt, updatedAt]
+      properties:
+        id:
+          type: string
+        employeeId:
+          type: string
+        employee:
+          $ref: '#/components/schemas/AttendanceEmployeeSummary'
+        clockIn:
+          type: string
+          format: date-time
+        clockOut:
+          type: string
+          format: date-time
+          nullable: true
+        method:
+          $ref: '#/components/schemas/AttendanceMethod'
+        location:
+          type: object
+          nullable: true
+          properties:
+            lat:
+              type: number
+            lng:
+              type: number
+        notes:
+          type: string
+        correctedBy:
+          type: string
+        durationMinutes:
+          type: integer
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    AttendanceStatus:
+      type: object
+      required: [clockedIn, session]
+      properties:
+        clockedIn:
+          type: boolean
+        session:
+          allOf:
+            - $ref: '#/components/schemas/AttendanceLog'
+          nullable: true
+
+    AttendanceSettings:
+      type: object
+      required: [attendanceGpsEnabled]
+      properties:
+        attendanceGpsEnabled:
+          type: boolean
+
+    PaginatedAttendanceLogs:
+      type: object
+      required: [logs, total, page, limit]
+      properties:
+        logs:
+          type: array
+          items:
+            $ref: '#/components/schemas/AttendanceLog'
+        total:
+          type: integer
+        page:
+          type: integer
+        limit:
+          type: integer
+
+    ClockInRequest:
+      type: object
+      properties:
+        location:
+          type: object
+          properties:
+            lat:
+              type: number
+              minimum: -90
+              maximum: 90
+            lng:
+              type: number
+              minimum: -180
+              maximum: 180
+
+    PatchAttendanceRequest:
+      type: object
+      required: [notes]
+      minProperties: 2
+      properties:
+        clockIn:
+          type: string
+          format: date-time
+        clockOut:
+          type: string
+          format: date-time
+          nullable: true
+        notes:
+          type: string
+          minLength: 1
+
+    PatchAttendanceSettingsRequest:
+      type: object
+      required: [attendanceGpsEnabled]
+      properties:
+        attendanceGpsEnabled:
+          type: boolean
