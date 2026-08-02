@@ -22,6 +22,7 @@ import {
   assertActiveWorkLocation,
   LocationServiceError,
 } from '../locations/location.service.js';
+import { WorkLocation } from '../locations/location.model.js';
 import { refreshBalanceEntitlement } from '../leave/leave-settings.service.js';
 import {
   Employee,
@@ -64,6 +65,19 @@ export interface EmployeePublic {
   updatedByName?: string;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface MyEmployeeProfile {
+  id: string;
+  employeeNumber: string;
+  firstName: string;
+  lastName: string;
+  email?: string;
+  phone?: string;
+  jobTitle?: string;
+  department?: string;
+  status: EmployeeStatus;
+  defaultLocationName?: string;
 }
 
 interface AuditUserSummary {
@@ -384,6 +398,60 @@ const assertCanAccessEmployee = async (
   }
 }
 
+const escapeRegex = (value: string): string => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+const buildEmployeeSearchFilter = (search: string): Record<string, unknown> => {
+  const trimmed = search.trim();
+  const escaped = escapeRegex(trimmed);
+  const regex = new RegExp(escaped, 'i');
+
+  const fieldMatch = (pattern: RegExp): Record<string, unknown>[] => [
+    { firstName: pattern },
+    { lastName: pattern },
+    { email: pattern },
+    { phone: pattern },
+    { jobTitle: pattern },
+    { department: pattern },
+    { employeeNumber: pattern },
+  ];
+
+  const fullNameMatch = (): Record<string, unknown>[] => [
+    {
+      $expr: {
+        $regexMatch: {
+          input: { $concat: ['$firstName', ' ', '$lastName'] },
+          regex: escaped,
+          options: 'i',
+        },
+      },
+    },
+    {
+      $expr: {
+        $regexMatch: {
+          input: { $concat: ['$lastName', ' ', '$firstName'] },
+          regex: escaped,
+          options: 'i',
+        },
+      },
+    },
+  ];
+
+  const terms = trimmed.split(/\s+/).filter(Boolean);
+  const matchAllTerms = terms.length > 1 && !trimmed.includes('@');
+
+  if (matchAllTerms) {
+    const termFilters = terms.map((term) => ({
+      $or: fieldMatch(new RegExp(escapeRegex(term), 'i')),
+    }));
+
+    return { $and: termFilters };
+  }
+
+  return {
+    $or: [...fieldMatch(regex), ...fullNameMatch()],
+  };
+};
+
 const buildListFilter = (
   tenantId: string,
   query: ListEmployeesQuery,
@@ -402,14 +470,7 @@ const buildListFilter = (
   }
 
   if (query.search) {
-    const regex = new RegExp(query.search.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
-    filter.$or = [
-      { firstName: regex },
-      { lastName: regex },
-      { email: regex },
-      { jobTitle: regex },
-      { employeeNumber: regex },
-    ];
+    Object.assign(filter, buildEmployeeSearchFilter(query.search));
   }
 
   if (teamManagerId) {
@@ -523,6 +584,37 @@ const validateDefaultLocation = async (
 
 export const listDepartments = async (tenantId: string): Promise<string[]> => {
   return listActiveDepartmentNames(tenantId);
+}
+
+export const getMyEmployee = async (
+  tenantId: string,
+  userId: string
+): Promise<MyEmployeeProfile> => {
+  const employee = await findEmployeeRecordForUser(tenantId, userId);
+
+  if (!employee) {
+    throw new EmployeeServiceError('No employee record linked to your account', 404);
+  }
+
+  let defaultLocationName: string | undefined;
+
+  if (employee.defaultLocationId) {
+    const location = await WorkLocation.findById(employee.defaultLocationId).select('name');
+    defaultLocationName = location?.name;
+  }
+
+  return {
+    id: employee._id.toString(),
+    employeeNumber: employee.employeeNumber,
+    firstName: employee.firstName,
+    lastName: employee.lastName,
+    email: employee.email,
+    phone: employee.phone,
+    jobTitle: employee.jobTitle,
+    department: employee.department,
+    status: employee.status,
+    defaultLocationName,
+  };
 }
 
 export const getEmployeeById = async (

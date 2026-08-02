@@ -19,3 +19,33 @@ export const formatDateTime = (iso: string): string => {
 export const statusLabel = (status: string): string => {
   return status.replace(/_/g, ' ');
 }
+
+export const employeeMatchesSearch = (employee: Employee, search: string): boolean => {
+  const trimmed = search.trim();
+  if (!trimmed) {
+    return true;
+  }
+
+  const fields = [
+    employee.firstName,
+    employee.lastName,
+    employee.email,
+    employee.phone,
+    employee.jobTitle,
+    employee.department,
+    employee.employeeNumber,
+    employeeName(employee),
+    `${employee.lastName} ${employee.firstName}`,
+  ]
+    .filter((value): value is string => Boolean(value))
+    .map((value) => value.toLowerCase());
+
+  const needle = trimmed.toLowerCase();
+
+  if (needle.includes('@') || !/\s/.test(trimmed)) {
+    return fields.some((field) => field.includes(needle));
+  }
+
+  const terms = needle.split(/\s+/).filter(Boolean);
+  return terms.every((term) => fields.some((field) => field.includes(term)));
+};

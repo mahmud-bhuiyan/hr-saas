@@ -12,8 +12,10 @@ export class ImgbbServiceError extends Error {
 
 const LOGO_MAX_BYTES = 2 * 1024 * 1024;
 const FAVICON_MAX_BYTES = 512 * 1024;
+const AVATAR_MAX_BYTES = 1 * 1024 * 1024;
 
-const ALLOWED_EXTENSIONS = new Set(['png', 'jpg', 'jpeg', 'webp', 'svg', 'ico']);
+const PLATFORM_EXTENSIONS = new Set(['png', 'jpg', 'jpeg', 'webp', 'svg', 'ico']);
+const AVATAR_EXTENSIONS = new Set(['png', 'jpg', 'jpeg', 'webp']);
 
 const estimateBase64Bytes = (base64: string): number => Math.ceil((base64.length * 3) / 4);
 
@@ -33,29 +35,9 @@ interface ImgbbUploadResponse {
   };
 }
 
-export const uploadPlatformAssetToImgbb = async (
-  env: ServerEnv,
-  asset: 'logo' | 'favicon',
-  imageBase64: string,
-  filename: string
-): Promise<string> => {
+const uploadToImgbb = async (env: ServerEnv, imageBase64: string): Promise<string> => {
   if (!env.imgbbApiKey) {
     throw new ImgbbServiceError('Image upload is not configured (IMGBB_API_KEY missing)', 503);
-  }
-
-  const extension = getExtension(filename);
-  if (!extension || !ALLOWED_EXTENSIONS.has(extension)) {
-    throw new ImgbbServiceError(
-      'Unsupported file type. Use PNG, JPEG, WebP, SVG, or ICO.',
-      400
-    );
-  }
-
-  const maxBytes = asset === 'logo' ? LOGO_MAX_BYTES : FAVICON_MAX_BYTES;
-  const estimatedBytes = estimateBase64Bytes(imageBase64);
-  if (estimatedBytes > maxBytes) {
-    const maxLabel = asset === 'logo' ? '2 MB' : '512 KB';
-    throw new ImgbbServiceError(`File exceeds ${maxLabel} limit`, 400);
   }
 
   const body = new URLSearchParams();
@@ -85,4 +67,49 @@ export const uploadPlatformAssetToImgbb = async (
   }
 
   return url;
+};
+
+export const uploadPlatformAssetToImgbb = async (
+  env: ServerEnv,
+  asset: 'logo' | 'favicon',
+  imageBase64: string,
+  filename: string
+): Promise<string> => {
+  const extension = getExtension(filename);
+  if (!extension || !PLATFORM_EXTENSIONS.has(extension)) {
+    throw new ImgbbServiceError(
+      'Unsupported file type. Use PNG, JPEG, WebP, SVG, or ICO.',
+      400
+    );
+  }
+
+  const maxBytes = asset === 'logo' ? LOGO_MAX_BYTES : FAVICON_MAX_BYTES;
+  const estimatedBytes = estimateBase64Bytes(imageBase64);
+  if (estimatedBytes > maxBytes) {
+    const maxLabel = asset === 'logo' ? '2 MB' : '512 KB';
+    throw new ImgbbServiceError(`File exceeds ${maxLabel} limit`, 400);
+  }
+
+  return uploadToImgbb(env, imageBase64);
+};
+
+export const uploadAvatarToImgbb = async (
+  env: ServerEnv,
+  imageBase64: string,
+  filename: string
+): Promise<string> => {
+  const extension = getExtension(filename);
+  if (!extension || !AVATAR_EXTENSIONS.has(extension)) {
+    throw new ImgbbServiceError(
+      'Unsupported file type. Use PNG, JPEG, or WebP.',
+      400
+    );
+  }
+
+  const estimatedBytes = estimateBase64Bytes(imageBase64);
+  if (estimatedBytes > AVATAR_MAX_BYTES) {
+    throw new ImgbbServiceError('File exceeds 1 MB limit', 400);
+  }
+
+  return uploadToImgbb(env, imageBase64);
 };

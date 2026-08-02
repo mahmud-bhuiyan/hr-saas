@@ -7,6 +7,8 @@ export type UserRole =
 
 export type ColorScheme = 'light' | 'dark';
 
+export type ThemeColor = 'purple' | 'blue' | 'pink' | 'green' | 'orange';
+
 export interface ApiHealthResponse {
   status: 'ok' | 'degraded';
   service: string;
@@ -45,7 +47,9 @@ export interface AuthUser {
   tenantId?: string;
   firstName?: string;
   lastName?: string;
+  avatarUrl?: string;
   colorScheme?: ColorScheme;
+  themeColor?: ThemeColor;
 }
 
 export interface AuthResponse {

@@ -1,5 +1,5 @@
 import mongoose, { Schema, type Document, type Model } from 'mongoose';
-import type { ColorScheme, UserRole } from '../../types/index.js';
+import type { ColorScheme, ThemeColor, UserRole } from '../../types/index.js';
 
 export interface IUser {
   email: string;
@@ -8,7 +8,9 @@ export interface IUser {
   tenantId?: mongoose.Types.ObjectId | null;
   firstName?: string;
   lastName?: string;
+  avatarUrl?: string;
   colorScheme: ColorScheme;
+  themeColor: ThemeColor;
   isActive: boolean;
 }
 
@@ -36,10 +38,16 @@ const userSchema = new Schema<IUserDocument>(
     tenantId: { type: Schema.Types.ObjectId, ref: 'Tenant', default: null },
     firstName: { type: String, trim: true },
     lastName: { type: String, trim: true },
+    avatarUrl: { type: String, trim: true },
     colorScheme: {
       type: String,
       enum: ['light', 'dark'],
       default: 'light',
+    },
+    themeColor: {
+      type: String,
+      enum: ['purple', 'blue', 'pink', 'green', 'orange'],
+      default: 'green',
     },
     isActive: { type: Boolean, default: true },
   },

@@ -8,6 +8,8 @@ export default {
         brand: {
           50: 'var(--brand-50)',
           100: 'var(--brand-100)',
+          300: 'var(--brand-300)',
+          400: 'var(--brand-400)',
           500: 'var(--brand-500)',
           600: 'var(--brand-600)',
           700: 'var(--brand-700)',

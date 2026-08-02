@@ -7,6 +7,8 @@ export type UserRole =
 
 export type ColorScheme = 'light' | 'dark';
 
+export type ThemeColor = 'purple' | 'blue' | 'pink' | 'green' | 'orange';
+
 export interface ApiHealthResponse {
   status: 'ok';
   service: string;
@@ -30,12 +32,15 @@ export interface AuthUser {
   tenantId?: string;
   firstName?: string;
   lastName?: string;
+  avatarUrl?: string;
   colorScheme?: ColorScheme;
+  themeColor?: ThemeColor;
 }
 
 export interface UserProfile extends AuthUser {
   companyName?: string;
   colorScheme: ColorScheme;
+  themeColor: ThemeColor;
   isActive: boolean;
   createdAt: string;
   updatedAt: string;
@@ -45,9 +50,16 @@ export interface UpdateProfileInput {
   firstName?: string;
   lastName?: string;
   email?: string;
+  avatarUrl?: string | null;
   currentPassword?: string;
   newPassword?: string;
   colorScheme?: ColorScheme;
+  themeColor?: ThemeColor;
+}
+
+export interface UploadProfileAvatarInput {
+  imageBase64: string;
+  filename: string;
 }
 
 export interface UpdateProfileResponse {
@@ -158,6 +170,19 @@ export interface Employee {
   updatedByName?: string;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface MyEmployeeProfile {
+  id: string;
+  employeeNumber: string;
+  firstName: string;
+  lastName: string;
+  email?: string;
+  phone?: string;
+  jobTitle?: string;
+  department?: string;
+  status: EmployeeStatus;
+  defaultLocationName?: string;
 }
 
 export interface CreateEmployeeInput {

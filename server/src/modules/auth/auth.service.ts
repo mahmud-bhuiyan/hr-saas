@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 import type { ServerEnv } from '../../config/env.js';
-import type { ColorScheme, UserRole } from '../../types/index.js';
+import type { ColorScheme, ThemeColor, UserRole } from '../../types/index.js';
 import { hashPassword, comparePassword } from '../../utils/password.js';
 import {
   signAccessToken,
@@ -19,7 +19,9 @@ export interface AuthUser {
   tenantId?: string;
   firstName?: string;
   lastName?: string;
+  avatarUrl?: string;
   colorScheme?: ColorScheme;
+  themeColor?: ThemeColor;
 }
 
 export interface AuthTokens {
@@ -48,7 +50,9 @@ const toAuthUser = (user: IUserDocument): AuthUser => {
     tenantId: user.tenantId?.toString(),
     firstName: user.firstName,
     lastName: user.lastName,
+    avatarUrl: user.avatarUrl,
     colorScheme: user.colorScheme ?? 'light',
+    themeColor: user.themeColor ?? 'green',
   };
 }
 

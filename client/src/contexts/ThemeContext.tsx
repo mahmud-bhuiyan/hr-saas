@@ -7,19 +7,26 @@ import {
   useState,
   type ReactNode,
 } from 'react';
-import { updateColorScheme } from '../lib/api';
+import { updateColorScheme, updateThemeColor } from '../lib/api';
 import { loadAuth, setUserState, subscribeAuth } from '../lib/auth-storage';
 import {
   applyColorScheme,
+  applyThemeColor,
   loadColorSchemeForUser,
+  loadThemeColorForUser,
   resolveColorScheme,
+  resolveUserThemeColor,
   saveColorSchemeForUser,
+  saveThemeColorForUser,
   type ColorScheme,
 } from '../lib/theme-storage';
+import type { ThemeColor } from '../types';
 
 interface ThemeContextValue {
   colorScheme: ColorScheme;
+  themeColor: ThemeColor;
   setColorScheme: (scheme: ColorScheme) => void;
+  setThemeColor: (themeColor: ThemeColor) => void;
   toggleColorScheme: () => void;
 }
 
@@ -32,9 +39,14 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
 
   const userId = authSnapshot.user?.id ?? null;
   const serverColorScheme = authSnapshot.user?.colorScheme;
+  const serverThemeColor = authSnapshot.user?.themeColor;
 
   const [colorScheme, setColorSchemeState] = useState<ColorScheme>(() =>
     resolveColorScheme(readAuthSnapshot().user?.id, readAuthSnapshot().user?.colorScheme)
+  );
+
+  const [themeColor, setThemeColorState] = useState<ThemeColor>(() =>
+    resolveUserThemeColor(readAuthSnapshot().user?.id, readAuthSnapshot().user?.themeColor)
   );
 
   useEffect(() => {
@@ -49,14 +61,25 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     if (userId) {
+      applyThemeColor(themeColor);
+    }
+  }, [themeColor, userId]);
+
+  useEffect(() => {
+    if (userId) {
       const scheme = resolveColorScheme(userId, serverColorScheme);
       setColorSchemeState(scheme);
       saveColorSchemeForUser(userId, scheme);
+
+      const color = resolveUserThemeColor(userId, serverThemeColor);
+      setThemeColorState(color);
+      saveThemeColorForUser(userId, color);
       return;
     }
 
     setColorSchemeState(loadColorSchemeForUser(null));
-  }, [userId, serverColorScheme]);
+    setThemeColorState(loadThemeColorForUser(null));
+  }, [userId, serverColorScheme, serverThemeColor]);
 
   const setColorScheme = useCallback(
     (scheme: ColorScheme) => {
@@ -77,6 +100,25 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
     [userId]
   );
 
+  const setThemeColor = useCallback(
+    (color: ThemeColor) => {
+      setThemeColorState(color);
+      saveThemeColorForUser(userId, color);
+
+      const { user } = loadAuth();
+      if (user) {
+        setUserState({ ...user, themeColor: color });
+      }
+
+      if (userId) {
+        void updateThemeColor(color).catch(() => {
+          // Keep local preference; server sync can retry on next login.
+        });
+      }
+    },
+    [userId]
+  );
+
   const toggleColorScheme = useCallback(() => {
     setColorScheme(colorScheme === 'dark' ? 'light' : 'dark');
   }, [colorScheme, setColorScheme]);
@@ -84,10 +126,12 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
   const value = useMemo<ThemeContextValue>(
     () => ({
       colorScheme,
+      themeColor,
       setColorScheme,
+      setThemeColor,
       toggleColorScheme,
     }),
-    [colorScheme, setColorScheme, toggleColorScheme]
+    [colorScheme, themeColor, setColorScheme, setThemeColor, toggleColorScheme]
   );
 
   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;

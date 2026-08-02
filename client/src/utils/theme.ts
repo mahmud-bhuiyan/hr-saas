@@ -4,6 +4,8 @@ import { resolveDocumentFaviconUrl } from './favicon';
 export interface BrandShades {
   50: string;
   100: string;
+  300: string;
+  400: string;
   500: string;
   600: string;
   700: string;
@@ -36,12 +38,16 @@ export const generateBrandShades = (primaryHex: string): BrandShades => {
 
   const shade50 = mix(primary, white, 0.92);
   const shade100 = mix(primary, white, 0.84);
+  const shade300 = mix(primary, white, 0.55);
+  const shade400 = mix(primary, white, 0.35);
   const shade500 = mix(primary, white, 0.25);
   const shade700 = mix(primary, black, 0.18);
 
   return {
     50: rgbToHex(shade50.r, shade50.g, shade50.b),
     100: rgbToHex(shade100.r, shade100.g, shade100.b),
+    300: rgbToHex(shade300.r, shade300.g, shade300.b),
+    400: rgbToHex(shade400.r, shade400.g, shade400.b),
     500: rgbToHex(shade500.r, shade500.g, shade500.b),
     600: primaryHex,
     700: rgbToHex(shade700.r, shade700.g, shade700.b),
@@ -54,6 +60,8 @@ export const applyBrandShades = (primaryHex: string): void => {
 
   root.style.setProperty('--brand-50', shades[50]);
   root.style.setProperty('--brand-100', shades[100]);
+  root.style.setProperty('--brand-300', shades[300]);
+  root.style.setProperty('--brand-400', shades[400]);
   root.style.setProperty('--brand-500', shades[500]);
   root.style.setProperty('--brand-600', shades[600]);
   root.style.setProperty('--brand-700', shades[700]);

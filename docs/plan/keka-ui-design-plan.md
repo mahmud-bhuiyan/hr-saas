@@ -7,7 +7,7 @@
 
 **Platform:** Web only (responsive). No native mobile app.
 
-**Status:** Draft — Phase 1 planned, not implemented
+**Status:** Phase 1 implemented (2026-08-03)
 
 ---
 
@@ -33,7 +33,7 @@ From Keka’s dashboard shell (reference screenshot, Aug 2026):
 
 | Phase | Scope | Status |
 |-------|-------|--------|
-| **Phase 1** | Global search bar in header + dashboard welcome banner | 📋 Planned |
+| **Phase 1** | Global search bar in header + dashboard welcome banner | ✅ Done |
 | Phase 2+ | TBD — client/design details to be added later | Not started |
 
 > **Rule:** Until a phase is marked “In development” or “Done” here, no code changes for that phase.
@@ -216,4 +216,4 @@ Details to be added when client provides direction. Candidates from Keka UI (not
 
 | Date | Change |
 |------|--------|
-| 2026-08-03 | Initial doc — Phase 1: global search + dashboard welcome banner; no other UI changes |
+| 2026-08-03 | Phase 1 implemented — `GlobalSearch`, `DashboardWelcomeBanner`, AppShell + dashboard wired |

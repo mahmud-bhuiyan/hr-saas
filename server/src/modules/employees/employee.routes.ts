@@ -6,6 +6,7 @@ import {
   commitEmployeeImportHandler,
   createEmployeeHandler,
   getEmployeeHandler,
+  getMyEmployeeHandler,
   inviteEmployeeHandler,
   listDepartmentsHandler,
   listDirectReportsHandler,
@@ -45,6 +46,10 @@ export const createEmployeeRoutes = (env: ServerEnv): Router => {
 
   router.post('/import/commit', authorizePermission('employee:create'), (req, res) => {
     void commitEmployeeImportHandler(req, res);
+  });
+
+  router.get('/me', (req, res) => {
+    void getMyEmployeeHandler(req, res);
   });
 
   router.get(

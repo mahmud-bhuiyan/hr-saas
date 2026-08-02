@@ -9,8 +9,8 @@ import {
   registerCompany,
 } from './auth.service.js';
 import { loginSchema, registerSchema, forgotPasswordSchema, resetPasswordSchema } from './auth.validation.js';
-import { getProfile, updateProfile } from './profile.service.js';
-import { updateProfileSchema } from './profile.validation.js';
+import { getProfile, updateProfile, uploadProfileAvatar } from './profile.service.js';
+import { updateProfileSchema, uploadAvatarSchema } from './profile.validation.js';
 import {
   requestPasswordReset,
   resetPasswordWithToken,
@@ -172,6 +172,36 @@ export const createUpdateMeHandler = (env: ServerEnv) => {
       }
 
       const result = await updateProfile(req.user.sub, parsed.data, env);
+
+      res.json({
+        status: 'ok',
+        data: result,
+      });
+    } catch (error) {
+      if (error instanceof AuthServiceError) {
+        res.status(error.statusCode).json({ status: 'error', message: error.message });
+        return;
+      }
+      res.status(500).json({ status: 'error', message: 'Internal server error' });
+    }
+  };
+};
+
+export const createUploadAvatarHandler = (env: ServerEnv) => {
+  return async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+    try {
+      if (!req.user) {
+        res.status(401).json({ status: 'error', message: 'Authentication required' });
+        return;
+      }
+
+      const parsed = uploadAvatarSchema.safeParse(req.body);
+      if (!parsed.success) {
+        validationError(res, parsed.error.issues[0]?.message ?? 'Invalid request body');
+        return;
+      }
+
+      const result = await uploadProfileAvatar(req.user.sub, parsed.data, env);
 
       res.json({
         status: 'ok',
