@@ -57,10 +57,15 @@ export const SidebarUserBar = ({ expanded }: SidebarUserBarProps) => {
   };
 
   if (!expanded) {
+    const sidebarName = user.firstName ?? displayName(user).split(' ')[0] ?? 'Me';
+
     return (
-      <div className="shrink-0 overflow-visible border-t border-white/10 px-2 py-3">
-        <div className="group/user-info relative flex w-full justify-center">
+      <div className="shrink-0 overflow-visible border-t border-white/10 px-1 py-3">
+        <div className="group/user-info relative flex w-full flex-col items-center gap-1">
           <UserAvatar user={user} variant="onBrand" />
+          <span className="max-w-full truncate text-center text-[10px] font-medium leading-tight text-slate-400">
+            {sidebarName}
+          </span>
           <UserInfoTooltip user={user} placement="right" />
         </div>
       </div>

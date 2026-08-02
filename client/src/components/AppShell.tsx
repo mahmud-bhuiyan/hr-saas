@@ -58,6 +58,8 @@ const navItems: Array<{
 
   label: string;
 
+  shortLabel: string;
+
   icon: IconType;
 
   end?: boolean;
@@ -68,9 +70,9 @@ const navItems: Array<{
 
 }> = [
 
-  { to: '/dashboard', label: 'Dashboard', icon: HiHome, end: true },
+  { to: '/dashboard', label: 'Dashboard', shortLabel: 'Home', icon: HiHome, end: true },
 
-  { to: '/dashboard/registrations', label: 'Companies', icon: HiBuildingOffice2, roles: ['super_admin'] },
+  { to: '/dashboard/registrations', label: 'Companies', shortLabel: 'Cos', icon: HiBuildingOffice2, roles: ['super_admin'] },
 
   {
 
@@ -78,35 +80,39 @@ const navItems: Array<{
 
     label: 'Site settings',
 
+    shortLabel: 'Site',
+
     icon: HiCog6Tooth,
 
     roles: ['super_admin'],
 
   },
 
-  { to: '/dashboard/employees', label: 'Employees', icon: HiUserGroup, roles: ['company_admin', 'hr_manager', 'manager'] },
+  { to: '/dashboard/employees', label: 'Employees', shortLabel: 'Team', icon: HiUserGroup, roles: ['company_admin', 'hr_manager', 'manager'] },
 
-  { to: '/dashboard/leave', label: 'Leave', icon: HiCalendarDays, roles: ['company_admin', 'hr_manager', 'manager', 'employee'] },
+  { to: '/dashboard/leave', label: 'Leave', shortLabel: 'Leave', icon: HiCalendarDays, roles: ['company_admin', 'hr_manager', 'manager', 'employee'] },
 
-  { to: '/dashboard/attendance', label: 'Attendance', icon: HiClock, roles: ['company_admin', 'hr_manager', 'manager', 'employee'] },
+  { to: '/dashboard/attendance', label: 'Attendance', shortLabel: 'Attend', icon: HiClock, roles: ['company_admin', 'hr_manager', 'manager', 'employee'] },
 
-  { to: '/dashboard/timesheets', label: 'Timesheets', icon: HiTableCells, roles: ['company_admin', 'hr_manager', 'manager', 'employee'] },
+  { to: '/dashboard/timesheets', label: 'Timesheets', shortLabel: 'Times', icon: HiTableCells, roles: ['company_admin', 'hr_manager', 'manager', 'employee'] },
 
-  { to: '/dashboard/rotas', label: 'Rotas', icon: HiBriefcase, roles: ['company_admin', 'hr_manager', 'manager', 'employee'] },
+  { to: '/dashboard/rotas', label: 'Rotas', shortLabel: 'Rotas', icon: HiBriefcase, roles: ['company_admin', 'hr_manager', 'manager', 'employee'] },
 
-  { to: '/dashboard/expenses', label: 'Expenses', icon: HiCurrencyDollar, roles: ['company_admin', 'hr_manager', 'manager', 'employee'] },
+  { to: '/dashboard/expenses', label: 'Expenses', shortLabel: 'Expense', icon: HiCurrencyDollar, roles: ['company_admin', 'hr_manager', 'manager', 'employee'] },
 
-  { to: '/dashboard/payroll', label: 'Payroll', icon: HiCurrencyDollar, roles: ['company_admin', 'hr_manager'] },
+  { to: '/dashboard/payroll', label: 'Payroll', shortLabel: 'Payroll', icon: HiCurrencyDollar, roles: ['company_admin', 'hr_manager'] },
 
-  { to: '/dashboard/reports', label: 'Reports', icon: HiChartBar, roles: ['company_admin', 'hr_manager'] },
+  { to: '/dashboard/reports', label: 'Reports', shortLabel: 'Reports', icon: HiChartBar, roles: ['company_admin', 'hr_manager'] },
 
-  { to: '/dashboard/documents', label: 'Documents', icon: HiDocumentText, roles: ['company_admin', 'hr_manager', 'employee'] },
+  { to: '/dashboard/documents', label: 'Documents', shortLabel: 'Docs', icon: HiDocumentText, roles: ['company_admin', 'hr_manager', 'employee'] },
 
   {
 
     to: '/dashboard/settings',
 
     label: 'Settings',
+
+    shortLabel: 'Settings',
 
     icon: HiCog6Tooth,
 
@@ -134,9 +140,15 @@ export const AppShell = () => {
 
 
 
-  const sidebarWidthClass = sidebarExpanded ? 'w-64' : 'w-16';
+  const sidebarWidthClass = sidebarExpanded ? 'w-64' : 'w-24';
 
-  const mainOffsetClass = sidebarExpanded ? 'md:left-64' : 'md:left-16';
+  const mainOffsetClass = sidebarExpanded ? 'md:left-64' : 'md:left-24';
+
+  const navItemLayoutClass = sidebarExpanded
+
+    ? 'flex-row items-center gap-3 px-3 py-2'
+
+    : 'flex-col items-center gap-1 px-1 py-2.5 text-center';
 
 
 
@@ -200,7 +212,7 @@ export const AppShell = () => {
 
       >
 
-        <nav className="thin-scrollbar min-h-0 flex-1 space-y-0.5 overflow-y-auto px-2 py-4">
+        <nav className={`thin-scrollbar min-h-0 flex-1 overflow-y-auto py-4 ${sidebarExpanded ? 'space-y-0.5 px-2' : 'space-y-1 px-1'}`}>
 
           {navItems
 
@@ -222,17 +234,13 @@ export const AppShell = () => {
 
                     title={item.label}
 
-                    className={`flex items-center rounded-md py-2 text-sm text-slate-500 ${
-
-                      sidebarExpanded ? 'gap-3 px-3' : 'justify-center px-2'
-
-                    }`}
+                    className={`flex rounded-md text-slate-500 ${navItemLayoutClass} ${sidebarExpanded ? 'text-sm' : 'text-[10px] leading-tight'}`}
 
                   >
 
-                    <Icon className="h-5 w-5 shrink-0" aria-hidden />
+                    <Icon className={`shrink-0 ${sidebarExpanded ? 'h-5 w-5' : 'h-6 w-6'}`} aria-hidden />
 
-                    {sidebarExpanded && (
+                    {sidebarExpanded ? (
 
                       <>
 
@@ -241,6 +249,10 @@ export const AppShell = () => {
                         <span className="ml-auto text-xs">Soon</span>
 
                       </>
+
+                    ) : (
+
+                      <span className="max-w-full truncate font-medium">{item.shortLabel}</span>
 
                     )}
 
@@ -262,15 +274,9 @@ export const AppShell = () => {
 
                   end={item.end}
 
-                  title={sidebarExpanded ? undefined : item.label}
-
                   className={({ isActive }) =>
 
-                    `flex items-center rounded-md py-2 text-sm transition ${
-
-                      sidebarExpanded ? 'gap-3 px-3' : 'justify-center px-2'
-
-                    } ${
+                    `flex rounded-md transition ${navItemLayoutClass} ${sidebarExpanded ? 'text-sm' : 'text-[10px] leading-tight'} ${
 
                       isActive
 
@@ -284,9 +290,17 @@ export const AppShell = () => {
 
                 >
 
-                  <Icon className="h-5 w-5 shrink-0" aria-hidden />
+                  <Icon className={`shrink-0 ${sidebarExpanded ? 'h-5 w-5' : 'h-6 w-6'}`} aria-hidden />
 
-                  {sidebarExpanded && <span className="truncate">{item.label}</span>}
+                  {sidebarExpanded ? (
+
+                    <span className="truncate">{item.label}</span>
+
+                  ) : (
+
+                    <span className="max-w-full truncate">{item.shortLabel}</span>
+
+                  )}
 
                 </NavLink>
 
@@ -310,9 +324,9 @@ export const AppShell = () => {
 
             title={sidebarExpanded ? 'Collapse sidebar' : 'Expand sidebar'}
 
-            className={`flex w-full items-center rounded-md py-2 text-slate-400 transition hover:bg-[#122E44] hover:text-white ${
+            className={`flex w-full rounded-md text-slate-400 transition hover:bg-[#122E44] hover:text-white ${
 
-              sidebarExpanded ? 'gap-3 px-3' : 'justify-center px-2'
+              sidebarExpanded ? 'flex-row items-center gap-3 px-3 py-2' : 'flex-col items-center gap-1 px-1 py-2.5 text-center'
 
             }`}
 
@@ -330,7 +344,13 @@ export const AppShell = () => {
 
             ) : (
 
-              <HiChevronRight className="h-5 w-5 shrink-0" aria-hidden />
+              <>
+
+                <HiChevronRight className="h-6 w-6 shrink-0" aria-hidden />
+
+                <span className="max-w-full truncate text-[10px] font-medium leading-tight">Expand</span>
+
+              </>
 
             )}
 
