@@ -61,6 +61,11 @@ export const listEmployeesQuerySchema = z.object({
   sortOrder: sortOrderSchema.optional(),
 });
 
+export const inviteEmployeeSchema = z.object({
+  role: z.enum(['employee', 'manager', 'hr_manager']).optional().default('employee'),
+});
+
 export type CreateEmployeeInput = z.infer<typeof createEmployeeSchema>;
 export type UpdateEmployeeInput = z.infer<typeof updateEmployeeSchema>;
 export type ListEmployeesQuery = z.infer<typeof listEmployeesQuerySchema>;
+export type InviteEmployeeInput = z.infer<typeof inviteEmployeeSchema>;

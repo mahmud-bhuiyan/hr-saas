@@ -1,5 +1,7 @@
 import mongoose from 'mongoose';
 import type { UserRole } from '../../types/index.js';
+import { userAuditSnapshot } from '../../utils/audit-snapshot.js';
+import { writeAuditLog, type AuditContext } from '../audit/audit.service.js';
 import { User } from '../admin/user.model.js';
 import type { PatchTenantUserInput } from './users.validation.js';
 
@@ -74,7 +76,8 @@ export const patchTenantUser = async (
   tenantId: string,
   targetUserId: string,
   input: PatchTenantUserInput,
-  actorUserId: string
+  actorUserId: string,
+  audit?: AuditContext
 ): Promise<TenantUserPublic> => {
   if (targetUserId === actorUserId) {
     throw new TenantUsersServiceError('You cannot change your own role or status', 400);
@@ -89,6 +92,8 @@ export const patchTenantUser = async (
   if (!user) {
     throw new TenantUsersServiceError('User not found', 404);
   }
+
+  const beforeSnapshot = userAuditSnapshot(user);
 
   const demotingAdmin =
     user.role === 'company_admin' &&
@@ -113,5 +118,17 @@ export const patchTenantUser = async (
   }
 
   await user.save();
+
+  void writeAuditLog({
+    tenantId,
+    userId: actorUserId,
+    action: 'update',
+    entityType: 'User',
+    entityId: user._id.toString(),
+    before: beforeSnapshot,
+    after: userAuditSnapshot(user),
+    context: audit,
+  });
+
   return toTenantUserPublic(user);
 };

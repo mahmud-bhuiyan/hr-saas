@@ -7,6 +7,8 @@ import { EmployeeEditPage } from "./pages/employees/EmployeeEditPage";
 import { EmployeeViewPage } from "./pages/employees/EmployeeViewPage";
 import { EmployeesPage } from "./pages/employees/EmployeesPage";
 import { LoginPage } from "./pages/login/LoginPage";
+import { ForgotPasswordPage } from "./pages/login/ForgotPasswordPage";
+import { ResetPasswordPage } from "./pages/login/ResetPasswordPage";
 import { ProfilePage } from "./pages/profile/ProfilePage";
 import { RegisterPage } from "./pages/register/RegisterPage";
 import { RegistrationsPage } from "./pages/registrations/RegistrationsPage";
@@ -16,6 +18,7 @@ import { CompanyProfilePage } from "./pages/settings/company/CompanyProfilePage"
 import { DepartmentsPage } from "./pages/settings/departments/DepartmentsPage";
 import { UsersPage } from "./pages/settings/users/UsersPage";
 import { TenantBrandingPage } from "./pages/settings/branding/TenantBrandingPage";
+import { AuditLogPage } from "./pages/settings/audit-log/AuditLogPage";
 import { LeavePage } from "./pages/leave/LeavePage";
 import { DocumentsPage } from "./pages/documents/DocumentsPage";
 
@@ -25,6 +28,8 @@ const App = () => {
       <Route element={<GuestRoute />}>
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
+        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+        <Route path="/reset-password" element={<ResetPasswordPage />} />
       </Route>
 
       <Route element={<ProtectedRoute />}>
@@ -49,6 +54,7 @@ const App = () => {
           <Route path="/dashboard/settings/departments" element={<DepartmentsPage />} />
           <Route path="/dashboard/settings/users" element={<UsersPage />} />
           <Route path="/dashboard/settings/branding" element={<TenantBrandingPage />} />
+          <Route path="/dashboard/settings/audit-log" element={<AuditLogPage />} />
         </Route>
       </Route>
 

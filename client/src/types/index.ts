@@ -186,6 +186,17 @@ export interface LeaveEmployeeSummary {
   email?: string;
 }
 
+export interface LeaveOverlapSummary {
+  id: string;
+  employeeId: string;
+  employeeName: string;
+  status: LeaveRequestStatus;
+  startDate: string;
+  endDate: string;
+  halfDay: boolean;
+  reason?: string;
+}
+
 export interface LeaveRequest {
   id: string;
   employeeId: string;
@@ -202,6 +213,7 @@ export interface LeaveRequest {
   declineReason?: string;
   createdAt: string;
   updatedAt: string;
+  overlappingRequests?: LeaveOverlapSummary[];
 }
 
 export interface CreateLeaveRequestInput {
@@ -217,6 +229,7 @@ export interface ListLeaveRequestsQuery {
   employeeId?: string;
   from?: string;
   to?: string;
+  mine?: boolean;
 }
 
 export interface LeaveBalance {
@@ -410,4 +423,59 @@ export interface ListDocumentsQuery {
 export interface DocumentDownloadResponse {
   downloadUrl: string;
   fileName: string;
+}
+
+export type AuditAction = 'create' | 'update' | 'delete';
+
+export type AuditEntityType = 'Employee' | 'HrDocument' | 'User' | 'LeaveRequest';
+
+export interface AuditLogEntry {
+  id: string;
+  userId: string;
+  userName: string;
+  userEmail: string;
+  action: AuditAction;
+  entityType: AuditEntityType;
+  entityId: string;
+  before?: Record<string, unknown> | null;
+  after?: Record<string, unknown> | null;
+  ip?: string;
+  createdAt: string;
+}
+
+export interface ListAuditLogsQuery {
+  entityType?: AuditEntityType;
+  entityId?: string;
+  userId?: string;
+  from?: string;
+  to?: string;
+  page?: number;
+  limit?: number;
+}
+
+export interface AppNotification {
+  id: string;
+  type: string;
+  title: string;
+  body: string;
+  readAt?: string;
+  metadata?: Record<string, unknown>;
+  createdAt: string;
+}
+
+export interface ForgotPasswordInput {
+  email: string;
+}
+
+export interface ResetPasswordInput {
+  token: string;
+  password: string;
+}
+
+export interface MessageResponse {
+  message: string;
+}
+
+export interface InviteEmployeeInput {
+  role?: 'employee' | 'manager' | 'hr_manager';
 }

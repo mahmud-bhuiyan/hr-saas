@@ -11,9 +11,23 @@ export const PERMISSIONS: Record<UserRole, string[]> = {
     'leave:approve',
     'leave:create:own',
     'leave:read:own',
+    'audit:read',
+    'notification:read:own',
   ],
-  manager: ['leave:approve:team', 'leave:create:own', 'leave:read:own', 'employee:read:team'],
-  employee: ['leave:create:own', 'leave:read:own', 'document:read:own', 'profile:update:own'],
+  manager: [
+    'leave:approve:team',
+    'leave:create:own',
+    'leave:read:own',
+    'employee:read:team',
+    'notification:read:own',
+  ],
+  employee: [
+    'leave:create:own',
+    'leave:read:own',
+    'document:read:own',
+    'profile:update:own',
+    'notification:read:own',
+  ],
 };
 
 export const hasPermission = (role: UserRole, permission: string): boolean => {

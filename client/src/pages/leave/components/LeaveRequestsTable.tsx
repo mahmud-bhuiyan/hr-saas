@@ -5,12 +5,14 @@ import { TablePageSizeControl } from '../../../components/ui/TablePagination';
 import { usePagination } from '../../../hooks/usePagination';
 import type { LeaveRequest } from '../../../types';
 import { formatDateRange, leaveStatusClass, leaveStatusLabel, leaveTypeLabel } from '../utils';
+import { LeaveOverlapIndicator } from './LeaveOverlapIndicator';
 
 interface LeaveRequestsTableProps {
   requests: LeaveRequest[];
   loading: boolean;
   emptyMessage?: string;
   showEmployee?: boolean;
+  showOverlaps?: boolean;
   onCancel?: (request: LeaveRequest) => void;
   cancelLoadingId?: string | null;
 }
@@ -20,6 +22,7 @@ export const LeaveRequestsTable = ({
   loading,
   emptyMessage = 'No leave requests yet.',
   showEmployee = false,
+  showOverlaps = false,
   onCancel,
   cancelLoadingId,
 }: LeaveRequestsTableProps) => {
@@ -93,6 +96,18 @@ export const LeaveRequestsTable = ({
           header: 'Reason',
           render: (row: LeaveRequest) => row.reason || '—',
         },
+        ...(showOverlaps
+          ? [
+              {
+                key: 'overlaps',
+                header: 'Overlaps',
+                align: 'left' as const,
+                render: (row: LeaveRequest) => (
+                  <LeaveOverlapIndicator overlaps={row.overlappingRequests} />
+                ),
+              },
+            ]
+          : []),
         ...(onCancel
           ? [
               {

@@ -2,6 +2,8 @@ import mongoose from 'mongoose';
 import type { ServerEnv } from '../../config/env.js';
 import type { UserRole } from '../../types/index.js';
 import { hasPermission } from '../../utils/permissions.js';
+import { documentAuditSnapshot } from '../../utils/audit-snapshot.js';
+import { writeAuditLog, type AuditContext } from '../audit/audit.service.js';
 import { Employee, type IEmployeeDocument } from '../employees/employee.model.js';
 import { User } from '../admin/user.model.js';
 import { resolveEmployeeForUser } from '../leave/leave.service.js';
@@ -216,7 +218,8 @@ export const createDocument = async (
   env: ServerEnv,
   tenantId: string,
   input: CreateDocumentInput,
-  context: AccessContext
+  context: AccessContext,
+  audit?: AuditContext
 ): Promise<DocumentPublic> => {
   assertFileKeyForTenant(tenantId, input.fileKey);
 
@@ -242,6 +245,16 @@ export const createDocument = async (
     fileSize: input.fileSize,
     uploadedBy: new mongoose.Types.ObjectId(context.userId),
     expiryDate: input.expiryDate ? parseDateString(input.expiryDate) : null,
+  });
+
+  void writeAuditLog({
+    tenantId,
+    userId: context.userId,
+    action: 'create',
+    entityType: 'HrDocument',
+    entityId: doc._id.toString(),
+    after: documentAuditSnapshot(doc),
+    context: audit,
   });
 
   return toDocumentPublic(doc);
@@ -345,7 +358,8 @@ export const deleteDocument = async (
   env: ServerEnv,
   tenantId: string,
   documentId: string,
-  context: AccessContext
+  context: AccessContext,
+  audit?: AuditContext
 ): Promise<void> => {
   if (!canManageDocuments(context.role)) {
     throw new DocumentServiceError('Forbidden', 403);
@@ -360,6 +374,18 @@ export const deleteDocument = async (
     throw new DocumentServiceError('Document not found', 404);
   }
 
+  const beforeSnapshot = documentAuditSnapshot(doc);
+
   await deleteObject(env, doc.fileKey);
   await doc.deleteOne();
+
+  void writeAuditLog({
+    tenantId,
+    userId: context.userId,
+    action: 'delete',
+    entityType: 'HrDocument',
+    entityId: documentId,
+    before: beforeSnapshot,
+    context: audit,
+  });
 };

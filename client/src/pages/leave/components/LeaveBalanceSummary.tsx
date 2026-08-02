@@ -3,9 +3,14 @@ import type { LeaveBalance } from '../../../types';
 interface LeaveBalanceSummaryProps {
   balance: LeaveBalance | undefined;
   loading: boolean;
+  missingEmployeeLink?: boolean;
 }
 
-export const LeaveBalanceSummary = ({ balance, loading }: LeaveBalanceSummaryProps) => {
+export const LeaveBalanceSummary = ({
+  balance,
+  loading,
+  missingEmployeeLink = false,
+}: LeaveBalanceSummaryProps) => {
   if (loading) {
     return (
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -16,12 +21,17 @@ export const LeaveBalanceSummary = ({ balance, loading }: LeaveBalanceSummaryPro
     );
   }
 
-  if (!balance) {
+  if (missingEmployeeLink) {
     return (
       <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
-        No employee record linked to your account. Contact your administrator to request leave.
+        No employee record linked to your account. Contact your administrator to link your profile
+        before requesting leave. You can still review staff leave on the Employee leave tab.
       </div>
     );
+  }
+
+  if (!balance) {
+    return null;
   }
 
   const cards = [

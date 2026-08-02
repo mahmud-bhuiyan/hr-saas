@@ -4,6 +4,7 @@ import {
   HiPaintBrush,
   HiRectangleGroup,
   HiUsers,
+  HiClipboardDocumentList,
 } from 'react-icons/hi2';
 import { PageContainer } from '../../components/ui/PageContainer';
 import { PageHeader } from '../../components/ui/PageHeader';
@@ -38,6 +39,13 @@ const settingsLinks: SettingsLink[] = [
     label: 'Departments',
     description: 'Manage departments used when assigning employees.',
     icon: HiRectangleGroup,
+    roles: ['company_admin', 'hr_manager'],
+  },
+  {
+    to: '/dashboard/settings/audit-log',
+    label: 'Audit log',
+    description: 'Review sensitive changes across your organization.',
+    icon: HiClipboardDocumentList,
     roles: ['company_admin', 'hr_manager'],
   },
   {

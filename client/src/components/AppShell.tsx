@@ -3,6 +3,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { BrandMark } from './BrandMark';
 import { SidebarUserBar } from './SidebarUserBar';
 import { UserMenu } from './UserMenu';
+import { NotificationBell } from './NotificationBell';
 import type { UserRole } from '../types';
 
 const navItems: Array<{
@@ -42,7 +43,8 @@ export const AppShell = () => {
           <span className="md:hidden">
             <BrandMark />
           </span>
-          <div className="ml-auto">
+          <div className="ml-auto flex items-center gap-2">
+            <NotificationBell />
             <UserMenu />
           </div>
         </div>

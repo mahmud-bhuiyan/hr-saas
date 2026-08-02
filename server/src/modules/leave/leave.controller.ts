@@ -1,6 +1,7 @@
 import type { Response } from 'express';
 import type { ServerEnv } from '../../config/env.js';
 import type { AuthenticatedRequest } from '../../middleware/auth.js';
+import type { AuditContext } from '../audit/audit.service.js';
 import {
   LeaveServiceError,
   approveLeaveRequest,
@@ -25,6 +26,11 @@ const accessContext = (req: AuthenticatedRequest) => ({
   userId: req.user!.sub,
   userEmail: req.user!.email,
   role: req.user!.role,
+});
+
+const auditContext = (req: AuthenticatedRequest): AuditContext => ({
+  ip: req.ip,
+  userAgent: req.get('user-agent'),
 });
 
 export const listLeaveRequestsHandler = async (
@@ -84,7 +90,8 @@ export const createLeaveRequestHandler = (env: ServerEnv) => {
         req.tenantId!,
         parsed.data,
         accessContext(req),
-        env
+        env,
+        auditContext(req)
       );
       res.status(201).json({ status: 'ok', data: request });
     } catch (error) {
@@ -102,7 +109,12 @@ export const cancelLeaveRequestHandler = async (
   res: Response
 ): Promise<void> => {
   try {
-    const request = await cancelLeaveRequest(req.tenantId!, req.params.id, accessContext(req));
+    const request = await cancelLeaveRequest(
+      req.tenantId!,
+      req.params.id,
+      accessContext(req),
+      auditContext(req)
+    );
     res.json({ status: 'ok', data: request });
   } catch (error) {
     if (error instanceof LeaveServiceError) {
@@ -120,7 +132,8 @@ export const approveLeaveRequestHandler = (env: ServerEnv) => {
         req.tenantId!,
         req.params.id,
         accessContext(req),
-        env
+        env,
+        auditContext(req)
       );
       res.json({ status: 'ok', data: request });
     } catch (error) {
@@ -150,7 +163,8 @@ export const declineLeaveRequestHandler = (env: ServerEnv) => {
         req.params.id,
         parsed.data.declineReason,
         accessContext(req),
-        env
+        env,
+        auditContext(req)
       );
       res.json({ status: 'ok', data: request });
     } catch (error) {

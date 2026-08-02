@@ -12,6 +12,8 @@ import { createPlatformRoutes } from './modules/platform/platform.routes.js';
 import { createSettingsRoutes } from './modules/settings/settings.routes.js';
 import { createLeaveRoutes } from './modules/leave/leave.routes.js';
 import { createDocumentRoutes } from './modules/documents/document.routes.js';
+import { createAuditRoutes } from './modules/audit/audit.routes.js';
+import { createNotificationRoutes } from './modules/notifications/notification.routes.js';
 import type { ApiHealthResponse } from './types/index.js';
 
 export const createApp = () => {
@@ -49,6 +51,8 @@ export const createApp = () => {
   app.use('/api/v1/settings', createSettingsRoutes(env));
   app.use('/api/v1/leave', createLeaveRoutes(env));
   app.use('/api/v1/documents', createDocumentRoutes(env));
+  app.use('/api/v1/audit-logs', createAuditRoutes(env));
+  app.use('/api/v1/notifications', createNotificationRoutes(env));
 
   return app;
 }

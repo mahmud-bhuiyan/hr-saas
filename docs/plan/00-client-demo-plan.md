@@ -222,6 +222,8 @@ Brief teaser only; detailed plans will be separate documents.
 | Stage | Focus | Indicative duration |
 |-------|-------|---------------------|
 | **Stage 2 — Operations** | Attendance, timesheets, expenses, notifications, billing | 6–8 weeks |
+
+Detailed plan: [10-stage-2-operations-plan.md](./10-stage-2-operations-plan.md) · Dev steps: [STAGE-2-IMPLEMENTATION-STEPS.md](./STAGE-2-IMPLEMENTATION-STEPS.md)
 | **Stage 3 — Scheduling & Payroll** | Rotas, payroll export, integrations | 6–8 weeks |
 | **Stage 4 — Growth** | Reporting, performance, recruitment, LMS | Ongoing |
 

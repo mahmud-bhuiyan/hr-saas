@@ -208,6 +208,44 @@
             "description": "Update own profile. Include currentPassword + newPassword to change password."
           },
           "response": []
+        },
+        {
+          "name": "Forgot Password",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@acme.com\"\n}"
+            },
+            "url": "{{baseUrl}}/api/v1/auth/forgot-password",
+            "description": "Sends reset email when account exists. Always returns success message."
+          },
+          "response": []
+        },
+        {
+          "name": "Reset Password",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"token\": \"paste-token-from-email\",\n  \"password\": \"NewPass123\"\n}"
+            },
+            "url": "{{baseUrl}}/api/v1/auth/reset-password",
+            "description": "Sets a new password using the token from the reset email."
+          },
+          "response": []
         }
       ]
     },
@@ -599,6 +637,29 @@
             "header": [],
             "url": "{{baseUrl}}/api/v1/employees/{{employeeId}}/reports",
             "description": "Returns employees who report to the given manager."
+          },
+          "response": []
+        },
+        {
+          "name": "Invite Employee",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"role\": \"employee\"\n}"
+            },
+            "url": "{{baseUrl}}/api/v1/employees/{{employeeId}}/invite",
+            "description": "Creates/links a user for an employee without userId and sends invite email."
           },
           "response": []
         }
@@ -1210,6 +1271,91 @@
             },
             "url": "{{baseUrl}}/api/v1/settings/users/{{tenantUserId}}",
             "description": "Company admin only. Cannot modify self or last admin."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Audit",
+      "item": [
+        {
+          "name": "List Audit Logs",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/audit-logs?limit=25",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "audit-logs"],
+              "query": [{ "key": "limit", "value": "25" }]
+            },
+            "description": "Requires audit:read (company admin or HR manager)."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Notifications",
+      "item": [
+        {
+          "name": "List Notifications",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+            },
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/notifications",
+            "description": "Returns in-app notifications for the authenticated user."
+          },
+          "response": []
+        },
+        {
+          "name": "Unread Count",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+            },
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/notifications/unread-count",
+            "description": "Unread notification count for the bell badge."
+          },
+          "response": []
+        },
+        {
+          "name": "Mark Notification Read",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+            },
+            "method": "PATCH",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/notifications/{{notificationId}}/read",
+            "description": "Marks a single notification as read."
+          },
+          "response": []
+        },
+        {
+          "name": "Mark All Read",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+            },
+            "method": "POST",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/notifications/read-all",
+            "description": "Marks all notifications read for the current user."
           },
           "response": []
         }

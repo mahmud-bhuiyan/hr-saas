@@ -1,7 +1,17 @@
+import { randomBytes } from 'node:crypto';
 import mongoose from 'mongoose';
 import type { UserRole } from '../../types/index.js';
 import { hasPermission } from '../../utils/permissions.js';
+import { hashPassword } from '../../utils/password.js';
+import { employeeAuditSnapshot } from '../../utils/audit-snapshot.js';
+import { writeAuditLog, type AuditContext } from '../audit/audit.service.js';
+import { findUserByEmail } from '../admin/admin.service.js';
 import { User } from '../admin/user.model.js';
+import type { ServerEnv } from '../../config/env.js';
+import {
+  createPasswordResetTokenForUser,
+  sendInviteSetPasswordEmail,
+} from '../auth/password-reset.service.js';
 import {
   assertActiveDepartmentName,
   DepartmentServiceError,
@@ -14,6 +24,7 @@ import {
 } from './employee.model.js';
 import type {
   CreateEmployeeInput,
+  InviteEmployeeInput,
   ListEmployeesQuery,
   UpdateEmployeeInput,
 } from './employee.validation.js';
@@ -437,7 +448,8 @@ export const listDirectReports = async (
 export const createEmployee = async (
   tenantId: string,
   input: CreateEmployeeInput,
-  createdByUserId: string
+  createdByUserId: string,
+  audit?: AuditContext
 ): Promise<EmployeePublic> => {
   await validateManagerId(tenantId, input.managerId);
   await validateDepartment(tenantId, input.department);
@@ -484,6 +496,16 @@ export const createEmployee = async (
     updatedBy: actorId,
   });
 
+  void writeAuditLog({
+    tenantId,
+    userId: createdByUserId,
+    action: 'create',
+    entityType: 'Employee',
+    entityId: employee._id.toString(),
+    after: employeeAuditSnapshot(employee),
+    context: audit,
+  });
+
   return getEmployeeById(tenantId, employee._id.toString(), {
     userId: '',
     role: 'company_admin',
@@ -494,7 +516,8 @@ export const updateEmployee = async (
   tenantId: string,
   employeeId: string,
   input: UpdateEmployeeInput,
-  updatedByUserId: string
+  updatedByUserId: string,
+  audit?: AuditContext
 ): Promise<EmployeePublic> => {
   const employee = await Employee.findOne({
     _id: new mongoose.Types.ObjectId(employeeId),
@@ -504,6 +527,8 @@ export const updateEmployee = async (
   if (!employee) {
     throw new EmployeeServiceError('Employee not found', 404);
   }
+
+  const beforeSnapshot = employeeAuditSnapshot(employee);
 
   if (input.managerId !== undefined) {
     await validateManagerId(tenantId, input.managerId, employeeId);
@@ -561,11 +586,100 @@ export const updateEmployee = async (
 
   await employee.save();
 
+  void writeAuditLog({
+    tenantId,
+    userId: updatedByUserId,
+    action: 'update',
+    entityType: 'Employee',
+    entityId: employee._id.toString(),
+    before: beforeSnapshot,
+    after: employeeAuditSnapshot(employee),
+    context: audit,
+  });
+
   return getEmployeeById(tenantId, employeeId, {
     userId: '',
     role: 'company_admin',
   });
-}
+};
+
+export const inviteEmployee = async (
+  tenantId: string,
+  employeeId: string,
+  input: InviteEmployeeInput,
+  invitedByUserId: string,
+  env: ServerEnv,
+  audit?: AuditContext
+): Promise<EmployeePublic> => {
+  const employee = await Employee.findOne({
+    _id: new mongoose.Types.ObjectId(employeeId),
+    tenantId: new mongoose.Types.ObjectId(tenantId),
+  });
+
+  if (!employee) {
+    throw new EmployeeServiceError('Employee not found', 404);
+  }
+
+  if (!employee.email) {
+    throw new EmployeeServiceError('Employee must have an email address to invite', 400);
+  }
+
+  if (employee.userId) {
+    throw new EmployeeServiceError('Employee already has a login account', 409);
+  }
+
+  const tenantObjectId = new mongoose.Types.ObjectId(tenantId);
+  let user = await User.findOne({ email: employee.email });
+
+  if (user) {
+    if (user.tenantId?.toString() !== tenantId) {
+      throw new EmployeeServiceError('Email already in use', 409);
+    }
+
+    const linkedElsewhere = await Employee.findOne({
+      tenantId: tenantObjectId,
+      userId: user._id,
+      _id: { $ne: employee._id },
+    });
+
+    if (linkedElsewhere) {
+      throw new EmployeeServiceError('User is already linked to another employee', 409);
+    }
+  } else {
+    const passwordHash = await hashPassword(randomBytes(24).toString('hex'));
+    user = await User.create({
+      email: employee.email,
+      passwordHash,
+      role: input.role ?? 'employee',
+      tenantId: tenantObjectId,
+      firstName: employee.firstName,
+      lastName: employee.lastName,
+      isActive: true,
+    });
+  }
+
+  employee.userId = user._id;
+  employee.updatedBy = new mongoose.Types.ObjectId(invitedByUserId);
+  await employee.save();
+
+  const token = await createPasswordResetTokenForUser(user._id.toString());
+  await sendInviteSetPasswordEmail(env, user.email, token);
+
+  void writeAuditLog({
+    tenantId,
+    userId: invitedByUserId,
+    action: 'update',
+    entityType: 'Employee',
+    entityId: employee._id.toString(),
+    after: employeeAuditSnapshot(employee),
+    context: audit,
+  });
+
+  return getEmployeeById(tenantId, employeeId, {
+    userId: invitedByUserId,
+    role: 'company_admin',
+  });
+};
 
 export class EmployeeServiceError extends Error {
   constructor(

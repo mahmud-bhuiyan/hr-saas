@@ -36,6 +36,10 @@ cd client
 cp .env.example .env
 npm install
 npm run dev
+
+# Terminal 3 — email/notification worker (optional; emails send synchronously without Redis)
+cd server
+npm run worker
 ```
 
 | App | URL |
@@ -53,7 +57,7 @@ docker compose up -d
 | Service | URL | Notes |
 |---------|-----|-------|
 | MongoDB | `mongodb://localhost:27017/hr-saas` | Default in `server/.env.example` |
-| Redis | `redis://localhost:6379` | Reserved for future use |
+| Redis | `redis://localhost:6379` | BullMQ email queue for `npm run worker` |
 | MinIO (S3) | http://localhost:9000 | API endpoint for `S3_ENDPOINT` |
 | MinIO console | http://localhost:9001 | Login `minioadmin` / `minioadmin`; bucket `hr-saas-documents` is created by `minio-init` |
 
@@ -63,7 +67,7 @@ Copy `S3_*` values from `server/.env.example` into `server/.env.local` for docum
 
 | App | File | Key variables |
 |-----|------|---------------|
-| **Server** | `server/.env.local` | `MONGODB_URI`, `CLIENT_URL`, `ADMIN_JWT_SECRET`, `IMGBB_API_KEY` (logo/favicon upload), `SENDGRID_API_KEY`, `EMAIL_FROM` (leave notifications), `S3_*` (document storage; optional: `PORT`, defaults to 5000) |
+| **Server** | `server/.env.local` | `MONGODB_URI`, `CLIENT_URL`, `ADMIN_JWT_SECRET`, `REDIS_URL` (optional; sync email fallback without Redis), `IMGBB_API_KEY` (logo/favicon upload), `SENDGRID_API_KEY`, `EMAIL_FROM` (leave notifications), `S3_*` (document storage; optional: `PORT`, defaults to 5000) |
 | **Client** | `client/.env` | `VITE_API_URL` (backend URL) |
 
 ## Separate deployment
@@ -112,4 +116,5 @@ Config files: `client/vercel.json`, `server/vercel.json`, `server/src/index.ts` 
 
 ## Implementation progress
 
-[docs/plan/IMPLEMENTATION-STEPS.md](./docs/plan/IMPLEMENTATION-STEPS.md)
+- Demo 1: [docs/plan/IMPLEMENTATION-STEPS.md](./docs/plan/IMPLEMENTATION-STEPS.md)
+- Stage 2: [docs/plan/STAGE-2-IMPLEMENTATION-STEPS.md](./docs/plan/STAGE-2-IMPLEMENTATION-STEPS.md) · [docs/plan/10-stage-2-operations-plan.md](./docs/plan/10-stage-2-operations-plan.md)

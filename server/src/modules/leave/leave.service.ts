@@ -2,6 +2,10 @@ import mongoose from 'mongoose';
 import type { ServerEnv } from '../../config/env.js';
 import type { UserRole } from '../../types/index.js';
 import { hasPermission } from '../../utils/permissions.js';
+import {
+  leaveRequestAuditSnapshot,
+} from '../../utils/audit-snapshot.js';
+import { writeAuditLog, type AuditContext } from '../audit/audit.service.js';
 import { Employee, type IEmployeeDocument } from '../employees/employee.model.js';
 import { User } from '../admin/user.model.js';
 import {
@@ -68,6 +72,18 @@ export interface LeaveRequestPublic {
   declineReason?: string;
   createdAt: string;
   updatedAt: string;
+  overlappingRequests?: LeaveOverlapSummary[];
+}
+
+export interface LeaveOverlapSummary {
+  id: string;
+  employeeId: string;
+  employeeName: string;
+  status: LeaveRequestStatus;
+  startDate: string;
+  endDate: string;
+  halfDay: boolean;
+  reason?: string;
 }
 
 export interface LeaveBalancePublic {
@@ -157,8 +173,57 @@ const toLeaveRequestPublic = async (
     declineReason: request.declineReason,
     createdAt: request.createdAt.toISOString(),
     updatedAt: request.updatedAt.toISOString(),
+    overlappingRequests: [],
   };
 };
+
+const loadOverlapPool = async (
+  tenantId: string,
+  access: AccessContext
+): Promise<ILeaveRequestDocument[]> => {
+  const filter: Record<string, unknown> = {
+    tenantId: new mongoose.Types.ObjectId(tenantId),
+    status: { $in: ['pending', 'approved'] },
+  };
+
+  if (canApproveAll(access.role)) {
+    return LeaveRequest.find(filter);
+  }
+
+  if (canApproveTeam(access.role)) {
+    const selfRecord = await resolveEmployeeForUser(tenantId, access.userId, access.userEmail);
+    const teamIds = await getTeamEmployeeIds(tenantId, selfRecord._id.toString());
+    filter.employeeId = {
+      $in: [...teamIds, selfRecord._id.toString()].map((id) => new mongoose.Types.ObjectId(id)),
+    };
+    return LeaveRequest.find(filter);
+  }
+
+  return [];
+};
+
+const findOverlapsForRequest = (
+  request: ILeaveRequestDocument,
+  pool: ILeaveRequestDocument[],
+  employeeNameMap: Map<string, string>
+): LeaveOverlapSummary[] =>
+  pool
+    .filter(
+      (other) =>
+        other._id.toString() !== request._id.toString() &&
+        other.employeeId.toString() !== request.employeeId.toString() &&
+        dateRangesOverlap(request.startDate, request.endDate, other.startDate, other.endDate)
+    )
+    .map((other) => ({
+      id: other._id.toString(),
+      employeeId: other.employeeId.toString(),
+      employeeName: employeeNameMap.get(other.employeeId.toString()) ?? 'Unknown',
+      status: other.status,
+      startDate: formatDateString(other.startDate),
+      endDate: formatDateString(other.endDate),
+      halfDay: other.halfDay,
+      reason: other.reason,
+    }));
 
 const getOrCreateBalance = async (
   tenantId: string,
@@ -259,6 +324,16 @@ const buildListFilter = async (
 
   if (query.to) {
     filter.startDate = { ...(filter.startDate as object), $lte: parseDateString(query.to) };
+  }
+
+  if (query.mine === 'true') {
+    try {
+      const selfRecord = await resolveEmployeeForUser(tenantId, access.userId, access.userEmail);
+      filter.employeeId = selfRecord._id;
+    } catch {
+      filter._id = new mongoose.Types.ObjectId('000000000000000000000000');
+    }
+    return filter;
   }
 
   if (canApproveAll(access.role)) {
@@ -391,7 +466,39 @@ export const listLeaveRequests = async (
 
   const requests = await LeaveRequest.find(filter).sort({ startDate: -1, createdAt: -1 });
 
-  return Promise.all(requests.map((r) => toLeaveRequestPublic(r)));
+  const includeOverlaps =
+    query.mine !== 'true' && (canApproveAll(access.role) || canApproveTeam(access.role));
+
+  let overlapPool: ILeaveRequestDocument[] = [];
+  let employeeNameMap = new Map<string, string>();
+
+  if (includeOverlaps && requests.length > 0) {
+    overlapPool = await loadOverlapPool(tenantId, access);
+    const employeeIds = [...new Set(overlapPool.map((entry) => entry.employeeId.toString()))];
+    const employees = await Employee.find({ _id: { $in: employeeIds } }).select('firstName lastName');
+    employeeNameMap = new Map(
+      employees.map((employee) => [
+        employee._id.toString(),
+        `${employee.firstName} ${employee.lastName}`,
+      ])
+    );
+  }
+
+  return Promise.all(
+    requests.map(async (request) => {
+      const leaveRequest = await toLeaveRequestPublic(request);
+
+      if (includeOverlaps) {
+        leaveRequest.overlappingRequests = findOverlapsForRequest(
+          request,
+          overlapPool,
+          employeeNameMap
+        );
+      }
+
+      return leaveRequest;
+    })
+  );
 };
 
 export const getLeaveRequestById = async (
@@ -417,7 +524,8 @@ export const createLeaveRequest = async (
   tenantId: string,
   input: CreateLeaveRequestInput,
   access: AccessContext,
-  env: ServerEnv
+  env: ServerEnv,
+  audit?: AuditContext
 ): Promise<LeaveRequestPublic> => {
   const employee = await resolveEmployeeForUser(tenantId, access.userId, access.userEmail);
 
@@ -466,13 +574,24 @@ export const createLeaveRequest = async (
     });
   }
 
+  void writeAuditLog({
+    tenantId,
+    userId: access.userId,
+    action: 'create',
+    entityType: 'LeaveRequest',
+    entityId: request._id.toString(),
+    after: leaveRequestAuditSnapshot(request),
+    context: audit,
+  });
+
   return toLeaveRequestPublic(request);
 };
 
 export const cancelLeaveRequest = async (
   tenantId: string,
   requestId: string,
-  access: AccessContext
+  access: AccessContext,
+  audit?: AuditContext
 ): Promise<LeaveRequestPublic> => {
   const request = await LeaveRequest.findOne({
     _id: new mongoose.Types.ObjectId(requestId),
@@ -493,6 +612,8 @@ export const cancelLeaveRequest = async (
     throw new LeaveServiceError('Only pending requests can be cancelled', 400);
   }
 
+  const beforeSnapshot = leaveRequestAuditSnapshot(request);
+
   if (request.type === 'annual') {
     const days = calculateLeaveDays(request.startDate, request.endDate, request.halfDay);
     const year = request.startDate.getUTCFullYear();
@@ -504,6 +625,17 @@ export const cancelLeaveRequest = async (
   request.status = 'cancelled';
   await request.save();
 
+  void writeAuditLog({
+    tenantId,
+    userId: access.userId,
+    action: 'update',
+    entityType: 'LeaveRequest',
+    entityId: request._id.toString(),
+    before: beforeSnapshot,
+    after: leaveRequestAuditSnapshot(request),
+    context: audit,
+  });
+
   return toLeaveRequestPublic(request);
 };
 
@@ -511,7 +643,8 @@ export const approveLeaveRequest = async (
   tenantId: string,
   requestId: string,
   access: AccessContext,
-  env: ServerEnv
+  env: ServerEnv,
+  audit?: AuditContext
 ): Promise<LeaveRequestPublic> => {
   const request = await LeaveRequest.findOne({
     _id: new mongoose.Types.ObjectId(requestId),
@@ -523,6 +656,8 @@ export const approveLeaveRequest = async (
   }
 
   await assertCanApproveRequest(tenantId, request, access);
+
+  const beforeSnapshot = leaveRequestAuditSnapshot(request);
 
   if (request.type === 'annual') {
     const days = calculateLeaveDays(request.startDate, request.endDate, request.halfDay);
@@ -552,6 +687,17 @@ export const approveLeaveRequest = async (
     });
   }
 
+  void writeAuditLog({
+    tenantId,
+    userId: access.userId,
+    action: 'update',
+    entityType: 'LeaveRequest',
+    entityId: request._id.toString(),
+    before: beforeSnapshot,
+    after: leaveRequestAuditSnapshot(request),
+    context: audit,
+  });
+
   return toLeaveRequestPublic(request);
 };
 
@@ -560,7 +706,8 @@ export const declineLeaveRequest = async (
   requestId: string,
   declineReason: string | undefined,
   access: AccessContext,
-  env: ServerEnv
+  env: ServerEnv,
+  audit?: AuditContext
 ): Promise<LeaveRequestPublic> => {
   const request = await LeaveRequest.findOne({
     _id: new mongoose.Types.ObjectId(requestId),
@@ -572,6 +719,8 @@ export const declineLeaveRequest = async (
   }
 
   await assertCanApproveRequest(tenantId, request, access);
+
+  const beforeSnapshot = leaveRequestAuditSnapshot(request);
 
   if (request.type === 'annual') {
     const days = calculateLeaveDays(request.startDate, request.endDate, request.halfDay);
@@ -597,6 +746,17 @@ export const declineLeaveRequest = async (
       declineReason,
     });
   }
+
+  void writeAuditLog({
+    tenantId,
+    userId: access.userId,
+    action: 'update',
+    entityType: 'LeaveRequest',
+    entityId: request._id.toString(),
+    before: beforeSnapshot,
+    after: leaveRequestAuditSnapshot(request),
+    context: audit,
+  });
 
   return toLeaveRequestPublic(request);
 };

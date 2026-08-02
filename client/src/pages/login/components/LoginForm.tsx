@@ -69,6 +69,15 @@ export const LoginForm = ({
           />
         </FormField>
 
+        <div className="text-right">
+          <Link
+            to="/forgot-password"
+            className="text-sm font-medium text-brand-600 hover:text-brand-700"
+          >
+            Forgot password?
+          </Link>
+        </div>
+
         <label className="flex cursor-pointer items-center gap-2 text-sm text-slate-600">
           <input
             type="checkbox"

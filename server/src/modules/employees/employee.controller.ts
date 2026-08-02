@@ -1,9 +1,12 @@
 import type { Response } from 'express';
+import type { ServerEnv } from '../../config/env.js';
 import type { AuthenticatedRequest } from '../../middleware/auth.js';
+import type { AuditContext } from '../audit/audit.service.js';
 import {
   EmployeeServiceError,
   createEmployee,
   getEmployeeById,
+  inviteEmployee,
   listDepartments,
   listDirectReports,
   listEmployees,
@@ -11,6 +14,7 @@ import {
 } from './employee.service.js';
 import {
   createEmployeeSchema,
+  inviteEmployeeSchema,
   listEmployeesQuerySchema,
   updateEmployeeSchema,
 } from './employee.validation.js';
@@ -20,7 +24,12 @@ const accessContext = (req: AuthenticatedRequest) => {
     userId: req.user!.sub,
     role: req.user!.role,
   };
-}
+};
+
+const auditContext = (req: AuthenticatedRequest): AuditContext => ({
+  ip: req.ip,
+  userAgent: req.get('user-agent'),
+});
 
 export const listEmployeesHandler = async (
   req: AuthenticatedRequest,
@@ -124,7 +133,12 @@ export const createEmployeeHandler = async (
       return;
     }
 
-    const employee = await createEmployee(req.tenantId!, parsed.data, req.user!.sub);
+    const employee = await createEmployee(
+      req.tenantId!,
+      parsed.data,
+      req.user!.sub,
+      auditContext(req)
+    );
 
     res.status(201).json({ status: 'ok', data: employee });
   } catch (error) {
@@ -155,7 +169,8 @@ export const updateEmployeeHandler = async (
       req.tenantId!,
       req.params.id,
       parsed.data,
-      req.user!.sub
+      req.user!.sub,
+      auditContext(req)
     );
 
     res.json({ status: 'ok', data: employee });
@@ -167,4 +182,37 @@ export const updateEmployeeHandler = async (
 
     res.status(500).json({ status: 'error', message: 'Internal server error' });
   }
-}
+};
+
+export const inviteEmployeeHandler = (env: ServerEnv) => {
+  return async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+    try {
+      const parsed = inviteEmployeeSchema.safeParse(req.body ?? {});
+      if (!parsed.success) {
+        res.status(400).json({
+          status: 'error',
+          message: parsed.error.issues[0]?.message ?? 'Invalid request body',
+        });
+        return;
+      }
+
+      const employee = await inviteEmployee(
+        req.tenantId!,
+        req.params.id,
+        parsed.data,
+        req.user!.sub,
+        env,
+        auditContext(req)
+      );
+
+      res.json({ status: 'ok', data: employee });
+    } catch (error) {
+      if (error instanceof EmployeeServiceError) {
+        res.status(error.statusCode).json({ status: 'error', message: error.message });
+        return;
+      }
+
+      res.status(500).json({ status: 'error', message: 'Internal server error' });
+    }
+  };
+};

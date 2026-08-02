@@ -5,6 +5,7 @@ import { requireTenant } from '../../middleware/tenant.js';
 import {
   createEmployeeHandler,
   getEmployeeHandler,
+  inviteEmployeeHandler,
   listDepartmentsHandler,
   listDirectReportsHandler,
   listEmployeesHandler,
@@ -54,6 +55,10 @@ export const createEmployeeRoutes = (env: ServerEnv): Router => {
 
   router.patch('/:id', authorizePermission('employee:update'), (req, res) => {
     void updateEmployeeHandler(req, res);
+  });
+
+  router.post('/:id/invite', authorizePermission('employee:create'), (req, res) => {
+    void inviteEmployeeHandler(env)(req, res);
   });
 
   return router;

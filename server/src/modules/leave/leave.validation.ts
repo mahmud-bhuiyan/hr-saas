@@ -29,6 +29,7 @@ export const listLeaveRequestsQuerySchema = z.object({
   employeeId: z.string().min(1).optional(),
   from: dateStringSchema.optional(),
   to: dateStringSchema.optional(),
+  mine: z.enum(['true', 'false']).optional(),
 });
 
 export const declineLeaveRequestSchema = z.object({

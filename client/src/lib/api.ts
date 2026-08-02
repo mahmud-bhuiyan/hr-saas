@@ -50,6 +50,13 @@ import type {
   CreateDocumentInput,
   ListDocumentsQuery,
   DocumentDownloadResponse,
+  AuditLogEntry,
+  ListAuditLogsQuery,
+  AppNotification,
+  ForgotPasswordInput,
+  ResetPasswordInput,
+  MessageResponse,
+  InviteEmployeeInput,
 } from '../types';
 
 const apiBase = import.meta.env.VITE_API_URL || '';
@@ -520,6 +527,7 @@ const buildLeaveQuery = (query: ListLeaveRequestsQuery = {}): string => {
   if (query.employeeId) params.set('employeeId', query.employeeId);
   if (query.from) params.set('from', query.from);
   if (query.to) params.set('to', query.to);
+  if (query.mine) params.set('mine', 'true');
   const qs = params.toString();
   return qs ? `?${qs}` : '';
 };
@@ -679,4 +687,88 @@ export const deleteDocument = async (documentId: string): Promise<void> => {
   await apiFetch<ApiSuccessResponse<{ deleted: boolean }>>(`/api/v1/documents/${documentId}`, {
     method: 'DELETE',
   });
+};
+
+export const forgotPassword = async (input: ForgotPasswordInput): Promise<MessageResponse> => {
+  const json = await apiFetch<ApiSuccessResponse<MessageResponse>>('/api/v1/auth/forgot-password', {
+    method: 'POST',
+    body: JSON.stringify(input),
+    skipAuth: true,
+  });
+  return json.data;
+};
+
+export const resetPassword = async (input: ResetPasswordInput): Promise<MessageResponse> => {
+  const json = await apiFetch<ApiSuccessResponse<MessageResponse>>('/api/v1/auth/reset-password', {
+    method: 'POST',
+    body: JSON.stringify(input),
+    skipAuth: true,
+  });
+  return json.data;
+};
+
+const buildAuditLogsQuery = (query: ListAuditLogsQuery = {}): string => {
+  const params = new URLSearchParams();
+  if (query.entityType) params.set('entityType', query.entityType);
+  if (query.entityId) params.set('entityId', query.entityId);
+  if (query.userId) params.set('userId', query.userId);
+  if (query.from) params.set('from', query.from);
+  if (query.to) params.set('to', query.to);
+  if (query.page) params.set('page', String(query.page));
+  if (query.limit) params.set('limit', String(query.limit));
+  const qs = params.toString();
+  return qs ? `?${qs}` : '';
+};
+
+export const fetchAuditLogs = async (
+  query: ListAuditLogsQuery = {}
+): Promise<{ logs: AuditLogEntry[]; total: number }> => {
+  const json = await apiFetch<ApiSuccessResponse<{ logs: AuditLogEntry[]; total: number }>>(
+    `/api/v1/audit-logs${buildAuditLogsQuery(query)}`
+  );
+  return json.data;
+};
+
+export const fetchNotifications = async (): Promise<AppNotification[]> => {
+  const json = await apiFetch<ApiSuccessResponse<{ notifications: AppNotification[] }>>(
+    '/api/v1/notifications'
+  );
+  return json.data.notifications;
+};
+
+export const fetchUnreadNotificationCount = async (): Promise<number> => {
+  const json = await apiFetch<ApiSuccessResponse<{ count: number }>>(
+    '/api/v1/notifications/unread-count'
+  );
+  return json.data.count;
+};
+
+export const markNotificationRead = async (id: string): Promise<AppNotification> => {
+  const json = await apiFetch<ApiSuccessResponse<AppNotification>>(
+    `/api/v1/notifications/${id}/read`,
+    { method: 'PATCH' }
+  );
+  return json.data;
+};
+
+export const markAllNotificationsRead = async (): Promise<number> => {
+  const json = await apiFetch<ApiSuccessResponse<{ count: number }>>(
+    '/api/v1/notifications/read-all',
+    { method: 'POST' }
+  );
+  return json.data.count;
+};
+
+export const inviteEmployee = async (
+  employeeId: string,
+  input: InviteEmployeeInput = {}
+): Promise<Employee> => {
+  const json = await apiFetch<ApiSuccessResponse<Employee>>(
+    `/api/v1/employees/${employeeId}/invite`,
+    {
+      method: 'POST',
+      body: JSON.stringify(input),
+    }
+  );
+  return json.data;
 };
