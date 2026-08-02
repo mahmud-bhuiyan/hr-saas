@@ -1,7 +1,7 @@
 # Module: Employee Management
 
-**Stage:** Demo 1  
-**Status:** Ready for review  
+**Stage:** Demo 1 (done) · Stage 2 extensions (S2-1, S2-6)  
+**Status:** Ready for review (Demo 1) · Stage 2 not started  
 **Depends on:** Auth & Tenant (Step 2)
 
 ---
@@ -34,7 +34,8 @@ HR records for each person in a company: directory, profile, manager hierarchy, 
   employeeNumber: String,   // unique per tenant, auto-generated EMP-0001
   firstName, lastName,
   email, phone,
-  jobTitle, department,     // department is free text until Step 7
+  jobTitle, department,     // department string; optional departmentId FK in S2-6
+  departmentId: ObjectId,  // Stage 2 optional FK to Department
   startDate: Date,
   managerId: ObjectId,      // ref Employee
   status: 'active' | 'on_leave' | 'terminated',
@@ -57,6 +58,14 @@ HR records for each person in a company: directory, profile, manager hierarchy, 
 | PATCH | `/api/v1/employees/:id` | update | Partial update; deactivate via `status: terminated` |
 | GET | `/api/v1/employees/:id/reports` | read / read:team | Direct reports (org view) |
 
+### Stage 2 endpoints (planned)
+
+| Method | Path | Permission | Description |
+|--------|------|------------|-------------|
+| POST | `/api/v1/employees/:id/invite` | create | Send invite email; create/link User |
+| POST | `/api/v1/employees/import/validate` | create | Parse CSV; return preview + errors |
+| POST | `/api/v1/employees/import/commit` | create | Create employees from validated CSV |
+
 ---
 
 ## 5. Business Rules
@@ -78,7 +87,8 @@ HR records for each person in a company: directory, profile, manager hierarchy, 
 | Employee profile | `/dashboard/employees/:id` | ✅ |
 | Edit details + deactivate | Profile page | ✅ |
 | Direct reports | Profile page section | ✅ |
-| Link to login user | — | ⬜ Deferred |
+| Link to login user | Profile invite action | ⬜ Stage 2 (S2-1) |
+| Bulk CSV import | Directory page wizard | ⬜ Stage 2 (S2-6) |
 
 ---
 
@@ -90,8 +100,55 @@ HR records for each person in a company: directory, profile, manager hierarchy, 
 | Search / filter | ✅ | Done |
 | Manager → direct reports | ✅ | Done |
 | Department as managed entity | Step 7 | Free text for now |
-| Employee ↔ User link / invite | Later | Not started |
-| Bulk CSV import | Stage 2 | Out of scope |
+| Employee ↔ User link / invite | Stage 2 S2-1 | Not started |
+| Bulk CSV import | Stage 2 S2-6 | Not started |
+| departmentId FK migration | Stage 2 S2-6 | Optional |
+
+---
+
+## 13. Stage 2 — Employee Invite (S2-1)
+
+### Business rules
+
+1. Invite requires employee `email`; 409 if User with that email already exists in another tenant.
+2. Creates User with random password + invite token, or links existing User in same tenant.
+3. Sets `Employee.userId` on success.
+4. Invite email contains set-password link (reuse PasswordResetToken pattern or separate InviteToken).
+5. Manager team-scoped reads require linked employee record for managers.
+
+### Tasks
+
+- [ ] `POST /employees/:id/invite` endpoint
+- [ ] Invite button on employee profile (HR/admin)
+- [ ] Email template via notification queue
+- [ ] OpenAPI + Postman
+
+**Estimate:** 2 days (part of S2-1)
+
+---
+
+## 14. Stage 2 — Bulk CSV Import (S2-6)
+
+### CSV columns (minimum)
+
+`firstName`, `lastName`, `email`, `jobTitle`, `department`, `startDate`, `managerEmail` (optional)
+
+### Business rules
+
+1. Two-step: validate returns `{ valid: [], errors: [{ row, field, message }] }` — no DB writes.
+2. Commit only processes previously validated batch (session id or re-upload with confirm).
+3. Duplicate email within tenant → error on that row.
+4. Max 500 rows per import.
+5. Writes audit log entry per batch.
+
+### Tasks
+
+- [ ] CSV parser + validation service
+- [ ] Validate + commit endpoints
+- [ ] Import wizard UI on EmployeesPage
+- [ ] OpenAPI + Postman
+
+**Estimate:** 4 days (part of S2-6)
 
 ---
 
@@ -101,4 +158,5 @@ HR records for each person in a company: directory, profile, manager hierarchy, 
 - [x] Directory supports search and filter by department/status
 - [x] Profile shows manager and direct reports
 - [x] Deactivate sets status to terminated
-- [ ] Link employee record to login user (deferred)
+- [ ] Link employee record to login user via invite (Stage 2 S2-1)
+- [ ] Bulk CSV import with validation preview (Stage 2 S2-6)

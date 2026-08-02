@@ -22,6 +22,7 @@ import type { CreateLeaveRequestInput } from '../../types';
 import { areRequiredFieldsFilled } from '../../utils/form';
 import { hasPermission } from '../../utils/permissions';
 import { LeaveApprovalQueue } from './components/LeaveApprovalQueue';
+import { EmployeeLeaveList } from './components/EmployeeLeaveList';
 import { LeaveBalanceSummary } from './components/LeaveBalanceSummary';
 import { LeaveCalendar } from './components/LeaveCalendar';
 import { LeaveRequestModal } from './components/LeaveRequestModal';
@@ -48,6 +49,7 @@ export const LeavePage = () => {
   const canApprove =
     user &&
     (hasPermission(user.role, 'leave:approve') || hasPermission(user.role, 'leave:approve:team'));
+  const canApproveAll = user && hasPermission(user.role, 'leave:approve');
   const canViewCalendar = canApprove;
 
   const balanceQuery = useQuery({
@@ -57,9 +59,14 @@ export const LeavePage = () => {
     retry: false,
   });
 
+  const missingEmployeeLink =
+    balanceQuery.isError &&
+    balanceQuery.error instanceof ApiError &&
+    balanceQuery.error.status === 403;
+
   const myRequestsQuery = useQuery({
     queryKey: ['leave', 'requests', 'mine'],
-    queryFn: () => fetchLeaveRequests(),
+    queryFn: () => fetchLeaveRequests({ mine: true }),
     enabled: Boolean(canCreate),
   });
 
@@ -67,6 +74,12 @@ export const LeavePage = () => {
     queryKey: ['leave', 'requests', 'pending'],
     queryFn: () => fetchLeaveRequests({ status: 'pending' }),
     enabled: Boolean(canApprove),
+  });
+
+  const employeeLeaveQuery = useQuery({
+    queryKey: ['leave', 'requests', 'employees'],
+    queryFn: () => fetchLeaveRequests(),
+    enabled: Boolean(canApprove && activeTab === 'employee-leave'),
   });
 
   const calendarQuery = useQuery({
@@ -164,6 +177,10 @@ export const LeavePage = () => {
     }
 
     if (canApprove) {
+      items.push({
+        id: 'employee-leave',
+        label: canApproveAll ? 'Employee leave' : 'Team leave',
+      });
       items.push({ id: 'approvals', label: 'Approvals' });
     }
 
@@ -172,7 +189,7 @@ export const LeavePage = () => {
     }
 
     return items;
-  }, [canCreate, canApprove, canViewCalendar]);
+  }, [canCreate, canApprove, canApproveAll, canViewCalendar]);
 
   if (!canAccess) {
     return <Navigate to="/dashboard" replace />;
@@ -192,7 +209,7 @@ export const LeavePage = () => {
         description="Request time off, review approvals, and view the team calendar."
         actionAlign="end"
         action={
-          canCreate && effectiveTab === 'my-leave' ? (
+          canCreate && !missingEmployeeLink && effectiveTab === 'my-leave' ? (
             <Button
               icon={<HiPlus className="h-4 w-4 text-white" />}
               onClick={() => setCreateOpen(true)}
@@ -215,8 +232,9 @@ export const LeavePage = () => {
       {effectiveTab === 'my-leave' && canCreate && (
         <div className="space-y-6">
           <LeaveBalanceSummary
-            balance={balanceQuery.isError ? undefined : balanceQuery.data}
+            balance={balanceQuery.data}
             loading={balanceQuery.isLoading}
+            missingEmployeeLink={missingEmployeeLink}
           />
           <div>
             <h2 className="mb-3 text-sm font-semibold text-slate-900">My requests</h2>
@@ -231,6 +249,19 @@ export const LeavePage = () => {
             />
           </div>
         </div>
+      )}
+
+      {effectiveTab === 'employee-leave' && canApprove && (
+        <EmployeeLeaveList
+          requests={employeeLeaveQuery.data ?? []}
+          loading={employeeLeaveQuery.isLoading}
+          title={canApproveAll ? 'Employee leave' : 'Team leave'}
+          description={
+            canApproveAll
+              ? 'All leave requests across your organization. Overlapping dates are highlighted so you can compare urgency before approving.'
+              : 'Leave requests for your direct reports. Overlapping dates are highlighted to help you decide who should be off.'
+          }
+        />
       )}
 
       {effectiveTab === 'approvals' && canApprove && (

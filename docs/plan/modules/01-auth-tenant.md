@@ -1,7 +1,7 @@
 # Module: Auth & Tenant
 
-**Stage:** Demo 1  
-**Status:** Done  
+**Stage:** Demo 1 (done) · Stage 2 extensions (S2-1)  
+**Status:** Done (Demo 1) · Stage 2 not started  
 **Depends on:** Step 1 (Foundation)
 
 ---
@@ -37,6 +37,20 @@ Authentication, multi-tenant isolation, and company onboarding. Every business r
 
 - `email`, `passwordHash`, `role`, `tenantId`, `firstName`, `lastName`, `isActive`
 
+### Collection: `PasswordResetToken` (Stage 2 — S2-1)
+
+```js
+{
+  userId: ObjectId,
+  tokenHash: String,        // hashed token sent in email link
+  expiresAt: Date,
+  usedAt: Date | null,
+  createdAt
+}
+```
+
+**Index:** `{ tokenHash }` unique, TTL on `expiresAt`
+
 ---
 
 ## 4. API Endpoints (implemented)
@@ -58,6 +72,13 @@ Authentication, multi-tenant isolation, and company onboarding. Every business r
 | POST | `/api/v1/admin/registrations/:tenantId/deactivate` | super_admin | Deactivate company |
 | POST | `/api/v1/admin/registrations/:tenantId/activate` | super_admin | Reactivate company |
 
+### Stage 2 endpoints (S2-1 — planned)
+
+| Method | Path | Access | Description |
+|--------|------|--------|-------------|
+| POST | `/api/v1/auth/forgot-password` | Public | Send reset email if user exists |
+| POST | `/api/v1/auth/reset-password` | Public | Validate token + set new password |
+
 ---
 
 ## 5. Business Rules
@@ -78,19 +99,42 @@ Authentication, multi-tenant isolation, and company onboarding. Every business r
 | My profile | `/dashboard/profile` | ✅ |
 | Companies (super admin) | `/dashboard/registrations` | ✅ |
 | Platform site settings (super admin) | `/dashboard/platform/site-settings` | ✅ Complete |
-| Forgot password | `/forgot-password` | ⬜ Not started |
+| Forgot password | `/forgot-password` | ⬜ Stage 2 (S2-1) |
+| Reset password | `/reset-password` | ⬜ Stage 2 (S2-1) |
 
 ---
 
 ## 7. Demo 1 vs Later
 
-| Feature | Demo 1 | Status |
-|---------|--------|--------|
-| Register / login / refresh | ✅ | Done |
-| Registration approval | ✅ | Done (added during build) |
-| Super admin add company | ✅ | Done (added during build) |
-| Profile + change password | ✅ | Done |
-| Forgot password (email) | Planned | Not started |
+| Feature | Demo 1 | Stage 2 |
+|---------|--------|---------|
+| Register / login / refresh | ✅ | |
+| Registration approval | ✅ | |
+| Super admin add company | ✅ | |
+| Profile + change password | ✅ | |
+| Forgot password (email) | — | S2-1 |
+
+---
+
+## 13. Stage 2 — Forgot Password (S2-1)
+
+### Business rules
+
+1. `POST /auth/forgot-password` always returns 200 (no email enumeration).
+2. Token expires in 1 hour; single use.
+3. Reset link: `{CLIENT_URL}/reset-password?token=…`
+4. Invalidate all refresh tokens on successful reset (optional — force re-login).
+5. Email via notification queue (BullMQ) when Redis available.
+
+### Tasks
+
+- [ ] PasswordResetToken model
+- [ ] Forgot + reset endpoints + Zod validation
+- [ ] ForgotPasswordPage + ResetPasswordPage (reuse UI kit, icons on all fields)
+- [ ] Link from LoginPage
+- [ ] OpenAPI + Postman
+
+**Estimate:** 2 days (part of S2-1)
 
 ---
 
@@ -100,4 +144,4 @@ Authentication, multi-tenant isolation, and company onboarding. Every business r
 - [x] Pending companies cannot log in until super admin approves
 - [x] Super admin can add company directly without approval step
 - [x] JWT + refresh cookie session works; 401 triggers client refresh
-- [ ] Forgot password flow (defer to Step 8 unless client requires earlier)
+- [ ] Forgot password flow (Stage 2 S2-1)

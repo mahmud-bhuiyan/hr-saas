@@ -9,6 +9,7 @@ import { usePagination } from '../../../hooks/usePagination';
 import { Textarea } from '../../../components/ui/Textarea';
 import type { LeaveRequest } from '../../../types';
 import { formatDateRange, leaveTypeLabel } from '../utils';
+import { LeaveOverlapIndicator } from './LeaveOverlapIndicator';
 
 interface LeaveApprovalQueueProps {
   requests: LeaveRequest[];
@@ -88,6 +89,14 @@ export const LeaveApprovalQueue = ({
             key: 'reason',
             header: 'Reason',
             render: (row: LeaveRequest) => row.reason || '—',
+          },
+          {
+            key: 'overlaps',
+            header: 'Same dates',
+            align: 'left',
+            render: (row: LeaveRequest) => (
+              <LeaveOverlapIndicator overlaps={row.overlappingRequests} />
+            ),
           },
           {
             key: 'actions',

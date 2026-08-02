@@ -11,17 +11,22 @@
     "dev": "tsx watch src/index.ts",
     "typecheck": "tsc --noEmit",
     "start": "tsx src/index.ts",
-    "seed:superadmin": "tsx scripts/seed-superadmin.ts"
+    "worker": "tsx src/worker.ts",
+    "seed:superadmin": "tsx scripts/seed-superadmin.ts",
+    "seed:demo": "tsx scripts/seed-demo.ts",
+    "seed:demo-employees": "tsx scripts/seed-demo-employees.ts"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1101.0",
     "@aws-sdk/s3-request-presigner": "^3.1101.0",
     "@sendgrid/mail": "^8.1.6",
     "bcrypt": "^6.0.0",
+    "bullmq": "^6.0.5",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "express": "^4.21.1",
+    "ioredis": "^6.0.0",
     "jsonwebtoken": "^9.0.3",
     "mongoose": "^9.9.1",
     "zod": "^4.4.3"
@@ -31,6 +36,7 @@
     "@types/cookie-parser": "^1.4.10",
     "@types/cors": "^2.8.17",
     "@types/express": "^4.17.21",
+    "@types/ioredis": "^4.28.10",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^22.9.0",
     "tsx": "^4.19.2",

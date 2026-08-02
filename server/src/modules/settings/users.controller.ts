@@ -1,11 +1,17 @@
 import type { Response } from 'express';
 import type { AuthenticatedRequest } from '../../middleware/auth.js';
+import type { AuditContext } from '../audit/audit.service.js';
 import {
   TenantUsersServiceError,
   listTenantUsers,
   patchTenantUser,
 } from './users.service.js';
 import { patchTenantUserSchema } from './users.validation.js';
+
+const auditContext = (req: AuthenticatedRequest): AuditContext => ({
+  ip: req.ip,
+  userAgent: req.get('user-agent'),
+});
 
 export const listTenantUsersHandler = async (
   req: AuthenticatedRequest,
@@ -51,7 +57,8 @@ export const patchTenantUserHandler = async (
       req.tenantId,
       req.params.id,
       parsed.data,
-      req.user.sub
+      req.user.sub,
+      auditContext(req)
     );
     res.json({ status: 'ok', data: user });
   } catch (error) {

@@ -65,7 +65,7 @@ export const MONTH_NAMES = [
   'December',
 ];
 
-export type LeaveTab = 'my-leave' | 'approvals' | 'calendar';
+export type LeaveTab = 'my-leave' | 'employee-leave' | 'approvals' | 'calendar';
 
 export const emptyLeaveForm = {
   type: 'annual' as LeaveType,

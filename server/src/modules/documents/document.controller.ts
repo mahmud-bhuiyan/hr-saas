@@ -1,6 +1,7 @@
 import type { Response } from 'express';
 import type { ServerEnv } from '../../config/env.js';
 import type { AuthenticatedRequest } from '../../middleware/auth.js';
+import type { AuditContext } from '../audit/audit.service.js';
 import {
   DocumentServiceError,
   createDocument,
@@ -23,6 +24,11 @@ const accessContext = (req: AuthenticatedRequest) => ({
   userId: req.user!.sub,
   userEmail: req.user!.email,
   role: req.user!.role,
+});
+
+const auditContext = (req: AuthenticatedRequest): AuditContext => ({
+  ip: req.ip,
+  userAgent: req.get('user-agent'),
 });
 
 const handleServiceError = (error: unknown, res: Response): void => {
@@ -128,7 +134,8 @@ export const createDocumentHandler = (env: ServerEnv) => {
         env,
         req.tenantId!,
         parsed.data,
-        accessContext(req)
+        accessContext(req),
+        auditContext(req)
       );
       res.status(201).json({ status: 'ok', data: document });
     } catch (error) {
@@ -156,7 +163,13 @@ export const downloadDocumentHandler = (env: ServerEnv) => {
 export const deleteDocumentHandler = (env: ServerEnv) => {
   return async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     try {
-      await deleteDocument(env, req.tenantId!, req.params.id, accessContext(req));
+      await deleteDocument(
+        env,
+        req.tenantId!,
+        req.params.id,
+        accessContext(req),
+        auditContext(req)
+      );
       res.json({ status: 'ok', data: { deleted: true } });
     } catch (error) {
       handleServiceError(error, res);

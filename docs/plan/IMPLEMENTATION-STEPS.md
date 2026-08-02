@@ -155,3 +155,16 @@ Features added during implementation that extend the original step list. Keep th
 - [ ] Forgot password flow (if required for Demo 1 sign-off)
 
 **Review:** Client demo sign-off per [00-client-demo-plan.md](./00-client-demo-plan.md) Section 7.
+
+---
+
+## Stage 2 — Operations
+
+Demo 1 Steps 1–8 above are complete (or in final polish). Stage 2 planning and build tracker:
+
+| Document | Purpose |
+|----------|---------|
+| [10-stage-2-operations-plan.md](./10-stage-2-operations-plan.md) | Client-facing scope, screens, timeline, sign-off |
+| [STAGE-2-IMPLEMENTATION-STEPS.md](./STAGE-2-IMPLEMENTATION-STEPS.md) | Dev checklist — Steps S2-1 through S2-8 |
+
+**Next step after Demo 1 sign-off:** S2-1 — platform foundations (audit log, notifications, forgot password, employee invite).

@@ -1,12 +1,13 @@
-import { useQuery } from '@tanstack/react-query';
-import { HiArrowLeft, HiPencilSquare, HiUserGroup } from 'react-icons/hi2';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { HiArrowLeft, HiEnvelope, HiPencilSquare, HiUserGroup } from 'react-icons/hi2';
 import { Link, Navigate, useNavigate, useParams } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import { Button } from '../../components/ui/Button';
 import { PageContainer } from '../../components/ui/PageContainer';
 import { PageHeader } from '../../components/ui/PageHeader';
 import { Spinner } from '../../components/ui/Spinner';
 import { useAuth } from '../../contexts/AuthContext';
-import { fetchEmployee, fetchEmployeeReports } from '../../lib/api';
+import { ApiError, fetchEmployee, fetchEmployeeReports, inviteEmployee } from '../../lib/api';
 import { hasPermission } from '../../utils/permissions';
 import { DirectReportsTable } from './components/DirectReportsTable';
 import { EmployeeProfileSummary } from './components/EmployeeProfileSummary';
@@ -21,6 +22,19 @@ export const EmployeeViewPage = () => {
   const canRead =
     user && (hasPermission(user.role, 'employee:read') || hasPermission(user.role, 'employee:read:team'));
   const canUpdate = user && hasPermission(user.role, 'employee:update');
+  const canInvite = user && hasPermission(user.role, 'employee:create');
+  const queryClient = useQueryClient();
+
+  const inviteMutation = useMutation({
+    mutationFn: () => inviteEmployee(id!),
+    onSuccess: () => {
+      toast.success('Invite sent successfully');
+      void queryClient.invalidateQueries({ queryKey: ['employees', id] });
+    },
+    onError: (err) => {
+      toast.error(err instanceof ApiError ? err.message : 'Invite failed');
+    },
+  });
 
   const employeeQuery = useQuery({
     queryKey: ['employees', id],
@@ -80,14 +94,29 @@ export const EmployeeViewPage = () => {
             description={`${employee.jobTitle ?? 'No job title'} · ${employee.employeeNumber}`}
             actionAlign="end"
             action={
-              canUpdate ? (
-                <Button
-                  variant="secondary"
-                  icon={<HiPencilSquare className="h-4 w-4 text-brand-600" />}
-                  onClick={() => navigate(`/dashboard/employees/${id}/edit`)}
-                >
-                  Edit employee
-                </Button>
+              canUpdate || (canInvite && employee.email && !employee.userId) ? (
+                <div className="flex flex-wrap items-center justify-end gap-2">
+                  {canInvite && employee.email && !employee.userId && (
+                    <Button
+                      variant="secondary"
+                      loading={inviteMutation.isPending}
+                      loadingText="Sending…"
+                      icon={<HiEnvelope className="h-4 w-4 text-brand-600" />}
+                      onClick={() => inviteMutation.mutate()}
+                    >
+                      Send invite
+                    </Button>
+                  )}
+                  {canUpdate && (
+                    <Button
+                      variant="secondary"
+                      icon={<HiPencilSquare className="h-4 w-4 text-brand-600" />}
+                      onClick={() => navigate(`/dashboard/employees/${id}/edit`)}
+                    >
+                      Edit employee
+                    </Button>
+                  )}
+                </div>
               ) : undefined
             }
           />

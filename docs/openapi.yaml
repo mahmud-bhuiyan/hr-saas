@@ -35,6 +35,10 @@ tags:
     description: Platform-wide site branding and configuration
   - name: Settings
     description: Tenant settings including branding overrides
+  - name: Audit
+    description: Tenant audit log for sensitive changes
+  - name: Notifications
+    description: In-app notifications for authenticated users
 
 paths:
   /:
@@ -266,6 +270,71 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/auth/forgot-password:
+    post:
+      tags: [Auth]
+      summary: Request password reset
+      description: |
+        Sends a password reset email when an account exists for the email address.
+        Always returns the same success message to avoid account enumeration.
+      operationId: forgotPassword
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ForgotPasswordRequest'
+            example:
+              email: admin@acme.com
+      responses:
+        '200':
+          description: Reset email queued (if account exists)
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, data]
+                properties:
+                  status:
+                    type: string
+                    enum: [ok]
+                  data:
+                    $ref: '#/components/schemas/MessageResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+
+  /api/v1/auth/reset-password:
+    post:
+      tags: [Auth]
+      summary: Reset password with token
+      description: Validates an expiring reset token and sets a new password.
+      operationId: resetPassword
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResetPasswordRequest'
+            example:
+              token: reset-token-from-email
+              password: NewPass123
+      responses:
+        '200':
+          description: Password updated
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, data]
+                properties:
+                  status:
+                    type: string
+                    enum: [ok]
+                  data:
+                    $ref: '#/components/schemas/MessageResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
 
   /api/v1/admins:
     post:
@@ -887,6 +956,62 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
 
+  /api/v1/employees/{id}/invite:
+    post:
+      tags: [Employees]
+      summary: Invite employee to set password
+      description: |
+        Creates or links a user account for an employee without a linked user and sends an invite email.
+        Requires `employee:create`.
+      operationId: inviteEmployee
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InviteEmployeeRequest'
+            example:
+              role: employee
+      responses:
+        '200':
+          description: Invite sent
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, data]
+                properties:
+                  status:
+                    type: string
+                    enum: [ok]
+                  data:
+                    $ref: '#/components/schemas/Employee'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          description: Employee not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Employee already linked to a user
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
   /api/v1/employees/{id}/reports:
     get:
       tags: [Employees]
@@ -937,6 +1062,7 @@ paths:
       summary: List leave requests
       description: |
         Returns leave requests scoped by role: own (employee), team (manager), or all (HR/admin).
+        Pass `mine=true` to restrict results to the authenticated user's employee record (My leave tab).
       operationId: listLeaveRequests
       security:
         - bearerAuth: []
@@ -949,6 +1075,11 @@ paths:
           in: query
           schema:
             type: string
+        - name: mine
+          in: query
+          schema:
+            type: boolean
+          description: When true, return only leave for the current user's linked employee record
         - name: from
           in: query
           schema:
@@ -2121,6 +2252,198 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
 
+  /api/v1/audit-logs:
+    get:
+      tags: [Audit]
+      summary: List audit log entries
+      description: |
+        Returns paginated audit entries for the tenant. Requires `audit:read` (company admin or HR manager).
+      operationId: listAuditLogs
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: entityType
+          in: query
+          schema:
+            type: string
+            enum: [Employee, HrDocument, User, LeaveRequest]
+        - name: entityId
+          in: query
+          schema:
+            type: string
+        - name: userId
+          in: query
+          schema:
+            type: string
+        - name: from
+          in: query
+          schema:
+            type: string
+            format: date-time
+        - name: to
+          in: query
+          schema:
+            type: string
+            format: date-time
+        - name: page
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 25
+      responses:
+        '200':
+          description: Audit log entries
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, data]
+                properties:
+                  status:
+                    type: string
+                    enum: [ok]
+                  data:
+                    type: object
+                    required: [logs, total]
+                    properties:
+                      logs:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/AuditLogEntry'
+                      total:
+                        type: integer
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /api/v1/notifications:
+    get:
+      tags: [Notifications]
+      summary: List notifications
+      description: Returns in-app notifications for the authenticated user.
+      operationId: listNotifications
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Notifications
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, data]
+                properties:
+                  status:
+                    type: string
+                    enum: [ok]
+                  data:
+                    type: object
+                    required: [notifications]
+                    properties:
+                      notifications:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Notification'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /api/v1/notifications/unread-count:
+    get:
+      tags: [Notifications]
+      summary: Unread notification count
+      operationId: getUnreadNotificationCount
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Unread count
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, data]
+                properties:
+                  status:
+                    type: string
+                    enum: [ok]
+                  data:
+                    type: object
+                    required: [count]
+                    properties:
+                      count:
+                        type: integer
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /api/v1/notifications/read-all:
+    post:
+      tags: [Notifications]
+      summary: Mark all notifications read
+      operationId: markAllNotificationsRead
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Notifications marked read
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, data]
+                properties:
+                  status:
+                    type: string
+                    enum: [ok]
+                  data:
+                    type: object
+                    required: [count]
+                    properties:
+                      count:
+                        type: integer
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /api/v1/notifications/{id}/read:
+    patch:
+      tags: [Notifications]
+      summary: Mark notification read
+      operationId: markNotificationRead
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Updated notification
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, data]
+                properties:
+                  status:
+                    type: string
+                    enum: [ok]
+                  data:
+                    $ref: '#/components/schemas/Notification'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
 components:
   securitySchemes:
     bearerAuth:
@@ -2314,6 +2637,96 @@ components:
           format: email
         password:
           type: string
+
+    ForgotPasswordRequest:
+      type: object
+      required: [email]
+      properties:
+        email:
+          type: string
+          format: email
+
+    ResetPasswordRequest:
+      type: object
+      required: [token, password]
+      properties:
+        token:
+          type: string
+        password:
+          type: string
+          minLength: 8
+
+    MessageResponse:
+      type: object
+      required: [message]
+      properties:
+        message:
+          type: string
+
+    InviteEmployeeRequest:
+      type: object
+      properties:
+        role:
+          type: string
+          enum: [employee, manager, hr_manager]
+          default: employee
+
+    AuditLogEntry:
+      type: object
+      required: [id, userId, userName, userEmail, action, entityType, entityId, createdAt]
+      properties:
+        id:
+          type: string
+        userId:
+          type: string
+        userName:
+          type: string
+        userEmail:
+          type: string
+          format: email
+        action:
+          type: string
+          enum: [create, update, delete]
+        entityType:
+          type: string
+          enum: [Employee, HrDocument, User, LeaveRequest]
+        entityId:
+          type: string
+        before:
+          type: object
+          nullable: true
+          additionalProperties: true
+        after:
+          type: object
+          nullable: true
+          additionalProperties: true
+        ip:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+
+    Notification:
+      type: object
+      required: [id, type, title, body, createdAt]
+      properties:
+        id:
+          type: string
+        type:
+          type: string
+        title:
+          type: string
+        body:
+          type: string
+        readAt:
+          type: string
+          format: date-time
+        metadata:
+          type: object
+          additionalProperties: true
+        createdAt:
+          type: string
+          format: date-time
 
     CreateAdminRequest:
       type: object
@@ -2870,6 +3283,34 @@ components:
         updatedAt:
           type: string
           format: date-time
+        overlappingRequests:
+          type: array
+          description: Other pending or approved leave that overlaps these dates (approver roles only)
+          items:
+            $ref: '#/components/schemas/LeaveOverlapSummary'
+
+    LeaveOverlapSummary:
+      type: object
+      required: [id, employeeId, employeeName, status, startDate, endDate, halfDay]
+      properties:
+        id:
+          type: string
+        employeeId:
+          type: string
+        employeeName:
+          type: string
+        status:
+          $ref: '#/components/schemas/LeaveRequestStatus'
+        startDate:
+          type: string
+          format: date
+        endDate:
+          type: string
+          format: date
+        halfDay:
+          type: boolean
+        reason:
+          type: string
 
     CreateLeaveRequest:
       type: object

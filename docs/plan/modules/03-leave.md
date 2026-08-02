@@ -1,7 +1,7 @@
 # Module: Leave & Absence
 
-**Stage:** Demo 1  
-**Status:** Complete  
+**Stage:** Demo 1 (done) · Stage 2 enhancements (S2-5)  
+**Status:** Complete (Demo 1) · Stage 2 not started  
 **Depends on:** Auth & Tenant (Step 2), Employee Management (Step 4)
 
 ---
@@ -40,7 +40,18 @@ Employees submit leave requests; managers and HR approve or decline them. Tracks
   approverId: ObjectId,
   approvedAt: Date,
   declineReason: String,
+  approvalStep: Number,     // Stage 2: 1 = manager, 2 = HR (when multi-step enabled)
   createdAt, updatedAt
+}
+```
+
+### Tenant leave settings (Stage 2 — on Tenant or settings subdoc)
+
+```js
+{
+  annualEntitlement: Number,       // default 25
+  maxCarryOverDays: Number,        // default 5
+  multiStepApprovalEnabled: Boolean // default false
 }
 ```
 
@@ -119,11 +130,56 @@ Employees submit leave requests; managers and HR approve or decline them. Tracks
 
 | Feature | Demo 1 | Later |
 |---------|--------|-------|
-| Fixed entitlement | ✅ | Accrual engine (Stage 2) |
-| Single approver | ✅ | Multi-step chains (Stage 2) |
-| Annual balance only | ✅ | Sick/unpaid balances |
-| Email notifications | ✅ | SMS (Stage 2) |
-| Team clash detection | — | Stage 2 |
+| Fixed entitlement | ✅ | Accrual engine (S2-5) |
+| Single approver | ✅ | Multi-step chains (S2-5) |
+| Annual balance only | ✅ | Sick/unpaid balances (Stage 3) |
+| Email notifications | ✅ | Queued via BullMQ (S2-1) |
+| Team clash detection | — | Stage 3 |
+| Document expiry reminders | — | S2-5 (email HR) |
+
+---
+
+## 13. Stage 2 — Leave Enhancements (S2-5)
+
+### Pro-rata accrual
+
+- Entitlement for calendar year = `annualEntitlement × (days employed in year / days in year)`.
+- Mid-year starters get prorated entitlement on first balance access or via cron.
+- Part-time FTE factor (default 1.0) — optional field on Employee in S2-5 or Stage 3.
+
+### Carry-over
+
+- On year boundary (or manual HR trigger): `carriedOver = min(remaining, maxCarryOverDays)`.
+- New year balance: `entitlement = annualEntitlement`, `carriedOver` set, `taken/pending` reset.
+
+### Multi-step approval
+
+When `multiStepApprovalEnabled`:
+
+1. Submit → `approvalStep: 1`, status `pending` — waiting for manager.
+2. Manager approves step 1 → `approvalStep: 2` — waiting for HR.
+3. HR approves step 2 → status `approved`, balance updated.
+
+Decline at any step → status `declined`, reverse pending balance.
+
+### API changes
+
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | `/api/v1/settings/leave` | Get tenant leave policy |
+| PATCH | `/api/v1/settings/leave` | Update policy (company_admin) |
+
+### Tasks
+
+- [ ] Tenant leave settings model + endpoints
+- [ ] Accrual calculation in balance service
+- [ ] Carry-over job (BullMQ cron on Jan 1 or manual)
+- [ ] Multi-step approve handler updates
+- [ ] Policy settings UI
+- [ ] Approval queue step indicators
+- [ ] OpenAPI + Postman
+
+**Estimate:** 5 days (part of S2-5)
 
 ---
 
@@ -136,3 +192,6 @@ Employees submit leave requests; managers and HR approve or decline them. Tracks
 - [x] Team calendar shows approved + pending leave for the month
 - [x] Email sent on submit, approve, decline (SendGrid)
 - [x] OpenAPI and Postman updated
+- [ ] Pro-rata accrual reflects employee start date (Stage 2 S2-5)
+- [ ] Multi-step approval manager → HR when enabled (Stage 2 S2-5)
+- [ ] Carry-over applied per tenant policy (Stage 2 S2-5)

@@ -8,9 +8,13 @@ import {
   loginUser,
   registerCompany,
 } from './auth.service.js';
-import { loginSchema, registerSchema } from './auth.validation.js';
+import { loginSchema, registerSchema, forgotPasswordSchema, resetPasswordSchema } from './auth.validation.js';
 import { getProfile, updateProfile } from './profile.service.js';
 import { updateProfileSchema } from './profile.validation.js';
+import {
+  requestPasswordReset,
+  resetPasswordWithToken,
+} from './password-reset.service.js';
 
 const REFRESH_COOKIE = 'refreshToken';
 const REFRESH_MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000;
@@ -181,4 +185,42 @@ export const createUpdateMeHandler = (env: ServerEnv) => {
       res.status(500).json({ status: 'error', message: 'Internal server error' });
     }
   };
-}
+};
+
+export const createForgotPasswordHandler = (env: ServerEnv) => {
+  return async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+    try {
+      const parsed = forgotPasswordSchema.safeParse(req.body);
+      if (!parsed.success) {
+        validationError(res, parsed.error.issues[0]?.message ?? 'Invalid request body');
+        return;
+      }
+
+      const result = await requestPasswordReset(parsed.data.email, env);
+      res.json({ status: 'ok', data: result });
+    } catch {
+      res.status(500).json({ status: 'error', message: 'Internal server error' });
+    }
+  };
+};
+
+export const createResetPasswordHandler = () => {
+  return async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+    try {
+      const parsed = resetPasswordSchema.safeParse(req.body);
+      if (!parsed.success) {
+        validationError(res, parsed.error.issues[0]?.message ?? 'Invalid request body');
+        return;
+      }
+
+      const result = await resetPasswordWithToken(parsed.data.token, parsed.data.password);
+      res.json({ status: 'ok', data: result });
+    } catch (error) {
+      if (error instanceof AuthServiceError) {
+        res.status(error.statusCode).json({ status: 'error', message: error.message });
+        return;
+      }
+      res.status(500).json({ status: 'error', message: 'Internal server error' });
+    }
+  };
+};
