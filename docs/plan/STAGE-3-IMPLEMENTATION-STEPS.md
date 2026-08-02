@@ -12,7 +12,7 @@ Check off each step with the client/dev team before moving to the next.
 | **S3-2** | Rotas backend — `Shift`, `RotaTemplate`, week CRUD, leave conflict detection | ✅ Done |
 | **S3-3** | Rotas UI — weekly grid, publish, employee shift view, open-shift claim | ✅ Done |
 | **S3-4** | Payroll export backend — `PayrollPeriod`, aggregate timesheets + expenses + pay rates | ✅ Done |
-| **S3-5** | Payroll export UI — generate, preview, CSV download | Not started |
+| **S3-5** | Payroll export UI — generate, preview, CSV download | ✅ Done |
 | **S3-6** | Accounting integration — Xero **or** QuickBooks OAuth push (client picks one) | Not started |
 | **S3-7** | Cross-module polish — rota/leave clash warnings, optional break deductions | Not started |
 | **S3-8** | Stage 3 polish, staging walkthrough, client sign-off | Not started |
@@ -105,13 +105,13 @@ Features added during Stage 3 implementation that extend the original step list.
 
 ## S3-5 — Done when
 
-- [ ] Payroll page `/dashboard/payroll` — list periods
-- [ ] Create period form (date range aligned to tenant pay period type)
-- [ ] Generate action with preview of employee summaries
-- [ ] CSV export download (`GET /api/v1/payroll/periods/:id/export`)
-- [ ] Period status indicators: draft → generated → exported
-- [ ] HR/admin only access
-- [ ] `docs/openapi.yaml` and Postman collection updated
+- [x] Payroll page `/dashboard/payroll` — list periods
+- [x] Create period form (date range aligned to tenant pay period type)
+- [x] Generate action with preview of employee summaries
+- [x] CSV export download (`GET /api/v1/payroll/periods/:id/export`)
+- [x] Period status indicators: draft → generated → exported
+- [x] HR/admin only access
+- [x] `docs/openapi.yaml` and Postman collection updated
 
 **Review:** Test CSV export with finance-friendly column layout before S3-6.
 

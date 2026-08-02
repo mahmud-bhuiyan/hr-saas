@@ -29,6 +29,7 @@ import { AttendanceSettingsPage } from "./pages/settings/attendance/AttendanceSe
 import { LeaveSettingsPage } from "./pages/settings/leave/LeaveSettingsPage";
 import { LocationsPage } from "./pages/settings/locations/LocationsPage";
 import { PayrollSettingsPage } from "./pages/settings/payroll/PayrollSettingsPage";
+import { PayrollPage } from "./pages/payroll/PayrollPage";
 import { BillingPage } from "./pages/settings/billing/BillingPage";
 import { ReportsPage } from "./pages/reports/ReportsPage";
 import { HeadcountReportPage } from "./pages/reports/HeadcountReportPage";
@@ -60,6 +61,7 @@ const App = () => {
           <Route path="/dashboard/timesheets" element={<TimesheetsPage />} />
           <Route path="/dashboard/rotas" element={<RotasPage />} />
           <Route path="/dashboard/expenses" element={<ExpensesPage />} />
+          <Route path="/dashboard/payroll" element={<PayrollPage />} />
           <Route path="/dashboard/reports" element={<ReportsPage />} />
           <Route path="/dashboard/reports/headcount" element={<HeadcountReportPage />} />
           <Route path="/dashboard/reports/absence" element={<AbsenceReportPage />} />

@@ -28,3 +28,13 @@ export const getWeekOfMinForPeriod = (periodStart: Date): Date => {
   weekOfMin.setUTCDate(weekOfMin.getUTCDate() - 6);
   return weekOfMin;
 };
+
+export const escapeCsvValue = (value: string): string => {
+  if (/[",\n]/.test(value)) {
+    return `"${value.replace(/"/g, '""')}"`;
+  }
+  return value;
+};
+
+export const buildPayrollExportFilename = (periodStart: string, periodEnd: string): string =>
+  `payroll-${periodStart}-to-${periodEnd}.csv`;

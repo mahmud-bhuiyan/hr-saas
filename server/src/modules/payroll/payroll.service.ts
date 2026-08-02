@@ -13,6 +13,8 @@ import {
 import type { CreatePayrollPeriodInput } from './payroll.validation.js';
 import {
   PERIODS_PER_YEAR,
+  buildPayrollExportFilename,
+  escapeCsvValue,
   formatDateOnly,
   getWeekOfMinForPeriod,
   parseDateOnly,
@@ -333,4 +335,92 @@ export const generatePayrollPeriod = async (
   });
 
   return toPeriodPublic(period);
+};
+
+const buildPayrollCsv = (period: IPayrollPeriodDocument): string => {
+  const header = [
+    'employeeId',
+    'employeeName',
+    'regularHours',
+    'overtimeHours',
+    'expenseTotal',
+    'grossEstimate',
+    'currency',
+    'payRateType',
+    'payRate',
+    'missingPayRate',
+  ].join(',');
+
+  const rows = period.employeeSummaries.map((summary) =>
+    [
+      summary.employeeId.toString(),
+      escapeCsvValue(summary.employeeName),
+      summary.regularHours.toFixed(2),
+      summary.overtimeHours.toFixed(2),
+      summary.expenseTotal.toFixed(2),
+      summary.grossEstimate.toFixed(2),
+      summary.payCurrency ?? '',
+      summary.payRateType ?? '',
+      summary.payRate != null ? summary.payRate.toFixed(2) : '',
+      summary.missingPayRate ? 'yes' : 'no',
+    ].join(',')
+  );
+
+  return [header, ...rows].join('\n');
+};
+
+export const exportPayrollPeriodCsv = async (
+  tenantId: string,
+  periodId: string,
+  userId: string,
+  auditContext?: AuditContext
+): Promise<{ csv: string; filename: string }> => {
+  if (!mongoose.isValidObjectId(periodId)) {
+    throw new PayrollServiceError('Invalid payroll period id', 400);
+  }
+
+  const period = await PayrollPeriod.findOne({
+    _id: periodId,
+    tenantId: new mongoose.Types.ObjectId(tenantId),
+  });
+
+  if (!period) {
+    throw new PayrollServiceError('Payroll period not found', 404);
+  }
+
+  if (period.status === 'draft') {
+    throw new PayrollServiceError('Generate payroll before exporting', 409);
+  }
+
+  if (period.employeeSummaries.length === 0) {
+    throw new PayrollServiceError('Payroll period has no employee summaries to export', 409);
+  }
+
+  const periodStart = formatDateOnly(period.periodStart);
+  const periodEnd = formatDateOnly(period.periodEnd);
+  const csv = buildPayrollCsv(period);
+
+  if (period.status === 'generated') {
+    const before = periodAuditSnapshot(period);
+    period.status = 'exported';
+    period.exportedAt = new Date();
+    period.exportedBy = new mongoose.Types.ObjectId(userId);
+    await period.save();
+
+    await writeAuditLog({
+      tenantId,
+      userId,
+      action: 'update',
+      entityType: 'PayrollPeriod',
+      entityId: period._id.toString(),
+      before,
+      after: periodAuditSnapshot(period),
+      context: auditContext,
+    });
+  }
+
+  return {
+    csv,
+    filename: buildPayrollExportFilename(periodStart, periodEnd),
+  };
 };

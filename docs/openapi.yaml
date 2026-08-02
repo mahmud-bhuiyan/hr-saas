@@ -4159,6 +4159,51 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
 
+  /api/v1/payroll/periods/{id}/export:
+    get:
+      tags: [Payroll]
+      summary: Export payroll period to CSV
+      description: |
+        HR manager or company admin. Downloads a CSV of employee payroll summaries for the period.
+        Requires the period to be generated first. Sets status to `exported` on first export and writes an audit log.
+        Re-downloading an already exported period returns the same CSV without changing status.
+      operationId: exportPayrollPeriod
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Payroll CSV file
+          content:
+            text/csv:
+              schema:
+                type: string
+                example: |
+                  employeeId,employeeName,regularHours,overtimeHours,expenseTotal,grossEstimate,currency,payRateType,payRate,missingPayRate
+                  64f1a2b3c4d5e6f7a8b9c0d1,Ada Lovelace,37.50,2.00,45.00,987.50,GBP,hourly,25.00,no
+          headers:
+            Content-Disposition:
+              schema:
+                type: string
+              example: attachment; filename="payroll-2026-08-01-to-2026-08-07.csv"
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: Period is draft or has no summaries
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
   /api/v1/settings/departments:
     get:
       tags: [Settings]
