@@ -2,7 +2,7 @@
   "info": {
     "_postman_id": "hr-saas-api-collection",
     "name": "HR SaaS API",
-    "description": "All API requests for the HR SaaS platform. Import into Postman or use with Newman.\n\n**Setup:** Import `hr-saas.local.postman_environment.json` or set collection variables `baseUrl`, `accessToken`, and `pendingTenantId`.\n\n**Auth flow:** Register submits for approval (no token). Super admin approves, then company admin logs in. Login saves `accessToken` automatically.",
+    "description": "All API requests for the HR SaaS platform. Import into Postman or use with Newman.\n\n**Setup:** Import `hr-saas.local.postman_environment.json` or set collection variables `baseUrl`, `accessToken`, `testPassword`, and `employeeEmail`.\n\n**Local test credentials:** After `cd server && npm run seed:test-data`, every seeded account signs in with its **email** and password **`User@123`** (`{{testPassword}}`).\n\n**Auth flow:** Register submits for approval (no token). Super admin approves, then company admin logs in. Login requests save `accessToken` automatically.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
@@ -56,6 +56,26 @@
     },
     {
       "key": "payrollPeriodId",
+      "value": ""
+    },
+    {
+      "key": "testPassword",
+      "value": "User@123"
+    },
+    {
+      "key": "superAdminEmail",
+      "value": "superadmin@hr.com"
+    },
+    {
+      "key": "adminEmail",
+      "value": "admin@acme.com"
+    },
+    {
+      "key": "employeeEmail",
+      "value": "alex.morgan@acme.com"
+    },
+    {
+      "key": "resetToken",
       "value": ""
     }
   ],
@@ -114,7 +134,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"companyName\": \"Acme Ltd\",\n  \"email\": \"admin@acme.com\",\n  \"password\": \"TestPass123\",\n  \"firstName\": \"Jane\",\n  \"lastName\": \"Admin\"\n}"
+              "raw": "{\n  \"companyName\": \"Acme Ltd\",\n  \"email\": \"{{adminEmail}}\",\n  \"password\": \"{{testPassword}}\",\n  \"firstName\": \"Jane\",\n  \"lastName\": \"Admin\"\n}"
             },
             "url": "{{baseUrl}}/api/v1/auth/register",
             "description": "Submits company for super admin approval. Returns pending status — no accessToken."
@@ -122,7 +142,7 @@
           "response": []
         },
         {
-          "name": "Login",
+          "name": "Login (Company Admin)",
           "event": [
             {
               "listen": "test",
@@ -147,10 +167,76 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"email\": \"admin@acme.com\",\n  \"password\": \"TestPass123\"\n}"
+              "raw": "{\n  \"email\": \"{{adminEmail}}\",\n  \"password\": \"{{testPassword}}\"\n}"
             },
             "url": "{{baseUrl}}/api/v1/auth/login",
-            "description": "Returns accessToken after company is approved. Pending registrations get 403."
+            "description": "Acme company admin after `npm run seed:test-data` or super-admin company creation. Saves accessToken."
+          },
+          "response": []
+        },
+        {
+          "name": "Login (Super Admin)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  const json = pm.response.json();",
+                  "  pm.collectionVariables.set('accessToken', json.data.accessToken);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{superAdminEmail}}\",\n  \"password\": \"{{testPassword}}\"\n}"
+            },
+            "url": "{{baseUrl}}/api/v1/auth/login",
+            "description": "Platform super admin (`npm run seed:superadmin` or seed:test-data). Saves accessToken."
+          },
+          "response": []
+        },
+        {
+          "name": "Login (Employee)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  const json = pm.response.json();",
+                  "  pm.collectionVariables.set('accessToken', json.data.accessToken);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{employeeEmail}}\",\n  \"password\": \"{{testPassword}}\"\n}"
+            },
+            "url": "{{baseUrl}}/api/v1/auth/login",
+            "description": "Employee self-service login. Set `employeeEmail` to any seeded employee (e.g. alex.morgan@acme.com, jane.smith@acme.com). Password is always `User@123` after seed:test-data."
           },
           "response": []
         },
@@ -249,7 +335,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"email\": \"admin@acme.com\"\n}"
+              "raw": "{\n  \"email\": \"{{adminEmail}}\"\n}"
             },
             "url": "{{baseUrl}}/api/v1/auth/forgot-password",
             "description": "Sends reset email when account exists. Always returns success message."
@@ -268,10 +354,10 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"token\": \"paste-token-from-email\",\n  \"password\": \"NewPass123\"\n}"
+              "raw": "{\n  \"token\": \"{{resetToken}}\",\n  \"password\": \"{{testPassword}}\"\n}"
             },
             "url": "{{baseUrl}}/api/v1/auth/reset-password",
-            "description": "Sets a new password using the token from the reset email."
+            "description": "Sets password to the standard test password (`User@123`). Paste invite/reset token into `resetToken` or use after Forgot Password."
           },
           "response": []
         }
@@ -322,7 +408,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"companyName\": \"Acme Ltd\",\n  \"email\": \"admin@acme.com\",\n  \"password\": \"TestPass123\",\n  \"firstName\": \"Jane\",\n  \"lastName\": \"Admin\"\n}"
+              "raw": "{\n  \"companyName\": \"Acme Ltd\",\n  \"email\": \"{{adminEmail}}\",\n  \"password\": \"{{testPassword}}\",\n  \"firstName\": \"Jane\",\n  \"lastName\": \"Admin\"\n}"
             },
             "url": "{{baseUrl}}/api/v1/admin/registrations",
             "description": "Super admin creates an approved company and company admin. Admin can sign in immediately."
@@ -464,7 +550,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"email\": \"superadmin@hr.com\",\n  \"password\": \"User@123\",\n  \"role\": \"super_admin\",\n  \"firstName\": \"Super\",\n  \"lastName\": \"Admin\"\n}"
+              "raw": "{\n  \"email\": \"superadmin@hr.com\",\n  \"password\": \"{{testPassword}}\",\n  \"role\": \"super_admin\",\n  \"firstName\": \"Super\",\n  \"lastName\": \"Admin\"\n}"
             },
             "url": "{{baseUrl}}/api/v1/admins",
             "description": "Bootstrap: works without auth when DB has zero users. Otherwise requires super_admin Bearer token."
@@ -493,7 +579,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"email\": \"hr@acme.com\",\n  \"password\": \"TestPass123\",\n  \"role\": \"hr_manager\",\n  \"firstName\": \"HR\",\n  \"lastName\": \"Manager\"\n}"
+              "raw": "{\n  \"email\": \"hr@acme.com\",\n  \"password\": \"{{testPassword}}\",\n  \"role\": \"hr_manager\",\n  \"firstName\": \"HR\",\n  \"lastName\": \"Manager\"\n}"
             },
             "url": "{{baseUrl}}/api/v1/admins",
             "description": "Requires super_admin Bearer token when users already exist."
@@ -687,7 +773,7 @@
               "raw": "{\n  \"role\": \"employee\"\n}"
             },
             "url": "{{baseUrl}}/api/v1/employees/{{employeeId}}/invite",
-            "description": "Creates/links a user for an employee without userId and sends invite email."
+            "description": "Creates/links a user for an employee without userId and sends invite email. For local testing with a known password, run `npm run seed:test-data` instead (all employees get `User@123`)."
           },
           "response": []
         },

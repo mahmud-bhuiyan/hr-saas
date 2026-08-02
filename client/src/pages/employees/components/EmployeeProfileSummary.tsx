@@ -59,8 +59,8 @@ export const EmployeeProfileSummary = ({ employee, showMetadata = false }: Emplo
       </div>
 
       {showMetadata && (
-        <div className="border-t border-slate-100 bg-slate-50 px-5 py-4">
-          <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
+        <div className="border-t border-slate-100 bg-slate-50 px-5 py-4 dark:border-slate-800 dark:bg-slate-800/50">
+          <p className="text-xs font-semibold uppercase tracking-wide text-slate-400 dark:text-slate-500">
             Record details
           </p>
           <dl className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
