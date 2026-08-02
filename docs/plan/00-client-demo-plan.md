@@ -265,6 +265,6 @@ Full roadmap: [hr-saas-mern-project-plan.md](./hr-saas-mern-project-plan.md)
 | Leave (Step 5) | ✅ Complete | Email via SendGrid; user→employee via email fallback |
 | Documents (Step 6) | ✅ Ready for review | MinIO for local dev; AWS S3 or Cloudflare R2 in production |
 | Settings (Step 7) | ✅ Ready for review | Company profile, departments CRUD, users/roles; branding was done earlier |
-| Demo polish (Step 8) | ⬜ Pending | |
+| Demo polish (Step 8) | 🔄 In progress | Seed + staging deploy done; walkthrough polish + optional forgot password remain |
 
-**Next step:** Step 8 — demo seed data, staging deploy, polish. See [IMPLEMENTATION-STEPS.md](./IMPLEMENTATION-STEPS.md).
+**Next step:** Step 8 — walkthrough bug fixes and Demo 1 sign-off. See [IMPLEMENTATION-STEPS.md](./IMPLEMENTATION-STEPS.md).

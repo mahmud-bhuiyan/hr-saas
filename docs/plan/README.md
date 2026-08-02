@@ -27,8 +27,8 @@ Planning documents for the HR SaaS platform. Use these to align with the client,
 | 4 | Employee management | ✅ Ready for review |
 | 5 | Leave & absence | ✅ Complete |
 | 6 | Documents | ✅ Ready for review |
-| 7 | Settings (branding complete; profile/depts/users pending) | 🟡 Partial |
-| 8 | Demo polish | ⬜ Pending |
+| 7 | Settings (company, departments, users, branding) | ✅ Ready for review |
+| 8 | Demo polish | 🔄 In progress (deploy done) |
 
 ---
 
