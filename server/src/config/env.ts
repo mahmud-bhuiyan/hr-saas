@@ -24,6 +24,9 @@ export interface ServerEnv {
   stripeSecretKey: string;
   stripeWebhookSecret: string;
   stripePriceId: string;
+  xeroClientId: string;
+  xeroClientSecret: string;
+  xeroRedirectUri: string;
 }
 
 export const loadServerEnv = (): ServerEnv => {
@@ -45,5 +48,8 @@ export const loadServerEnv = (): ServerEnv => {
     stripeSecretKey: process.env.STRIPE_SECRET_KEY ?? '',
     stripeWebhookSecret: process.env.STRIPE_WEBHOOK_SECRET ?? '',
     stripePriceId: process.env.STRIPE_PRICE_ID ?? '',
+    xeroClientId: process.env.XERO_CLIENT_ID ?? '',
+    xeroClientSecret: process.env.XERO_CLIENT_SECRET ?? '',
+    xeroRedirectUri: process.env.XERO_REDIRECT_URI ?? '',
   };
 }

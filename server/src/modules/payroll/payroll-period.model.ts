@@ -26,6 +26,10 @@ export interface IPayrollPeriod {
   generatedBy?: mongoose.Types.ObjectId | null;
   exportedAt?: Date | null;
   exportedBy?: mongoose.Types.ObjectId | null;
+  accountingProvider?: 'xero' | null;
+  accountingReference?: string | null;
+  accountingSyncedAt?: Date | null;
+  accountingSyncedBy?: mongoose.Types.ObjectId | null;
 }
 
 export interface IPayrollPeriodDocument extends IPayrollPeriod, Document {
@@ -66,6 +70,10 @@ const payrollPeriodSchema = new Schema<IPayrollPeriodDocument>(
     generatedBy: { type: Schema.Types.ObjectId, ref: 'User', default: null },
     exportedAt: { type: Date, default: null },
     exportedBy: { type: Schema.Types.ObjectId, ref: 'User', default: null },
+    accountingProvider: { type: String, enum: ['xero'], default: null },
+    accountingReference: { type: String, default: null, trim: true },
+    accountingSyncedAt: { type: Date, default: null },
+    accountingSyncedBy: { type: Schema.Types.ObjectId, ref: 'User', default: null },
   },
   { timestamps: true }
 );

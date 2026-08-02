@@ -497,12 +497,33 @@ export interface PayrollSettings {
   payPeriodType: PayPeriodType;
   defaultPayCurrency: string;
   payrollWeekStartDay: number;
+  xeroExpenseAccountCode: string;
+  xeroPayableAccountCode: string;
 }
 
 export interface PatchPayrollSettingsInput {
   payPeriodType?: PayPeriodType;
   defaultPayCurrency?: string;
   payrollWeekStartDay?: number;
+  xeroExpenseAccountCode?: string;
+  xeroPayableAccountCode?: string;
+}
+
+export interface AccountingConnectionStatus {
+  provider: 'xero';
+  configured: boolean;
+  connected: boolean;
+  organisationName?: string;
+  connectedAt?: string;
+  expenseAccountCode: string;
+  payableAccountCode: string;
+}
+
+export interface PayrollSyncResult {
+  periodId: string;
+  provider: 'xero';
+  externalReference: string;
+  syncedAt: string;
 }
 
 export type PayrollPeriodStatus = 'draft' | 'generated' | 'exported';
@@ -530,6 +551,10 @@ export interface PayrollPeriod {
   generatedBy?: string;
   exportedAt?: string;
   exportedBy?: string;
+  accountingProvider?: 'xero';
+  accountingReference?: string;
+  accountingSyncedAt?: string;
+  accountingSyncedBy?: string;
   createdAt: string;
   updatedAt: string;
 }

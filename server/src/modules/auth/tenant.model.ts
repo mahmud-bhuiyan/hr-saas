@@ -32,6 +32,8 @@ export interface ITenant {
   payPeriodType?: PayPeriodType;
   defaultPayCurrency?: string;
   payrollWeekStartDay?: number;
+  xeroExpenseAccountCode?: string;
+  xeroPayableAccountCode?: string;
 }
 
 export interface ITenantDocument extends ITenant, Document {
@@ -73,6 +75,8 @@ const tenantSchema = new Schema<ITenantDocument>(
     },
     defaultPayCurrency: { type: String, default: 'GBP', trim: true, uppercase: true },
     payrollWeekStartDay: { type: Number, default: 1, min: 0, max: 6 },
+    xeroExpenseAccountCode: { type: String, default: '477', trim: true },
+    xeroPayableAccountCode: { type: String, default: '804', trim: true },
   },
   { timestamps: true }
 );

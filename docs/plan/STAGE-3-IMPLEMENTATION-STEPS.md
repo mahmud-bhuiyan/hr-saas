@@ -13,7 +13,7 @@ Check off each step with the client/dev team before moving to the next.
 | **S3-3** | Rotas UI — weekly grid, publish, employee shift view, open-shift claim | ✅ Done |
 | **S3-4** | Payroll export backend — `PayrollPeriod`, aggregate timesheets + expenses + pay rates | ✅ Done |
 | **S3-5** | Payroll export UI — generate, preview, CSV download | ✅ Done |
-| **S3-6** | Accounting integration — Xero **or** QuickBooks OAuth push (client picks one) | Not started |
+| **S3-6** | Accounting integration — Xero OAuth push (manual journals) | ✅ Done |
 | **S3-7** | Cross-module polish — rota/leave clash warnings, optional break deductions | Not started |
 | **S3-8** | Stage 3 polish, staging walkthrough, client sign-off | Not started |
 
@@ -26,6 +26,7 @@ Features added during Stage 3 implementation that extend the original step list.
 | Added | Step | Description |
 |-------|------|-------------|
 | Open-shift auto-assign on claim | S3-3 | Claim assigns shift immediately (no manager approval queue) |
+| Xero chosen over QuickBooks for S3-6 | S3-6 | Client default GBP market; OAuth + manual journal sync |
 
 ---
 
@@ -121,12 +122,12 @@ Features added during Stage 3 implementation that extend the original step list.
 
 ## S3-6 — Done when
 
-- [ ] Client selects **Xero** or **QuickBooks** (document choice in out-of-plan log)
-- [ ] OAuth connect flow for chosen provider
-- [ ] `POST /api/v1/payroll/periods/:id/sync` — push export to accounting system
-- [ ] Connection status in payroll settings
-- [ ] Env vars documented in README and `.env.example`
-- [ ] `docs/openapi.yaml` and Postman collection updated
+- [x] Client selects **Xero** (documented in out-of-plan log; QuickBooks deferred)
+- [x] OAuth connect flow for chosen provider
+- [x] `POST /api/v1/payroll/periods/:id/sync` — push export to accounting system
+- [x] Connection status in payroll settings
+- [x] Env vars documented in README and `.env.example`
+- [x] `docs/openapi.yaml` and Postman collection updated
 
 **Review:** Test OAuth + sync in provider sandbox before S3-7.
 
