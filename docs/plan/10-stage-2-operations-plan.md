@@ -1,10 +1,10 @@
 # HR SaaS — Stage 2 Operations Plan
 
-**Purpose:** Extend the platform from Demo 1 core HR into day-to-day **operations** — attendance, timesheets, expenses, notifications, audit visibility, and per-seat billing — so SMEs can run payroll-adjacent workflows without leaving the product.
+**Purpose:** Extend the platform from Stage 1 core HR into day-to-day **operations** — attendance, timesheets, expenses, notifications, audit visibility, and per-seat billing — so SMEs can run payroll-adjacent workflows without leaving the product.
 
-**Prerequisite:** Demo 1 sign-off per [00-client-demo-plan.md](./00-client-demo-plan.md) Section 7.
+**Prerequisite:** Stage 1 sign-off per [00-stage-1-core-hr-plan.md](./00-stage-1-core-hr-plan.md) Section 7.
 
-**Target companies:** Same as Demo 1 — SMEs with 5–100 employees.
+**Target companies:** Same as Stage 1 — SMEs with 5–100 employees.
 
 **Stack:** React + Node.js + MongoDB + Redis (BullMQ) + Stripe — separate `client/` and `server/` apps.
 
@@ -33,7 +33,7 @@ A live web app where employees clock in/out, managers see who's working, timeshe
 | 11 | HR manager | Bulk-imports new hires via CSV wizard |
 | 12 | Company admin | Views headcount and absence summary reports on dashboard |
 
-This flow covers **time → pay data → expenses → compliance → monetization**, building on Demo 1's people and leave foundation.
+This flow covers **time → pay data → expenses → compliance → monetization**, building on Stage 1's people and leave foundation.
 
 ---
 
@@ -195,11 +195,11 @@ Steps S2-4, S2-5, S2-6, and S2-7 can overlap after S2-1 completes (S2-3 requires
 
 ## 6. Demo Environment
 
-- Reuse Demo 1 staging URLs (client + server on Vercel or equivalent)
+- Reuse Stage 1 staging URLs (client + server on Vercel or equivalent)
 - Extend Acme Ltd demo data manually on staging (attendance, timesheets, expenses, notifications)
 - Redis required for notification worker in staging
 - Stripe test mode keys for billing walkthrough
-- Demo accounts unchanged from Demo 1 (`admin@acme-demo.com`, etc.) — password `User@123`
+- Demo accounts unchanged from Stage 1 (`admin@acme-demo.com`, etc.) — password `User@123`
 
 ---
 

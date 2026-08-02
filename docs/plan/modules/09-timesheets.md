@@ -145,9 +145,9 @@ Week ends → Employee clicks Generate → reviews draft → submits
 
 ---
 
-## 9. Demo 1 vs Stage 2
+## 9. Stage 1 vs Stage 2
 
-| Feature | Demo 1 | Stage 2 |
+| Feature | Stage 1 | Stage 2 |
 |---------|--------|---------|
 | Timesheets | — | ✅ |
 | Overtime tracking | — | ✅ |

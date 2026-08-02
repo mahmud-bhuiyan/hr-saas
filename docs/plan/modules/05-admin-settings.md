@@ -1,6 +1,6 @@
 # Module: Admin & Settings
 
-**Stage:** Demo 1 (Step 7) — complete  
+**Stage:** Stage 1 (Step 7) — complete  
 **Status:** Ready for review  
 **Depends on:** Auth & Tenant (Step 2), Employee Management (Step 4)
 
@@ -14,13 +14,13 @@
 
 ## 2. Scope split: platform vs tenant
 
-| Scope | Who | Module | Demo 1 |
+| Scope | Who | Module | Stage 1 |
 |-------|-----|--------|--------|
 | Platform branding (site name, theme, logo, favicon) | `super_admin` | [15-platform-site-settings.md](./15-platform-site-settings.md) | ✅ Step 7 |
 | Company profile (name, address, logo) | `company_admin` | This module | ✅ Step 7 |
 | Departments CRUD | `company_admin`, `hr_manager` | This module | ✅ Step 7 |
 | User list & role assignment | `company_admin` | This module | ✅ Step 7 |
-| Per-tenant white-label overrides | `company_admin` | This module | ✅ Demo 1 (early) |
+| Per-tenant white-label overrides | `company_admin` | This module | ✅ Stage 1 (early) |
 
 ---
 
@@ -100,9 +100,9 @@ Platform site settings endpoints live in [15-platform-site-settings.md](./15-pla
 
 ---
 
-## 7. Demo 1 vs Later
+## 7. Stage 1 vs Later
 
-| Feature | Demo 1 | Later |
+| Feature | Stage 1 | Later |
 |---------|--------|-------|
 | Company profile (name, address, logo) | ✅ | |
 | Departments CRUD | ✅ | |

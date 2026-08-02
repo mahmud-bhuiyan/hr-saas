@@ -1,6 +1,6 @@
 # Module: Document Storage
 
-**Stage:** Demo 1  
+**Stage:** Stage 1  
 **Status:** Ready for review  
 **Depends on:** Auth & Tenant (Step 2), Employee Management (Step 4)
 
@@ -78,9 +78,9 @@ HR teams store contracts, IDs, certifications, and other files per employee or a
 
 ---
 
-## 7. Demo 1 vs Later
+## 7. Stage 1 vs Later
 
-| Feature | Demo 1 | Later |
+| Feature | Stage 1 | Later |
 |---------|--------|-------|
 | Upload/download | ✅ | |
 | Categories | ✅ | |

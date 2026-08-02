@@ -12,7 +12,8 @@ export type AuditEntityType =
   | 'Expense'
   | 'Subscription'
   | 'WorkLocation'
-  | 'Shift';
+  | 'Shift'
+  | 'PayrollPeriod';
 
 export interface IAuditLog {
   tenantId: mongoose.Types.ObjectId;
@@ -44,7 +45,7 @@ const auditLogSchema = new Schema<IAuditLogDocument>(
     entityType: {
       type: String,
       required: true,
-      enum: ['Employee', 'HrDocument', 'User', 'LeaveRequest', 'AttendanceLog', 'Timesheet', 'Expense', 'Subscription', 'WorkLocation', 'Shift'],
+      enum: ['Employee', 'HrDocument', 'User', 'LeaveRequest', 'AttendanceLog', 'Timesheet', 'Expense', 'Subscription', 'WorkLocation', 'Shift', 'PayrollPeriod'],
     },
     entityId: { type: Schema.Types.ObjectId, required: true },
     before: { type: Schema.Types.Mixed, default: null },

@@ -171,5 +171,5 @@ After deploy, run `npm run seed:superadmin` once against the staging `MONGODB_UR
 
 ## Implementation progress
 
-- Demo 1: [docs/plan/IMPLEMENTATION-STEPS.md](./docs/plan/IMPLEMENTATION-STEPS.md)
+- Stage 1: [docs/plan/STAGE-1-IMPLEMENTATION-STEPS.md](./docs/plan/STAGE-1-IMPLEMENTATION-STEPS.md) · [docs/plan/00-stage-1-core-hr-plan.md](./docs/plan/00-stage-1-core-hr-plan.md)
 - Stage 2: [docs/plan/STAGE-2-IMPLEMENTATION-STEPS.md](./docs/plan/STAGE-2-IMPLEMENTATION-STEPS.md) · [docs/plan/10-stage-2-operations-plan.md](./docs/plan/10-stage-2-operations-plan.md)

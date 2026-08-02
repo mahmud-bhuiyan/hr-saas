@@ -2,7 +2,7 @@
 
 Planning documents for the HR SaaS platform. Use these to align with the client, scope demos, and guide development phase by phase.
 
-**Keep plans current:** When adding features mid-sprint, update [IMPLEMENTATION-STEPS.md](./IMPLEMENTATION-STEPS.md), [STAGE-2-IMPLEMENTATION-STEPS.md](./STAGE-2-IMPLEMENTATION-STEPS.md), or [STAGE-3-IMPLEMENTATION-STEPS.md](./STAGE-3-IMPLEMENTATION-STEPS.md) (including the out-of-plan log), the relevant module file in [modules/](./modules/), and the screens checklist in [00-client-demo-plan.md](./00-client-demo-plan.md), [10-stage-2-operations-plan.md](./10-stage-2-operations-plan.md), or [11-stage-3-scheduling-payroll-plan.md](./11-stage-3-scheduling-payroll-plan.md).
+**Keep plans current:** When adding features mid-sprint, update [STAGE-1-IMPLEMENTATION-STEPS.md](./STAGE-1-IMPLEMENTATION-STEPS.md), [STAGE-2-IMPLEMENTATION-STEPS.md](./STAGE-2-IMPLEMENTATION-STEPS.md), or [STAGE-3-IMPLEMENTATION-STEPS.md](./STAGE-3-IMPLEMENTATION-STEPS.md) (including the out-of-plan log), the relevant module file in [modules/](./modules/), and the screens checklist in [00-stage-1-core-hr-plan.md](./00-stage-1-core-hr-plan.md), [10-stage-2-operations-plan.md](./10-stage-2-operations-plan.md), or [11-stage-3-scheduling-payroll-plan.md](./11-stage-3-scheduling-payroll-plan.md).
 
 ---
 
@@ -10,8 +10,8 @@ Planning documents for the HR SaaS platform. Use these to align with the client,
 
 | File | Purpose | Audience |
 |------|---------|----------|
-| [IMPLEMENTATION-STEPS.md](./IMPLEMENTATION-STEPS.md) | **Demo 1 dev checklist** — Steps 1–8 | Dev team |
-| [00-client-demo-plan.md](./00-client-demo-plan.md) | **Demo 1** — first client presentation | Client + dev team |
+| [STAGE-1-IMPLEMENTATION-STEPS.md](./STAGE-1-IMPLEMENTATION-STEPS.md) | **Stage 1 dev checklist** — Steps 1–8 | Dev team |
+| [00-stage-1-core-hr-plan.md](./00-stage-1-core-hr-plan.md) | **Stage 1** — first client presentation | Client + dev team |
 | [STAGE-2-IMPLEMENTATION-STEPS.md](./STAGE-2-IMPLEMENTATION-STEPS.md) | **Stage 2 dev checklist** — Steps S2-1–S2-8 | Dev team |
 | [10-stage-2-operations-plan.md](./10-stage-2-operations-plan.md) | **Stage 2** — operations scope and sign-off | Client + dev team |
 | [STAGE-3-IMPLEMENTATION-STEPS.md](./STAGE-3-IMPLEMENTATION-STEPS.md) | **Stage 3 dev checklist** — Steps S3-1–S3-8 | Dev team |
@@ -21,7 +21,7 @@ Planning documents for the HR SaaS platform. Use these to align with the client,
 
 ---
 
-## Current progress — Demo 1 (2026-08-02)
+## Current progress — Stage 1 (2026-08-02)
 
 | Step | Scope | Status |
 |------|-------|--------|
@@ -58,20 +58,20 @@ Planning documents for the HR SaaS platform. Use these to align with the client,
 | S3-1 | Foundations — locations, pay fields, payroll settings | ✅ Done |
 | S3-2 | Rotas backend | ✅ Done |
 | S3-3 | Rotas UI | ✅ Done |
-| S3-4 | Payroll export backend | Not started |
+| S3-4 | Payroll export backend | ✅ Done |
 | S3-5 | Payroll export UI + CSV | Not started |
 | S3-6 | Accounting integration (Xero or QuickBooks) | Not started |
 | S3-7 | Cross-module polish | Not started |
 | S3-8 | Stage 3 sign-off | Not started |
 
-**Next step:** S3-4 — payroll export backend. See [STAGE-3-IMPLEMENTATION-STEPS.md](./STAGE-3-IMPLEMENTATION-STEPS.md).
+**Next step:** S3-5 — payroll export UI + CSV. See [STAGE-3-IMPLEMENTATION-STEPS.md](./STAGE-3-IMPLEMENTATION-STEPS.md).
 
 ---
 
 ## Roadmap at a Glance
 
 ```
-Demo 1 (client presentation) — Steps 1–8
+Stage 1 (client presentation) — Steps 1–8
   └── Auth, Employees, Leave, Documents, Admin shell
         │
         ▼
@@ -91,19 +91,19 @@ Detailed plans live in `modules/`. Each file follows [modules/_template.md](./mo
 
 | Module | Plan file | Stage | Status |
 |--------|-----------|-------|--------|
-| Auth & Tenant | [modules/01-auth-tenant.md](./modules/01-auth-tenant.md) | Demo 1 + S2-1 | Done |
-| Employee Management | [modules/02-employees.md](./modules/02-employees.md) | Demo 1 + S2 | Ready for review |
-| Leave & Absence | [modules/03-leave.md](./modules/03-leave.md) | Demo 1 + S2-5 | Complete |
-| Document Storage | [modules/04-documents.md](./modules/04-documents.md) | Demo 1 | Ready for review |
-| Admin & Settings | [modules/05-admin-settings.md](./modules/05-admin-settings.md) | Demo 1 | Ready for review |
+| Auth & Tenant | [modules/01-auth-tenant.md](./modules/01-auth-tenant.md) | Stage 1 + S2-1 | Done |
+| Employee Management | [modules/02-employees.md](./modules/02-employees.md) | Stage 1 + S2 | Ready for review |
+| Leave & Absence | [modules/03-leave.md](./modules/03-leave.md) | Stage 1 + S2-5 | Complete |
+| Document Storage | [modules/04-documents.md](./modules/04-documents.md) | Stage 1 | Ready for review |
+| Admin & Settings | [modules/05-admin-settings.md](./modules/05-admin-settings.md) | Stage 1 | Ready for review |
 | Attendance | [modules/06-attendance.md](./modules/06-attendance.md) | Stage 2 | Done |
 | Notifications | [modules/07-notifications.md](./modules/07-notifications.md) | Stage 2 | Done |
 | Shifts & Rotas | [modules/08-rotas.md](./modules/08-rotas.md) | Stage 3 | ✅ Done (S3-1–S3-3) |
 | Timesheets | [modules/09-timesheets.md](./modules/09-timesheets.md) | Stage 2 | Done |
 | Expenses | [modules/10-expenses.md](./modules/10-expenses.md) | Stage 2 | Done |
-| Payroll Export | [modules/11-payroll.md](./modules/11-payroll.md) | Stage 3 | S3-1 settings done; S3-4–S3-6 pending |
+| Payroll Export | [modules/11-payroll.md](./modules/11-payroll.md) | Stage 3 | S3-1 + S3-4 done; S3-5–S3-6 pending |
 | Reporting | [modules/12-reporting.md](./modules/12-reporting.md) | Stage 2 | Done (S2-6 thin slice) |
-| Platform Site Settings | [modules/15-platform-site-settings.md](./modules/15-platform-site-settings.md) | Demo 1 | Complete |
+| Platform Site Settings | [modules/15-platform-site-settings.md](./modules/15-platform-site-settings.md) | Stage 1 | Complete |
 | Audit Log | [modules/16-audit-log.md](./modules/16-audit-log.md) | Stage 2 | Done |
 | Billing (Stripe) | [modules/17-billing-stripe.md](./modules/17-billing-stripe.md) | Stage 2 | Done |
 
@@ -111,8 +111,8 @@ Detailed plans live in `modules/`. Each file follows [modules/_template.md](./mo
 
 ## How to Use
 
-1. **Client meeting (Demo 1):** Walk through `00-client-demo-plan.md` — scope, screens, timeline, out-of-scope list.
-2. **Client meeting (Stage 2):** Walk through `10-stage-2-operations-plan.md` after Demo 1 sign-off.
-3. **Development:** Follow `IMPLEMENTATION-STEPS.md` (Demo 1), then `STAGE-2-IMPLEMENTATION-STEPS.md`, then `STAGE-3-IMPLEMENTATION-STEPS.md`; create or update module plans in `modules/` before coding each module.
-4. **Scope changes:** Update the module plan first, log additions in the relevant IMPLEMENTATION-STEPS out-of-plan table, then sync the client plan screens checklist.
+1. **Client meeting (Stage 1):** Walk through `00-stage-1-core-hr-plan.md` — scope, screens, timeline, out-of-scope list.
+2. **Client meeting (Stage 2):** Walk through `10-stage-2-operations-plan.md` after Stage 1 sign-off.
+3. **Development:** Follow `STAGE-1-IMPLEMENTATION-STEPS.md` (Stage 1), then `STAGE-2-IMPLEMENTATION-STEPS.md`, then `STAGE-3-IMPLEMENTATION-STEPS.md`; create or update module plans in `modules/` before coding each module.
+4. **Scope changes:** Update the module plan first, log additions in the relevant STAGE-1-IMPLEMENTATION-STEPS out-of-plan table, then sync the client plan screens checklist.
 5. **Client meeting (Stage 3):** Walk through `11-stage-3-scheduling-payroll-plan.md` after Stage 2 sign-off.

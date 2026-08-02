@@ -5,7 +5,7 @@
 | [openapi.yaml](./openapi.yaml) | **API spec (source of truth)** — OpenAPI 3.0, all endpoints |
 | [postman/hr-saas.postman_collection.json](./postman/hr-saas.postman_collection.json) | **Postman collection** — runnable requests for every endpoint |
 | [postman/hr-saas.local.postman_environment.json](./postman/hr-saas.local.postman_environment.json) | Local Postman environment (`baseUrl`, `accessToken`) |
-| [plan/](./plan/) | Product roadmap and implementation steps — [Demo 1](./plan/IMPLEMENTATION-STEPS.md) · [Stage 2](./plan/STAGE-2-IMPLEMENTATION-STEPS.md) |
+| [plan/](./plan/) | Product roadmap and implementation steps — [Stage 1](./plan/STAGE-1-IMPLEMENTATION-STEPS.md) · [Stage 2](./plan/STAGE-2-IMPLEMENTATION-STEPS.md) |
 
 ## Using the API docs
 
@@ -33,6 +33,6 @@ See [AGENTS.md](../AGENTS.md) for the full agent checklist.
 
 Update plan docs in the same change (keep in sync with code):
 
-1. [plan/IMPLEMENTATION-STEPS.md](./plan/IMPLEMENTATION-STEPS.md) — step checklist; log out-of-plan additions in the table at the top
+1. [plan/STAGE-1-IMPLEMENTATION-STEPS.md](./plan/STAGE-1-IMPLEMENTATION-STEPS.md) — step checklist; log out-of-plan additions in the table at the top
 2. Relevant [plan/modules/](./plan/modules/) file — endpoints, screens, acceptance criteria
-3. [plan/00-client-demo-plan.md](./plan/00-client-demo-plan.md) — screens checklist and Section 11 status table
+3. [plan/00-stage-1-core-hr-plan.md](./plan/00-stage-1-core-hr-plan.md) — screens checklist and Section 11 status table

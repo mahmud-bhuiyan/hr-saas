@@ -1,4 +1,4 @@
-# Implementation Steps
+# Stage 1 — Implementation Steps
 
 Check off each step with the client/dev team before moving to the next.
 
@@ -11,7 +11,7 @@ Check off each step with the client/dev team before moving to the next.
 | **5** | Leave & absence — requests, approval, balance, calendar | ✅ Complete |
 | **6** | Document storage — S3 upload/download | ✅ Ready for review |
 | **7** | Admin & settings — company, departments, users | ✅ Ready for review |
-| **8** | Demo polish — staging deploy, bug fixes, manual demo data | ✅ Complete |
+| **8** | Stage 1 polish — staging deploy, bug fixes, manual demo data | ✅ Complete |
 
 ---
 
@@ -155,16 +155,16 @@ Features added during implementation that extend the original step list. Keep th
 - [x] Staging deployment (client + server)
 - [x] Bug fixes on demo walkthrough path (Stage 2 path addressed in S2-8)
 - [x] Forgot password flow — shipped in S2-1 (`/forgot-password`, `/reset-password`)
-- [x] Client demo sign-off per [00-client-demo-plan.md](./00-client-demo-plan.md) Section 7
+- [x] Client demo sign-off per [00-stage-1-core-hr-plan.md](./00-stage-1-core-hr-plan.md) Section 7
 - [x] Automated demo seed scripts and demo-era unit tests removed intentionally — manual staging data only (`npm run seed:superadmin` for platform bootstrap)
 
-**Review:** Demo 1 complete. See [STAGE-3-IMPLEMENTATION-STEPS.md](./STAGE-3-IMPLEMENTATION-STEPS.md) for Stage 3.
+**Review:** Stage 1 complete. See [STAGE-3-IMPLEMENTATION-STEPS.md](./STAGE-3-IMPLEMENTATION-STEPS.md) for Stage 3.
 
 ---
 
 ## Stage 2 — Operations
 
-Demo 1 Steps 1–8 are complete. Stage 2 is complete. Stage 3 planning and build tracker:
+Stage 1 Steps 1–8 are complete. Stage 2 is complete. Stage 3 planning and build tracker:
 
 | Document | Purpose |
 |----------|---------|
@@ -173,4 +173,4 @@ Demo 1 Steps 1–8 are complete. Stage 2 is complete. Stage 3 planning and build
 | [11-stage-3-scheduling-payroll-plan.md](./11-stage-3-scheduling-payroll-plan.md) | Stage 3 client-facing scope |
 | [STAGE-3-IMPLEMENTATION-STEPS.md](./STAGE-3-IMPLEMENTATION-STEPS.md) | Dev checklist — Steps S3-1 through S3-8 |
 
-**Next step:** S3-4 — Payroll export backend. See [STAGE-3-IMPLEMENTATION-STEPS.md](./STAGE-3-IMPLEMENTATION-STEPS.md).
+**Next step:** S3-5 — Payroll export UI + CSV. See [STAGE-3-IMPLEMENTATION-STEPS.md](./STAGE-3-IMPLEMENTATION-STEPS.md).

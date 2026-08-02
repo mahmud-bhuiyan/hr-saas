@@ -141,9 +141,9 @@ HR opens employee history → corrects missed punch → audit log entry
 
 ---
 
-## 9. Demo 1 vs Stage 2
+## 9. Stage 1 vs Stage 2
 
-| Feature | Demo 1 | Stage 2 |
+| Feature | Stage 1 | Stage 2 |
 |---------|--------|---------|
 | Clock in/out | — | ✅ |
 | Live team board | — | ✅ |

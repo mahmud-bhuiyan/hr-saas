@@ -1,6 +1,6 @@
 # Module: Auth & Tenant
 
-**Stage:** Demo 1 (done) · Stage 2 extensions (S2-1 done)  
+**Stage:** Stage 1 (done) · Stage 2 extensions (S2-1 done)  
 **Status:** Done  
 **Depends on:** Step 1 (Foundation)
 
@@ -107,9 +107,9 @@ Authentication, multi-tenant isolation, and company onboarding. Every business r
 
 ---
 
-## 7. Demo 1 vs Later
+## 7. Stage 1 vs Later
 
-| Feature | Demo 1 | Stage 2 |
+| Feature | Stage 1 | Stage 2 |
 |---------|--------|---------|
 | Register / login / refresh | ✅ | |
 | Registration approval | ✅ | |

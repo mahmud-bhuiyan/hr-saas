@@ -78,9 +78,9 @@ Optional: update [`docs/postman/hr-saas.local.postman_environment.json`](./docs/
 
 When shipping features or adding scope mid-sprint, update **all** of these in the same change:
 
-1. [`docs/plan/IMPLEMENTATION-STEPS.md`](./docs/plan/IMPLEMENTATION-STEPS.md) — step checklist; log out-of-plan additions in the table at the top
+1. [`docs/plan/STAGE-1-IMPLEMENTATION-STEPS.md`](./docs/plan/STAGE-1-IMPLEMENTATION-STEPS.md) — step checklist; log out-of-plan additions in the table at the top
 2. Relevant file in [`docs/plan/modules/`](./docs/plan/modules/) — endpoints, screens, acceptance criteria
-3. [`docs/plan/00-client-demo-plan.md`](./docs/plan/00-client-demo-plan.md) — screens checklist and Section 11 status table
+3. [`docs/plan/00-stage-1-core-hr-plan.md`](./docs/plan/00-stage-1-core-hr-plan.md) — screens checklist and Section 11 status table
 
 See [`docs/plan/README.md`](./docs/plan/README.md) for the full plan index.
 

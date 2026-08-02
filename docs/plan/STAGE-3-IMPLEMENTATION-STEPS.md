@@ -11,7 +11,7 @@ Check off each step with the client/dev team before moving to the next.
 | **S3-1** | Foundations — work locations, employee pay fields, tenant payroll settings, permissions | ✅ Done |
 | **S3-2** | Rotas backend — `Shift`, `RotaTemplate`, week CRUD, leave conflict detection | ✅ Done |
 | **S3-3** | Rotas UI — weekly grid, publish, employee shift view, open-shift claim | ✅ Done |
-| **S3-4** | Payroll export backend — `PayrollPeriod`, aggregate timesheets + expenses + pay rates | Not started |
+| **S3-4** | Payroll export backend — `PayrollPeriod`, aggregate timesheets + expenses + pay rates | ✅ Done |
 | **S3-5** | Payroll export UI — generate, preview, CSV download | Not started |
 | **S3-6** | Accounting integration — Xero **or** QuickBooks OAuth push (client picks one) | Not started |
 | **S3-7** | Cross-module polish — rota/leave clash warnings, optional break deductions | Not started |
@@ -88,13 +88,14 @@ Features added during Stage 3 implementation that extend the original step list.
 
 ## S3-4 — Done when
 
-- [ ] `PayrollPeriod` model with `{ tenantId, periodStart, periodEnd, status, employeeSummaries[], generatedAt, exportedAt, exportedBy }`
-- [ ] `GET/POST /api/v1/payroll/periods` — list and create period
-- [ ] `POST /api/v1/payroll/periods/:id/generate` — aggregate approved timesheets + expenses + pay rates
-- [ ] Aggregation rules: only `approved` timesheets; only `approved`|`reimbursed` expenses
-- [ ] Hourly gross = `(regularHours + overtimeHours) × payRate`; salary = pro-rata period amount (no tax)
-- [ ] Audit log on generate and export
-- [ ] `docs/openapi.yaml` and Postman collection updated
+- [x] `PayrollPeriod` model with `{ tenantId, periodStart, periodEnd, status, employeeSummaries[], generatedAt, exportedAt, exportedBy }`
+- [x] `GET/POST /api/v1/payroll/periods` — list and create period
+- [x] `GET /api/v1/payroll/periods/:id` — period detail with summaries
+- [x] `POST /api/v1/payroll/periods/:id/generate` — aggregate approved timesheets + expenses + pay rates
+- [x] Aggregation rules: only `approved` timesheets; only `approved`|`reimbursed` expenses
+- [x] Hourly gross = `(regularHours + overtimeHours) × payRate`; salary = pro-rata period amount (no tax)
+- [x] Audit log on create and generate (export audit in S3-5)
+- [x] `docs/openapi.yaml` and Postman collection updated
 
 **Review:** Verify aggregation math with sample data before S3-5.
 

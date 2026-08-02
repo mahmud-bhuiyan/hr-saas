@@ -2,7 +2,7 @@
 
 Check off each step with the client/dev team before moving to the next.
 
-**Prerequisite:** Demo 1 complete — see [IMPLEMENTATION-STEPS.md](./IMPLEMENTATION-STEPS.md) Steps 1–8.
+**Prerequisite:** Stage 1 complete — see [STAGE-1-IMPLEMENTATION-STEPS.md](./STAGE-1-IMPLEMENTATION-STEPS.md) Steps 1–8.
 
 **Client plan:** [10-stage-2-operations-plan.md](./10-stage-2-operations-plan.md)
 
@@ -182,7 +182,7 @@ Features added during Stage 2 implementation that extend the original step list.
 - [x] Staging deploy updated with Redis worker and Stripe test keys — `server/render.yaml`, `npm run verify:staging`, enhanced `/api/v1/health` checks; see README staging section
 - [x] Bug fixes on Stage 2 walkthrough path — HR attendance corrections tab, local date/week fixes, multi-step leave toast, settings nav alignment
 - [x] SMS via Twilio — deferred (see out-of-plan log)
-- [x] Demo 1 carry-over items closed: forgot password verified (S2-1), walkthrough bugs fixed (Stage 2 path)
+- [x] Stage 1 carry-over items closed: forgot password verified (S2-1), walkthrough bugs fixed (Stage 2 path)
 - [x] Client sign-off per [10-stage-2-operations-plan.md](./10-stage-2-operations-plan.md) Section 7
 
 **Review:** Stage 2 complete. Next: [STAGE-3-IMPLEMENTATION-STEPS.md](./STAGE-3-IMPLEMENTATION-STEPS.md) S3-1.
