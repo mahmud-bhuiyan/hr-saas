@@ -710,3 +710,74 @@ export interface ExpenseReceiptDownloadResponse {
   downloadUrl: string;
   fileName: string;
 }
+
+export interface EmployeeImportError {
+  row: number;
+  field?: string;
+  message: string;
+}
+
+export interface EmployeeImportValidRow {
+  row: number;
+  firstName: string;
+  lastName: string;
+  email: string;
+  jobTitle: string;
+  department: string;
+  startDate: string;
+  managerEmail?: string;
+  phone?: string;
+}
+
+export interface EmployeeImportValidateResult {
+  valid: EmployeeImportValidRow[];
+  errors: EmployeeImportError[];
+  totalRows: number;
+}
+
+export interface EmployeeImportCommitResult {
+  created: number;
+  errors: EmployeeImportError[];
+}
+
+export interface HeadcountDepartmentBreakdown {
+  department: string;
+  active: number;
+  onLeave: number;
+  terminated: number;
+}
+
+export interface HeadcountReport {
+  total: number;
+  byDepartment: HeadcountDepartmentBreakdown[];
+  byStatus: {
+    active: number;
+    on_leave: number;
+    terminated: number;
+  };
+}
+
+export interface AbsenceTypeBreakdown {
+  type: string;
+  days: number;
+}
+
+export interface AbsenceDepartmentBreakdown {
+  department: string;
+  totalDays: number;
+  byType: AbsenceTypeBreakdown[];
+}
+
+export interface AbsenceSummaryReport {
+  from: string;
+  to: string;
+  totalDays: number;
+  byType: AbsenceTypeBreakdown[];
+  byDepartment: AbsenceDepartmentBreakdown[];
+}
+
+export interface AbsenceSummaryQuery {
+  from: string;
+  to: string;
+  department?: string;
+}

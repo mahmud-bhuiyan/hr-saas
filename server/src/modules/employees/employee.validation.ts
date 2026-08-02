@@ -69,3 +69,30 @@ export type CreateEmployeeInput = z.infer<typeof createEmployeeSchema>;
 export type UpdateEmployeeInput = z.infer<typeof updateEmployeeSchema>;
 export type ListEmployeesQuery = z.infer<typeof listEmployeesQuerySchema>;
 export type InviteEmployeeInput = z.infer<typeof inviteEmployeeSchema>;
+
+export const employeeImportCsvSchema = z.object({
+  csv: z.string().trim().min(1, 'CSV content is required'),
+});
+
+const employeeImportRowSchema = z.object({
+  firstName: z.string().trim().min(1).max(100),
+  lastName: z.string().trim().min(1).max(100),
+  email: z.string().email().transform((value) => value.toLowerCase().trim()),
+  jobTitle: z.string().trim().min(1).max(100),
+  department: z.string().trim().min(1).max(100),
+  startDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Start date must be YYYY-MM-DD'),
+  managerEmail: z
+    .string()
+    .email()
+    .transform((value) => value.toLowerCase().trim())
+    .optional(),
+  phone: z.string().trim().max(30).optional(),
+});
+
+export const employeeImportCommitSchema = z.object({
+  rows: z.array(employeeImportRowSchema).min(1, 'At least one row is required').max(500),
+});
+
+export type EmployeeImportCsvInput = z.infer<typeof employeeImportCsvSchema>;
+export type EmployeeImportRowInput = z.infer<typeof employeeImportRowSchema>;
+export type EmployeeImportCommitInput = z.infer<typeof employeeImportCommitSchema>;

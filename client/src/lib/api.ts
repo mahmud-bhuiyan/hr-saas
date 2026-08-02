@@ -81,6 +81,12 @@ import type {
   ExportExpensesQuery,
   DeclineExpenseInput,
   ExpenseReceiptDownloadResponse,
+  EmployeeImportValidateResult,
+  EmployeeImportValidRow,
+  EmployeeImportCommitResult,
+  HeadcountReport,
+  AbsenceSummaryReport,
+  AbsenceSummaryQuery,
 } from '../types';
 
 const apiBase = import.meta.env.VITE_API_URL || '';
@@ -814,6 +820,57 @@ export const inviteEmployee = async (
       method: 'POST',
       body: JSON.stringify(input),
     }
+  );
+  return json.data;
+};
+
+export const validateEmployeeImport = async (csv: string): Promise<EmployeeImportValidateResult> => {
+  const json = await apiFetch<ApiSuccessResponse<EmployeeImportValidateResult>>(
+    '/api/v1/employees/import/validate',
+    {
+      method: 'POST',
+      body: JSON.stringify({ csv }),
+    }
+  );
+  return json.data;
+};
+
+export const commitEmployeeImport = async (
+  rows: Omit<EmployeeImportValidRow, 'row'>[]
+): Promise<EmployeeImportCommitResult> => {
+  const json = await apiFetch<ApiSuccessResponse<EmployeeImportCommitResult>>(
+    '/api/v1/employees/import/commit',
+    {
+      method: 'POST',
+      body: JSON.stringify({ rows }),
+    }
+  );
+  return json.data;
+};
+
+export const fetchHeadcountReport = async (department?: string): Promise<HeadcountReport> => {
+  const params = new URLSearchParams();
+  if (department) {
+    params.set('department', department);
+  }
+  const qs = params.toString();
+  const json = await apiFetch<ApiSuccessResponse<HeadcountReport>>(
+    `/api/v1/reports/headcount${qs ? `?${qs}` : ''}`
+  );
+  return json.data;
+};
+
+export const fetchAbsenceSummaryReport = async (
+  query: AbsenceSummaryQuery
+): Promise<AbsenceSummaryReport> => {
+  const params = new URLSearchParams();
+  params.set('from', query.from);
+  params.set('to', query.to);
+  if (query.department) {
+    params.set('department', query.department);
+  }
+  const json = await apiFetch<ApiSuccessResponse<AbsenceSummaryReport>>(
+    `/api/v1/reports/absence-summary?${params.toString()}`
   );
   return json.data;
 };

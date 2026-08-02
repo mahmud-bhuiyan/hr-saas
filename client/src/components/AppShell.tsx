@@ -26,6 +26,7 @@ const navItems: Array<{
   { to: '/dashboard/attendance', label: 'Attendance', roles: ['company_admin', 'hr_manager', 'manager', 'employee'] },
   { to: '/dashboard/timesheets', label: 'Timesheets', roles: ['company_admin', 'hr_manager', 'manager', 'employee'] },
   { to: '/dashboard/expenses', label: 'Expenses', roles: ['company_admin', 'hr_manager', 'manager', 'employee'] },
+  { to: '/dashboard/reports', label: 'Reports', roles: ['company_admin', 'hr_manager'] },
   { to: '/dashboard/documents', label: 'Documents', roles: ['company_admin', 'hr_manager', 'employee'] },
   {
     to: '/dashboard/settings',

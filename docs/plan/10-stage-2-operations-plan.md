@@ -159,11 +159,11 @@ This flow covers **time → pay data → expenses → compliance → monetizatio
 
 ### Employees
 - [x] Employee invite action on profile
-- [ ] Bulk CSV import wizard on directory page
+- [x] Bulk CSV import wizard on directory page
 
 ### Reports
-- [ ] Headcount report (`/dashboard/reports/headcount`)
-- [ ] Absence summary (`/dashboard/reports/absence`)
+- [x] Headcount report (`/dashboard/reports/headcount`)
+- [x] Absence summary (`/dashboard/reports/absence`)
 
 ### Settings
 - [x] Audit log viewer (`/dashboard/settings/audit-log`) — HR/admin
@@ -273,12 +273,12 @@ Full roadmap: [hr-saas-mern-project-plan.md](./hr-saas-mern-project-plan.md)
 | S2-1 | Platform foundations | ✅ Done |
 | S2-2 | Attendance | ✅ Done |
 | S2-3 | Timesheets | ✅ Done |
-| S2-4 | Expenses | ⬜ Not started |
-| S2-5 | Leave enhancements | ⬜ Not started |
-| S2-6 | Import & reporting | ⬜ Not started |
+| S2-4 | Expenses | ✅ Done |
+| S2-5 | Leave enhancements | ✅ Done |
+| S2-6 | Import & reporting | ✅ Done |
 | S2-7 | Stripe billing | ⬜ Not started |
 | S2-8 | Polish & sign-off | ⬜ Not started |
 
 **Cross-cutting (Stage 2):** User light/dark theme preference — `colorScheme` on User; `PATCH /auth/me`; header toggle; `ThemeContext` + localStorage cache.
 
-**Next step:** S2-5 — leave enhancements. See [STAGE-2-IMPLEMENTATION-STEPS.md](./STAGE-2-IMPLEMENTATION-STEPS.md).
+**Next step:** S2-7 — Stripe billing. See [STAGE-2-IMPLEMENTATION-STEPS.md](./STAGE-2-IMPLEMENTATION-STEPS.md).

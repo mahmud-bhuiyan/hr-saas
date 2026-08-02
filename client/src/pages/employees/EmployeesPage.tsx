@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { FormEvent, useMemo, useState } from 'react';
 import { Navigate, useNavigate } from 'react-router-dom';
-import { HiPlus } from 'react-icons/hi2';
+import { HiArrowUpTray, HiPlus } from 'react-icons/hi2';
 import { Button } from '../../components/ui/Button';
 import { PageContainer } from '../../components/ui/PageContainer';
 import { PageHeader } from '../../components/ui/PageHeader';
@@ -21,6 +21,7 @@ import { areRequiredFieldsFilled } from '../../utils/form';
 import { hasPermission } from '../../utils/permissions';
 import { usePagination } from '../../hooks/usePagination';
 import { CreateEmployeeModal } from './components/CreateEmployeeModal';
+import { EmployeeImportModal } from './components/EmployeeImportModal';
 import { EmployeeFilters } from './components/EmployeeFilters';
 import { EmployeesTable } from './components/EmployeesTable';
 import { employeeName, isActiveEmployee, type EmployeesTab } from './utils';
@@ -44,6 +45,7 @@ export const EmployeesPage = () => {
   const [department, setDepartment] = useState('');
   const [activeTab, setActiveTab] = useState<EmployeesTab>('active');
   const [createOpen, setCreateOpen] = useState(false);
+  const [importOpen, setImportOpen] = useState(false);
   const [createForm, setCreateForm] = useState<CreateEmployeeInput>(emptyCreateForm);
   const [deactivateLoadingId, setDeactivateLoadingId] = useState<string | null>(null);
   const [activateLoadingId, setActivateLoadingId] = useState<string | null>(null);
@@ -224,12 +226,21 @@ export const EmployeesPage = () => {
         actionAlign="end"
         action={
           canCreate ? (
-            <Button
-              icon={<HiPlus className="h-4 w-4 text-white" />}
-              onClick={openCreateModal}
-            >
-              Add employee
-            </Button>
+            <div className="flex flex-wrap items-center justify-end gap-2">
+              <Button
+                variant="secondary"
+                icon={<HiArrowUpTray className="h-4 w-4 text-brand-600" />}
+                onClick={() => setImportOpen(true)}
+              >
+                Import CSV
+              </Button>
+              <Button
+                icon={<HiPlus className="h-4 w-4 text-white" />}
+                onClick={openCreateModal}
+              >
+                Add employee
+              </Button>
+            </div>
           ) : undefined
         }
       />
@@ -301,6 +312,14 @@ export const EmployeesPage = () => {
         departmentOptions={departmentsQuery.data ?? []}
         loading={createMutation.isPending}
         submitDisabled={!canSubmitCreate}
+      />
+
+      <EmployeeImportModal
+        open={importOpen}
+        onClose={() => setImportOpen(false)}
+        onSuccess={() => {
+          void queryClient.invalidateQueries({ queryKey: ['employees'] });
+        }}
       />
 
     </PageContainer>

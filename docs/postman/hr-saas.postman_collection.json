@@ -674,6 +674,42 @@
             "description": "Creates/links a user for an employee without userId and sends invite email."
           },
           "response": []
+        },
+        {
+          "name": "Validate Employee Import",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+            },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"csv\": \"firstName,lastName,email,jobTitle,department,startDate,managerEmail,phone\\nJane,Smith,jane.smith@acme.com,Software Engineer,Engineering,2024-01-15,,\"\n}"
+            },
+            "url": "{{baseUrl}}/api/v1/employees/import/validate",
+            "description": "Parse CSV and return valid rows plus validation errors (no DB writes)."
+          },
+          "response": []
+        },
+        {
+          "name": "Commit Employee Import",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+            },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"rows\": [\n    {\n      \"firstName\": \"Jane\",\n      \"lastName\": \"Smith\",\n      \"email\": \"jane.smith@acme.com\",\n      \"jobTitle\": \"Software Engineer\",\n      \"department\": \"Engineering\",\n      \"startDate\": \"2024-01-15\"\n    }\n  ]\n}"
+            },
+            "url": "{{baseUrl}}/api/v1/employees/import/commit",
+            "description": "Create employees from validated rows. Writes batch audit log entry."
+          },
+          "response": []
         }
       ]
     },
@@ -1338,6 +1374,47 @@
               "query": [{ "key": "status", "value": "approved" }]
             },
             "description": "Download approved expenses as CSV (HR/admin)."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Reports",
+      "item": [
+        {
+          "name": "Headcount Report",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+            },
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/reports/headcount",
+            "description": "Employee counts by department and status. Requires report:read."
+          },
+          "response": []
+        },
+        {
+          "name": "Absence Summary Report",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/reports/absence-summary?from=2026-01-01&to=2026-12-31",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "reports", "absence-summary"],
+              "query": [
+                { "key": "from", "value": "2026-01-01" },
+                { "key": "to", "value": "2026-12-31" }
+              ]
+            },
+            "description": "Approved leave days by type and department for date range. Requires report:read."
           },
           "response": []
         }

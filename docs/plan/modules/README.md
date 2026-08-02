@@ -11,7 +11,7 @@ One detailed plan file per business module. Use these for sprint planning and as
 | # | Module | File | Status |
 |---|--------|------|--------|
 | 01 | Auth & Tenant | [01-auth-tenant.md](./01-auth-tenant.md) | Done (S2-1 forgot password; user theme preference) |
-| 02 | Employee Management | [02-employees.md](./02-employees.md) | Ready for review |
+| 02 | Employee Management | [02-employees.md](./02-employees.md) | Ready for review (S2-6 CSV import done) |
 | 03 | Leave & Absence | [03-leave.md](./03-leave.md) | Complete (S2-5 enhancements) |
 | 04 | Document Storage | [04-documents.md](./04-documents.md) | Ready for review |
 | 05 | Admin & Settings | [05-admin-settings.md](./05-admin-settings.md) | Ready for review |
@@ -28,7 +28,7 @@ One detailed plan file per business module. Use these for sprint planning and as
 | 06 | Attendance | [06-attendance.md](./06-attendance.md) | S2-2 | Done |
 | 09 | Timesheets | [09-timesheets.md](./09-timesheets.md) | S2-3 | Done |
 | 10 | Expenses | [10-expenses.md](./10-expenses.md) | S2-4 | Done |
-| 12 | Reporting (thin slice) | [12-reporting.md](./12-reporting.md) | S2-6 | Not started |
+| 12 | Reporting (thin slice) | [12-reporting.md](./12-reporting.md) | S2-6 | Done |
 | 17 | Billing (Stripe) | [17-billing-stripe.md](./17-billing-stripe.md) | S2-7 | Not started |
 
 Stage 2 also extends **01-auth-tenant** (forgot password), **02-employees** (invite, CSV import), and **03-leave** (accrual, multi-step approval) — see Stage 2 sections in those files.

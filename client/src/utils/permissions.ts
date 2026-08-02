@@ -24,6 +24,7 @@ export const PERMISSIONS: Record<UserRole, string[]> = {
     'expense:read:own',
     'expense:approve',
     'expense:export',
+    'report:read',
   ],
   manager: [
     'leave:approve:team',

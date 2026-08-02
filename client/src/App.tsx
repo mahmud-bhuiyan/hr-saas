@@ -26,6 +26,9 @@ import { TimesheetsPage } from "./pages/timesheets/TimesheetsPage";
 import { ExpensesPage } from "./pages/expenses/ExpensesPage";
 import { AttendanceSettingsPage } from "./pages/settings/attendance/AttendanceSettingsPage";
 import { LeaveSettingsPage } from "./pages/settings/leave/LeaveSettingsPage";
+import { ReportsPage } from "./pages/reports/ReportsPage";
+import { HeadcountReportPage } from "./pages/reports/HeadcountReportPage";
+import { AbsenceReportPage } from "./pages/reports/AbsenceReportPage";
 
 const App = () => {
   return (
@@ -52,6 +55,9 @@ const App = () => {
           <Route path="/dashboard/attendance" element={<AttendancePage />} />
           <Route path="/dashboard/timesheets" element={<TimesheetsPage />} />
           <Route path="/dashboard/expenses" element={<ExpensesPage />} />
+          <Route path="/dashboard/reports" element={<ReportsPage />} />
+          <Route path="/dashboard/reports/headcount" element={<HeadcountReportPage />} />
+          <Route path="/dashboard/reports/absence" element={<AbsenceReportPage />} />
           <Route path="/dashboard/documents" element={<DocumentsPage />} />
           <Route
             path="/dashboard/platform/site-settings"

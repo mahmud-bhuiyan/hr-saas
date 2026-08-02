@@ -1,7 +1,7 @@
 # Module: Reporting (Stage 2 slice)
 
 **Stage:** Stage 2 (S2-6) — thin slice; full module in Stage 4  
-**Status:** Not started  
+**Status:** Done (S2-6)  
 **Depends on:** Employee Management, Leave & Absence
 
 ---
@@ -119,18 +119,18 @@ None.
 ## 10. Tasks Breakdown
 
 ### Backend
-- [ ] Headcount aggregation service
-- [ ] Absence summary aggregation service
-- [ ] Routes + RBAC
-- [ ] Add `report:read` permission
+- [x] Headcount aggregation service
+- [x] Absence summary aggregation service
+- [x] Routes + RBAC
+- [x] Add `report:read` permission
 
 ### Frontend
-- [ ] Headcount report page with recharts
-- [ ] Absence summary page with date filter
+- [x] Headcount report page with recharts
+- [x] Absence summary page with date filter
 - [ ] Dashboard quick links (optional)
 
 ### Integration
-- [ ] OpenAPI + Postman
+- [x] OpenAPI + Postman
 
 **Estimate:** 3 days (part of S2-6)
 
@@ -145,7 +145,7 @@ None.
 
 ## 12. Acceptance Criteria
 
-- [ ] Headcount report matches employee directory counts
-- [ ] Absence summary totals match approved leave in date range
-- [ ] Charts render on desktop and tablet
-- [ ] OpenAPI and Postman updated
+- [x] Headcount report matches employee directory counts
+- [x] Absence summary totals match approved leave in date range
+- [x] Charts render on desktop and tablet
+- [x] OpenAPI and Postman updated
