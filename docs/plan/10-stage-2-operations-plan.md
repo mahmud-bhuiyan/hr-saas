@@ -201,7 +201,7 @@ Steps S2-4, S2-5, S2-6, and S2-7 can overlap after S2-1 completes (S2-3 requires
 ## 6. Demo Environment
 
 - Reuse Demo 1 staging URLs (client + server on Vercel or equivalent)
-- Extend Acme Ltd seed: attendance sessions, timesheets, expenses, notifications
+- Extend Acme Ltd demo data manually on staging (attendance, timesheets, expenses, notifications)
 - Redis required for notification worker in staging
 - Stripe test mode keys for billing walkthrough
 - Demo accounts unchanged from Demo 1 (`admin@acme-demo.com`, etc.) — password `User@123`
@@ -276,9 +276,9 @@ Full roadmap: [hr-saas-mern-project-plan.md](./hr-saas-mern-project-plan.md)
 | S2-4 | Expenses | ✅ Done |
 | S2-5 | Leave enhancements | ✅ Done |
 | S2-6 | Import & reporting | ✅ Done |
-| S2-7 | Stripe billing | ⬜ Not started |
-| S2-8 | Polish & sign-off | ⬜ Not started |
+| S2-7 | Stripe billing | ✅ Done |
+| S2-8 | Polish & sign-off | 🔄 In progress (staging tooling + walkthrough fixes done; client sign-off pending) |
 
 **Cross-cutting (Stage 2):** User light/dark theme preference — `colorScheme` on User; `PATCH /auth/me`; header toggle; `ThemeContext` + localStorage cache.
 
-**Next step:** S2-7 — Stripe billing. See [STAGE-2-IMPLEMENTATION-STEPS.md](./STAGE-2-IMPLEMENTATION-STEPS.md).
+**Next step:** S2-8 client sign-off. Optional: Twilio SMS (deferred).

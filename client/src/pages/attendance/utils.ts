@@ -30,6 +30,6 @@ export const fromDatetimeLocalValue = (value: string): string => {
   return new Date(value).toISOString();
 };
 
-export type AttendanceTab = 'my-attendance' | 'team-live';
+export type AttendanceTab = 'my-attendance' | 'team-live' | 'hr-corrections';
 
 export const GPS_CONSENT_KEY = 'hr-saas-gps-consent';

@@ -70,11 +70,27 @@ paths:
     get:
       tags: [Health]
       summary: Health check
-      description: Returns service status and timestamp.
+      description: |
+        Returns service status, timestamp, and optional dependency checks (MongoDB, Redis, Stripe config).
+        Returns HTTP 503 when MongoDB is unavailable (`status: degraded`).
       operationId: getHealth
       responses:
         '200':
           description: Service is healthy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+              example:
+                status: ok
+                service: Daily HR
+                timestamp: '2026-08-02T12:00:00.000Z'
+                checks:
+                  mongodb: ok
+                  redis: ok
+                  stripe: configured
+        '503':
+          description: Service degraded (MongoDB unavailable)
           content:
             application/json:
               schema:
@@ -3931,13 +3947,25 @@ components:
       properties:
         status:
           type: string
-          enum: [ok]
+          enum: [ok, degraded]
         service:
           type: string
           example: Daily HR
         timestamp:
           type: string
           format: date-time
+        checks:
+          type: object
+          properties:
+            mongodb:
+              type: string
+              enum: [ok, error]
+            redis:
+              type: string
+              enum: [ok, error, skipped]
+            stripe:
+              type: string
+              enum: [configured, not_configured]
 
     ErrorResponse:
       type: object

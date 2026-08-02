@@ -18,6 +18,7 @@ import {
 } from '../../lib/api';
 import type { AttendanceLog, PatchAttendanceInput } from '../../types';
 import { hasPermission } from '../../utils/permissions';
+import { AttendanceEmployeeCorrections } from './components/AttendanceEmployeeCorrections';
 import { AttendanceClockCard } from './components/AttendanceClockCard';
 import { AttendanceCorrectionModal } from './components/AttendanceCorrectionModal';
 import { AttendanceHistoryTable } from './components/AttendanceHistoryTable';
@@ -140,6 +141,7 @@ export const AttendancePage = () => {
   const tabs = [
     { id: 'my-attendance' as const, label: 'My attendance' },
     ...(canReadTeam ? [{ id: 'team-live' as const, label: 'Team live board' }] : []),
+    ...(canManage ? [{ id: 'hr-corrections' as const, label: 'HR corrections' }] : []),
   ];
 
   return (
@@ -220,6 +222,10 @@ export const AttendancePage = () => {
 
       {activeTab === 'team-live' && canReadTeam && (
         <AttendanceTeamBoard logs={teamLiveQuery.data ?? []} loading={teamLiveQuery.isLoading} />
+      )}
+
+      {activeTab === 'hr-corrections' && canManage && (
+        <AttendanceEmployeeCorrections onCorrect={setCorrectLog} />
       )}
 
       <AttendanceCorrectionModal

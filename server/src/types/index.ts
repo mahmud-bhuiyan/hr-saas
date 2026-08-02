@@ -8,9 +8,14 @@ export type UserRole =
 export type ColorScheme = 'light' | 'dark';
 
 export interface ApiHealthResponse {
-  status: 'ok';
+  status: 'ok' | 'degraded';
   service: string;
   timestamp: string;
+  checks?: {
+    mongodb: 'ok' | 'error';
+    redis: 'ok' | 'error' | 'skipped';
+    stripe: 'configured' | 'not_configured';
+  };
 }
 
 export interface ApiErrorResponse {

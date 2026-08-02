@@ -1,18 +1,12 @@
+import { formatLocalDate, getLocalMondayOfWeek } from '../../utils/date';
+
 export type TimesheetTab = 'my-timesheet' | 'approval-queue';
 
 export const DAY_LABELS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'] as const;
 
-export const getMondayOfWeek = (date: Date): Date => {
-  const normalized = new Date(
-    Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate())
-  );
-  const day = normalized.getUTCDay();
-  const diff = day === 0 ? -6 : 1 - day;
-  normalized.setUTCDate(normalized.getUTCDate() + diff);
-  return normalized;
-};
+export const getMondayOfWeek = (date: Date): Date => getLocalMondayOfWeek(date);
 
-export const formatWeekOf = (date: Date): string => date.toISOString().slice(0, 10);
+export const formatWeekOf = (date: Date): string => formatLocalDate(date);
 
 export const getWeekDays = (weekOf: string): string[] => {
   const monday = new Date(`${weekOf}T00:00:00.000Z`);

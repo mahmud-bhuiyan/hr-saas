@@ -128,8 +128,12 @@ export const LeavePage = () => {
 
   const approveMutation = useMutation({
     mutationFn: approveLeaveRequest,
-    onSuccess: () => {
-      toast.success('Leave request approved.');
+    onSuccess: (request) => {
+      if (request.status === 'pending' && request.approvalStep === 2) {
+        toast.success('Step 1 approved — awaiting HR final approval.');
+      } else {
+        toast.success('Leave request approved.');
+      }
       setActionLoadingId(null);
       invalidateLeave();
     },

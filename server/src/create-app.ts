@@ -2,7 +2,7 @@ import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import express from 'express';
 import { loadServerEnv } from './config/env.js';
-import { APP_NAME } from './constants/app.js';
+import { buildHealthResponse } from './config/health.js';
 import { createAdminRoutes } from './modules/admin/admin.routes.js';
 import { createRegistrationRoutes } from './modules/admin/registration.routes.js';
 import { stripeWebhookHandler } from './modules/billing/billing.controller.js';
@@ -20,7 +20,6 @@ import { createAttendanceRoutes } from './modules/attendance/attendance.routes.j
 import { createTimesheetRoutes } from './modules/timesheets/timesheet.routes.js';
 import { createExpenseRoutes } from './modules/expenses/expense.routes.js';
 import { createReportRoutes } from './modules/reports/report.routes.js';
-import type { ApiHealthResponse } from './types/index.js';
 
 export const createApp = () => {
   const env = loadServerEnv();
@@ -46,13 +45,9 @@ export const createApp = () => {
     res.type('text').send('Server is running');
   });
 
-  app.get('/api/v1/health', (_req, res) => {
-    const response: ApiHealthResponse = {
-      status: 'ok',
-      service: APP_NAME,
-      timestamp: new Date().toISOString(),
-    };
-    res.json(response);
+  app.get('/api/v1/health', async (_req, res) => {
+    const response = await buildHealthResponse(env);
+    res.status(response.status === 'ok' ? 200 : 503).json(response);
   });
 
   app.use('/api/v1/auth', createAuthRoutes(env));
