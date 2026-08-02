@@ -23,6 +23,7 @@ const navItems: Array<{
   { to: '/dashboard/employees', label: 'Employees', roles: ['company_admin', 'hr_manager', 'manager'] },
   { to: '/dashboard/leave', label: 'Leave', roles: ['company_admin', 'hr_manager', 'manager', 'employee'] },
   { to: '/dashboard/attendance', label: 'Attendance', roles: ['company_admin', 'hr_manager', 'manager', 'employee'] },
+  { to: '/dashboard/timesheets', label: 'Timesheets', roles: ['company_admin', 'hr_manager', 'manager', 'employee'] },
   { to: '/dashboard/documents', label: 'Documents', roles: ['company_admin', 'hr_manager', 'employee'] },
   {
     to: '/dashboard/settings',
@@ -45,8 +46,8 @@ export const AppShell = () => {
             <BrandMark />
           </span>
           <div className="ml-auto flex items-center gap-2">
-            <NotificationBell />
             <UserMenu />
+            <NotificationBell />
           </div>
         </div>
       </header>

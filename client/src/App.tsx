@@ -22,6 +22,7 @@ import { AuditLogPage } from "./pages/settings/audit-log/AuditLogPage";
 import { LeavePage } from "./pages/leave/LeavePage";
 import { DocumentsPage } from "./pages/documents/DocumentsPage";
 import { AttendancePage } from "./pages/attendance/AttendancePage";
+import { TimesheetsPage } from "./pages/timesheets/TimesheetsPage";
 import { AttendanceSettingsPage } from "./pages/settings/attendance/AttendanceSettingsPage";
 
 const App = () => {
@@ -47,6 +48,7 @@ const App = () => {
           <Route path="/dashboard/employees/:id" element={<EmployeeViewPage />} />
           <Route path="/dashboard/leave" element={<LeavePage />} />
           <Route path="/dashboard/attendance" element={<AttendancePage />} />
+          <Route path="/dashboard/timesheets" element={<TimesheetsPage />} />
           <Route path="/dashboard/documents" element={<DocumentsPage />} />
           <Route
             path="/dashboard/platform/site-settings"

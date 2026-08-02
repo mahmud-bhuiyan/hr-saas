@@ -1,7 +1,7 @@
 # Module: Timesheets
 
 **Stage:** Stage 2 (S2-3)  
-**Status:** Not started  
+**Status:** Done  
 **Depends on:** Attendance (S2-2), Notifications (S2-1)
 
 ---
@@ -158,21 +158,21 @@ Week ends → Employee clicks Generate → reviews draft → submits
 ## 10. Tasks Breakdown
 
 ### Backend
-- [ ] Model + indexes
-- [ ] Generate from attendance logic
-- [ ] CRUD + submit/approve/decline
-- [ ] Overtime calculation
-- [ ] Routes + RBAC
+- [x] Model + indexes
+- [x] Generate from attendance logic
+- [x] CRUD + submit/approve/decline
+- [x] Overtime calculation
+- [x] Routes + RBAC
 
 ### Frontend
-- [ ] Weekly grid component
-- [ ] Generate + submit flow
-- [ ] Approval queue tab
-- [ ] Overtime highlight styling
+- [x] Weekly grid component
+- [x] Generate + submit flow
+- [x] Approval queue tab
+- [x] Overtime highlight styling
 
 ### Integration
 - [ ] Seed sample timesheets in S2-8
-- [ ] OpenAPI + Postman
+- [x] OpenAPI + Postman
 
 **Estimate:** 5 days
 
@@ -187,7 +187,7 @@ Week ends → Employee clicks Generate → reviews draft → submits
 
 ## 12. Acceptance Criteria
 
-- [ ] Draft auto-generates from attendance logs for the selected week
-- [ ] Employee can submit; manager can approve
-- [ ] Overtime hours calculated and displayed when over threshold
-- [ ] OpenAPI and Postman updated
+- [x] Draft auto-generates from attendance logs for the selected week
+- [x] Employee can submit; manager can approve
+- [x] Overtime hours calculated and displayed when over threshold
+- [x] OpenAPI and Postman updated

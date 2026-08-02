@@ -15,6 +15,7 @@ import { createDocumentRoutes } from './modules/documents/document.routes.js';
 import { createAuditRoutes } from './modules/audit/audit.routes.js';
 import { createNotificationRoutes } from './modules/notifications/notification.routes.js';
 import { createAttendanceRoutes } from './modules/attendance/attendance.routes.js';
+import { createTimesheetRoutes } from './modules/timesheets/timesheet.routes.js';
 import type { ApiHealthResponse } from './types/index.js';
 
 export const createApp = () => {
@@ -55,6 +56,7 @@ export const createApp = () => {
   app.use('/api/v1/audit-logs', createAuditRoutes(env));
   app.use('/api/v1/notifications', createNotificationRoutes(env));
   app.use('/api/v1/attendance', createAttendanceRoutes(env));
+  app.use('/api/v1/timesheets', createTimesheetRoutes(env));
 
   return app;
 }

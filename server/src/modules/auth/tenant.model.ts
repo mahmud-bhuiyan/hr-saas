@@ -20,6 +20,7 @@ export interface ITenant {
   updatedBy?: mongoose.Types.ObjectId;
   branding?: TenantBranding;
   attendanceGpsEnabled?: boolean;
+  overtimeThresholdHours?: number;
 }
 
 export interface ITenantDocument extends ITenant, Document {
@@ -49,6 +50,7 @@ const tenantSchema = new Schema<ITenantDocument>(
       primaryColor: { type: String, default: null },
     },
     attendanceGpsEnabled: { type: Boolean, default: false },
+    overtimeThresholdHours: { type: Number, default: 40, min: 1, max: 168 },
   },
   { timestamps: true }
 );

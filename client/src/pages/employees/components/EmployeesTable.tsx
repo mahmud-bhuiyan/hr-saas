@@ -51,7 +51,7 @@ export const EmployeesTable = ({
         key: 'name',
         header: 'Name',
         sortable: true,
-        width: showStatus ? 13 : 15,
+        width: showStatus ? 15 : 17,
         render: (row: Employee) => (
           <button
             type="button"
@@ -63,33 +63,24 @@ export const EmployeesTable = ({
         ),
       },
       {
-        key: 'employeeNumber',
-        header: 'ID',
-        sortable: true,
-        width: showStatus ? 8 : 9,
-        render: (row: Employee) => (
-          <span className="font-mono text-xs text-slate-500">{row.employeeNumber}</span>
-        ),
-      },
-      {
         key: 'jobTitle',
         header: 'Job title',
         sortable: true,
-        width: showStatus ? 13 : 15,
+        width: showStatus ? 15 : 17,
         render: (row: Employee) => row.jobTitle ?? '—',
       },
       {
         key: 'department',
         header: 'Department',
         sortable: true,
-        width: showStatus ? 13 : 15,
+        width: showStatus ? 15 : 17,
         render: (row: Employee) => row.department ?? '—',
       },
       {
         key: 'manager',
         header: 'Manager',
         sortable: true,
-        width: showStatus ? 13 : 15,
+        width: showStatus ? 15 : 18,
         render: (row: Employee) =>
           row.manager ? `${row.manager.firstName} ${row.manager.lastName}` : '—',
       },

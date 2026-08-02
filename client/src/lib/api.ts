@@ -64,6 +64,11 @@ import type {
   ClockInInput,
   PatchAttendanceInput,
   PatchAttendanceSettingsInput,
+  Timesheet,
+  PaginatedTimesheets,
+  GenerateTimesheetInput,
+  PatchTimesheetInput,
+  DeclineTimesheetInput,
 } from '../types';
 
 const apiBase = import.meta.env.VITE_API_URL || '';
@@ -844,6 +849,71 @@ export const patchAttendanceLog = async (
 ): Promise<AttendanceLog> => {
   const json = await apiFetch<ApiSuccessResponse<AttendanceLog>>(`/api/v1/attendance/${id}`, {
     method: 'PATCH',
+    body: JSON.stringify(input),
+  });
+  return json.data;
+};
+
+export const generateTimesheet = async (input: GenerateTimesheetInput): Promise<Timesheet> => {
+  const json = await apiFetch<ApiSuccessResponse<Timesheet>>('/api/v1/timesheets/generate', {
+    method: 'POST',
+    body: JSON.stringify(input),
+  });
+  return json.data;
+};
+
+export const fetchMyTimesheets = async (page = 1, limit = 20): Promise<PaginatedTimesheets> => {
+  const json = await apiFetch<ApiSuccessResponse<PaginatedTimesheets>>(
+    `/api/v1/timesheets/me?page=${page}&limit=${limit}`
+  );
+  return json.data;
+};
+
+export const fetchMyTimesheetForWeek = async (weekOf: string): Promise<Timesheet | null> => {
+  const json = await apiFetch<ApiSuccessResponse<Timesheet | null>>(
+    `/api/v1/timesheets/me/${weekOf}`
+  );
+  return json.data;
+};
+
+export const fetchTimesheetApprovalQueue = async (
+  page = 1,
+  limit = 20
+): Promise<PaginatedTimesheets> => {
+  const json = await apiFetch<ApiSuccessResponse<PaginatedTimesheets>>(
+    `/api/v1/timesheets?status=submitted&page=${page}&limit=${limit}`
+  );
+  return json.data;
+};
+
+export const patchTimesheet = async (id: string, input: PatchTimesheetInput): Promise<Timesheet> => {
+  const json = await apiFetch<ApiSuccessResponse<Timesheet>>(`/api/v1/timesheets/${id}`, {
+    method: 'PATCH',
+    body: JSON.stringify(input),
+  });
+  return json.data;
+};
+
+export const submitTimesheet = async (id: string): Promise<Timesheet> => {
+  const json = await apiFetch<ApiSuccessResponse<Timesheet>>(`/api/v1/timesheets/${id}/submit`, {
+    method: 'POST',
+  });
+  return json.data;
+};
+
+export const approveTimesheet = async (id: string): Promise<Timesheet> => {
+  const json = await apiFetch<ApiSuccessResponse<Timesheet>>(`/api/v1/timesheets/${id}/approve`, {
+    method: 'POST',
+  });
+  return json.data;
+};
+
+export const declineTimesheet = async (
+  id: string,
+  input: DeclineTimesheetInput = {}
+): Promise<Timesheet> => {
+  const json = await apiFetch<ApiSuccessResponse<Timesheet>>(`/api/v1/timesheets/${id}/decline`, {
+    method: 'POST',
     body: JSON.stringify(input),
   });
   return json.data;
