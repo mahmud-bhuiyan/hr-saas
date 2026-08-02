@@ -3,6 +3,7 @@ import type { ServerEnv } from '../../config/env.js';
 import { authenticate, authorizePermission } from '../../middleware/auth.js';
 import { requireTenant } from '../../middleware/tenant.js';
 import {
+  commitEmployeeImportHandler,
   createEmployeeHandler,
   getEmployeeHandler,
   inviteEmployeeHandler,
@@ -10,6 +11,7 @@ import {
   listDirectReportsHandler,
   listEmployeesHandler,
   updateEmployeeHandler,
+  validateEmployeeImportHandler,
 } from './employee.controller.js';
 
 export const createEmployeeRoutes = (env: ServerEnv): Router => {
@@ -35,6 +37,14 @@ export const createEmployeeRoutes = (env: ServerEnv): Router => {
 
   router.post('/', authorizePermission('employee:create'), (req, res) => {
     void createEmployeeHandler(req, res);
+  });
+
+  router.post('/import/validate', authorizePermission('employee:create'), (req, res) => {
+    void validateEmployeeImportHandler(req, res);
+  });
+
+  router.post('/import/commit', authorizePermission('employee:create'), (req, res) => {
+    void commitEmployeeImportHandler(req, res);
   });
 
   router.get(

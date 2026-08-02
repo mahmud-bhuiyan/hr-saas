@@ -1,7 +1,7 @@
 # Module: Employee Management
 
 **Stage:** Demo 1 (done) · Stage 2 extensions (S2-1, S2-6)  
-**Status:** Ready for review (Demo 1) · Stage 2 not started  
+**Status:** Ready for review (Demo 1) · S2-6 CSV import done  
 **Depends on:** Auth & Tenant (Step 2)
 
 ---
@@ -88,7 +88,7 @@ HR records for each person in a company: directory, profile, manager hierarchy, 
 | Edit details + deactivate | Profile page | ✅ |
 | Direct reports | Profile page section | ✅ |
 | Link to login user | Profile invite action | ✅ S2-1 |
-| Bulk CSV import | Directory page wizard | ⬜ Stage 2 (S2-6) |
+| Bulk CSV import | Directory page wizard | ✅ S2-6 |
 
 ---
 
@@ -101,7 +101,7 @@ HR records for each person in a company: directory, profile, manager hierarchy, 
 | Manager → direct reports | ✅ | Done |
 | Department as managed entity | Step 7 | Free text for now |
 | Employee ↔ User link / invite | Stage 2 S2-1 | Done |
-| Bulk CSV import | Stage 2 S2-6 | Not started |
+| Bulk CSV import | Stage 2 S2-6 | Done |
 | departmentId FK migration | Stage 2 S2-6 | Optional |
 
 ---
@@ -143,10 +143,10 @@ HR records for each person in a company: directory, profile, manager hierarchy, 
 
 ### Tasks
 
-- [ ] CSV parser + validation service
-- [ ] Validate + commit endpoints
-- [ ] Import wizard UI on EmployeesPage
-- [ ] OpenAPI + Postman
+- [x] CSV parser + validation service
+- [x] Validate + commit endpoints
+- [x] Import wizard UI on EmployeesPage
+- [x] OpenAPI + Postman
 
 **Estimate:** 4 days (part of S2-6)
 
@@ -159,4 +159,4 @@ HR records for each person in a company: directory, profile, manager hierarchy, 
 - [x] Profile shows manager and direct reports
 - [x] Deactivate sets status to terminated
 - [x] Link employee record to login user via invite (Stage 2 S2-1)
-- [ ] Bulk CSV import with validation preview (Stage 2 S2-6)
+- [x] Bulk CSV import with validation preview (Stage 2 S2-6)

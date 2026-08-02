@@ -35,6 +35,8 @@ tags:
     description: Weekly timesheets from attendance, submit/approve workflow, and overtime
   - name: Expenses
     description: Expense claims with receipt upload, approval workflow, and CSV export
+  - name: Reports
+    description: Operational reports — headcount and absence summary (HR/admin)
   - name: Documents
     description: HR document storage with S3 presigned upload and download
   - name: Platform
@@ -865,6 +867,102 @@ paths:
                         type: array
                         items:
                           type: string
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /api/v1/employees/import/validate:
+    post:
+      tags: [Employees]
+      summary: Validate employee CSV import
+      description: |
+        Parses a CSV file and returns valid rows plus per-row validation errors. No database writes.
+
+        **Required columns:** firstName, lastName, email, jobTitle, department, startDate.
+        **Optional columns:** managerEmail, phone. Maximum 500 rows.
+
+        Requires `employee:create` permission.
+      operationId: validateEmployeeImport
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [csv]
+              properties:
+                csv:
+                  type: string
+                  description: Raw CSV text including header row
+            example:
+              csv: |
+                firstName,lastName,email,jobTitle,department,startDate,managerEmail,phone
+                Jane,Smith,jane.smith@acme.com,Software Engineer,Engineering,2024-01-15,,555-0100
+      responses:
+        '200':
+          description: Validation preview
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, data]
+                properties:
+                  status:
+                    type: string
+                    enum: [ok]
+                  data:
+                    $ref: '#/components/schemas/EmployeeImportValidateResult'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /api/v1/employees/import/commit:
+    post:
+      tags: [Employees]
+      summary: Commit employee CSV import
+      description: |
+        Creates employees from validated rows. Re-validates server-side before insert.
+        Writes one audit log entry per batch.
+
+        Requires `employee:create` permission.
+      operationId: commitEmployeeImport
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [rows]
+              properties:
+                rows:
+                  type: array
+                  maxItems: 500
+                  items:
+                    $ref: '#/components/schemas/EmployeeImportRow'
+      responses:
+        '201':
+          description: Import result
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, data]
+                properties:
+                  status:
+                    type: string
+                    enum: [ok]
+                  data:
+                    $ref: '#/components/schemas/EmployeeImportCommitResult'
+        '400':
+          $ref: '#/components/responses/BadRequest'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
@@ -2485,6 +2583,94 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
 
+  /api/v1/reports/headcount:
+    get:
+      tags: [Reports]
+      summary: Headcount report
+      description: |
+        Returns employee counts by department and employment status (point-in-time).
+
+        Requires `report:read` permission (company_admin, hr_manager).
+      operationId: getHeadcountReport
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: department
+          in: query
+          schema:
+            type: string
+          description: Optional filter to a single department
+      responses:
+        '200':
+          description: Headcount breakdown
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, data]
+                properties:
+                  status:
+                    type: string
+                    enum: [ok]
+                  data:
+                    $ref: '#/components/schemas/HeadcountReport'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /api/v1/reports/absence-summary:
+    get:
+      tags: [Reports]
+      summary: Absence summary report
+      description: |
+        Returns approved leave days taken by type and department for a date range (max 1 year).
+
+        Requires `report:read` permission (company_admin, hr_manager).
+      operationId: getAbsenceSummaryReport
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: from
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+          description: Period start (YYYY-MM-DD)
+        - name: to
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+          description: Period end (YYYY-MM-DD)
+        - name: department
+          in: query
+          schema:
+            type: string
+          description: Optional department filter
+      responses:
+        '200':
+          description: Absence summary
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, data]
+                properties:
+                  status:
+                    type: string
+                    enum: [ok]
+                  data:
+                    $ref: '#/components/schemas/AbsenceSummaryReport'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
   /api/v1/documents:
     get:
       tags: [Documents]
@@ -4062,6 +4248,155 @@ components:
           nullable: true
         status:
           $ref: '#/components/schemas/EmployeeStatus'
+
+    EmployeeImportRow:
+      type: object
+      required: [firstName, lastName, email, jobTitle, department, startDate]
+      properties:
+        firstName:
+          type: string
+        lastName:
+          type: string
+        email:
+          type: string
+          format: email
+        jobTitle:
+          type: string
+        department:
+          type: string
+        startDate:
+          type: string
+          format: date
+        managerEmail:
+          type: string
+          format: email
+        phone:
+          type: string
+
+    EmployeeImportError:
+      type: object
+      required: [row, message]
+      properties:
+        row:
+          type: integer
+          minimum: 2
+        field:
+          type: string
+        message:
+          type: string
+
+    EmployeeImportValidRow:
+      allOf:
+        - $ref: '#/components/schemas/EmployeeImportRow'
+        - type: object
+          required: [row]
+          properties:
+            row:
+              type: integer
+              minimum: 2
+
+    EmployeeImportValidateResult:
+      type: object
+      required: [valid, errors, totalRows]
+      properties:
+        valid:
+          type: array
+          items:
+            $ref: '#/components/schemas/EmployeeImportValidRow'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/EmployeeImportError'
+        totalRows:
+          type: integer
+
+    EmployeeImportCommitResult:
+      type: object
+      required: [created, errors]
+      properties:
+        created:
+          type: integer
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/EmployeeImportError'
+
+    HeadcountDepartmentBreakdown:
+      type: object
+      required: [department, active, onLeave, terminated]
+      properties:
+        department:
+          type: string
+        active:
+          type: integer
+        onLeave:
+          type: integer
+        terminated:
+          type: integer
+
+    HeadcountReport:
+      type: object
+      required: [total, byDepartment, byStatus]
+      properties:
+        total:
+          type: integer
+        byDepartment:
+          type: array
+          items:
+            $ref: '#/components/schemas/HeadcountDepartmentBreakdown'
+        byStatus:
+          type: object
+          required: [active, on_leave, terminated]
+          properties:
+            active:
+              type: integer
+            on_leave:
+              type: integer
+            terminated:
+              type: integer
+
+    AbsenceTypeBreakdown:
+      type: object
+      required: [type, days]
+      properties:
+        type:
+          type: string
+        days:
+          type: number
+
+    AbsenceDepartmentBreakdown:
+      type: object
+      required: [department, totalDays, byType]
+      properties:
+        department:
+          type: string
+        totalDays:
+          type: number
+        byType:
+          type: array
+          items:
+            $ref: '#/components/schemas/AbsenceTypeBreakdown'
+
+    AbsenceSummaryReport:
+      type: object
+      required: [from, to, totalDays, byType, byDepartment]
+      properties:
+        from:
+          type: string
+          format: date
+        to:
+          type: string
+          format: date
+        totalDays:
+          type: number
+        byType:
+          type: array
+          items:
+            $ref: '#/components/schemas/AbsenceTypeBreakdown'
+        byDepartment:
+          type: array
+          items:
+            $ref: '#/components/schemas/AbsenceDepartmentBreakdown'
 
     SiteConfig:
       type: object

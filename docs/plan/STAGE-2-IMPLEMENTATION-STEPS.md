@@ -13,7 +13,7 @@ Check off each step with the client/dev team before moving to the next.
 | **S2-3** | Timesheets — weekly grid, auto-generate, submit/approve, overtime | ✅ Done |
 | **S2-4** | Expenses — submit with receipt, approval, CSV export | ✅ Done |
 | **S2-5** | Leave enhancements — accrual, carry-over, multi-step approval, doc expiry emails | ✅ Done |
-| **S2-6** | Employee ops & reporting — CSV import, headcount + absence reports | ⬜ Not started |
+| **S2-6** | Employee ops & reporting — CSV import, headcount + absence reports | ✅ Done |
 | **S2-7** | Stripe billing — checkout, portal, webhooks, seat metering | ⬜ Not started |
 | **S2-8** | Stage 2 polish — extended seed, deploy, bug fixes, sign-off | ⬜ Not started |
 
@@ -135,15 +135,15 @@ Features added during Stage 2 implementation that extend the original step list.
 
 ## S2-6 — Done when
 
-- [ ] `POST /api/v1/employees/import/validate` — parse CSV, return preview + errors
-- [ ] `POST /api/v1/employees/import/commit` — create valid rows
-- [ ] CSV import wizard on Employees page (upload → preview → confirm)
-- [ ] `GET /api/v1/reports/headcount` — by department, status
-- [ ] `GET /api/v1/reports/absence-summary` — leave days taken by type/period
-- [ ] Reports pages `/dashboard/reports/headcount`, `/dashboard/reports/absence`
-- [ ] Dashboard charts (recharts) for headcount trend and absence summary
+- [x] `POST /api/v1/employees/import/validate` — parse CSV, return preview + errors
+- [x] `POST /api/v1/employees/import/commit` — create valid rows
+- [x] CSV import wizard on Employees page (upload → preview → confirm)
+- [x] `GET /api/v1/reports/headcount` — by department, status
+- [x] `GET /api/v1/reports/absence-summary` — leave days taken by type/period
+- [x] Reports pages `/dashboard/reports/headcount`, `/dashboard/reports/absence`
+- [x] Dashboard charts (recharts) for headcount trend and absence summary
 - [ ] Optional migration: employee `department` string → `departmentId` ref
-- [ ] `docs/openapi.yaml` and Postman collection updated
+- [x] `docs/openapi.yaml` and Postman collection updated
 
 **Review:** Test CSV import with invalid rows and report accuracy before S2-7.
 
