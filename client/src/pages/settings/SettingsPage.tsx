@@ -6,6 +6,7 @@ import {
   HiUsers,
   HiClipboardDocumentList,
   HiClock,
+  HiCalendarDays,
 } from 'react-icons/hi2';
 import { PageContainer } from '../../components/ui/PageContainer';
 import { PageHeader } from '../../components/ui/PageHeader';
@@ -55,6 +56,13 @@ const settingsLinks: SettingsLink[] = [
     description: 'Configure GPS tracking and attendance policies.',
     icon: HiClock,
     roles: ['company_admin', 'hr_manager'],
+  },
+  {
+    to: '/dashboard/settings/leave',
+    label: 'Leave policy',
+    description: 'Annual entitlement, carry-over, and multi-step approval.',
+    icon: HiCalendarDays,
+    roles: ['company_admin'],
   },
   {
     to: '/dashboard/settings/users',

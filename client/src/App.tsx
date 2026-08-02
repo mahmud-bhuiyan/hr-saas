@@ -25,6 +25,7 @@ import { AttendancePage } from "./pages/attendance/AttendancePage";
 import { TimesheetsPage } from "./pages/timesheets/TimesheetsPage";
 import { ExpensesPage } from "./pages/expenses/ExpensesPage";
 import { AttendanceSettingsPage } from "./pages/settings/attendance/AttendanceSettingsPage";
+import { LeaveSettingsPage } from "./pages/settings/leave/LeaveSettingsPage";
 
 const App = () => {
   return (
@@ -62,6 +63,7 @@ const App = () => {
           <Route path="/dashboard/settings/users" element={<UsersPage />} />
           <Route path="/dashboard/settings/branding" element={<TenantBrandingPage />} />
           <Route path="/dashboard/settings/attendance" element={<AttendanceSettingsPage />} />
+          <Route path="/dashboard/settings/leave" element={<LeaveSettingsPage />} />
           <Route path="/dashboard/settings/audit-log" element={<AuditLogPage />} />
         </Route>
       </Route>

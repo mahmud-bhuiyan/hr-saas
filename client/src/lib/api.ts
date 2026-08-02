@@ -26,6 +26,8 @@ import type {
   ListEmployeesQuery,
   LeaveRequest,
   LeaveBalance,
+  LeaveSettings,
+  PatchLeaveSettingsInput,
   LeaveCalendarEntry,
   CreateLeaveRequestInput,
   ListLeaveRequestsQuery,
@@ -638,6 +640,21 @@ export const fetchLeaveCalendar = async (
 export const fetchPendingLeaveCount = async (): Promise<number> => {
   const json = await apiFetch<ApiSuccessResponse<{ count: number }>>('/api/v1/leave/pending-count');
   return json.data.count;
+};
+
+export const fetchLeaveSettings = async (): Promise<LeaveSettings> => {
+  const json = await apiFetch<ApiSuccessResponse<LeaveSettings>>('/api/v1/settings/leave');
+  return json.data;
+};
+
+export const patchLeaveSettings = async (
+  input: PatchLeaveSettingsInput
+): Promise<LeaveSettings> => {
+  const json = await apiFetch<ApiSuccessResponse<LeaveSettings>>('/api/v1/settings/leave', {
+    method: 'PATCH',
+    body: JSON.stringify(input),
+  });
+  return json.data;
 };
 
 const buildDocumentsQuery = (query: ListDocumentsQuery = {}): string => {

@@ -16,6 +16,7 @@ import {
   declineLeaveRequest,
   fetchLeaveCalendar,
   fetchLeaveRequests,
+  fetchLeaveSettings,
   fetchMyLeaveBalance,
 } from '../../lib/api';
 import type { CreateLeaveRequestInput } from '../../types';
@@ -73,6 +74,12 @@ export const LeavePage = () => {
   const pendingQuery = useQuery({
     queryKey: ['leave', 'requests', 'pending'],
     queryFn: () => fetchLeaveRequests({ status: 'pending' }),
+    enabled: Boolean(canApprove),
+  });
+
+  const leaveSettingsQuery = useQuery({
+    queryKey: ['leave', 'settings'],
+    queryFn: fetchLeaveSettings,
     enabled: Boolean(canApprove),
   });
 
@@ -270,6 +277,7 @@ export const LeavePage = () => {
         <LeaveApprovalQueue
           requests={pendingQuery.data ?? []}
           loading={pendingQuery.isLoading}
+          multiStepApprovalEnabled={leaveSettingsQuery.data?.multiStepApprovalEnabled ?? false}
           actionLoadingId={actionLoadingId}
           onApprove={(request) => {
             setActionLoadingId(request.id);

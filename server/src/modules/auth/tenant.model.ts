@@ -21,6 +21,9 @@ export interface ITenant {
   branding?: TenantBranding;
   attendanceGpsEnabled?: boolean;
   overtimeThresholdHours?: number;
+  annualEntitlement?: number;
+  maxCarryOverDays?: number;
+  multiStepApprovalEnabled?: boolean;
 }
 
 export interface ITenantDocument extends ITenant, Document {
@@ -51,6 +54,9 @@ const tenantSchema = new Schema<ITenantDocument>(
     },
     attendanceGpsEnabled: { type: Boolean, default: false },
     overtimeThresholdHours: { type: Number, default: 40, min: 1, max: 168 },
+    annualEntitlement: { type: Number, default: 25, min: 0, max: 365 },
+    maxCarryOverDays: { type: Number, default: 5, min: 0, max: 365 },
+    multiStepApprovalEnabled: { type: Boolean, default: false },
   },
   { timestamps: true }
 );

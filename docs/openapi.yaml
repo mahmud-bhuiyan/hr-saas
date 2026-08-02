@@ -3077,6 +3077,74 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
 
+  /api/v1/settings/leave:
+    get:
+      tags: [Settings]
+      summary: Get leave policy settings
+      description: Company admin only. Returns annual entitlement, carry-over limit, and multi-step approval flag.
+      operationId: getLeaveSettings
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Leave policy settings
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, data]
+                properties:
+                  status:
+                    type: string
+                    enum: [ok]
+                  data:
+                    $ref: '#/components/schemas/LeaveSettings'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    patch:
+      tags: [Settings]
+      summary: Update leave policy settings
+      description: Company admin only. Partial update of leave policy (entitlement, carry-over, multi-step approval).
+      operationId: patchLeaveSettings
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchLeaveSettingsRequest'
+            example:
+              annualEntitlement: 25
+              maxCarryOverDays: 5
+              multiStepApprovalEnabled: true
+      responses:
+        '200':
+          description: Updated leave policy settings
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, data]
+                properties:
+                  status:
+                    type: string
+                    enum: [ok]
+                  data:
+                    $ref: '#/components/schemas/LeaveSettings'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
   /api/v1/settings/departments:
     get:
       tags: [Settings]
@@ -4194,6 +4262,39 @@ components:
           nullable: true
           format: uri
 
+    LeaveSettings:
+      type: object
+      required: [annualEntitlement, maxCarryOverDays, multiStepApprovalEnabled]
+      properties:
+        annualEntitlement:
+          type: number
+          minimum: 0
+          maximum: 365
+          example: 25
+        maxCarryOverDays:
+          type: number
+          minimum: 0
+          maximum: 365
+          example: 5
+        multiStepApprovalEnabled:
+          type: boolean
+          example: false
+
+    PatchLeaveSettingsRequest:
+      type: object
+      minProperties: 1
+      properties:
+        annualEntitlement:
+          type: number
+          minimum: 0
+          maximum: 365
+        maxCarryOverDays:
+          type: number
+          minimum: 0
+          maximum: 365
+        multiStepApprovalEnabled:
+          type: boolean
+
     Department:
       type: object
       required: [id, name, isArchived, employeeCount, createdAt, updatedAt]
@@ -4322,6 +4423,11 @@ components:
           format: date-time
         declineReason:
           type: string
+        approvalStep:
+          type: integer
+          minimum: 1
+          maximum: 2
+          description: Multi-step approval progress (1 = manager, 2 = HR when enabled)
         createdAt:
           type: string
           format: date-time

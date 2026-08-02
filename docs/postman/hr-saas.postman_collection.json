@@ -1674,6 +1674,55 @@
           "response": []
         },
         {
+          "name": "Get Leave Policy Settings",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/settings/leave",
+            "description": "Company admin only."
+          },
+          "response": []
+        },
+        {
+          "name": "Update Leave Policy Settings",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"annualEntitlement\": 25,\n  \"maxCarryOverDays\": 5,\n  \"multiStepApprovalEnabled\": true\n}"
+            },
+            "url": "{{baseUrl}}/api/v1/settings/leave",
+            "description": "Company admin only. Partial update."
+          },
+          "response": []
+        },
+        {
           "name": "List Departments",
           "request": {
             "auth": {

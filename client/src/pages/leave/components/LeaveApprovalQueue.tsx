@@ -8,12 +8,13 @@ import { TablePageSizeControl } from '../../../components/ui/TablePagination';
 import { usePagination } from '../../../hooks/usePagination';
 import { Textarea } from '../../../components/ui/Textarea';
 import type { LeaveRequest } from '../../../types';
-import { formatDateRange, leaveTypeLabel } from '../utils';
+import { formatDateRange, leaveTypeLabel, approvalStepLabel } from '../utils';
 import { LeaveOverlapIndicator } from './LeaveOverlapIndicator';
 
 interface LeaveApprovalQueueProps {
   requests: LeaveRequest[];
   loading: boolean;
+  multiStepApprovalEnabled?: boolean;
   onApprove: (request: LeaveRequest) => void;
   onDecline: (request: LeaveRequest, reason?: string) => void;
   actionLoadingId: string | null;
@@ -22,6 +23,7 @@ interface LeaveApprovalQueueProps {
 export const LeaveApprovalQueue = ({
   requests,
   loading,
+  multiStepApprovalEnabled = false,
   onApprove,
   onDecline,
   actionLoadingId,
@@ -86,6 +88,20 @@ export const LeaveApprovalQueue = ({
             render: (row: LeaveRequest) => row.days,
           },
           {
+            key: 'step',
+            header: 'Approval step',
+            render: (row: LeaveRequest) => {
+              const label = approvalStepLabel(row, multiStepApprovalEnabled);
+              return label ? (
+                <span className="rounded-full border border-brand-200 bg-brand-50 px-2 py-0.5 text-xs text-brand-700 dark:border-brand-500/30 dark:bg-brand-500/10 dark:text-brand-300">
+                  {label}
+                </span>
+              ) : (
+                '—'
+              );
+            },
+          },
+          {
             key: 'reason',
             header: 'Reason',
             render: (row: LeaveRequest) => row.reason || '—',
@@ -109,10 +125,14 @@ export const LeaveApprovalQueue = ({
                   className="px-3 py-1.5 text-xs"
                   icon={<HiCheck className="h-4 w-4 text-white" />}
                   loading={actionLoadingId === row.id}
-                  loadingText="Approving…"
+                  loadingText={row.approvalStep === 2 ? 'Approving…' : 'Approving…'}
                   onClick={() => onApprove(row)}
                 >
-                  Approve
+                  {multiStepApprovalEnabled && row.approvalStep === 2
+                    ? 'Final approve'
+                    : multiStepApprovalEnabled && row.approvalStep === 1
+                      ? 'Approve step 1'
+                      : 'Approve'}
                 </Button>
                 <Button
                   type="button"

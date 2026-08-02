@@ -63,6 +63,7 @@ export const leaveRequestAuditSnapshot = (request: {
   status?: string;
   approverId?: unknown;
   declineReason?: string;
+  approvalStep?: number;
 }): Record<string, unknown> =>
   sanitizeAuditPayload({
     employeeId: request.employeeId,
@@ -74,6 +75,7 @@ export const leaveRequestAuditSnapshot = (request: {
     status: request.status,
     approverId: request.approverId,
     declineReason: request.declineReason,
+    approvalStep: request.approvalStep,
   }) ?? {};
 
 export const documentAuditSnapshot = (doc: {
