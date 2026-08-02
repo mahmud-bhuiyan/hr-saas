@@ -44,11 +44,26 @@ npm run dev
 | Server | http://localhost:5000 |
 | Health | http://localhost:5000/api/v1/health |
 
+### Docker (MongoDB, Redis, MinIO)
+
+```bash
+docker compose up -d
+```
+
+| Service | URL | Notes |
+|---------|-----|-------|
+| MongoDB | `mongodb://localhost:27017/hr-saas` | Default in `server/.env.example` |
+| Redis | `redis://localhost:6379` | Reserved for future use |
+| MinIO (S3) | http://localhost:9000 | API endpoint for `S3_ENDPOINT` |
+| MinIO console | http://localhost:9001 | Login `minioadmin` / `minioadmin`; bucket `hr-saas-documents` is created by `minio-init` |
+
+Copy `S3_*` values from `server/.env.example` into `server/.env.local` for document upload/download.
+
 ## Environment files
 
 | App | File | Key variables |
 |-----|------|---------------|
-| **Server** | `server/.env.local` | `MONGODB_URI`, `CLIENT_URL`, `ADMIN_JWT_SECRET`, `IMGBB_API_KEY` (logo/favicon upload), `SENDGRID_API_KEY`, `EMAIL_FROM` (leave notifications; optional: `PORT`, defaults to 5000) |
+| **Server** | `server/.env.local` | `MONGODB_URI`, `CLIENT_URL`, `ADMIN_JWT_SECRET`, `IMGBB_API_KEY` (logo/favicon upload), `SENDGRID_API_KEY`, `EMAIL_FROM` (leave notifications), `S3_*` (document storage; optional: `PORT`, defaults to 5000) |
 | **Client** | `client/.env` | `VITE_API_URL` (backend URL) |
 
 ## Separate deployment

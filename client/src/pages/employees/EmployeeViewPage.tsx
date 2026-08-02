@@ -1,0 +1,120 @@
+import { useQuery } from '@tanstack/react-query';
+import { HiArrowLeft, HiPencilSquare, HiUserGroup } from 'react-icons/hi2';
+import { Link, Navigate, useNavigate, useParams } from 'react-router-dom';
+import { Button } from '../../components/ui/Button';
+import { PageContainer } from '../../components/ui/PageContainer';
+import { PageHeader } from '../../components/ui/PageHeader';
+import { Spinner } from '../../components/ui/Spinner';
+import { useAuth } from '../../contexts/AuthContext';
+import { fetchEmployee, fetchEmployeeReports } from '../../lib/api';
+import { hasPermission } from '../../utils/permissions';
+import { DirectReportsTable } from './components/DirectReportsTable';
+import { EmployeeProfileSummary } from './components/EmployeeProfileSummary';
+import { EmployeeStatusBadge } from './components/EmployeeStatusBadge';
+import { employeeName } from './utils';
+
+export const EmployeeViewPage = () => {
+  const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
+  const { user } = useAuth();
+
+  const canRead =
+    user && (hasPermission(user.role, 'employee:read') || hasPermission(user.role, 'employee:read:team'));
+  const canUpdate = user && hasPermission(user.role, 'employee:update');
+
+  const employeeQuery = useQuery({
+    queryKey: ['employees', id],
+    queryFn: () => fetchEmployee(id!),
+    enabled: Boolean(canRead && id),
+  });
+
+  const reportsQuery = useQuery({
+    queryKey: ['employees', id, 'reports'],
+    queryFn: () => fetchEmployeeReports(id!),
+    enabled: Boolean(canRead && id),
+  });
+
+  if (!canRead) {
+    return <Navigate to="/dashboard" replace />;
+  }
+
+  if (!id) {
+    return <Navigate to="/dashboard/employees" replace />;
+  }
+
+  const employee = employeeQuery.data;
+  const reportCount = reportsQuery.data?.length ?? 0;
+
+  return (
+    <PageContainer className="space-y-6">
+      <div>
+        <Link
+          to="/dashboard/employees"
+          className="inline-flex items-center gap-1.5 text-sm font-medium text-brand-700 hover:text-brand-800"
+        >
+          <HiArrowLeft className="h-4 w-4" />
+          Back to employees
+        </Link>
+      </div>
+
+      {employeeQuery.isLoading && (
+        <div className="flex justify-center py-12">
+          <Spinner className="h-6 w-6 text-brand-600" />
+        </div>
+      )}
+
+      {employeeQuery.isError && (
+        <p className="text-sm text-red-600">Failed to load employee details.</p>
+      )}
+
+      {employee && (
+        <>
+          <PageHeader
+            label="People"
+            title={
+              <span className="flex flex-wrap items-center gap-2">
+                {employeeName(employee)}
+                <EmployeeStatusBadge status={employee.status} />
+              </span>
+            }
+            description={`${employee.jobTitle ?? 'No job title'} · ${employee.employeeNumber}`}
+            actionAlign="end"
+            action={
+              canUpdate ? (
+                <Button
+                  variant="secondary"
+                  icon={<HiPencilSquare className="h-4 w-4 text-brand-600" />}
+                  onClick={() => navigate(`/dashboard/employees/${id}/edit`)}
+                >
+                  Edit employee
+                </Button>
+              ) : undefined
+            }
+          />
+
+          <EmployeeProfileSummary employee={employee} showMetadata />
+
+          <section className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+            <div className="flex items-center justify-between gap-3 border-b border-slate-100 bg-slate-50 px-5 py-3">
+              <div className="flex items-center gap-2">
+                <HiUserGroup className="h-4 w-4 text-brand-600" />
+                <h2 className="text-sm font-semibold text-slate-900">Direct reports</h2>
+              </div>
+              {!reportsQuery.isLoading && (
+                <span className="rounded-full bg-white px-2.5 py-0.5 text-xs font-medium text-slate-600 ring-1 ring-slate-200">
+                  {reportCount}
+                </span>
+              )}
+            </div>
+            <DirectReportsTable
+              reports={reportsQuery.data ?? []}
+              loading={reportsQuery.isLoading}
+              onViewEmployee={(employeeId) => navigate(`/dashboard/employees/${employeeId}`)}
+              embedded
+            />
+          </section>
+        </>
+      )}
+    </PageContainer>
+  );
+};

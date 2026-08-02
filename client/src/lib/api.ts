@@ -37,6 +37,12 @@ import type {
   PatchTenantBrandingInput,
   UploadPlatformAssetInput,
   UploadPlatformAssetResponse,
+  HrDocument,
+  PresignDocumentInput,
+  PresignDocumentResponse,
+  CreateDocumentInput,
+  ListDocumentsQuery,
+  DocumentDownloadResponse,
 } from '../types';
 
 const apiBase = import.meta.env.VITE_API_URL || '';
@@ -523,4 +529,81 @@ export const fetchLeaveCalendar = async (
 export const fetchPendingLeaveCount = async (): Promise<number> => {
   const json = await apiFetch<ApiSuccessResponse<{ count: number }>>('/api/v1/leave/pending-count');
   return json.data.count;
+};
+
+const buildDocumentsQuery = (query: ListDocumentsQuery = {}): string => {
+  const params = new URLSearchParams();
+  if (query.employeeId) params.set('employeeId', query.employeeId);
+  if (query.category) params.set('category', query.category);
+  if (query.expiringWithinDays) params.set('expiringWithinDays', String(query.expiringWithinDays));
+  const qs = params.toString();
+  return qs ? `?${qs}` : '';
+};
+
+export const fetchDocuments = async (query: ListDocumentsQuery = {}): Promise<HrDocument[]> => {
+  const json = await apiFetch<ApiSuccessResponse<{ documents: HrDocument[] }>>(
+    `/api/v1/documents${buildDocumentsQuery(query)}`
+  );
+  return json.data.documents;
+};
+
+export const fetchExpiringDocuments = async (days = 30): Promise<HrDocument[]> => {
+  const json = await apiFetch<ApiSuccessResponse<{ documents: HrDocument[] }>>(
+    `/api/v1/documents/expiring?days=${days}`
+  );
+  return json.data.documents;
+};
+
+export const presignDocumentUpload = async (
+  input: PresignDocumentInput
+): Promise<PresignDocumentResponse> => {
+  const json = await apiFetch<ApiSuccessResponse<PresignDocumentResponse>>(
+    '/api/v1/documents/presign',
+    {
+      method: 'POST',
+      body: JSON.stringify(input),
+    }
+  );
+  return json.data;
+};
+
+export const uploadFileToPresignedUrl = async (
+  uploadUrl: string,
+  file: File,
+  mimeType: string
+): Promise<void> => {
+  const response = await fetch(uploadUrl, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': mimeType,
+    },
+    body: file,
+  });
+
+  if (!response.ok) {
+    throw new ApiError('Failed to upload file to storage', response.status);
+  }
+};
+
+export const createDocument = async (input: CreateDocumentInput): Promise<HrDocument> => {
+  const json = await apiFetch<ApiSuccessResponse<HrDocument>>('/api/v1/documents', {
+    method: 'POST',
+    body: JSON.stringify(input),
+  });
+  return json.data;
+};
+
+export const fetchDocumentDownloadUrl = async (
+  documentId: string
+): Promise<DocumentDownloadResponse> => {
+  const json = await apiFetch<ApiSuccessResponse<DocumentDownloadResponse>>(
+    `/api/v1/documents/${documentId}/download`
+  );
+  return json.data;
+};
+
+export const deleteDocument = async (documentId: string): Promise<void> => {
+  await apiFetch<ApiSuccessResponse<{ deleted: boolean }>>(`/api/v1/documents/${documentId}`, {
+    method: 'DELETE',
+  });
 };

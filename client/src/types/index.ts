@@ -307,3 +307,60 @@ export interface PatchTenantBrandingInput {
   logoUrl?: string | null;
   primaryColor?: string | null;
 }
+
+export type DocumentCategory = 'contract' | 'id' | 'certification' | 'other';
+
+export interface DocumentEmployeeSummary {
+  id: string;
+  firstName: string;
+  lastName: string;
+}
+
+export interface DocumentUploaderSummary {
+  id: string;
+  name: string;
+  email: string;
+}
+
+export interface HrDocument {
+  id: string;
+  employeeId?: string;
+  employee?: DocumentEmployeeSummary;
+  category: DocumentCategory;
+  fileName: string;
+  mimeType: string;
+  fileSize: number;
+  uploadedBy: DocumentUploaderSummary;
+  expiryDate?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface PresignDocumentInput {
+  fileName: string;
+  mimeType: string;
+  fileSize: number;
+  category: DocumentCategory;
+  employeeId?: string;
+  expiryDate?: string;
+}
+
+export interface PresignDocumentResponse {
+  uploadUrl: string;
+  fileKey: string;
+}
+
+export interface CreateDocumentInput extends PresignDocumentInput {
+  fileKey: string;
+}
+
+export interface ListDocumentsQuery {
+  employeeId?: string;
+  category?: DocumentCategory;
+  expiringWithinDays?: number;
+}
+
+export interface DocumentDownloadResponse {
+  downloadUrl: string;
+  fileName: string;
+}

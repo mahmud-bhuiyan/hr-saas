@@ -6,6 +6,7 @@ import { connectToDatabase, disconnectFromDatabase } from '../src/config/db.js';
 import { Tenant } from '../src/modules/auth/tenant.model.js';
 import { User } from '../src/modules/admin/user.model.js';
 import { Employee } from '../src/modules/employees/employee.model.js';
+import type { UserRole } from '../src/types/index.js';
 import { hashPassword } from '../src/utils/password.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -24,49 +25,55 @@ type DemoEmployeeSeed = {
   department: string;
   startDate: string;
   managerIndex?: number;
+  /** Login role — managers/HR get approval + team calendar access. Defaults to employee. */
+  role?: UserRole;
 };
 
 const DEMO_EMPLOYEES: DemoEmployeeSeed[] = [
   {
     firstName: 'Alex',
     lastName: 'Morgan',
-    email: 'demo.alex.morgan@hr-saas.demo',
+    email: 'alex.morgan@demo.com',
     phone: '+1 555-0101',
     jobTitle: 'Engineering Manager',
     department: 'Engineering',
     startDate: '2022-01-15',
+    role: 'manager',
   },
   {
     firstName: 'Jordan',
     lastName: 'Lee',
-    email: 'demo.jordan.lee@hr-saas.demo',
+    email: 'jordan.lee@demo.com',
     phone: '+1 555-0102',
     jobTitle: 'Sales Manager',
     department: 'Sales',
     startDate: '2022-02-01',
+    role: 'manager',
   },
   {
     firstName: 'Taylor',
     lastName: 'Brooks',
-    email: 'demo.taylor.brooks@hr-saas.demo',
+    email: 'taylor.brooks@demo.com',
     phone: '+1 555-0103',
     jobTitle: 'HR Manager',
     department: 'Human Resources',
     startDate: '2022-03-10',
+    role: 'hr_manager',
   },
   {
     firstName: 'Morgan',
     lastName: 'Chen',
-    email: 'demo.morgan.chen@hr-saas.demo',
+    email: 'morgan.chen@demo.com',
     phone: '+1 555-0104',
     jobTitle: 'Finance Manager',
     department: 'Finance',
     startDate: '2022-04-05',
+    role: 'manager',
   },
   {
     firstName: 'Jamie',
     lastName: 'Rivera',
-    email: 'demo.jamie.rivera@hr-saas.demo',
+    email: 'jamie.rivera@demo.com',
     phone: '+1 555-0105',
     jobTitle: 'Software Engineer',
     department: 'Engineering',
@@ -76,7 +83,7 @@ const DEMO_EMPLOYEES: DemoEmployeeSeed[] = [
   {
     firstName: 'Casey',
     lastName: 'Kim',
-    email: 'demo.casey.kim@hr-saas.demo',
+    email: 'casey.kim@demo.com',
     phone: '+1 555-0106',
     jobTitle: 'Software Engineer',
     department: 'Engineering',
@@ -86,7 +93,7 @@ const DEMO_EMPLOYEES: DemoEmployeeSeed[] = [
   {
     firstName: 'Riley',
     lastName: 'Patel',
-    email: 'demo.riley.patel@hr-saas.demo',
+    email: 'riley.patel@demo.com',
     phone: '+1 555-0107',
     jobTitle: 'QA Engineer',
     department: 'Engineering',
@@ -96,7 +103,7 @@ const DEMO_EMPLOYEES: DemoEmployeeSeed[] = [
   {
     firstName: 'Avery',
     lastName: 'Nguyen',
-    email: 'demo.avery.nguyen@hr-saas.demo',
+    email: 'avery.nguyen@demo.com',
     phone: '+1 555-0108',
     jobTitle: 'DevOps Engineer',
     department: 'Engineering',
@@ -106,7 +113,7 @@ const DEMO_EMPLOYEES: DemoEmployeeSeed[] = [
   {
     firstName: 'Quinn',
     lastName: "O'Brien",
-    email: 'demo.quinn.obrien@hr-saas.demo',
+    email: 'quinn.obrien@demo.com',
     phone: '+1 555-0109',
     jobTitle: 'Frontend Developer',
     department: 'Engineering',
@@ -116,7 +123,7 @@ const DEMO_EMPLOYEES: DemoEmployeeSeed[] = [
   {
     firstName: 'Blake',
     lastName: 'Santos',
-    email: 'demo.blake.santos@hr-saas.demo',
+    email: 'blake.santos@demo.com',
     phone: '+1 555-0110',
     jobTitle: 'Backend Developer',
     department: 'Engineering',
@@ -126,7 +133,7 @@ const DEMO_EMPLOYEES: DemoEmployeeSeed[] = [
   {
     firstName: 'Drew',
     lastName: 'Anderson',
-    email: 'demo.drew.anderson@hr-saas.demo',
+    email: 'drew.anderson@demo.com',
     phone: '+1 555-0111',
     jobTitle: 'Account Executive',
     department: 'Sales',
@@ -136,7 +143,7 @@ const DEMO_EMPLOYEES: DemoEmployeeSeed[] = [
   {
     firstName: 'Cameron',
     lastName: 'Wright',
-    email: 'demo.cameron.wright@hr-saas.demo',
+    email: 'cameron.wright@demo.com',
     phone: '+1 555-0112',
     jobTitle: 'Account Executive',
     department: 'Sales',
@@ -146,7 +153,7 @@ const DEMO_EMPLOYEES: DemoEmployeeSeed[] = [
   {
     firstName: 'Parker',
     lastName: 'Evans',
-    email: 'demo.parker.evans@hr-saas.demo',
+    email: 'parker.evans@demo.com',
     phone: '+1 555-0113',
     jobTitle: 'Sales Coordinator',
     department: 'Sales',
@@ -156,7 +163,7 @@ const DEMO_EMPLOYEES: DemoEmployeeSeed[] = [
   {
     firstName: 'Reese',
     lastName: 'Taylor',
-    email: 'demo.reese.taylor@hr-saas.demo',
+    email: 'reese.taylor@demo.com',
     phone: '+1 555-0114',
     jobTitle: 'Business Development Rep',
     department: 'Sales',
@@ -166,7 +173,7 @@ const DEMO_EMPLOYEES: DemoEmployeeSeed[] = [
   {
     firstName: 'Skyler',
     lastName: 'Moore',
-    email: 'demo.skyler.moore@hr-saas.demo',
+    email: 'skyler.moore@demo.com',
     phone: '+1 555-0115',
     jobTitle: 'Customer Success Manager',
     department: 'Sales',
@@ -176,7 +183,7 @@ const DEMO_EMPLOYEES: DemoEmployeeSeed[] = [
   {
     firstName: 'Avery',
     lastName: 'Clark',
-    email: 'demo.avery.clark@hr-saas.demo',
+    email: 'avery.clark@demo.com',
     phone: '+1 555-0116',
     jobTitle: 'HR Specialist',
     department: 'Human Resources',
@@ -186,7 +193,7 @@ const DEMO_EMPLOYEES: DemoEmployeeSeed[] = [
   {
     firstName: 'Jordan',
     lastName: 'Hayes',
-    email: 'demo.jordan.hayes@hr-saas.demo',
+    email: 'jordan.hayes@demo.com',
     phone: '+1 555-0117',
     jobTitle: 'Recruiter',
     department: 'Human Resources',
@@ -196,7 +203,7 @@ const DEMO_EMPLOYEES: DemoEmployeeSeed[] = [
   {
     firstName: 'Morgan',
     lastName: 'Price',
-    email: 'demo.morgan.price@hr-saas.demo',
+    email: 'morgan.price@demo.com',
     phone: '+1 555-0118',
     jobTitle: 'Payroll Analyst',
     department: 'Finance',
@@ -206,7 +213,7 @@ const DEMO_EMPLOYEES: DemoEmployeeSeed[] = [
   {
     firstName: 'Riley',
     lastName: 'Foster',
-    email: 'demo.riley.foster@hr-saas.demo',
+    email: 'riley.foster@demo.com',
     phone: '+1 555-0119',
     jobTitle: 'Financial Analyst',
     department: 'Finance',
@@ -216,7 +223,7 @@ const DEMO_EMPLOYEES: DemoEmployeeSeed[] = [
   {
     firstName: 'Casey',
     lastName: 'Reed',
-    email: 'demo.casey.reed@hr-saas.demo',
+    email: 'casey.reed@demo.com',
     phone: '+1 555-0120',
     jobTitle: 'Operations Coordinator',
     department: 'Operations',
@@ -260,6 +267,23 @@ const generateEmployeeNumber = async (tenantId: mongoose.Types.ObjectId): Promis
   return `EMP-${String(count + 1).padStart(4, '0')}`;
 };
 
+const resolveDemoUserRole = (seed: DemoEmployeeSeed): UserRole => seed.role ?? 'employee';
+
+/** Previous seed format, e.g. alex.morgan@demo.com → demo.alex.morgan@hr-saas.demo */
+const legacyDemoEmail = (email: string): string => {
+  const local = email.split('@')[0];
+  return `demo.${local}@hr-saas.demo`;
+};
+
+const findExistingDemoUser = async (seed: DemoEmployeeSeed) => {
+  const byCurrent = await User.findOne({ email: seed.email });
+  if (byCurrent) {
+    return byCurrent;
+  }
+
+  return User.findOne({ email: legacyDemoEmail(seed.email) });
+};
+
 const seedDemoEmployees = async (): Promise<void> => {
   const uri = process.env.MONGODB_URI;
   if (!uri) {
@@ -280,21 +304,47 @@ const seedDemoEmployees = async (): Promise<void> => {
     const createdEmployeeIds: mongoose.Types.ObjectId[] = [];
     let created = 0;
     let skipped = 0;
+    let rolesUpdated = 0;
+    let emailsUpdated = 0;
 
     for (let i = 0; i < DEMO_EMPLOYEES.length; i++) {
       const seed = DEMO_EMPLOYEES[i];
-      const existingUser = await User.findOne({ email: seed.email });
+      const expectedRole = resolveDemoUserRole(seed);
+      const existingUser = await findExistingDemoUser(seed);
 
       if (existingUser) {
-        console.log(`  skip  ${seed.email} — user already exists`);
         skipped += 1;
+
+        const previousEmail = existingUser.email;
+
+        if (existingUser.email !== seed.email) {
+          existingUser.email = seed.email;
+          emailsUpdated += 1;
+          console.log(`  update ${previousEmail} → ${seed.email}`);
+        }
+
+        if (existingUser.role !== expectedRole) {
+          existingUser.role = expectedRole;
+          rolesUpdated += 1;
+          console.log(`  update ${seed.email} — role set to ${expectedRole}`);
+        } else if (existingUser.email === seed.email && previousEmail === seed.email) {
+          console.log(`  skip  ${seed.email} — user already exists`);
+        }
+
+        if (existingUser.isModified()) {
+          await existingUser.save();
+        }
 
         const existingEmployee = await Employee.findOne({
           tenantId,
-          $or: [{ userId: existingUser._id }, { email: seed.email }],
+          $or: [{ userId: existingUser._id }, { email: seed.email }, { email: previousEmail }],
         });
 
         if (existingEmployee) {
+          if (existingEmployee.email !== seed.email) {
+            existingEmployee.email = seed.email;
+            await existingEmployee.save();
+          }
           createdEmployeeIds[i] = existingEmployee._id;
         }
 
@@ -314,7 +364,7 @@ const seedDemoEmployees = async (): Promise<void> => {
             {
               email: seed.email,
               passwordHash,
-              role: 'employee' as const,
+              role: expectedRole,
               tenantId,
               firstName: seed.firstName,
               lastName: seed.lastName,
@@ -349,7 +399,9 @@ const seedDemoEmployees = async (): Promise<void> => {
         await session.commitTransaction();
         createdEmployeeIds[i] = employee._id;
         created += 1;
-        console.log(`  added ${seed.firstName} ${seed.lastName} (${seed.email}) — ${employeeNumber}`);
+        console.log(
+          `  added ${seed.firstName} ${seed.lastName} (${seed.email}) — ${employeeNumber}, role ${expectedRole}`
+        );
       } catch (error) {
         await session.abortTransaction();
         throw error;
@@ -358,7 +410,9 @@ const seedDemoEmployees = async (): Promise<void> => {
       }
     }
 
-    console.log(`\nDone: ${created} created, ${skipped} skipped. Password for all: ${DEMO_PASSWORD}`);
+    console.log(
+      `\nDone: ${created} created, ${skipped} skipped, ${rolesUpdated} roles updated, ${emailsUpdated} emails updated. Password for all: ${DEMO_PASSWORD}`
+    );
   } finally {
     await disconnectFromDatabase();
   }

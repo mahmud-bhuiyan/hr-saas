@@ -9,7 +9,7 @@ Check off each step with the client/dev team before moving to the next.
 | **3** | App shell — layout, routing, design system, dashboard, profile | ✅ Complete |
 | **4** | Employee management — CRUD, directory, profile, direct reports | ✅ Ready for review |
 | **5** | Leave & absence — requests, approval, balance, calendar | ✅ Complete |
-| **6** | Document storage — S3 upload/download | ⬜ Pending |
+| **6** | Document storage — S3 upload/download | ✅ Ready for review |
 | **7** | Admin & settings — company, departments, users | ⬜ Pending |
 | **8** | Demo polish — seed data, staging deploy, bug fixes | ⬜ Pending |
 
@@ -33,6 +33,7 @@ Features added during implementation that extend the original step list. Keep th
 | Per-tenant branding overrides | 7 | Company admin: logo + primary color override (pulled forward from Stage 3) |
 | ImgBB logo/favicon upload | 7 | Super admin: upload or URL for platform logo/favicon via `IMGBB_API_KEY` |
 | Logo/favicon display settings | 7 | Super admin: logo size/fit/name toggle; favicon MIME type + preview |
+| Document storage (Step 6) | 6 | S3 presigned upload/download; `document:read:own` for employees; MinIO in docker compose |
 
 ---
 
@@ -117,11 +118,11 @@ Features added during implementation that extend the original step list. Keep th
 
 ## Step 6 — Done when
 
-- [ ] S3/R2 upload and download with permission checks
-- [ ] Document categories (contract, ID, certification, other)
-- [ ] Document list and upload UI
-- [ ] Optional expiry date on documents
-- [ ] `docs/openapi.yaml` and Postman collection updated
+- [x] S3/R2 upload and download with permission checks
+- [x] Document categories (contract, ID, certification, other)
+- [x] Document list and upload UI
+- [x] Optional expiry date on documents
+- [x] `docs/openapi.yaml` and Postman collection updated
 
 **Review:** Test document flows before Step 7.
 

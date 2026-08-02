@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { FormEvent, useMemo, useState } from 'react';
-import { Navigate } from 'react-router-dom';
+import { Navigate, useNavigate } from 'react-router-dom';
 import { HiPlus } from 'react-icons/hi2';
 import { Button } from '../../components/ui/Button';
 import { PageContainer } from '../../components/ui/PageContainer';
@@ -21,10 +21,8 @@ import { areRequiredFieldsFilled } from '../../utils/form';
 import { hasPermission } from '../../utils/permissions';
 import { usePagination } from '../../hooks/usePagination';
 import { CreateEmployeeModal } from './components/CreateEmployeeModal';
-import { EmployeeEditModal } from './components/EmployeeEditModal';
 import { EmployeeFilters } from './components/EmployeeFilters';
 import { EmployeesTable } from './components/EmployeesTable';
-import { EmployeeViewModal } from './components/EmployeeViewModal';
 import { employeeName, isActiveEmployee, type EmployeesTab } from './utils';
 
 const emptyCreateForm: CreateEmployeeInput = {
@@ -39,6 +37,7 @@ const emptyCreateForm: CreateEmployeeInput = {
 
 export const EmployeesPage = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const queryClient = useQueryClient();
 
   const [search, setSearch] = useState('');
@@ -48,8 +47,6 @@ export const EmployeesPage = () => {
   const [createForm, setCreateForm] = useState<CreateEmployeeInput>(emptyCreateForm);
   const [deactivateLoadingId, setDeactivateLoadingId] = useState<string | null>(null);
   const [activateLoadingId, setActivateLoadingId] = useState<string | null>(null);
-  const [viewEmployeeId, setViewEmployeeId] = useState<string | null>(null);
-  const [editEmployeeId, setEditEmployeeId] = useState<string | null>(null);
   const [sort, setSort] = useState<TableSortState>({ key: 'name', direction: 'asc' });
 
   const canRead =
@@ -281,16 +278,10 @@ export const EmployeesPage = () => {
           }}
           canUpdate={Boolean(canUpdate)}
           showStatus={activeTab === 'inactive'}
-          onView={(employee) => {
-            setEditEmployeeId(null);
-            setViewEmployeeId(employee.id);
-          }}
+          onView={(employee) => navigate(`/dashboard/employees/${employee.id}`)}
           onEdit={
             canUpdate
-              ? (employee) => {
-                  setViewEmployeeId(null);
-                  setEditEmployeeId(employee.id);
-                }
+              ? (employee) => navigate(`/dashboard/employees/${employee.id}/edit`)
               : undefined
           }
           onDeactivate={activeTab === 'active' && canUpdate ? handleDeactivate : undefined}
@@ -311,16 +302,6 @@ export const EmployeesPage = () => {
         submitDisabled={!canSubmitCreate}
       />
 
-      <EmployeeViewModal
-        employeeId={viewEmployeeId}
-        onClose={() => setViewEmployeeId(null)}
-        onViewEmployee={(id) => setViewEmployeeId(id)}
-      />
-
-      <EmployeeEditModal
-        employeeId={editEmployeeId}
-        onClose={() => setEditEmployeeId(null)}
-      />
     </PageContainer>
   );
 }
