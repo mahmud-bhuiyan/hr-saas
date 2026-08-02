@@ -1,5 +1,5 @@
 import type { FaviconDisplaySettings } from '../types';
-import { resolveFaviconMimeType } from '../constants/branding';
+import { resolveDocumentFaviconUrl } from './favicon';
 
 export interface BrandShades {
   50: string;
@@ -59,11 +59,11 @@ export const applyBrandShades = (primaryHex: string): void => {
   root.style.setProperty('--brand-700', shades[700]);
 };
 
-export const applyDocumentBranding = (
+export const applyDocumentBranding = async (
   siteName: string,
   faviconUrl: string | null,
-  faviconDisplay?: FaviconDisplaySettings
-): void => {
+  _faviconDisplay?: FaviconDisplaySettings
+): Promise<void> => {
   document.title = siteName;
 
   let link = document.querySelector<HTMLLinkElement>('link[rel="icon"]');
@@ -73,16 +73,7 @@ export const applyDocumentBranding = (
     document.head.appendChild(link);
   }
 
-  link.href = faviconUrl ?? '/vite.svg';
-
-  const resolvedType = resolveFaviconMimeType(
-    faviconUrl,
-    faviconDisplay?.mimeType ?? 'auto'
-  );
-
-  if (resolvedType) {
-    link.type = resolvedType;
-  } else {
-    link.removeAttribute('type');
-  }
+  const styledFaviconUrl = await resolveDocumentFaviconUrl(faviconUrl, siteName);
+  link.href = styledFaviconUrl;
+  link.type = 'image/png';
 };

@@ -306,6 +306,8 @@ export interface SiteConfig {
 
 export type LogoObjectFit = 'contain' | 'cover';
 
+export type LogoShape = 'default' | 'circle';
+
 export type FaviconMimeType =
   | 'auto'
   | 'image/png'
@@ -317,6 +319,7 @@ export interface LogoDisplaySettings {
   heightPx: number;
   maxWidthPx: number;
   objectFit: LogoObjectFit;
+  shape: LogoShape;
   showSiteName: boolean;
 }
 

@@ -20,6 +20,7 @@ const settingsFormKeys = [
   'logoHeightPx',
   'logoMaxWidthPx',
   'logoObjectFit',
+  'logoShape',
   'logoShowSiteName',
   'faviconMimeType',
 ] as const;
@@ -32,6 +33,7 @@ const toFormValues = (settings: PlatformSiteSettings): SiteSettingsFormValues =>
   logoHeightPx: settings.logoDisplay.heightPx,
   logoMaxWidthPx: settings.logoDisplay.maxWidthPx,
   logoObjectFit: settings.logoDisplay.objectFit,
+  logoShape: settings.logoDisplay.shape,
   logoShowSiteName: settings.logoDisplay.showSiteName,
   faviconMimeType: settings.faviconDisplay.mimeType,
 });
@@ -51,6 +53,7 @@ const toSettingsPatchInput = (
     changed.logoHeightPx !== undefined ||
     changed.logoMaxWidthPx !== undefined ||
     changed.logoObjectFit !== undefined ||
+    changed.logoShape !== undefined ||
     changed.logoShowSiteName !== undefined;
 
   if (logoDisplayChanged) {
@@ -63,6 +66,9 @@ const toSettingsPatchInput = (
     }
     if (changed.logoObjectFit !== undefined) {
       input.logoDisplay.objectFit = changed.logoObjectFit as SiteSettingsFormValues['logoObjectFit'];
+    }
+    if (changed.logoShape !== undefined) {
+      input.logoDisplay.shape = changed.logoShape as SiteSettingsFormValues['logoShape'];
     }
     if (changed.logoShowSiteName !== undefined) {
       input.logoDisplay.showSiteName = Boolean(changed.logoShowSiteName);

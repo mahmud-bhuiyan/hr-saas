@@ -1,10 +1,11 @@
 import mongoose, { Schema, type Document, type Model } from 'mongoose';
-import type { FaviconMimeType, LogoObjectFit } from '../../constants/platform-settings.js';
+import type { FaviconMimeType, LogoObjectFit, LogoShape } from '../../constants/platform-settings.js';
 
 export interface ILogoDisplay {
   heightPx: number;
   maxWidthPx: number;
   objectFit: LogoObjectFit;
+  shape: LogoShape;
   showSiteName: boolean;
 }
 
@@ -33,6 +34,7 @@ const logoDisplaySchema = new Schema<ILogoDisplay>(
     heightPx: { type: Number, default: 32, min: 24, max: 80 },
     maxWidthPx: { type: Number, default: 160, min: 80, max: 320 },
     objectFit: { type: String, enum: ['contain', 'cover'], default: 'contain' },
+    shape: { type: String, enum: ['default', 'circle'], default: 'circle' },
     showSiteName: { type: Boolean, default: false },
   },
   { _id: false }

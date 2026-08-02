@@ -2,6 +2,8 @@ export const PLATFORM_SETTINGS_KEY = 'default';
 
 export type LogoObjectFit = 'contain' | 'cover';
 
+export type LogoShape = 'default' | 'circle';
+
 export type FaviconMimeType =
   | 'auto'
   | 'image/png'
@@ -13,6 +15,7 @@ export interface LogoDisplaySettings {
   heightPx: number;
   maxWidthPx: number;
   objectFit: LogoObjectFit;
+  shape: LogoShape;
   showSiteName: boolean;
 }
 
@@ -47,6 +50,7 @@ export const DEFAULT_LOGO_DISPLAY: LogoDisplaySettings = {
   heightPx: 32,
   maxWidthPx: 160,
   objectFit: 'contain',
+  shape: 'circle',
   showSiteName: false,
 };
 

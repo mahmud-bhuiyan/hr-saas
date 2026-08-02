@@ -4908,7 +4908,7 @@ components:
 
     LogoDisplay:
       type: object
-      required: [heightPx, maxWidthPx, objectFit, showSiteName]
+      required: [heightPx, maxWidthPx, objectFit, shape, showSiteName]
       properties:
         heightPx:
           type: integer
@@ -4923,6 +4923,10 @@ components:
         objectFit:
           type: string
           enum: [contain, cover]
+        shape:
+          type: string
+          enum: [default, circle]
+          example: circle
         showSiteName:
           type: boolean
 
@@ -5026,6 +5030,9 @@ components:
             objectFit:
               type: string
               enum: [contain, cover]
+            shape:
+              type: string
+              enum: [default, circle]
             showSiteName:
               type: boolean
         faviconDisplay:

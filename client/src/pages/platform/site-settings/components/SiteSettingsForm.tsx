@@ -13,7 +13,9 @@ import { FormActions } from '../../../../components/ui/FormActions';
 import { FormField } from '../../../../components/ui/FormField';
 import { Input } from '../../../../components/ui/Input';
 import { Select } from '../../../../components/ui/Select';
-import type { FaviconMimeType, LogoObjectFit } from '../../../../types';
+import type { FaviconMimeType, LogoObjectFit, LogoShape } from '../../../../types';
+import { LogoImage } from '../../../../components/BrandMark';
+import { FaviconImage } from '../../../../components/FaviconImage';
 import { ImageAssetField } from './ImageAssetField';
 
 export interface SiteSettingsFormValues extends Record<string, unknown> {
@@ -24,6 +26,7 @@ export interface SiteSettingsFormValues extends Record<string, unknown> {
   logoHeightPx: number;
   logoMaxWidthPx: number;
   logoObjectFit: LogoObjectFit;
+  logoShape: LogoShape;
   logoShowSiteName: boolean;
   faviconMimeType: FaviconMimeType;
 }
@@ -170,6 +173,17 @@ export const SiteSettingsForm = ({
             <option value="cover">Cover</option>
           </Select>
         </FormField>
+        <FormField label="Logo shape" htmlFor="logoShape">
+          <Select
+            id="logoShape"
+            value={values.logoShape}
+            onChange={(e) => onChange('logoShape', e.target.value as LogoShape)}
+            icon={<HiPhoto className="h-4 w-4 text-brand-600" />}
+          >
+            <option value="circle">Circle</option>
+            <option value="default">Default</option>
+          </Select>
+        </FormField>
         <label className="flex cursor-pointer items-center gap-2 text-sm text-slate-700">
           <input
             type="checkbox"
@@ -222,10 +236,12 @@ export const SiteSettingsForm = ({
 };
 
 export const SiteSettingsPreview = ({ values }: { values: SiteSettingsFormValues }) => {
-  const logoStyle = {
-    height: `${values.logoHeightPx}px`,
-    maxWidth: `${values.logoMaxWidthPx}px`,
-    objectFit: values.logoObjectFit as React.CSSProperties['objectFit'],
+  const logoDisplay = {
+    heightPx: values.logoHeightPx,
+    maxWidthPx: values.logoMaxWidthPx,
+    objectFit: values.logoObjectFit,
+    shape: values.logoShape,
+    showSiteName: values.logoShowSiteName,
   };
 
   return (
@@ -237,7 +253,7 @@ export const SiteSettingsPreview = ({ values }: { values: SiteSettingsFormValues
         <div className="flex items-center justify-between border-b border-slate-200 bg-white px-4 py-3 dark:border-slate-700 dark:bg-slate-900">
           <div className="flex items-center gap-2">
             {values.logoUrl ? (
-              <img src={values.logoUrl} alt={values.siteName} style={logoStyle} />
+              <LogoImage src={values.logoUrl} alt={values.siteName} display={logoDisplay} />
             ) : null}
             {(values.logoShowSiteName || !values.logoUrl) && (
               <span className="text-base font-semibold" style={{ color: values.primaryColor }}>
@@ -263,7 +279,7 @@ export const SiteSettingsPreview = ({ values }: { values: SiteSettingsFormValues
         <p className="mb-2 text-xs font-medium uppercase tracking-wide text-slate-500">Browser tab</p>
         <div className="inline-flex max-w-full items-center gap-2 rounded-t-lg border border-b-0 border-slate-200 bg-white px-3 py-2 shadow-sm dark:border-slate-700 dark:bg-slate-900">
           {values.faviconUrl ? (
-            <img src={values.faviconUrl} alt="" className="h-4 w-4 object-contain" />
+            <FaviconImage src={values.faviconUrl} />
           ) : (
             <span className="flex h-4 w-4 items-center justify-center rounded bg-brand-100 text-[8px] font-bold text-brand-700">
               HR

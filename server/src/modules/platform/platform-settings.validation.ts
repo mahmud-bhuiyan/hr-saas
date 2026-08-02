@@ -15,6 +15,7 @@ const logoDisplaySchema = z
     heightPx: z.number().int().min(24).max(80).optional(),
     maxWidthPx: z.number().int().min(80).max(320).optional(),
     objectFit: z.enum(['contain', 'cover']).optional(),
+    shape: z.enum(['default', 'circle']).optional(),
     showSiteName: z.boolean().optional(),
   })
   .optional();
