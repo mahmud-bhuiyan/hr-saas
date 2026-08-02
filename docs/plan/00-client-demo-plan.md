@@ -160,9 +160,9 @@ Be explicit with the client so expectations stay aligned.
 - [x] Download document
 
 ### Settings
-- [ ] Company profile
-- [ ] Departments
-- [ ] Users & roles
+- [x] Company profile
+- [x] Departments
+- [x] Users & roles
 
 ---
 
@@ -264,7 +264,7 @@ Full roadmap: [hr-saas-mern-project-plan.md](./hr-saas-mern-project-plan.md)
 | Employees (Step 4) | ✅ Ready for review | User link deferred |
 | Leave (Step 5) | ✅ Complete | Email via SendGrid; user→employee via email fallback |
 | Documents (Step 6) | ✅ Ready for review | MinIO for local dev; AWS S3 or Cloudflare R2 in production |
-| Settings (Step 7) | 🟡 Partial | Platform site settings + tenant branding done; company profile, departments, users pending |
+| Settings (Step 7) | ✅ Ready for review | Company profile, departments CRUD, users/roles; branding was done earlier |
 | Demo polish (Step 8) | ⬜ Pending | |
 
-**Next step:** Step 7 — finish Admin & settings (company profile, departments, users). See [IMPLEMENTATION-STEPS.md](./IMPLEMENTATION-STEPS.md).
+**Next step:** Step 8 — demo seed data, staging deploy, polish. See [IMPLEMENTATION-STEPS.md](./IMPLEMENTATION-STEPS.md).

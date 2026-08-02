@@ -22,6 +22,7 @@ interface CreateEmployeeModalProps {
   form: CreateEmployeeInput;
   onFormChange: (updater: (prev: CreateEmployeeInput) => CreateEmployeeInput) => void;
   managerOptions: Employee[];
+  departmentOptions: string[];
   loading: boolean;
   submitDisabled: boolean;
 }
@@ -33,6 +34,7 @@ export const CreateEmployeeModal = ({
   form,
   onFormChange,
   managerOptions,
+  departmentOptions,
   loading,
   submitDisabled,
 }: CreateEmployeeModalProps) => {
@@ -99,13 +101,19 @@ export const CreateEmployeeModal = ({
           />
         </FormField>
         <FormField label="Department" htmlFor="create-department">
-          <Input
+          <Select
             id="create-department"
             value={form.department ?? ''}
-            onChange={(e) => onFormChange((f) => ({ ...f, department: e.target.value }))}
-            placeholder="e.g. Engineering"
+            onChange={(e) => onFormChange((f) => ({ ...f, department: e.target.value || undefined }))}
             icon={<HiRectangleGroup className="h-4 w-4 text-brand-600" />}
-          />
+          >
+            <option value="">No department</option>
+            {departmentOptions.map((dept) => (
+              <option key={dept} value={dept}>
+                {dept}
+              </option>
+            ))}
+          </Select>
         </FormField>
       </div>
 

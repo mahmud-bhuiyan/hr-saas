@@ -1841,6 +1841,286 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
 
+  /api/v1/settings/company:
+    get:
+      tags: [Settings]
+      summary: Get company profile
+      description: Company admin only. Returns tenant company name, address, and logo.
+      operationId: getCompanyProfile
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Company profile
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, data]
+                properties:
+                  status:
+                    type: string
+                    enum: [ok]
+                  data:
+                    $ref: '#/components/schemas/CompanyProfile'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    patch:
+      tags: [Settings]
+      summary: Update company profile
+      description: Company admin only. Partial update of company name, address, and logo URL.
+      operationId: patchCompanyProfile
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchCompanyProfileRequest'
+            example:
+              name: Acme Ltd
+              address: 123 Main Street, London, UK
+              logoUrl: https://example.com/acme-logo.png
+      responses:
+        '200':
+          description: Updated company profile
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, data]
+                properties:
+                  status:
+                    type: string
+                    enum: [ok]
+                  data:
+                    $ref: '#/components/schemas/CompanyProfile'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/v1/settings/departments:
+    get:
+      tags: [Settings]
+      summary: List departments
+      description: Company admin or HR manager. Lists managed departments for the tenant.
+      operationId: listSettingsDepartments
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: includeArchived
+          in: query
+          schema:
+            type: boolean
+            default: false
+      responses:
+        '200':
+          description: Department list
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, data]
+                properties:
+                  status:
+                    type: string
+                    enum: [ok]
+                  data:
+                    type: object
+                    required: [departments]
+                    properties:
+                      departments:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Department'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+    post:
+      tags: [Settings]
+      summary: Create department
+      description: Company admin or HR manager. Creates a new department (or restores archived by name).
+      operationId: createSettingsDepartment
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateDepartmentRequest'
+            example:
+              name: Engineering
+      responses:
+        '201':
+          description: Department created
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, data]
+                properties:
+                  status:
+                    type: string
+                    enum: [ok]
+                  data:
+                    $ref: '#/components/schemas/Department'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          description: Department name already exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/settings/departments/{id}:
+    patch:
+      tags: [Settings]
+      summary: Update department
+      description: Company admin or HR manager. Rename or archive a department.
+      operationId: patchSettingsDepartment
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchDepartmentRequest'
+            example:
+              name: Product Engineering
+      responses:
+        '200':
+          description: Updated department
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, data]
+                properties:
+                  status:
+                    type: string
+                    enum: [ok]
+                  data:
+                    $ref: '#/components/schemas/Department'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: Department name already exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/settings/users:
+    get:
+      tags: [Settings]
+      summary: List tenant users
+      description: Company admin only. Lists users in the current tenant with roles.
+      operationId: listTenantUsers
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Tenant user list
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, data]
+                properties:
+                  status:
+                    type: string
+                    enum: [ok]
+                  data:
+                    type: object
+                    required: [users]
+                    properties:
+                      users:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/TenantUser'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /api/v1/settings/users/{id}:
+    patch:
+      tags: [Settings]
+      summary: Update tenant user
+      description: |
+        Company admin only. Update role or active status for a tenant user.
+        Cannot modify own account or demote/deactivate the last company admin.
+      operationId: patchTenantUser
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchTenantUserRequest'
+            example:
+              role: hr_manager
+              isActive: true
+      responses:
+        '200':
+          description: Updated tenant user
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, data]
+                properties:
+                  status:
+                    type: string
+                    enum: [ok]
+                  data:
+                    $ref: '#/components/schemas/TenantUser'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
 components:
   securitySchemes:
     bearerAuth:
@@ -2422,6 +2702,112 @@ components:
           type: string
           nullable: true
           pattern: '^#[0-9A-Fa-f]{6}$'
+
+    CompanyProfile:
+      type: object
+      required: [name, address, logoUrl, updatedAt]
+      properties:
+        name:
+          type: string
+        address:
+          type: string
+          nullable: true
+        logoUrl:
+          type: string
+          nullable: true
+          format: uri
+        updatedAt:
+          type: string
+          format: date-time
+
+    PatchCompanyProfileRequest:
+      type: object
+      minProperties: 1
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 200
+        address:
+          type: string
+          maxLength: 500
+        logoUrl:
+          type: string
+          nullable: true
+          format: uri
+
+    Department:
+      type: object
+      required: [id, name, isArchived, employeeCount, createdAt, updatedAt]
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        isArchived:
+          type: boolean
+        employeeCount:
+          type: integer
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    CreateDepartmentRequest:
+      type: object
+      required: [name]
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 100
+
+    PatchDepartmentRequest:
+      type: object
+      minProperties: 1
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 100
+        isArchived:
+          type: boolean
+
+    TenantUser:
+      type: object
+      required: [id, email, role, isActive, createdAt, updatedAt]
+      properties:
+        id:
+          type: string
+        email:
+          type: string
+          format: email
+        role:
+          $ref: '#/components/schemas/UserRole'
+        firstName:
+          type: string
+        lastName:
+          type: string
+        isActive:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    PatchTenantUserRequest:
+      type: object
+      minProperties: 1
+      properties:
+        role:
+          type: string
+          enum: [company_admin, hr_manager, manager, employee]
+        isActive:
+          type: boolean
 
     LeaveType:
       type: string

@@ -35,6 +35,13 @@ import type {
   TenantBrandingOverrides,
   PatchPlatformSiteSettingsInput,
   PatchTenantBrandingInput,
+  CompanyProfile,
+  PatchCompanyProfileInput,
+  Department,
+  CreateDepartmentInput,
+  PatchDepartmentInput,
+  TenantUser,
+  PatchTenantUserInput,
   UploadPlatformAssetInput,
   UploadPlatformAssetResponse,
   HrDocument,
@@ -438,6 +445,72 @@ export const updateTenantBranding = async (
     method: 'PATCH',
     body: JSON.stringify(input),
   });
+  return json.data;
+};
+
+export const fetchCompanyProfile = async (): Promise<CompanyProfile> => {
+  const json = await apiFetch<ApiSuccessResponse<CompanyProfile>>('/api/v1/settings/company');
+  return json.data;
+};
+
+export const updateCompanyProfile = async (
+  input: PatchCompanyProfileInput
+): Promise<CompanyProfile> => {
+  const json = await apiFetch<ApiSuccessResponse<CompanyProfile>>('/api/v1/settings/company', {
+    method: 'PATCH',
+    body: JSON.stringify(input),
+  });
+  return json.data;
+};
+
+export const fetchManagedDepartments = async (
+  includeArchived = false
+): Promise<Department[]> => {
+  const qs = includeArchived ? '?includeArchived=true' : '';
+  const json = await apiFetch<ApiSuccessResponse<{ departments: Department[] }>>(
+    `/api/v1/settings/departments${qs}`
+  );
+  return json.data.departments;
+};
+
+export const createDepartment = async (input: CreateDepartmentInput): Promise<Department> => {
+  const json = await apiFetch<ApiSuccessResponse<Department>>('/api/v1/settings/departments', {
+    method: 'POST',
+    body: JSON.stringify(input),
+  });
+  return json.data;
+};
+
+export const updateDepartment = async (
+  departmentId: string,
+  input: PatchDepartmentInput
+): Promise<Department> => {
+  const json = await apiFetch<ApiSuccessResponse<Department>>(
+    `/api/v1/settings/departments/${departmentId}`,
+    {
+      method: 'PATCH',
+      body: JSON.stringify(input),
+    }
+  );
+  return json.data;
+};
+
+export const fetchTenantUsers = async (): Promise<TenantUser[]> => {
+  const json = await apiFetch<ApiSuccessResponse<{ users: TenantUser[] }>>('/api/v1/settings/users');
+  return json.data.users;
+};
+
+export const updateTenantUser = async (
+  userId: string,
+  input: PatchTenantUserInput
+): Promise<TenantUser> => {
+  const json = await apiFetch<ApiSuccessResponse<TenantUser>>(
+    `/api/v1/settings/users/${userId}`,
+    {
+      method: 'PATCH',
+      body: JSON.stringify(input),
+    }
+  );
   return json.data;
 };
 

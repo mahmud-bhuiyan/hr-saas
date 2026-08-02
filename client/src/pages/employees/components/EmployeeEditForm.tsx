@@ -39,6 +39,7 @@ interface EmployeeEditFieldsProps {
     value: EmployeeFormValues[K]
   ) => void;
   managerOptions: Employee[];
+  departmentOptions: string[];
   idPrefix?: string;
 }
 
@@ -46,6 +47,7 @@ export const EmployeeEditFields = ({
   form,
   onFieldChange,
   managerOptions,
+  departmentOptions,
   idPrefix = '',
 }: EmployeeEditFieldsProps) => {
   return (
@@ -101,12 +103,19 @@ export const EmployeeEditFields = ({
           />
         </FormField>
         <FormField label="Department" htmlFor={`${idPrefix}department`}>
-          <Input
+          <Select
             id={`${idPrefix}department`}
             value={form.department}
             onChange={(e) => onFieldChange('department', e.target.value)}
             icon={<HiRectangleGroup className="h-4 w-4 text-brand-600" />}
-          />
+          >
+            <option value="">No department</option>
+            {departmentOptions.map((dept) => (
+              <option key={dept} value={dept}>
+                {dept}
+              </option>
+            ))}
+          </Select>
         </FormField>
       </div>
 

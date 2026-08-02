@@ -11,6 +11,10 @@ import { ProfilePage } from "./pages/profile/ProfilePage";
 import { RegisterPage } from "./pages/register/RegisterPage";
 import { RegistrationsPage } from "./pages/registrations/RegistrationsPage";
 import { PlatformSiteSettingsPage } from "./pages/platform/site-settings/PlatformSiteSettingsPage";
+import { SettingsPage } from "./pages/settings/SettingsPage";
+import { CompanyProfilePage } from "./pages/settings/company/CompanyProfilePage";
+import { DepartmentsPage } from "./pages/settings/departments/DepartmentsPage";
+import { UsersPage } from "./pages/settings/users/UsersPage";
 import { TenantBrandingPage } from "./pages/settings/branding/TenantBrandingPage";
 import { LeavePage } from "./pages/leave/LeavePage";
 import { DocumentsPage } from "./pages/documents/DocumentsPage";
@@ -40,6 +44,10 @@ const App = () => {
             path="/dashboard/platform/site-settings"
             element={<PlatformSiteSettingsPage />}
           />
+          <Route path="/dashboard/settings" element={<SettingsPage />} />
+          <Route path="/dashboard/settings/company" element={<CompanyProfilePage />} />
+          <Route path="/dashboard/settings/departments" element={<DepartmentsPage />} />
+          <Route path="/dashboard/settings/users" element={<UsersPage />} />
           <Route path="/dashboard/settings/branding" element={<TenantBrandingPage />} />
         </Route>
       </Route>
