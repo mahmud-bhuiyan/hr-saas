@@ -21,6 +21,9 @@ export interface ServerEnv {
   s3AccessKeyId: string;
   s3SecretAccessKey: string;
   s3ForcePathStyle: boolean;
+  stripeSecretKey: string;
+  stripeWebhookSecret: string;
+  stripePriceId: string;
 }
 
 export const loadServerEnv = (): ServerEnv => {
@@ -39,5 +42,8 @@ export const loadServerEnv = (): ServerEnv => {
     s3AccessKeyId: process.env.S3_ACCESS_KEY_ID ?? '',
     s3SecretAccessKey: process.env.S3_SECRET_ACCESS_KEY ?? '',
     s3ForcePathStyle: process.env.S3_FORCE_PATH_STYLE === 'true',
+    stripeSecretKey: process.env.STRIPE_SECRET_KEY ?? '',
+    stripeWebhookSecret: process.env.STRIPE_WEBHOOK_SECRET ?? '',
+    stripePriceId: process.env.STRIPE_PRICE_ID ?? '',
   };
 }

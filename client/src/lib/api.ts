@@ -87,6 +87,8 @@ import type {
   HeadcountReport,
   AbsenceSummaryReport,
   AbsenceSummaryQuery,
+  BillingStatus,
+  BillingSession,
 } from '../types';
 
 const apiBase = import.meta.env.VITE_API_URL || '';
@@ -1133,4 +1135,25 @@ export const exportExpensesCsv = async (query: ExportExpensesQuery = {}): Promis
   link.click();
   link.remove();
   URL.revokeObjectURL(url);
+};
+
+export const fetchBillingStatus = async (): Promise<BillingStatus> => {
+  const json = await apiFetch<ApiSuccessResponse<BillingStatus>>('/api/v1/billing/status');
+  return json.data;
+};
+
+export const createBillingCheckoutSession = async (): Promise<BillingSession> => {
+  const json = await apiFetch<ApiSuccessResponse<BillingSession>>(
+    '/api/v1/billing/checkout-session',
+    { method: 'POST', body: JSON.stringify({}) }
+  );
+  return json.data;
+};
+
+export const createBillingPortalSession = async (): Promise<BillingSession> => {
+  const json = await apiFetch<ApiSuccessResponse<BillingSession>>(
+    '/api/v1/billing/portal-session',
+    { method: 'POST', body: JSON.stringify({}) }
+  );
+  return json.data;
 };

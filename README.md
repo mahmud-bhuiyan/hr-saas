@@ -63,11 +63,27 @@ docker compose up -d
 
 Copy `S3_*` values from `server/.env.example` into `server/.env.local` for document upload/download.
 
+### Stripe billing (optional — S2-7)
+
+Set in `server/.env.local`:
+
+- `STRIPE_SECRET_KEY` — Stripe secret key (test mode for local/staging)
+- `STRIPE_PRICE_ID` — recurring price ID for per-seat billing
+- `STRIPE_WEBHOOK_SECRET` — from Stripe Dashboard or CLI
+
+Local webhook forwarding:
+
+```bash
+stripe listen --forward-to localhost:5000/api/v1/billing/webhook
+```
+
+Set demo/staging tenants `billingExempt: true` on the Tenant document to skip payment gates.
+
 ## Environment files
 
 | App | File | Key variables |
 |-----|------|---------------|
-| **Server** | `server/.env.local` | `MONGODB_URI`, `CLIENT_URL`, `ADMIN_JWT_SECRET`, `REDIS_URL` (optional; sync email fallback without Redis), `IMGBB_API_KEY` (logo/favicon upload), `SENDGRID_API_KEY`, `EMAIL_FROM` (leave notifications), `S3_*` (document storage; optional: `PORT`, defaults to 5000) |
+| **Server** | `server/.env.local` | `MONGODB_URI`, `CLIENT_URL`, `ADMIN_JWT_SECRET`, `REDIS_URL` (optional; sync email fallback without Redis), `IMGBB_API_KEY` (logo/favicon upload), `SENDGRID_API_KEY`, `EMAIL_FROM` (leave notifications), `S3_*` (document storage), `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `STRIPE_PRICE_ID` (billing; optional: `PORT`, defaults to 5000) |
 | **Client** | `client/.env` | `VITE_API_URL` (backend URL) |
 
 ## Separate deployment

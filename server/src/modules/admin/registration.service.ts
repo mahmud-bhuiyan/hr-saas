@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 import type { TenantApprovalStatus } from '../auth/tenant.model.js';
 import { Tenant } from '../auth/tenant.model.js';
+import { getTenantBillingSummaries } from '../billing/billing.service.js';
 import { hashPassword } from '../../utils/password.js';
 import { ensureEmployeeRecordForUser } from '../employees/employee.service.js';
 import { findUserByEmail } from './admin.service.js';
@@ -20,6 +21,9 @@ export interface RegistrationRequest {
   createdByName?: string;
   updatedByName?: string;
   updatedAt?: string;
+  billingExempt?: boolean;
+  subscriptionStatus?: 'trialing' | 'active' | 'past_due' | 'canceled' | 'incomplete' | 'exempt' | 'none';
+  seatCount?: number;
 }
 
 interface UserSummary {
@@ -234,6 +238,26 @@ export const listRegistrationRequests = async (
         auditUsers
       )
     );
+  }
+
+  if (status === 'approved' && results.length > 0) {
+    const billingSummaries = await getTenantBillingSummaries(
+      results.map((row) => row.tenantId)
+    );
+
+    return results.map((row) => {
+      const billing = billingSummaries.get(row.tenantId);
+      if (!billing) {
+        return row;
+      }
+
+      return {
+        ...row,
+        billingExempt: billing.billingExempt,
+        subscriptionStatus: billing.subscriptionStatus,
+        seatCount: billing.seatCount,
+      };
+    });
   }
 
   return results;

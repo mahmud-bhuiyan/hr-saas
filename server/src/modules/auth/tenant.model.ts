@@ -24,6 +24,7 @@ export interface ITenant {
   annualEntitlement?: number;
   maxCarryOverDays?: number;
   multiStepApprovalEnabled?: boolean;
+  billingExempt?: boolean;
 }
 
 export interface ITenantDocument extends ITenant, Document {
@@ -57,6 +58,7 @@ const tenantSchema = new Schema<ITenantDocument>(
     annualEntitlement: { type: Number, default: 25, min: 0, max: 365 },
     maxCarryOverDays: { type: Number, default: 5, min: 0, max: 365 },
     multiStepApprovalEnabled: { type: Boolean, default: false },
+    billingExempt: { type: Boolean, default: false },
   },
   { timestamps: true }
 );

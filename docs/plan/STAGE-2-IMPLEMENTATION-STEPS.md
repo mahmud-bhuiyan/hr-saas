@@ -14,7 +14,7 @@ Check off each step with the client/dev team before moving to the next.
 | **S2-4** | Expenses — submit with receipt, approval, CSV export | ✅ Done |
 | **S2-5** | Leave enhancements — accrual, carry-over, multi-step approval, doc expiry emails | ✅ Done |
 | **S2-6** | Employee ops & reporting — CSV import, headcount + absence reports | ✅ Done |
-| **S2-7** | Stripe billing — checkout, portal, webhooks, seat metering | ⬜ Not started |
+| **S2-7** | Stripe billing — checkout, portal, webhooks, seat metering | ✅ Done |
 | **S2-8** | Stage 2 polish — extended seed, deploy, bug fixes, sign-off | ⬜ Not started |
 
 ---
@@ -153,16 +153,16 @@ Features added during Stage 2 implementation that extend the original step list.
 
 ## S2-7 — Done when
 
-- [ ] `Subscription` model per tenant (`stripeCustomerId`, `stripeSubscriptionId`, `status`, `seatCount`)
-- [ ] `tenant.billingExempt` flag for demo/staging tenants
-- [ ] `POST /api/v1/billing/checkout-session` — Stripe Checkout for company admin
-- [ ] `POST /api/v1/billing/portal-session` — Stripe Customer Portal
-- [ ] `POST /api/v1/billing/webhook` — handle subscription lifecycle + seat sync
-- [ ] Seat count updates on employee activate/deactivate (webhook or service hook)
-- [ ] Billing page `/dashboard/settings/billing` — plan status, upgrade, manage subscription
-- [ ] Super admin: subscription status on companies/registrations list
-- [ ] Env vars documented: `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `STRIPE_PRICE_ID`
-- [ ] `docs/openapi.yaml` and Postman collection updated
+- [x] `Subscription` model per tenant (`stripeCustomerId`, `stripeSubscriptionId`, `status`, `seatCount`)
+- [x] `tenant.billingExempt` flag for demo/staging tenants
+- [x] `POST /api/v1/billing/checkout-session` — Stripe Checkout for company admin
+- [x] `POST /api/v1/billing/portal-session` — Stripe Customer Portal
+- [x] `POST /api/v1/billing/webhook` — handle subscription lifecycle + seat sync
+- [x] Seat count updates on employee activate/deactivate (webhook or service hook)
+- [x] Billing page `/dashboard/settings/billing` — plan status, upgrade, manage subscription
+- [x] Super admin: subscription status on companies/registrations list
+- [x] Env vars documented: `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `STRIPE_PRICE_ID`
+- [x] `docs/openapi.yaml` and Postman collection updated
 
 **Review:** Test Checkout flow in Stripe test mode and webhook seat sync before S2-8.
 

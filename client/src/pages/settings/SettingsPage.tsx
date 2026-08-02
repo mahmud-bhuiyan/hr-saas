@@ -7,6 +7,7 @@ import {
   HiClipboardDocumentList,
   HiClock,
   HiCalendarDays,
+  HiCreditCard,
 } from 'react-icons/hi2';
 import { PageContainer } from '../../components/ui/PageContainer';
 import { PageHeader } from '../../components/ui/PageHeader';
@@ -62,6 +63,13 @@ const settingsLinks: SettingsLink[] = [
     label: 'Leave policy',
     description: 'Annual entitlement, carry-over, and multi-step approval.',
     icon: HiCalendarDays,
+    roles: ['company_admin'],
+  },
+  {
+    to: '/dashboard/settings/billing',
+    label: 'Billing',
+    description: 'Manage your per-seat Stripe subscription and seat count.',
+    icon: HiCreditCard,
     roles: ['company_admin'],
   },
   {

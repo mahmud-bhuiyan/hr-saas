@@ -26,6 +26,7 @@ import { TimesheetsPage } from "./pages/timesheets/TimesheetsPage";
 import { ExpensesPage } from "./pages/expenses/ExpensesPage";
 import { AttendanceSettingsPage } from "./pages/settings/attendance/AttendanceSettingsPage";
 import { LeaveSettingsPage } from "./pages/settings/leave/LeaveSettingsPage";
+import { BillingPage } from "./pages/settings/billing/BillingPage";
 import { ReportsPage } from "./pages/reports/ReportsPage";
 import { HeadcountReportPage } from "./pages/reports/HeadcountReportPage";
 import { AbsenceReportPage } from "./pages/reports/AbsenceReportPage";
@@ -70,6 +71,7 @@ const App = () => {
           <Route path="/dashboard/settings/branding" element={<TenantBrandingPage />} />
           <Route path="/dashboard/settings/attendance" element={<AttendanceSettingsPage />} />
           <Route path="/dashboard/settings/leave" element={<LeaveSettingsPage />} />
+          <Route path="/dashboard/settings/billing" element={<BillingPage />} />
           <Route path="/dashboard/settings/audit-log" element={<AuditLogPage />} />
         </Route>
       </Route>
