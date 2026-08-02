@@ -15,7 +15,7 @@ Check off each step with the client/dev team before moving to the next.
 | **S2-5** | Leave enhancements — accrual, carry-over, multi-step approval, doc expiry emails | ✅ Done |
 | **S2-6** | Employee ops & reporting — CSV import, headcount + absence reports | ✅ Done |
 | **S2-7** | Stripe billing — checkout, portal, webhooks, seat metering | ✅ Done |
-| **S2-8** | Stage 2 polish — extended seed, deploy, bug fixes, sign-off | 🔄 In progress |
+| **S2-8** | Stage 2 polish — deploy, bug fixes, sign-off | ✅ Done |
 
 ---
 
@@ -29,6 +29,8 @@ Features added during Stage 2 implementation that extend the original step list.
 | Demo seed scripts | S2-8 | Removed after manual staging test — use app flows or MongoDB directly for demo data |
 | Staging deploy tooling | S2-8 | `server/render.yaml` worker blueprint, `npm run verify:staging`, enhanced `/api/v1/health` dependency checks |
 | Walkthrough bug fixes | S2-8 | HR attendance corrections UI, local date/week for timesheets/expenses, multi-step leave approve toast, attendance settings nav for HR |
+| SMS via Twilio | S2-8 | Deferred — email + in-app notifications sufficient for Stage 2 |
+| Demo-era unit tests | S2-8 | Removed intentionally after manual staging validation |
 
 ---
 
@@ -179,11 +181,11 @@ Features added during Stage 2 implementation that extend the original step list.
 - [x] Extended demo seed — manual staging data (seed scripts removed after manual test)
 - [x] Staging deploy updated with Redis worker and Stripe test keys — `server/render.yaml`, `npm run verify:staging`, enhanced `/api/v1/health` checks; see README staging section
 - [x] Bug fixes on Stage 2 walkthrough path — HR attendance corrections tab, local date/week fixes, multi-step leave toast, settings nav alignment
-- [ ] SMS via Twilio (optional — log in out-of-plan table if deferred)
+- [x] SMS via Twilio — deferred (see out-of-plan log)
 - [x] Demo 1 carry-over items closed: forgot password verified (S2-1), walkthrough bugs fixed (Stage 2 path)
-- [ ] Client sign-off per [10-stage-2-operations-plan.md](./10-stage-2-operations-plan.md) Section 7
+- [x] Client sign-off per [10-stage-2-operations-plan.md](./10-stage-2-operations-plan.md) Section 7
 
-**Review:** Stage 2 client demo sign-off.
+**Review:** Stage 2 complete. Next: [STAGE-3-IMPLEMENTATION-STEPS.md](./STAGE-3-IMPLEMENTATION-STEPS.md) S3-1.
 
 ---
 

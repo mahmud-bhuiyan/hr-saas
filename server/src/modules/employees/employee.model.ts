@@ -1,4 +1,5 @@
 import mongoose, { Schema, type Document, type Model } from 'mongoose';
+import type { PayRateType } from '../auth/tenant.model.js';
 
 export type EmployeeStatus = 'active' | 'on_leave' | 'terminated';
 
@@ -15,6 +16,11 @@ export interface IEmployee {
   startDate?: Date;
   managerId?: mongoose.Types.ObjectId | null;
   status: EmployeeStatus;
+  payRate?: number;
+  payRateType?: PayRateType;
+  payCurrency?: string;
+  fteFactor?: number;
+  defaultLocationId?: mongoose.Types.ObjectId | null;
   createdBy?: mongoose.Types.ObjectId;
   updatedBy?: mongoose.Types.ObjectId;
 }
@@ -44,6 +50,11 @@ const employeeSchema = new Schema<IEmployeeDocument>(
       enum: ['active', 'on_leave', 'terminated'],
       default: 'active',
     },
+    payRate: { type: Number, min: 0 },
+    payRateType: { type: String, enum: ['hourly', 'salary'] },
+    payCurrency: { type: String, trim: true, uppercase: true },
+    fteFactor: { type: Number, default: 1, min: 0, max: 1 },
+    defaultLocationId: { type: Schema.Types.ObjectId, ref: 'WorkLocation', default: null },
     createdBy: { type: Schema.Types.ObjectId, ref: 'User' },
     updatedBy: { type: Schema.Types.ObjectId, ref: 'User' },
   },

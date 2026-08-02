@@ -3493,6 +3493,207 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
 
+  /api/v1/settings/payroll:
+    get:
+      tags: [Settings]
+      summary: Get payroll settings
+      description: Company admin only. Returns pay period type, default currency, and payroll week start day.
+      operationId: getPayrollSettings
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Payroll settings
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, data]
+                properties:
+                  status:
+                    type: string
+                    enum: [ok]
+                  data:
+                    $ref: '#/components/schemas/PayrollSettings'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    patch:
+      tags: [Settings]
+      summary: Update payroll settings
+      description: Company admin only. Partial update of payroll configuration.
+      operationId: patchPayrollSettings
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchPayrollSettingsRequest'
+            example:
+              payPeriodType: weekly
+              defaultPayCurrency: GBP
+              payrollWeekStartDay: 1
+      responses:
+        '200':
+          description: Updated payroll settings
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, data]
+                properties:
+                  status:
+                    type: string
+                    enum: [ok]
+                  data:
+                    $ref: '#/components/schemas/PayrollSettings'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/v1/locations:
+    get:
+      tags: [Locations]
+      summary: List work locations
+      description: HR manager or company admin. Lists tenant work locations for shift scheduling.
+      operationId: listWorkLocations
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: includeArchived
+          in: query
+          schema:
+            type: boolean
+            default: false
+      responses:
+        '200':
+          description: Work location list
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, data]
+                properties:
+                  status:
+                    type: string
+                    enum: [ok]
+                  data:
+                    type: object
+                    required: [locations]
+                    properties:
+                      locations:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/WorkLocation'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+    post:
+      tags: [Locations]
+      summary: Create work location
+      description: HR manager or company admin. Creates a work location (or restores archived by name).
+      operationId: createWorkLocation
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateWorkLocationRequest'
+            example:
+              name: Main Office
+              address: 1 High Street, London
+              timezone: Europe/London
+      responses:
+        '201':
+          description: Work location created
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, data]
+                properties:
+                  status:
+                    type: string
+                    enum: [ok]
+                  data:
+                    $ref: '#/components/schemas/WorkLocation'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          description: Location name already exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/locations/{id}:
+    patch:
+      tags: [Locations]
+      summary: Update work location
+      description: HR manager or company admin. Rename, update address/timezone, or archive a location.
+      operationId: patchWorkLocation
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchWorkLocationRequest'
+            example:
+              name: HQ Office
+      responses:
+        '200':
+          description: Updated work location
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, data]
+                properties:
+                  status:
+                    type: string
+                    enum: [ok]
+                  data:
+                    $ref: '#/components/schemas/WorkLocation'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: Location name already exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
   /api/v1/settings/departments:
     get:
       tags: [Settings]
@@ -4424,6 +4625,28 @@ components:
         userId:
           type: string
           description: Linked login user, when set
+        payRate:
+          type: number
+          minimum: 0
+          description: HR/admin only — hourly rate or annual salary amount
+        payRateType:
+          type: string
+          enum: [hourly, salary]
+          description: HR/admin only
+        payCurrency:
+          type: string
+          minLength: 3
+          maxLength: 3
+          example: GBP
+          description: HR/admin only
+        fteFactor:
+          type: number
+          minimum: 0
+          maximum: 1
+          description: Full-time equivalent factor (default 1.0)
+        defaultLocationId:
+          type: string
+          description: Default work location for scheduling
         createdByName:
           type: string
           description: Display name of the user who created the record
@@ -4490,6 +4713,25 @@ components:
           nullable: true
         status:
           $ref: '#/components/schemas/EmployeeStatus'
+        payRate:
+          type: number
+          minimum: 0
+          nullable: true
+        payRateType:
+          type: string
+          enum: [hourly, salary]
+          nullable: true
+        payCurrency:
+          type: string
+          minLength: 3
+          maxLength: 3
+        fteFactor:
+          type: number
+          minimum: 0
+          maximum: 1
+        defaultLocationId:
+          type: string
+          nullable: true
 
     EmployeeImportRow:
       type: object
@@ -4666,7 +4908,7 @@ components:
 
     LogoDisplay:
       type: object
-      required: [heightPx, maxWidthPx, objectFit, showSiteName]
+      required: [heightPx, maxWidthPx, objectFit, shape, showSiteName]
       properties:
         heightPx:
           type: integer
@@ -4681,6 +4923,10 @@ components:
         objectFit:
           type: string
           enum: [contain, cover]
+        shape:
+          type: string
+          enum: [default, circle]
+          example: circle
         showSiteName:
           type: boolean
 
@@ -4784,6 +5030,9 @@ components:
             objectFit:
               type: string
               enum: [contain, cover]
+            shape:
+              type: string
+              enum: [default, circle]
             showSiteName:
               type: boolean
         faviconDisplay:
@@ -4908,6 +5157,94 @@ components:
           type: string
           minLength: 1
           maxLength: 100
+        isArchived:
+          type: boolean
+
+    PayrollSettings:
+      type: object
+      required: [payPeriodType, defaultPayCurrency, payrollWeekStartDay]
+      properties:
+        payPeriodType:
+          type: string
+          enum: [weekly, biweekly, monthly]
+        defaultPayCurrency:
+          type: string
+          minLength: 3
+          maxLength: 3
+          example: GBP
+        payrollWeekStartDay:
+          type: integer
+          minimum: 0
+          maximum: 6
+          description: 0=Sunday through 6=Saturday
+
+    PatchPayrollSettingsRequest:
+      type: object
+      minProperties: 1
+      properties:
+        payPeriodType:
+          type: string
+          enum: [weekly, biweekly, monthly]
+        defaultPayCurrency:
+          type: string
+          minLength: 3
+          maxLength: 3
+        payrollWeekStartDay:
+          type: integer
+          minimum: 0
+          maximum: 6
+
+    WorkLocation:
+      type: object
+      required: [id, name, isArchived, createdAt, updatedAt]
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        address:
+          type: string
+        timezone:
+          type: string
+          example: Europe/London
+        isArchived:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    CreateWorkLocationRequest:
+      type: object
+      required: [name]
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 100
+        address:
+          type: string
+          maxLength: 200
+        timezone:
+          type: string
+          maxLength: 64
+
+    PatchWorkLocationRequest:
+      type: object
+      minProperties: 1
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 100
+        address:
+          type: string
+          maxLength: 200
+        timezone:
+          type: string
+          maxLength: 64
         isArchived:
           type: boolean
 

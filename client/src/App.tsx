@@ -26,6 +26,8 @@ import { TimesheetsPage } from "./pages/timesheets/TimesheetsPage";
 import { ExpensesPage } from "./pages/expenses/ExpensesPage";
 import { AttendanceSettingsPage } from "./pages/settings/attendance/AttendanceSettingsPage";
 import { LeaveSettingsPage } from "./pages/settings/leave/LeaveSettingsPage";
+import { LocationsPage } from "./pages/settings/locations/LocationsPage";
+import { PayrollSettingsPage } from "./pages/settings/payroll/PayrollSettingsPage";
 import { BillingPage } from "./pages/settings/billing/BillingPage";
 import { ReportsPage } from "./pages/reports/ReportsPage";
 import { HeadcountReportPage } from "./pages/reports/HeadcountReportPage";
@@ -67,6 +69,8 @@ const App = () => {
           <Route path="/dashboard/settings" element={<SettingsPage />} />
           <Route path="/dashboard/settings/company" element={<CompanyProfilePage />} />
           <Route path="/dashboard/settings/departments" element={<DepartmentsPage />} />
+          <Route path="/dashboard/settings/locations" element={<LocationsPage />} />
+          <Route path="/dashboard/settings/payroll" element={<PayrollSettingsPage />} />
           <Route path="/dashboard/settings/users" element={<UsersPage />} />
           <Route path="/dashboard/settings/branding" element={<TenantBrandingPage />} />
           <Route path="/dashboard/settings/attendance" element={<AttendanceSettingsPage />} />

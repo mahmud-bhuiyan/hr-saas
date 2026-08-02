@@ -14,7 +14,7 @@ export const AuthLayout = ({ title, subtitle, children, footer }: AuthLayoutProp
     <div className="flex min-h-screen flex-col items-center justify-center bg-slate-50 px-4 py-12 dark:bg-slate-950">
       <div className="mb-8 text-center">
         <Link to="/" className="inline-block">
-          <BrandMark className="text-2xl font-semibold text-brand-700" />
+          <BrandMark textClassName="text-2xl font-semibold text-brand-700" />
         </Link>
       </div>
 

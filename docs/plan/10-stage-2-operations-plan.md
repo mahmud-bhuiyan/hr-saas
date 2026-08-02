@@ -149,13 +149,13 @@ This flow covers **time → pay data → expenses → compliance → monetizatio
 - [x] Timesheet approval queue — manager/HR (tab)
 
 ### Expenses
-- [ ] Submit expense (`/dashboard/expenses`)
-- [ ] Expense approval queue — manager/HR (tab)
-- [ ] Expense CSV export — HR/admin
+- [x] Submit expense (`/dashboard/expenses`)
+- [x] Expense approval queue — manager/HR (tab)
+- [x] Expense CSV export — HR/admin
 
 ### Leave (enhancements)
-- [ ] Multi-step approval indicators on approval queue
-- [ ] Tenant leave policy settings (accrual, carry-over) — company admin
+- [x] Multi-step approval indicators on approval queue
+- [x] Tenant leave policy settings (accrual, carry-over) — company admin
 
 ### Employees
 - [x] Employee invite action on profile
@@ -167,11 +167,11 @@ This flow covers **time → pay data → expenses → compliance → monetizatio
 
 ### Settings
 - [x] Audit log viewer (`/dashboard/settings/audit-log`) — HR/admin
-- [ ] Billing & subscription (`/dashboard/settings/billing`) — company admin
+- [x] Billing & subscription (`/dashboard/settings/billing`) — company admin
 - [x] Attendance settings (GPS toggle) — company admin
 
 ### Super admin
-- [ ] Subscription status column on companies list
+- [x] Subscription status column on companies list
 
 ---
 
@@ -277,8 +277,8 @@ Full roadmap: [hr-saas-mern-project-plan.md](./hr-saas-mern-project-plan.md)
 | S2-5 | Leave enhancements | ✅ Done |
 | S2-6 | Import & reporting | ✅ Done |
 | S2-7 | Stripe billing | ✅ Done |
-| S2-8 | Polish & sign-off | 🔄 In progress (staging tooling + walkthrough fixes done; client sign-off pending) |
+| S2-8 | Polish & sign-off | ✅ Done |
 
 **Cross-cutting (Stage 2):** User light/dark theme preference — `colorScheme` on User; `PATCH /auth/me`; header toggle; `ThemeContext` + localStorage cache.
 
-**Next step:** S2-8 client sign-off. Optional: Twilio SMS (deferred).
+**Next step:** Stage 3 — see [11-stage-3-scheduling-payroll-plan.md](./11-stage-3-scheduling-payroll-plan.md) and [STAGE-3-IMPLEMENTATION-STEPS.md](./STAGE-3-IMPLEMENTATION-STEPS.md).

@@ -2,7 +2,7 @@
 
 One detailed plan file per business module. Use these for sprint planning and as the source of truth for scope before coding.
 
-**When shipping features:** Update the module file and [IMPLEMENTATION-STEPS.md](../IMPLEMENTATION-STEPS.md) or [STAGE-2-IMPLEMENTATION-STEPS.md](../STAGE-2-IMPLEMENTATION-STEPS.md) so plans stay aligned with the codebase.
+**When shipping features:** Update the module file and [IMPLEMENTATION-STEPS.md](../IMPLEMENTATION-STEPS.md), [STAGE-2-IMPLEMENTATION-STEPS.md](../STAGE-2-IMPLEMENTATION-STEPS.md), or [STAGE-3-IMPLEMENTATION-STEPS.md](../STAGE-3-IMPLEMENTATION-STEPS.md) so plans stay aligned with the codebase.
 
 ---
 
@@ -37,12 +37,23 @@ Stage 2 also extends **01-auth-tenant** (forgot password), **02-employees** (inv
 
 ---
 
-## Later stages
+## Stage 3 modules
+
+| # | Module | File | Step | Status |
+|---|--------|------|------|--------|
+| 08 | Shifts & Rotas | [08-rotas.md](./08-rotas.md) | S3-1–S3-3 | S3-1 done |
+| 11 | Payroll Export | [11-payroll.md](./11-payroll.md) | S3-1, S3-4–S3-6 | S3-1 settings done |
+
+Stage 3 also extends **02-employees** (pay fields) — see [11-payroll.md](./11-payroll.md).
+
+**Stage 3 tracker:** [STAGE-3-IMPLEMENTATION-STEPS.md](../STAGE-3-IMPLEMENTATION-STEPS.md) · **Client plan:** [11-stage-3-scheduling-payroll-plan.md](../11-stage-3-scheduling-payroll-plan.md)
+
+---
+
+## Later stages (Stage 4+)
 
 | # | Module | File | Stage |
 |---|--------|------|-------|
-| 08 | Shifts & Rotas | [08-rotas.md](./08-rotas.md) | Stage 3 |
-| 11 | Payroll Export | [11-payroll.md](./11-payroll.md) | Stage 3 |
 | 12 | Reporting (full) | [12-reporting.md](./12-reporting.md) | Stage 4 (S2-6 is thin slice) |
 | 13 | Performance | [13-performance.md](./13-performance.md) | Stage 4 |
 | 14 | Recruitment (ATS) | [14-recruitment.md](./14-recruitment.md) | Stage 4 |
@@ -53,7 +64,7 @@ Stage 2 also extends **01-auth-tenant** (forgot password), **02-employees** (inv
 
 1. Copy [_template.md](./_template.md) to the numbered filename above.
 2. Fill every section; leave `Open Questions` for client decisions.
-3. Link acceptance criteria to [00-client-demo-plan.md](../00-client-demo-plan.md) or [10-stage-2-operations-plan.md](../10-stage-2-operations-plan.md) where applicable.
+3. Link acceptance criteria to [00-client-demo-plan.md](../00-client-demo-plan.md), [10-stage-2-operations-plan.md](../10-stage-2-operations-plan.md), or [11-stage-3-scheduling-payroll-plan.md](../11-stage-3-scheduling-payroll-plan.md) where applicable.
 4. Update the Status column in this README when a plan is ready for development or done.
 
 ---

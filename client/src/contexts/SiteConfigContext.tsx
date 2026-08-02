@@ -65,7 +65,7 @@ export const SiteConfigProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     applyBrandShades(config.primaryColor);
-    applyDocumentBranding(config.siteName, config.faviconUrl, config.faviconDisplay);
+    void applyDocumentBranding(config.siteName, config.faviconUrl, config.faviconDisplay);
   }, [config]);
 
   const refresh = useCallback(async () => {

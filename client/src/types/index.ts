@@ -125,6 +125,10 @@ export interface RegistrationRequest {
 
 export type EmployeeStatus = 'active' | 'on_leave' | 'terminated';
 
+export type PayRateType = 'hourly' | 'salary';
+
+export type PayPeriodType = 'weekly' | 'biweekly' | 'monthly';
+
 export interface EmployeeManagerSummary {
   id: string;
   firstName: string;
@@ -145,6 +149,11 @@ export interface Employee {
   manager?: EmployeeManagerSummary;
   status: EmployeeStatus;
   userId?: string;
+  payRate?: number;
+  payRateType?: PayRateType;
+  payCurrency?: string;
+  fteFactor?: number;
+  defaultLocationId?: string;
   createdByName?: string;
   updatedByName?: string;
   createdAt: string;
@@ -174,6 +183,11 @@ export interface UpdateEmployeeInput {
   startDate?: string;
   managerId?: string | null;
   status?: EmployeeStatus;
+  payRate?: number | null;
+  payRateType?: PayRateType | null;
+  payCurrency?: string;
+  fteFactor?: number;
+  defaultLocationId?: string | null;
 }
 
 export interface ListEmployeesQuery {
@@ -292,6 +306,8 @@ export interface SiteConfig {
 
 export type LogoObjectFit = 'contain' | 'cover';
 
+export type LogoShape = 'default' | 'circle';
+
 export type FaviconMimeType =
   | 'auto'
   | 'image/png'
@@ -303,6 +319,7 @@ export interface LogoDisplaySettings {
   heightPx: number;
   maxWidthPx: number;
   objectFit: LogoObjectFit;
+  shape: LogoShape;
   showSiteName: boolean;
 }
 
@@ -378,6 +395,41 @@ export interface CreateDepartmentInput {
 export interface PatchDepartmentInput {
   name?: string;
   isArchived?: boolean;
+}
+
+export interface WorkLocation {
+  id: string;
+  name: string;
+  address?: string;
+  timezone?: string;
+  isArchived: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateWorkLocationInput {
+  name: string;
+  address?: string;
+  timezone?: string;
+}
+
+export interface PatchWorkLocationInput {
+  name?: string;
+  address?: string;
+  timezone?: string;
+  isArchived?: boolean;
+}
+
+export interface PayrollSettings {
+  payPeriodType: PayPeriodType;
+  defaultPayCurrency: string;
+  payrollWeekStartDay: number;
+}
+
+export interface PatchPayrollSettingsInput {
+  payPeriodType?: PayPeriodType;
+  defaultPayCurrency?: string;
+  payrollWeekStartDay?: number;
 }
 
 export interface TenantUser {

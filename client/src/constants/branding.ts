@@ -1,5 +1,7 @@
 export type LogoObjectFit = 'contain' | 'cover';
 
+export type LogoShape = 'default' | 'circle';
+
 export type FaviconMimeType =
   | 'auto'
   | 'image/png'
@@ -11,6 +13,7 @@ export const DEFAULT_LOGO_DISPLAY = {
   heightPx: 32,
   maxWidthPx: 160,
   objectFit: 'contain' as LogoObjectFit,
+  shape: 'circle' as LogoShape,
   showSiteName: false,
 };
 

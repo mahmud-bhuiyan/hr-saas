@@ -13,12 +13,14 @@ import {
   fetchEmployee,
   fetchEmployeeDepartments,
   fetchEmployees,
+  fetchWorkLocations,
   updateEmployee,
 } from '../../lib/api';
 import { hasFormChanges, pickChangedFields } from '../../utils/form';
 import { hasPermission } from '../../utils/permissions';
 import {
   EmployeeEditFields,
+  EmployeePayFields,
   toEmployeeFormValues,
   type EmployeeFormValues,
 } from './components/EmployeeEditForm';
@@ -27,7 +29,7 @@ import { employeeName } from './utils';
 
 const FORM_ID = 'employee-edit-page-form';
 
-const editableKeys = [
+const baseEditableKeys = [
   'firstName',
   'lastName',
   'email',
@@ -39,6 +41,14 @@ const editableKeys = [
   'status',
 ] as const;
 
+const payEditableKeys = [
+  'payRate',
+  'payRateType',
+  'payCurrency',
+  'fteFactor',
+  'defaultLocationId',
+] as const;
+
 export const EmployeeEditPage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -47,6 +57,12 @@ export const EmployeeEditPage = () => {
   const [form, setForm] = useState<EmployeeFormValues | null>(null);
 
   const canUpdate = user && hasPermission(user.role, 'employee:update');
+  const canEditPay = user && hasPermission(user.role, 'payroll:read');
+
+  const editableKeys = useMemo(
+    () => (canEditPay ? [...baseEditableKeys, ...payEditableKeys] : [...baseEditableKeys]),
+    [canEditPay]
+  );
 
   const employeeQuery = useQuery({
     queryKey: ['employees', id],
@@ -64,6 +80,12 @@ export const EmployeeEditPage = () => {
     queryKey: ['employees', 'departments'],
     queryFn: fetchEmployeeDepartments,
     enabled: Boolean(canUpdate && id),
+  });
+
+  const locationsQuery = useQuery({
+    queryKey: ['locations', 'active'],
+    queryFn: () => fetchWorkLocations(false),
+    enabled: Boolean(canEditPay && id),
   });
 
   const employee = employeeQuery.data;
@@ -136,6 +158,28 @@ export const EmployeeEditPage = () => {
 
     if (changes.managerId === '') {
       changes.managerId = null;
+    }
+
+    if (canEditPay) {
+      if ('payRate' in changes) {
+        changes.payRate =
+          changes.payRate === '' || changes.payRate == null
+            ? null
+            : Number(changes.payRate);
+      }
+      if ('payRateType' in changes) {
+        changes.payRateType = changes.payRateType === '' ? null : changes.payRateType;
+      }
+      if ('payCurrency' in changes && changes.payCurrency === '') {
+        changes.payCurrency = '';
+      }
+      if ('fteFactor' in changes && changes.fteFactor !== undefined) {
+        changes.fteFactor = Number(changes.fteFactor);
+      }
+      if ('defaultLocationId' in changes) {
+        changes.defaultLocationId =
+          changes.defaultLocationId === '' ? null : changes.defaultLocationId;
+      }
     }
 
     updateMutation.mutate(changes);
@@ -214,6 +258,15 @@ export const EmployeeEditPage = () => {
             departmentOptions={departmentsQuery.data ?? []}
             idPrefix="edit-"
           />
+
+          {canEditPay && (
+            <EmployeePayFields
+              form={form!}
+              onFieldChange={updateField}
+              locationOptions={locationsQuery.data ?? []}
+              idPrefix="edit-"
+            />
+          )}
 
           <div className="flex flex-wrap items-center justify-between gap-3 border-t border-slate-100 pt-5 dark:border-slate-800">
             {employee?.status !== 'terminated' && (

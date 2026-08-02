@@ -129,7 +129,7 @@ Be explicit with the client so expectations stay aligned.
 ### Public
 - [x] Login
 - [x] Register company
-- [ ] Forgot password / reset password
+- [x] Forgot password / reset password (shipped in S2-1)
 
 ### Super admin
 - [x] Companies — pending queue, approve/reject, add company directly
@@ -268,6 +268,6 @@ Full roadmap: [hr-saas-mern-project-plan.md](./hr-saas-mern-project-plan.md)
 | Leave (Step 5) | ✅ Complete | Email via SendGrid; user→employee via email fallback |
 | Documents (Step 6) | ✅ Ready for review | MinIO for local dev; AWS S3 or Cloudflare R2 in production |
 | Settings (Step 7) | ✅ Ready for review | Company profile, departments CRUD, users/roles; branding was done earlier |
-| Demo polish (Step 8) | 🔄 In progress | Manual demo data on staging; client sign-off remains |
+| Demo polish (Step 8) | ✅ Complete | Manual staging data only; automated seeds/tests removed |
 
-**Next step:** Step 8 — walkthrough bug fixes and Demo 1 sign-off. See [IMPLEMENTATION-STEPS.md](./IMPLEMENTATION-STEPS.md).
+**Next step:** Stage 3 — see [11-stage-3-scheduling-payroll-plan.md](./11-stage-3-scheduling-payroll-plan.md).

@@ -1,6 +1,7 @@
 import { z } from 'zod';
 
 const employeeStatusSchema = z.enum(['active', 'on_leave', 'terminated']);
+const payRateTypeSchema = z.enum(['hourly', 'salary']);
 
 export const createEmployeeSchema = z.object({
   firstName: z.string().trim().min(1, 'First name is required').max(100),
@@ -38,6 +39,11 @@ export const updateEmployeeSchema = z
       .or(z.literal('')),
     managerId: z.string().min(1).optional().nullable(),
     status: employeeStatusSchema.optional(),
+    payRate: z.number().min(0).optional().nullable(),
+    payRateType: payRateTypeSchema.optional().nullable(),
+    payCurrency: z.string().trim().length(3).optional().or(z.literal('')),
+    fteFactor: z.number().min(0).max(1).optional(),
+    defaultLocationId: z.string().min(1).optional().nullable(),
   })
   .refine((data) => Object.keys(data).length > 0, {
     message: 'At least one field is required',

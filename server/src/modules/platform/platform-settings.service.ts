@@ -45,6 +45,7 @@ const mergeLogoDisplay = (
   heightPx: current?.heightPx ?? DEFAULT_LOGO_DISPLAY.heightPx,
   maxWidthPx: current?.maxWidthPx ?? DEFAULT_LOGO_DISPLAY.maxWidthPx,
   objectFit: current?.objectFit ?? DEFAULT_LOGO_DISPLAY.objectFit,
+  shape: current?.shape ?? DEFAULT_LOGO_DISPLAY.shape,
   showSiteName: current?.showSiteName ?? DEFAULT_LOGO_DISPLAY.showSiteName,
 });
 

@@ -38,6 +38,11 @@ export const employeeAuditSnapshot = (employee: {
   managerId?: unknown;
   status?: string;
   userId?: unknown;
+  payRate?: number;
+  payRateType?: string;
+  payCurrency?: string;
+  fteFactor?: number;
+  defaultLocationId?: unknown;
 }): Record<string, unknown> =>
   sanitizeAuditPayload({
     employeeNumber: employee.employeeNumber,
@@ -51,6 +56,24 @@ export const employeeAuditSnapshot = (employee: {
     managerId: employee.managerId,
     status: employee.status,
     userId: employee.userId,
+    payRate: employee.payRate,
+    payRateType: employee.payRateType,
+    payCurrency: employee.payCurrency,
+    fteFactor: employee.fteFactor,
+    defaultLocationId: employee.defaultLocationId,
+  }) ?? {};
+
+export const locationAuditSnapshot = (location: {
+  name?: string;
+  address?: string;
+  timezone?: string;
+  isArchived?: boolean;
+}): Record<string, unknown> =>
+  sanitizeAuditPayload({
+    name: location.name,
+    address: location.address,
+    timezone: location.timezone,
+    isArchived: location.isArchived,
   }) ?? {};
 
 export const leaveRequestAuditSnapshot = (request: {

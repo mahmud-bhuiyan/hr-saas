@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react';
 import { HiArrowUpTray, HiCheck, HiLink } from 'react-icons/hi2';
 import { Button } from '../../../../components/ui/Button';
+import { FaviconImage } from '../../../../components/FaviconImage';
 import { FormField } from '../../../../components/ui/FormField';
 import { Input } from '../../../../components/ui/Input';
 import { ApiError, readFileAsBase64, uploadPlatformAsset } from '../../../../lib/api';
@@ -121,8 +122,8 @@ export const ImageAssetField = ({
             Upload image
           </Button>
           {url && (
-            <div className="flex items-center gap-2 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2">
-              <img src={url} alt="" className="h-8 w-8 object-contain" />
+            <div className="flex items-center gap-2 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 dark:border-slate-700 dark:bg-slate-800">
+              <FaviconImage src={url} className="h-8 w-8" />
               <span className="flex items-center gap-1 text-xs text-slate-500">
                 <HiLink className="h-3.5 w-3.5 text-brand-600" />
                 Preview
