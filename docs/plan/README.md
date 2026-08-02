@@ -17,6 +17,7 @@ Planning documents for the HR SaaS platform. Use these to align with the client,
 | [STAGE-3-IMPLEMENTATION-STEPS.md](./STAGE-3-IMPLEMENTATION-STEPS.md) | **Stage 3 dev checklist** — Steps S3-1–S3-8 | Dev team |
 | [11-stage-3-scheduling-payroll-plan.md](./11-stage-3-scheduling-payroll-plan.md) | **Stage 3** — scheduling & payroll scope and sign-off | Client + dev team |
 | [hr-saas-mern-project-plan.md](./hr-saas-mern-project-plan.md) | Full product vision, architecture, all 14 modules | Internal / long-term reference |
+| [keka-platform-reference.md](./keka-platform-reference.md) | **Keka benchmark** — full module/screen catalogue for competitive comparison | Internal / planning |
 | [modules/](./modules/) | Per-module detailed plans (one file per module) | Dev team |
 
 ---

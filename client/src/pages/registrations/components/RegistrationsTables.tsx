@@ -70,7 +70,7 @@ export const PendingRegistrationsTable = ({
             header: "Company",
             width: 18,
             render: (row) => (
-              <span className="font-medium text-slate-900">
+              <span className="text-slate-900 dark:text-slate-100">
                 {row.companyName}
               </span>
             ),
@@ -80,7 +80,7 @@ export const PendingRegistrationsTable = ({
             header: "Admin",
             width: 16,
             render: (row) => (
-              <span className="text-slate-700">
+              <span className="text-slate-700 dark:text-slate-300">
                 {adminDisplayName(row.adminFirstName, row.adminLastName)}
               </span>
             ),
@@ -90,7 +90,7 @@ export const PendingRegistrationsTable = ({
             header: "Admin email",
             width: 20,
             render: (row) => (
-              <span className="text-slate-600">{row.adminEmail}</span>
+              <span className="text-slate-600 dark:text-slate-400">{row.adminEmail}</span>
             ),
           },
           {
@@ -98,7 +98,7 @@ export const PendingRegistrationsTable = ({
             header: "Submitted on",
             width: 12,
             render: (row) => (
-              <span className="text-slate-600">
+              <span className="text-slate-600 dark:text-slate-400">
                 {formatDate(row.submittedAt)}
               </span>
             ),
@@ -216,7 +216,7 @@ export const RegisteredCompaniesTable = ({
             header: "Company",
             width: 16,
             render: (row) => (
-              <span className="font-medium text-slate-900">
+              <span className="text-slate-900 dark:text-slate-100">
                 {row.companyName}
               </span>
             ),
@@ -226,7 +226,7 @@ export const RegisteredCompaniesTable = ({
             header: "Admin",
             width: 12,
             render: (row) => (
-              <span className="text-slate-700">
+              <span className="text-slate-700 dark:text-slate-300">
                 {adminDisplayName(row.adminFirstName, row.adminLastName)}
               </span>
             ),
@@ -236,7 +236,7 @@ export const RegisteredCompaniesTable = ({
             header: "Admin email",
             width: 18,
             render: (row) => (
-              <span className="text-slate-600">{row.adminEmail}</span>
+              <span className="text-slate-600 dark:text-slate-400">{row.adminEmail}</span>
             ),
           },
           {
@@ -261,7 +261,7 @@ export const RegisteredCompaniesTable = ({
             header: "Registered",
             width: 10,
             render: (row) => (
-              <span className="text-slate-600">
+              <span className="text-slate-600 dark:text-slate-400">
                 {formatDate(row.submittedAt)}
               </span>
             ),
