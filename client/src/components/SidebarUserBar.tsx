@@ -62,7 +62,7 @@ export const SidebarUserBar = ({ expanded }: SidebarUserBarProps) => {
     return (
       <div className="shrink-0 overflow-visible border-t border-white/10 px-1 py-3">
         <div className="group/user-info relative flex w-full flex-col items-center gap-1">
-          <UserAvatar user={user} variant="onBrand" />
+          <UserAvatar user={user} variant="onBrand" className="h-8 w-8" textClassName="text-xs" />
           <span className="max-w-full truncate text-center text-[10px] font-medium leading-tight text-slate-400">
             {sidebarName}
           </span>

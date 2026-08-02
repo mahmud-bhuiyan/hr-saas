@@ -140,15 +140,15 @@ export const AppShell = () => {
 
 
 
-  const sidebarWidthClass = sidebarExpanded ? 'w-64' : 'w-24';
+  const sidebarWidthClass = sidebarExpanded ? 'w-64' : 'w-20';
 
-  const mainOffsetClass = sidebarExpanded ? 'md:left-64' : 'md:left-24';
+  const mainOffsetClass = sidebarExpanded ? 'md:left-64' : 'md:left-20';
 
   const navItemLayoutClass = sidebarExpanded
 
     ? 'flex-row items-center gap-3 px-3 py-2'
 
-    : 'flex-col items-center gap-1 px-1 py-2.5 text-center';
+    : 'flex-col items-center gap-0.5 px-1 py-2 text-center';
 
 
 
@@ -238,7 +238,7 @@ export const AppShell = () => {
 
                   >
 
-                    <Icon className={`shrink-0 ${sidebarExpanded ? 'h-5 w-5' : 'h-6 w-6'}`} aria-hidden />
+                    <Icon className={`shrink-0 ${sidebarExpanded ? 'h-5 w-5' : 'h-[18px] w-[18px]'}`} aria-hidden />
 
                     {sidebarExpanded ? (
 
@@ -290,7 +290,7 @@ export const AppShell = () => {
 
                 >
 
-                  <Icon className={`shrink-0 ${sidebarExpanded ? 'h-5 w-5' : 'h-6 w-6'}`} aria-hidden />
+                  <Icon className={`shrink-0 ${sidebarExpanded ? 'h-5 w-5' : 'h-[18px] w-[18px]'}`} aria-hidden />
 
                   {sidebarExpanded ? (
 
@@ -326,7 +326,7 @@ export const AppShell = () => {
 
             className={`flex w-full rounded-md text-slate-400 transition hover:bg-[#122E44] hover:text-white ${
 
-              sidebarExpanded ? 'flex-row items-center gap-3 px-3 py-2' : 'flex-col items-center gap-1 px-1 py-2.5 text-center'
+              sidebarExpanded ? 'flex-row items-center gap-3 px-3 py-2' : 'flex-col items-center gap-0.5 px-1 py-2 text-center'
 
             }`}
 
@@ -346,7 +346,7 @@ export const AppShell = () => {
 
               <>
 
-                <HiChevronRight className="h-6 w-6 shrink-0" aria-hidden />
+                <HiChevronRight className="h-[18px] w-[18px] shrink-0" aria-hidden />
 
                 <span className="max-w-full truncate text-[10px] font-medium leading-tight">Expand</span>
 
