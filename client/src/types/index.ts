@@ -308,6 +308,53 @@ export interface PatchTenantBrandingInput {
   primaryColor?: string | null;
 }
 
+export interface CompanyProfile {
+  name: string;
+  address: string | null;
+  logoUrl: string | null;
+  updatedAt: string;
+}
+
+export interface PatchCompanyProfileInput {
+  name?: string;
+  address?: string;
+  logoUrl?: string | null;
+}
+
+export interface Department {
+  id: string;
+  name: string;
+  isArchived: boolean;
+  employeeCount: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateDepartmentInput {
+  name: string;
+}
+
+export interface PatchDepartmentInput {
+  name?: string;
+  isArchived?: boolean;
+}
+
+export interface TenantUser {
+  id: string;
+  email: string;
+  role: UserRole;
+  firstName?: string;
+  lastName?: string;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface PatchTenantUserInput {
+  role?: Exclude<UserRole, 'super_admin'>;
+  isActive?: boolean;
+}
+
 export type DocumentCategory = 'contract' | 'id' | 'certification' | 'other';
 
 export interface DocumentEmployeeSummary {

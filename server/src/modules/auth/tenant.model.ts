@@ -9,6 +9,8 @@ export interface TenantBranding {
 
 export interface ITenant {
   name: string;
+  address?: string;
+  logoUrl?: string | null;
   isActive: boolean;
   approvalStatus: TenantApprovalStatus;
   rejectedReason?: string;
@@ -28,6 +30,8 @@ export interface ITenantDocument extends ITenant, Document {
 const tenantSchema = new Schema<ITenantDocument>(
   {
     name: { type: String, required: true, trim: true },
+    address: { type: String, trim: true },
+    logoUrl: { type: String, default: null },
     isActive: { type: Boolean, default: false },
     approvalStatus: {
       type: String,

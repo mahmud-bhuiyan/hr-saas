@@ -14,7 +14,7 @@ One detailed plan file per business module. Use these for sprint planning and as
 | 02 | Employee Management | [02-employees.md](./02-employees.md) | Ready for review |
 | 03 | Leave & Absence | [03-leave.md](./03-leave.md) | Complete |
 | 04 | Document Storage | [04-documents.md](./04-documents.md) | Ready for review |
-| 05 | Admin & Settings | [05-admin-settings.md](./05-admin-settings.md) | In progress (branding done) |
+| 05 | Admin & Settings | [05-admin-settings.md](./05-admin-settings.md) | Ready for review |
 | 15 | Platform Site Settings | [15-platform-site-settings.md](./15-platform-site-settings.md) | Complete |
 
 ---

@@ -3,6 +3,11 @@ import type { UserRole } from '../../types/index.js';
 import { hasPermission } from '../../utils/permissions.js';
 import { User } from '../admin/user.model.js';
 import {
+  assertActiveDepartmentName,
+  DepartmentServiceError,
+  listActiveDepartmentNames,
+} from '../settings/department.service.js';
+import {
   Employee,
   type EmployeeStatus,
   type IEmployeeDocument,
@@ -359,13 +364,19 @@ export const listEmployees = async (
   return publicEmployees;
 }
 
-export const listDepartments = async (tenantId: string): Promise<string[]> => {
-  const departments = await Employee.distinct('department', {
-    tenantId: new mongoose.Types.ObjectId(tenantId),
-    department: { $exists: true, $nin: [null, ''] },
-  });
+const validateDepartment = async (tenantId: string, department?: string): Promise<void> => {
+  try {
+    await assertActiveDepartmentName(tenantId, department);
+  } catch (error) {
+    if (error instanceof DepartmentServiceError) {
+      throw new EmployeeServiceError(error.message, error.statusCode);
+    }
+    throw error;
+  }
+};
 
-  return (departments as string[]).sort((a, b) => a.localeCompare(b));
+export const listDepartments = async (tenantId: string): Promise<string[]> => {
+  return listActiveDepartmentNames(tenantId);
 }
 
 export const getEmployeeById = async (
@@ -429,6 +440,7 @@ export const createEmployee = async (
   createdByUserId: string
 ): Promise<EmployeePublic> => {
   await validateManagerId(tenantId, input.managerId);
+  await validateDepartment(tenantId, input.department);
 
   const employeeNumber =
     input.employeeNumber?.trim() ||
@@ -533,6 +545,7 @@ export const updateEmployee = async (
   }
 
   if (input.department !== undefined) {
+    await validateDepartment(tenantId, input.department || undefined);
     employee.department = input.department || undefined;
   }
 

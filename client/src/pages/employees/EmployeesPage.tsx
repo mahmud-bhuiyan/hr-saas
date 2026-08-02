@@ -298,6 +298,7 @@ export const EmployeesPage = () => {
         form={createForm}
         onFormChange={setCreateForm}
         managerOptions={managerOptions}
+        departmentOptions={departmentsQuery.data ?? []}
         loading={createMutation.isPending}
         submitDisabled={!canSubmitCreate}
       />

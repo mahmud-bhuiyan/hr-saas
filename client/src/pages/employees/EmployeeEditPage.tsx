@@ -11,6 +11,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import {
   ApiError,
   fetchEmployee,
+  fetchEmployeeDepartments,
   fetchEmployees,
   updateEmployee,
 } from '../../lib/api';
@@ -56,6 +57,12 @@ export const EmployeeEditPage = () => {
   const managersQuery = useQuery({
     queryKey: ['employees', 'managers'],
     queryFn: () => fetchEmployees({ status: 'active' }),
+    enabled: Boolean(canUpdate && id),
+  });
+
+  const departmentsQuery = useQuery({
+    queryKey: ['employees', 'departments'],
+    queryFn: fetchEmployeeDepartments,
     enabled: Boolean(canUpdate && id),
   });
 
@@ -204,6 +211,7 @@ export const EmployeeEditPage = () => {
             form={form!}
             onFieldChange={updateField}
             managerOptions={managerOptions}
+            departmentOptions={departmentsQuery.data ?? []}
             idPrefix="edit-"
           />
 

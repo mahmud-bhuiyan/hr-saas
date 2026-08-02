@@ -1,7 +1,7 @@
 # Module: Admin & Settings
 
-**Stage:** Demo 1 (Step 7) — partial (branding complete; profile/departments/users pending)  
-**Status:** In progress  
+**Stage:** Demo 1 (Step 7) — complete  
+**Status:** Ready for review  
 **Depends on:** Auth & Tenant (Step 2), Employee Management (Step 4)
 
 ---
@@ -92,10 +92,10 @@ Platform site settings endpoints live in [15-platform-site-settings.md](./15-pla
 | Screen | Route | Access | Status |
 |--------|-------|--------|--------|
 | Company branding | `/dashboard/settings/branding` | `company_admin` | ✅ |
-| Settings hub | `/dashboard/settings` | `company_admin` | ⬜ |
-| Company profile | `/dashboard/settings/company` | `company_admin` | ⬜ |
-| Departments | `/dashboard/settings/departments` | `company_admin`, `hr_manager` | ⬜ |
-| Users & roles | `/dashboard/settings/users` | `company_admin` | ⬜ |
+| Settings hub | `/dashboard/settings` | `company_admin`, `hr_manager` | ✅ |
+| Company profile | `/dashboard/settings/company` | `company_admin` | ✅ |
+| Departments | `/dashboard/settings/departments` | `company_admin`, `hr_manager` | ✅ |
+| Users & roles | `/dashboard/settings/users` | `company_admin` | ✅ |
 | Platform site settings | `/dashboard/platform/site-settings` | `super_admin` | ✅ (module 15) |
 
 ---
@@ -116,7 +116,7 @@ Platform site settings endpoints live in [15-platform-site-settings.md](./15-pla
 ## 12. Acceptance Criteria
 
 - [x] Company admin can override primary color and logo URL; clearing reverts to platform default
-- [ ] Company admin can update company name, address, and logo (tenant-scoped profile)
-- [ ] Departments can be added, renamed, and archived; employees use department list
-- [ ] Company admin can view users and assign roles within tenant
+- [x] Company admin can update company name, address, and logo (tenant-scoped profile)
+- [x] Departments can be added, renamed, and archived; employees use department list
+- [x] Company admin can view users and assign roles within tenant
 - [x] Platform site customization remains super-admin-only (module 15)

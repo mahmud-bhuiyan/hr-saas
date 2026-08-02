@@ -23,9 +23,9 @@ const navItems: Array<{
   { to: '/dashboard/leave', label: 'Leave', roles: ['company_admin', 'hr_manager', 'manager', 'employee'] },
   { to: '/dashboard/documents', label: 'Documents', roles: ['company_admin', 'hr_manager', 'employee'] },
   {
-    to: '/dashboard/settings/branding',
+    to: '/dashboard/settings',
     label: 'Settings',
-    roles: ['company_admin'],
+    roles: ['company_admin', 'hr_manager'],
   },
 ];
 

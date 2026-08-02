@@ -53,8 +53,8 @@ export const tenantAdminLinks = (canCreate: boolean): DashboardLink[] => [
   ...(canCreate ? [{ label: 'Add employee', to: '/dashboard/employees' }] : []),
   { label: 'View employees', to: '/dashboard/employees' },
   { label: 'Review leave requests', to: '/dashboard/leave' },
-  { label: 'Company branding', to: '/dashboard/settings/branding' },
-  { label: 'Upload document', note: 'Coming in Step 6', disabled: true },
+  { label: 'Company settings', to: '/dashboard/settings' },
+  { label: 'Upload document', to: '/dashboard/documents' },
 ];
 
 export const managerCards = (team: Employee[], pendingLeave: number): DashboardCard[] => {
@@ -72,7 +72,6 @@ export const managerLinks = (): DashboardLink[] => [
   { label: 'View team', to: '/dashboard/employees' },
   { label: 'Review leave requests', to: '/dashboard/leave' },
   { label: 'Request leave', to: '/dashboard/leave' },
-  { label: 'Upload document', note: 'Coming in Step 6', disabled: true },
 ];
 
 export const employeeCards = (
@@ -85,14 +84,14 @@ export const employeeCards = (
     value: balance != null ? balance.remaining : '—',
     note: balance != null ? `${balance.year} annual leave remaining` : 'View on Leave page',
   },
-  { label: 'Documents', value: '—', note: 'Coming in Step 6' },
+  { label: 'Documents', value: '—', note: 'View on Documents page' },
   { label: 'My requests', value: balance != null ? balance.pending : '—', note: 'Pending approval' },
 ];
 
 export const employeeLinks = (): DashboardLink[] => [
   { label: 'My profile', to: '/dashboard/profile' },
   { label: 'Request leave', to: '/dashboard/leave' },
-  { label: 'Upload document', note: 'Coming in Step 6', disabled: true },
+  { label: 'My documents', to: '/dashboard/documents' },
 ];
 
 export const dashboardDescription = (role: UserRole): string => {

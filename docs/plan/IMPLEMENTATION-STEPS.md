@@ -10,7 +10,7 @@ Check off each step with the client/dev team before moving to the next.
 | **4** | Employee management — CRUD, directory, profile, direct reports | ✅ Ready for review |
 | **5** | Leave & absence — requests, approval, balance, calendar | ✅ Complete |
 | **6** | Document storage — S3 upload/download | ✅ Ready for review |
-| **7** | Admin & settings — company, departments, users | ⬜ Pending |
+| **7** | Admin & settings — company, departments, users | ✅ Ready for review |
 | **8** | Demo polish — seed data, staging deploy, bug fixes | ⬜ Pending |
 
 ---
@@ -130,9 +130,9 @@ Features added during implementation that extend the original step list. Keep th
 
 ## Step 7 — Done when
 
-- [ ] Company profile settings (name, address, logo)
-- [ ] Departments CRUD (replace free-text department on employees)
-- [ ] User list with role assignment
+- [x] Company profile settings (name, address, logo)
+- [x] Departments CRUD (replace free-text department on employees)
+- [x] User list with role assignment
 - [x] Platform site settings (super admin): site name, primary color, logo, favicon
 - [x] Logo/favicon ImgBB upload + display customization (height, fit, favicon type)
 - [x] Public `GET /api/v1/platform/site-config` + super_admin PATCH endpoints
