@@ -427,7 +427,13 @@ export interface DocumentDownloadResponse {
 
 export type AuditAction = 'create' | 'update' | 'delete';
 
-export type AuditEntityType = 'Employee' | 'HrDocument' | 'User' | 'LeaveRequest' | 'AttendanceLog';
+export type AuditEntityType =
+  | 'Employee'
+  | 'HrDocument'
+  | 'User'
+  | 'LeaveRequest'
+  | 'AttendanceLog'
+  | 'Timesheet';
 
 export interface AuditLogEntry {
   id: string;
@@ -532,4 +538,65 @@ export interface PatchAttendanceInput {
 
 export interface PatchAttendanceSettingsInput {
   attendanceGpsEnabled: boolean;
+}
+
+export type TimesheetEntrySource = 'attendance' | 'manual';
+export type TimesheetStatus = 'draft' | 'submitted' | 'approved' | 'declined';
+
+export interface TimesheetEmployeeSummary {
+  id: string;
+  firstName: string;
+  lastName: string;
+  email?: string;
+}
+
+export interface TimesheetEntry {
+  date: string;
+  hours: number;
+  source: TimesheetEntrySource;
+  attendanceLogId?: string | null;
+  notes?: string;
+}
+
+export interface Timesheet {
+  id: string;
+  employeeId: string;
+  employee?: TimesheetEmployeeSummary;
+  weekOf: string;
+  entries: TimesheetEntry[];
+  totalHours: number;
+  overtimeHours: number;
+  overtimeThresholdHours: number;
+  status: TimesheetStatus;
+  submittedAt?: string;
+  approverId?: string;
+  approvedAt?: string;
+  declineReason?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface PaginatedTimesheets {
+  timesheets: Timesheet[];
+  total: number;
+  page: number;
+  limit: number;
+}
+
+export interface GenerateTimesheetInput {
+  weekOf: string;
+}
+
+export interface PatchTimesheetEntryInput {
+  date: string;
+  hours: number;
+  notes?: string;
+}
+
+export interface PatchTimesheetInput {
+  entries: PatchTimesheetEntryInput[];
+}
+
+export interface DeclineTimesheetInput {
+  declineReason?: string;
 }

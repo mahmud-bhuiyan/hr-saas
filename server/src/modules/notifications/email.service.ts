@@ -121,3 +121,78 @@ export const sendLeaveDeclinedEmail = async (
     text,
   });
 };
+
+export const sendTimesheetSubmittedEmail = async (
+  env: ServerEnv,
+  params: {
+    to: string;
+    employeeName: string;
+    weekOf: string;
+    totalHours: number;
+  }
+): Promise<void> => {
+  const text = [
+    `${params.employeeName} has submitted a timesheet for approval.`,
+    '',
+    `Week of: ${params.weekOf}`,
+    `Total hours: ${params.totalHours}`,
+    '',
+    'Please review and approve or decline in the HR platform.',
+  ].join('\n');
+
+  await sendEmail(env, {
+    to: params.to,
+    subject: `Timesheet submitted by ${params.employeeName}`,
+    text,
+  });
+};
+
+export const sendTimesheetApprovedEmail = async (
+  env: ServerEnv,
+  params: {
+    to: string;
+    weekOf: string;
+    totalHours: number;
+    approverName: string;
+  }
+): Promise<void> => {
+  const text = [
+    'Your timesheet has been approved.',
+    '',
+    `Week of: ${params.weekOf}`,
+    `Total hours: ${params.totalHours}`,
+    `Approved by: ${params.approverName}`,
+  ].join('\n');
+
+  await sendEmail(env, {
+    to: params.to,
+    subject: 'Timesheet approved',
+    text,
+  });
+};
+
+export const sendTimesheetDeclinedEmail = async (
+  env: ServerEnv,
+  params: {
+    to: string;
+    weekOf: string;
+    declineReason?: string;
+  }
+): Promise<void> => {
+  const text = [
+    'Your timesheet has been declined.',
+    '',
+    `Week of: ${params.weekOf}`,
+    params.declineReason ? `Reason: ${params.declineReason}` : '',
+    '',
+    'You can edit and resubmit your timesheet in the HR platform.',
+  ]
+    .filter(Boolean)
+    .join('\n');
+
+  await sendEmail(env, {
+    to: params.to,
+    subject: 'Timesheet declined',
+    text,
+  });
+};

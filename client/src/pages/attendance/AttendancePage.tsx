@@ -6,13 +6,13 @@ import { PageContainer } from '../../components/ui/PageContainer';
 import { PageHeader } from '../../components/ui/PageHeader';
 import { Tabs } from '../../components/ui/Tabs';
 import { useAuth } from '../../contexts/AuthContext';
+import { useMyAttendanceStatus } from '../../hooks/useMyAttendanceStatus';
 import {
   ApiError,
   clockIn,
   clockOut,
   fetchAttendanceSettings,
   fetchMyAttendance,
-  fetchMyAttendanceStatus,
   fetchTeamLiveAttendance,
   patchAttendanceLog,
 } from '../../lib/api';
@@ -47,13 +47,7 @@ export const AttendancePage = () => {
     enabled: Boolean(canClock),
   });
 
-  const statusQuery = useQuery({
-    queryKey: ['attendance', 'status'],
-    queryFn: fetchMyAttendanceStatus,
-    enabled: Boolean(canClock),
-    refetchInterval: 60000,
-    retry: false,
-  });
+  const statusQuery = useMyAttendanceStatus();
 
   const historyQuery = useQuery({
     queryKey: ['attendance', 'me', historyPage],

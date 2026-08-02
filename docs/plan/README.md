@@ -40,7 +40,7 @@ Planning documents for the HR SaaS platform. Use these to align with the client,
 |------|-------|--------|
 | S2-1 | Platform foundations | ✅ Done |
 | S2-2 | Attendance | ⬜ Not started |
-| S2-3 | Timesheets | ⬜ Not started |
+| S2-3 | Timesheets | ✅ Done |
 | S2-4 | Expenses | ⬜ Not started |
 | S2-5 | Leave enhancements | ⬜ Not started |
 | S2-6 | Import & reporting | ⬜ Not started |

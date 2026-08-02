@@ -26,7 +26,7 @@ One detailed plan file per business module. Use these for sprint planning and as
 | 16 | Audit Log | [16-audit-log.md](./16-audit-log.md) | S2-1 | Done |
 | 07 | Notifications | [07-notifications.md](./07-notifications.md) | S2-1 | Done |
 | 06 | Attendance | [06-attendance.md](./06-attendance.md) | S2-2 | Not started |
-| 09 | Timesheets | [09-timesheets.md](./09-timesheets.md) | S2-3 | Not started |
+| 09 | Timesheets | [09-timesheets.md](./09-timesheets.md) | S2-3 | Done |
 | 10 | Expenses | [10-expenses.md](./10-expenses.md) | S2-4 | Not started |
 | 12 | Reporting (thin slice) | [12-reporting.md](./12-reporting.md) | S2-6 | Not started |
 | 17 | Billing (Stripe) | [17-billing-stripe.md](./17-billing-stripe.md) | S2-7 | Not started |

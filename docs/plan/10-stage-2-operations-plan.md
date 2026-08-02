@@ -144,8 +144,8 @@ This flow covers **time → pay data → expenses → compliance → monetizatio
 - [x] HR attendance correction modal
 
 ### Timesheets
-- [ ] My timesheet — weekly grid (`/dashboard/timesheets`)
-- [ ] Timesheet approval queue — manager/HR (tab)
+- [x] My timesheet — weekly grid (`/dashboard/timesheets`)
+- [x] Timesheet approval queue — manager/HR (tab)
 
 ### Expenses
 - [ ] Submit expense (`/dashboard/expenses`)
@@ -271,11 +271,11 @@ Full roadmap: [hr-saas-mern-project-plan.md](./hr-saas-mern-project-plan.md)
 |------|-------|--------|
 | S2-1 | Platform foundations | ✅ Done |
 | S2-2 | Attendance | ✅ Done |
-| S2-3 | Timesheets | ⬜ Not started |
+| S2-3 | Timesheets | ✅ Done |
 | S2-4 | Expenses | ⬜ Not started |
 | S2-5 | Leave enhancements | ⬜ Not started |
 | S2-6 | Import & reporting | ⬜ Not started |
 | S2-7 | Stripe billing | ⬜ Not started |
 | S2-8 | Polish & sign-off | ⬜ Not started |
 
-**Next step:** S2-3 — timesheets. See [STAGE-2-IMPLEMENTATION-STEPS.md](./STAGE-2-IMPLEMENTATION-STEPS.md).
+**Next step:** S2-4 — expenses. See [STAGE-2-IMPLEMENTATION-STEPS.md](./STAGE-2-IMPLEMENTATION-STEPS.md).

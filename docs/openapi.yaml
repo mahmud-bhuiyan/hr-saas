@@ -31,6 +31,8 @@ tags:
     description: Leave requests, balances, approval, and team calendar
   - name: Attendance
     description: Clock in/out, attendance history, live team board, and HR corrections
+  - name: Timesheets
+    description: Weekly timesheets from attendance, submit/approve workflow, and overtime
   - name: Documents
     description: HR document storage with S3 presigned upload and download
   - name: Platform
@@ -1772,6 +1774,341 @@ paths:
                     enum: [ok]
                   data:
                     $ref: '#/components/schemas/AttendanceLog'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/v1/timesheets/generate:
+    post:
+      tags: [Timesheets]
+      summary: Generate timesheet from attendance
+      description: |
+        Builds or updates a draft timesheet for the given week (Monday date) from closed attendance logs.
+        Manual entries are preserved. Requires `timesheet:read:own`.
+      operationId: generateTimesheet
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenerateTimesheetRequest'
+            example:
+              weekOf: '2026-08-04'
+      responses:
+        '201':
+          description: Generated timesheet
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, data]
+                properties:
+                  status:
+                    type: string
+                    enum: [ok]
+                  data:
+                    $ref: '#/components/schemas/Timesheet'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /api/v1/timesheets/me:
+    get:
+      tags: [Timesheets]
+      summary: List my timesheets
+      description: Paginated list of timesheets for the authenticated user's employee record.
+      operationId: listMyTimesheets
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+      responses:
+        '200':
+          description: Paginated timesheets
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, data]
+                properties:
+                  status:
+                    type: string
+                    enum: [ok]
+                  data:
+                    $ref: '#/components/schemas/PaginatedTimesheets'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /api/v1/timesheets/me/{weekOf}:
+    get:
+      tags: [Timesheets]
+      summary: Get my timesheet for week
+      description: Returns the timesheet for the given Monday (`weekOf`) or null if none exists.
+      operationId: getMyTimesheetForWeek
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: weekOf
+          in: path
+          required: true
+          schema:
+            type: string
+            format: date
+          example: '2026-08-04'
+      responses:
+        '200':
+          description: Timesheet or null
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, data]
+                properties:
+                  status:
+                    type: string
+                    enum: [ok]
+                  data:
+                    allOf:
+                      - $ref: '#/components/schemas/Timesheet'
+                    nullable: true
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /api/v1/timesheets:
+    get:
+      tags: [Timesheets]
+      summary: List timesheets for approval
+      description: |
+        Approval queue (default status `submitted`). Managers see direct reports only;
+        HR/admin see all. Requires `timesheet:approve` or `timesheet:approve:team`.
+      operationId: listTimesheets
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [submitted, approved, declined, draft]
+        - name: page
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+      responses:
+        '200':
+          description: Paginated timesheets
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, data]
+                properties:
+                  status:
+                    type: string
+                    enum: [ok]
+                  data:
+                    $ref: '#/components/schemas/PaginatedTimesheets'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /api/v1/timesheets/{id}:
+    patch:
+      tags: [Timesheets]
+      summary: Edit draft timesheet entries
+      description: |
+        Updates manual entries on a draft or declined timesheet. Writes to audit log.
+        Requires `timesheet:submit:own`.
+      operationId: patchTimesheet
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchTimesheetRequest'
+            example:
+              entries:
+                - date: '2026-08-04'
+                  hours: 8
+                  notes: Forgot to clock out
+      responses:
+        '200':
+          description: Updated timesheet
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, data]
+                properties:
+                  status:
+                    type: string
+                    enum: [ok]
+                  data:
+                    $ref: '#/components/schemas/Timesheet'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/v1/timesheets/{id}/submit:
+    post:
+      tags: [Timesheets]
+      summary: Submit timesheet for approval
+      description: Requires `timesheet:submit:own`. Sends notification to manager/HR.
+      operationId: submitTimesheet
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Submitted timesheet
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, data]
+                properties:
+                  status:
+                    type: string
+                    enum: [ok]
+                  data:
+                    $ref: '#/components/schemas/Timesheet'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/v1/timesheets/{id}/approve:
+    post:
+      tags: [Timesheets]
+      summary: Approve submitted timesheet
+      description: Requires `timesheet:approve` or `timesheet:approve:team`.
+      operationId: approveTimesheet
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Approved timesheet
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, data]
+                properties:
+                  status:
+                    type: string
+                    enum: [ok]
+                  data:
+                    $ref: '#/components/schemas/Timesheet'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/v1/timesheets/{id}/decline:
+    post:
+      tags: [Timesheets]
+      summary: Decline submitted timesheet
+      description: Requires `timesheet:approve` or `timesheet:approve:team`.
+      operationId: declineTimesheet
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeclineTimesheetRequest'
+            example:
+              declineReason: Hours do not match attendance records
+      responses:
+        '200':
+          description: Declined timesheet
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, data]
+                properties:
+                  status:
+                    type: string
+                    enum: [ok]
+                  data:
+                    $ref: '#/components/schemas/Timesheet'
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -3950,3 +4287,148 @@ components:
       properties:
         attendanceGpsEnabled:
           type: boolean
+
+    TimesheetEntrySource:
+      type: string
+      enum: [attendance, manual]
+
+    TimesheetStatus:
+      type: string
+      enum: [draft, submitted, approved, declined]
+
+    TimesheetEntry:
+      type: object
+      required: [date, hours, source]
+      properties:
+        date:
+          type: string
+          format: date
+        hours:
+          type: number
+          minimum: 0
+        source:
+          $ref: '#/components/schemas/TimesheetEntrySource'
+        attendanceLogId:
+          type: string
+          nullable: true
+        notes:
+          type: string
+
+    TimesheetEmployeeSummary:
+      type: object
+      required: [id, firstName, lastName]
+      properties:
+        id:
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+        email:
+          type: string
+
+    Timesheet:
+      type: object
+      required:
+        - id
+        - employeeId
+        - weekOf
+        - entries
+        - totalHours
+        - overtimeHours
+        - overtimeThresholdHours
+        - status
+        - createdAt
+        - updatedAt
+      properties:
+        id:
+          type: string
+        employeeId:
+          type: string
+        employee:
+          $ref: '#/components/schemas/TimesheetEmployeeSummary'
+        weekOf:
+          type: string
+          format: date
+        entries:
+          type: array
+          items:
+            $ref: '#/components/schemas/TimesheetEntry'
+        totalHours:
+          type: number
+        overtimeHours:
+          type: number
+        overtimeThresholdHours:
+          type: number
+        status:
+          $ref: '#/components/schemas/TimesheetStatus'
+        submittedAt:
+          type: string
+          format: date-time
+        approverId:
+          type: string
+        approvedAt:
+          type: string
+          format: date-time
+        declineReason:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    PaginatedTimesheets:
+      type: object
+      required: [timesheets, total, page, limit]
+      properties:
+        timesheets:
+          type: array
+          items:
+            $ref: '#/components/schemas/Timesheet'
+        total:
+          type: integer
+        page:
+          type: integer
+        limit:
+          type: integer
+
+    GenerateTimesheetRequest:
+      type: object
+      required: [weekOf]
+      properties:
+        weekOf:
+          type: string
+          format: date
+          description: Monday of the week (YYYY-MM-DD)
+
+    PatchTimesheetEntryRequest:
+      type: object
+      required: [date, hours]
+      properties:
+        date:
+          type: string
+          format: date
+        hours:
+          type: number
+          minimum: 0
+          maximum: 24
+        notes:
+          type: string
+
+    PatchTimesheetRequest:
+      type: object
+      required: [entries]
+      properties:
+        entries:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/PatchTimesheetEntryRequest'
+
+    DeclineTimesheetRequest:
+      type: object
+      properties:
+        declineReason:
+          type: string

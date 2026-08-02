@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
-import { HiArrowRightOnRectangle, HiUserCircle } from 'react-icons/hi2';
+import { HiArrowRightOnRectangle, HiClock, HiUserCircle } from 'react-icons/hi2';
 import { useAuth } from '../contexts/AuthContext';
+import { useMyAttendanceStatus } from '../hooks/useMyAttendanceStatus';
 import { logout } from '../lib/api';
 import { avatarLetter, displayName, roleLabel } from '../utils/user';
 import { Dropdown } from './ui/Dropdown';
@@ -8,6 +9,8 @@ import { Dropdown } from './ui/Dropdown';
 export const UserMenu = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const statusQuery = useMyAttendanceStatus();
+  const clockedIn = statusQuery.data?.clockedIn ?? false;
 
   if (!user) {
     return null;
@@ -27,8 +30,14 @@ export const UserMenu = () => {
           aria-haspopup="menu"
           className="flex items-center gap-3 rounded-lg px-2 py-1.5 transition hover:bg-slate-50"
         >
-          <span className="hidden min-w-0 text-right sm:block">
-            <span className="block text-sm font-medium leading-5 text-slate-900">
+          {clockedIn && (
+            <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-xs font-medium text-emerald-700 ring-1 ring-inset ring-emerald-600/20">
+              <HiClock className="h-3 w-3" aria-hidden />
+              Clocked in
+            </span>
+          )}
+          <span className="hidden min-w-0 sm:block">
+            <span className="block truncate text-sm font-medium leading-5 text-slate-900">
               {displayName(user)}
             </span>
             <span className="block text-xs capitalize leading-4 text-brand-600">

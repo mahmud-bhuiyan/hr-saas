@@ -33,6 +33,10 @@
     {
       "key": "attendanceLogId",
       "value": ""
+    },
+    {
+      "key": "timesheetId",
+      "value": ""
     }
   ],
   "item": [
@@ -989,6 +993,166 @@
             },
             "url": "{{baseUrl}}/api/v1/attendance/{{attendanceLogId}}",
             "description": "HR correction with required notes."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Timesheets",
+      "item": [
+        {
+          "name": "Generate Timesheet",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "  const json = pm.response.json();",
+                  "  pm.collectionVariables.set('timesheetId', json.data.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+            },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"weekOf\": \"2026-08-04\"\n}"
+            },
+            "url": "{{baseUrl}}/api/v1/timesheets/generate",
+            "description": "Generate draft timesheet from attendance for the week (Monday date)."
+          },
+          "response": []
+        },
+        {
+          "name": "List My Timesheets",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/timesheets/me?page=1&limit=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "timesheets", "me"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "20" }
+              ]
+            },
+            "description": "Paginated list of own timesheets."
+          },
+          "response": []
+        },
+        {
+          "name": "Get My Timesheet For Week",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+            },
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/timesheets/me/2026-08-04",
+            "description": "Get timesheet for a specific week (Monday date) or null."
+          },
+          "response": []
+        },
+        {
+          "name": "List Timesheet Approval Queue",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/timesheets?status=submitted&page=1&limit=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "timesheets"],
+              "query": [
+                { "key": "status", "value": "submitted" },
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "20" }
+              ]
+            },
+            "description": "Manager/HR approval queue."
+          },
+          "response": []
+        },
+        {
+          "name": "Patch Timesheet",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+            },
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"entries\": [\n    {\n      \"date\": \"2026-08-04\",\n      \"hours\": 8,\n      \"notes\": \"Manual adjustment\"\n    }\n  ]\n}"
+            },
+            "url": "{{baseUrl}}/api/v1/timesheets/{{timesheetId}}",
+            "description": "Edit draft timesheet entries (manual source)."
+          },
+          "response": []
+        },
+        {
+          "name": "Submit Timesheet",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+            },
+            "method": "POST",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/timesheets/{{timesheetId}}/submit",
+            "description": "Submit draft timesheet for approval."
+          },
+          "response": []
+        },
+        {
+          "name": "Approve Timesheet",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+            },
+            "method": "POST",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/timesheets/{{timesheetId}}/approve",
+            "description": "Manager/HR approves submitted timesheet."
+          },
+          "response": []
+        },
+        {
+          "name": "Decline Timesheet",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+            },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"declineReason\": \"Hours do not match attendance\"\n}"
+            },
+            "url": "{{baseUrl}}/api/v1/timesheets/{{timesheetId}}/decline",
+            "description": "Manager/HR declines submitted timesheet."
           },
           "response": []
         }

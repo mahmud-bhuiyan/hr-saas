@@ -10,7 +10,7 @@ Check off each step with the client/dev team before moving to the next.
 |------|-------|--------|
 | **S2-1** | Platform foundations — audit log, notifications, forgot password, employee invite | ✅ Done |
 | **S2-2** | Attendance — clock in/out, history, live board, HR corrections | ✅ Done |
-| **S2-3** | Timesheets — weekly grid, auto-generate, submit/approve, overtime | ⬜ Not started |
+| **S2-3** | Timesheets — weekly grid, auto-generate, submit/approve, overtime | ✅ Done |
 | **S2-4** | Expenses — submit with receipt, approval, CSV export | ⬜ Not started |
 | **S2-5** | Leave enhancements — accrual, carry-over, multi-step approval, doc expiry emails | ⬜ Not started |
 | **S2-6** | Employee ops & reporting — CSV import, headcount + absence reports | ⬜ Not started |
@@ -77,17 +77,17 @@ Features added during Stage 2 implementation that extend the original step list.
 
 ## S2-3 — Done when
 
-- [ ] `Timesheet` model (weekly `weekOf`, `entries[]`, `totalHours`, `overtimeHours`, `status`)
-- [ ] `POST /api/v1/timesheets/generate` — build draft from `AttendanceLog` for Mon–Sun week
-- [ ] `GET /api/v1/timesheets/me`, `GET /api/v1/timesheets` (approval queue)
-- [ ] `PATCH /api/v1/timesheets/:id` — manual entry adjustments (draft only)
-- [ ] `POST /api/v1/timesheets/:id/submit`, `POST /api/v1/timesheets/:id/approve`, `POST /api/v1/timesheets/:id/decline`
-- [ ] Overtime calculated when `totalHours > tenant.overtimeThreshold` (default 40)
-- [ ] Timesheet page `/dashboard/timesheets` with weekly grid
-- [ ] Approval queue tab for manager/HR
-- [ ] Notification on submit and approve/decline
-- [ ] Permissions: `timesheet:read:own`, `timesheet:submit:own`, `timesheet:approve:team`, `timesheet:approve`
-- [ ] `docs/openapi.yaml` and Postman collection updated
+- [x] `Timesheet` model (weekly `weekOf`, `entries[]`, `totalHours`, `overtimeHours`, `status`)
+- [x] `POST /api/v1/timesheets/generate` — build draft from `AttendanceLog` for Mon–Sun week
+- [x] `GET /api/v1/timesheets/me`, `GET /api/v1/timesheets` (approval queue)
+- [x] `PATCH /api/v1/timesheets/:id` — manual entry adjustments (draft only)
+- [x] `POST /api/v1/timesheets/:id/submit`, `POST /api/v1/timesheets/:id/approve`, `POST /api/v1/timesheets/:id/decline`
+- [x] Overtime calculated when `totalHours > tenant.overtimeThreshold` (default 40)
+- [x] Timesheet page `/dashboard/timesheets` with weekly grid
+- [x] Approval queue tab for manager/HR
+- [x] Notification on submit and approve/decline
+- [x] Permissions: `timesheet:read:own`, `timesheet:submit:own`, `timesheet:approve:team`, `timesheet:approve`
+- [x] `docs/openapi.yaml` and Postman collection updated
 
 **Review:** Test generate → edit → submit → approve flow before S2-4.
 
