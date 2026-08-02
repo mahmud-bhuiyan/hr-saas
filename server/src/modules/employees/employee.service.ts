@@ -5,6 +5,7 @@ import { hasPermission } from '../../utils/permissions.js';
 import { hashPassword } from '../../utils/password.js';
 import { employeeAuditSnapshot } from '../../utils/audit-snapshot.js';
 import { writeAuditLog, type AuditContext } from '../audit/audit.service.js';
+import { syncSeatCount } from '../billing/billing.service.js';
 import { findUserByEmail } from '../admin/admin.service.js';
 import { User } from '../admin/user.model.js';
 import type { ServerEnv } from '../../config/env.js';
@@ -600,6 +601,8 @@ export const createEmployee = async (
     context: audit,
   });
 
+  void syncSeatCount(tenantId);
+
   return getEmployeeById(tenantId, employee._id.toString(), {
     userId: '',
     role: 'company_admin',
@@ -676,6 +679,9 @@ export const updateEmployee = async (
     employee.status = input.status;
   }
 
+  const statusChanged =
+    input.status !== undefined && input.status !== beforeSnapshot.status;
+
   employee.updatedBy = new mongoose.Types.ObjectId(updatedByUserId);
 
   await employee.save();
@@ -690,6 +696,10 @@ export const updateEmployee = async (
     after: employeeAuditSnapshot(employee),
     context: audit,
   });
+
+  if (statusChanged) {
+    void syncSeatCount(tenantId);
+  }
 
   return getEmployeeById(tenantId, employeeId, {
     userId: '',

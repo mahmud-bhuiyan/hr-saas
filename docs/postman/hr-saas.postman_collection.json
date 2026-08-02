@@ -1421,6 +1421,78 @@
       ]
     },
     {
+      "name": "Billing",
+      "item": [
+        {
+          "name": "Billing Status",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+            },
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/billing/status",
+            "description": "Current subscription status and seat count. Requires company_admin."
+          },
+          "response": []
+        },
+        {
+          "name": "Create Checkout Session",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+            },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": "{{baseUrl}}/api/v1/billing/checkout-session",
+            "description": "Create Stripe Checkout session; returns redirect URL. Requires company_admin."
+          },
+          "response": []
+        },
+        {
+          "name": "Create Portal Session",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+            },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": "{{baseUrl}}/api/v1/billing/portal-session",
+            "description": "Create Stripe Customer Portal session. Requires company_admin and existing subscription."
+          },
+          "response": []
+        },
+        {
+          "name": "Stripe Webhook",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Stripe-Signature", "value": "whsec_test_signature" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"evt_test\",\n  \"type\": \"checkout.session.completed\",\n  \"data\": { \"object\": {} }\n}"
+            },
+            "url": "{{baseUrl}}/api/v1/billing/webhook",
+            "description": "Stripe webhook (public). Use Stripe CLI locally: stripe listen --forward-to localhost:5000/api/v1/billing/webhook"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
       "name": "Documents",
       "item": [
         {

@@ -29,7 +29,7 @@ One detailed plan file per business module. Use these for sprint planning and as
 | 09 | Timesheets | [09-timesheets.md](./09-timesheets.md) | S2-3 | Done |
 | 10 | Expenses | [10-expenses.md](./10-expenses.md) | S2-4 | Done |
 | 12 | Reporting (thin slice) | [12-reporting.md](./12-reporting.md) | S2-6 | Done |
-| 17 | Billing (Stripe) | [17-billing-stripe.md](./17-billing-stripe.md) | S2-7 | Not started |
+| 17 | Billing (Stripe) | [17-billing-stripe.md](./17-billing-stripe.md) | S2-7 | Done |
 
 Stage 2 also extends **01-auth-tenant** (forgot password), **02-employees** (invite, CSV import), and **03-leave** (accrual, multi-step approval) — see Stage 2 sections in those files.
 

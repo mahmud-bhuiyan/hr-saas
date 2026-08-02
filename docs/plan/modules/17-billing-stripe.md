@@ -1,7 +1,7 @@
 # Module: Billing (Stripe)
 
 **Stage:** Stage 2 (S2-7)  
-**Status:** Not started  
+**Status:** Done  
 **Depends on:** Auth & Tenant (Demo 1), Employee Management (seat count source)
 
 ---
@@ -138,23 +138,23 @@ Company admin opens billing → Subscribe → Stripe Checkout → webhook activa
 ## 10. Tasks Breakdown
 
 ### Backend
-- [ ] Subscription model + indexes
-- [ ] Stripe SDK integration
-- [ ] Checkout + portal session endpoints
-- [ ] Webhook handler with signature verify
-- [ ] Seat sync on employee status change
-- [ ] `billingExempt` on Tenant
-- [ ] Routes + RBAC
+- [x] Subscription model + indexes
+- [x] Stripe SDK integration
+- [x] Checkout + portal session endpoints
+- [x] Webhook handler with signature verify
+- [x] Seat sync on employee status change
+- [x] `billingExempt` on Tenant
+- [x] Routes + RBAC
 
 ### Frontend
-- [ ] Billing settings page
-- [ ] Redirect to Checkout / Portal
-- [ ] Subscription status on super admin companies table
+- [x] Billing settings page
+- [x] Redirect to Checkout / Portal
+- [x] Subscription status on super admin companies table
 
 ### Integration
-- [ ] Env vars in server/.env.example
+- [x] Env vars in server/.env.example
 - [ ] Stripe test webhook via CLI for local dev
-- [ ] OpenAPI + Postman
+- [x] OpenAPI + Postman
 
 **Estimate:** 7–10 days
 
@@ -170,9 +170,9 @@ Company admin opens billing → Subscribe → Stripe Checkout → webhook activa
 
 ## 12. Acceptance Criteria
 
-- [ ] Company admin can complete Checkout in Stripe test mode
-- [ ] Webhook updates subscription status in MongoDB
-- [ ] Seat count syncs when employee activated/deactivated
-- [ ] Demo tenant with billingExempt bypasses payment
-- [ ] Super admin sees subscription status per tenant
-- [ ] OpenAPI and Postman updated
+- [x] Company admin can complete Checkout in Stripe test mode
+- [x] Webhook updates subscription status in MongoDB
+- [x] Seat count syncs when employee activated/deactivated
+- [x] Demo tenant with billingExempt bypasses payment
+- [x] Super admin sees subscription status per tenant
+- [x] OpenAPI and Postman updated

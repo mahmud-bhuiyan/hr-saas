@@ -47,6 +47,8 @@ tags:
     description: Tenant audit log for sensitive changes
   - name: Notifications
     description: In-app notifications for authenticated users
+  - name: Billing
+    description: Per-seat Stripe subscriptions for company admins
 
 paths:
   /:
@@ -2671,6 +2673,150 @@ paths:
         '403':
           $ref: '#/components/responses/Forbidden'
 
+  /api/v1/billing/status:
+    get:
+      tags: [Billing]
+      summary: Billing status
+      description: |
+        Returns subscription status, seat count, and active employee count for the current tenant.
+
+        Requires `company_admin` role. Billing-exempt tenants return `billingExempt: true`.
+      operationId: getBillingStatus
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Billing status
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, data]
+                properties:
+                  status:
+                    type: string
+                    enum: [ok]
+                  data:
+                    $ref: '#/components/schemas/BillingStatus'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/v1/billing/checkout-session:
+    post:
+      tags: [Billing]
+      summary: Create Stripe Checkout session
+      description: |
+        Creates a Stripe Checkout session for a per-seat subscription. Returns a redirect URL.
+
+        Requires `company_admin` role. Seat quantity matches active employees (minimum 1).
+      operationId: createBillingCheckoutSession
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BillingCheckoutSessionRequest'
+      responses:
+        '200':
+          description: Checkout session URL
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, data]
+                properties:
+                  status:
+                    type: string
+                    enum: [ok]
+                  data:
+                    $ref: '#/components/schemas/BillingSession'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '503':
+          description: Stripe not configured
+
+  /api/v1/billing/portal-session:
+    post:
+      tags: [Billing]
+      summary: Create Stripe Customer Portal session
+      description: |
+        Creates a Stripe Customer Portal session so the company admin can manage billing.
+
+        Requires `company_admin` role and an existing Stripe customer.
+      operationId: createBillingPortalSession
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BillingPortalSessionRequest'
+      responses:
+        '200':
+          description: Portal session URL
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, data]
+                properties:
+                  status:
+                    type: string
+                    enum: [ok]
+                  data:
+                    $ref: '#/components/schemas/BillingSession'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '503':
+          description: Stripe not configured
+
+  /api/v1/billing/webhook:
+    post:
+      tags: [Billing]
+      summary: Stripe webhook
+      description: |
+        Public endpoint for Stripe webhooks. Verifies `Stripe-Signature` header.
+
+        Handles `checkout.session.completed`, `customer.subscription.updated`,
+        `customer.subscription.deleted`, and `invoice.payment_failed`.
+      operationId: stripeBillingWebhook
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              description: Raw Stripe event payload
+      responses:
+        '200':
+          description: Event received
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  received:
+                    type: boolean
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '503':
+          description: Webhook secret not configured
+
   /api/v1/documents:
     get:
       tags: [Documents]
@@ -4100,6 +4246,74 @@ components:
         updatedAt:
           type: string
           format: date-time
+        billingExempt:
+          type: boolean
+          description: Present on approved companies when listed by super admin
+        subscriptionStatus:
+          type: string
+          enum: [trialing, active, past_due, canceled, incomplete, exempt, none]
+          description: Stripe subscription status or billing exemption (approved companies only)
+        seatCount:
+          type: integer
+          minimum: 1
+          description: Billed seat count from Stripe (when subscribed)
+
+    BillingSubscription:
+      type: object
+      required: [status, seatCount, activeEmployeeCount]
+      properties:
+        status:
+          type: string
+          enum: [trialing, active, past_due, canceled, incomplete]
+        seatCount:
+          type: integer
+          minimum: 1
+        activeEmployeeCount:
+          type: integer
+          minimum: 0
+        currentPeriodEnd:
+          type: string
+          format: date-time
+        stripeCustomerId:
+          type: string
+
+    BillingStatus:
+      type: object
+      required: [billingExempt, hasActiveSubscription, subscription]
+      properties:
+        billingExempt:
+          type: boolean
+        hasActiveSubscription:
+          type: boolean
+        subscription:
+          nullable: true
+          allOf:
+            - $ref: '#/components/schemas/BillingSubscription'
+
+    BillingSession:
+      type: object
+      required: [url]
+      properties:
+        url:
+          type: string
+          format: uri
+
+    BillingCheckoutSessionRequest:
+      type: object
+      properties:
+        successUrl:
+          type: string
+          format: uri
+        cancelUrl:
+          type: string
+          format: uri
+
+    BillingPortalSessionRequest:
+      type: object
+      properties:
+        returnUrl:
+          type: string
+          format: uri
 
     UpdateCompanyRequest:
       type: object

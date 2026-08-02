@@ -11,6 +11,7 @@ import { usePagination } from '../../../hooks/usePagination';
 import type { RegistrationRequest } from '../../../types';
 import { adminDisplayName, formatDate } from '../utils';
 import { CompanyStatusBadge } from './CompanyStatusBadge';
+import { SubscriptionStatusBadge } from './SubscriptionStatusBadge';
 
 interface PendingRegistrationsTableProps {
   pending: RegistrationRequest[];
@@ -243,6 +244,17 @@ export const RegisteredCompaniesTable = ({
             header: "Status",
             width: 10,
             render: (row) => <CompanyStatusBadge isActive={row.isActive} />,
+          },
+          {
+            key: "billing",
+            header: "Subscription",
+            width: 12,
+            render: (row) => (
+              <SubscriptionStatusBadge
+                status={row.subscriptionStatus}
+                seatCount={row.seatCount}
+              />
+            ),
           },
           {
             key: "registered",

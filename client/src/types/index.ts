@@ -111,6 +111,16 @@ export interface RegistrationRequest {
   createdByName?: string;
   updatedByName?: string;
   updatedAt?: string;
+  billingExempt?: boolean;
+  subscriptionStatus?:
+    | 'trialing'
+    | 'active'
+    | 'past_due'
+    | 'canceled'
+    | 'incomplete'
+    | 'exempt'
+    | 'none';
+  seatCount?: number;
 }
 
 export type EmployeeStatus = 'active' | 'on_leave' | 'terminated';
@@ -780,4 +790,29 @@ export interface AbsenceSummaryQuery {
   from: string;
   to: string;
   department?: string;
+}
+
+export type SubscriptionStatus =
+  | 'trialing'
+  | 'active'
+  | 'past_due'
+  | 'canceled'
+  | 'incomplete';
+
+export interface BillingSubscription {
+  status: SubscriptionStatus;
+  seatCount: number;
+  activeEmployeeCount: number;
+  currentPeriodEnd?: string;
+  stripeCustomerId?: string;
+}
+
+export interface BillingStatus {
+  billingExempt: boolean;
+  hasActiveSubscription: boolean;
+  subscription: BillingSubscription | null;
+}
+
+export interface BillingSession {
+  url: string;
 }

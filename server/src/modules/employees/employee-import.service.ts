@@ -1,6 +1,7 @@
 import { parse } from 'csv-parse/sync';
 import mongoose from 'mongoose';
 import { writeAuditLog, type AuditContext } from '../audit/audit.service.js';
+import { syncSeatCount } from '../billing/billing.service.js';
 import { assertActiveDepartmentName, DepartmentServiceError } from '../settings/department.service.js';
 import { Employee } from './employee.model.js';
 import { EmployeeServiceError } from './employee.service.js';
@@ -438,6 +439,10 @@ export const commitEmployeeImport = async (
     },
     context: audit,
   });
+
+  if (created > 0) {
+    void syncSeatCount(tenantId);
+  }
 
   return { created, errors: [] };
 };

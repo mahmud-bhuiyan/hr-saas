@@ -169,4 +169,4 @@ Demo 1 Steps 1–8 above are complete (or in final polish). Stage 2 planning and
 | [10-stage-2-operations-plan.md](./10-stage-2-operations-plan.md) | Client-facing scope, screens, timeline, sign-off |
 | [STAGE-2-IMPLEMENTATION-STEPS.md](./STAGE-2-IMPLEMENTATION-STEPS.md) | Dev checklist — Steps S2-1 through S2-8 |
 
-**Next step after Demo 1 sign-off:** S2-7 — Stripe billing. S2-6 import and reporting are complete.
+**Next step after Demo 1 sign-off:** S2-8 — Stage 2 polish and client sign-off. S2-7 Stripe billing is complete.

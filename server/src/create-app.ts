@@ -5,6 +5,8 @@ import { loadServerEnv } from './config/env.js';
 import { APP_NAME } from './constants/app.js';
 import { createAdminRoutes } from './modules/admin/admin.routes.js';
 import { createRegistrationRoutes } from './modules/admin/registration.routes.js';
+import { stripeWebhookHandler } from './modules/billing/billing.controller.js';
+import { createBillingRoutes } from './modules/billing/billing.routes.js';
 import { createAuthRoutes } from './modules/auth/auth.routes.js';
 import { createEmployeeRoutes } from './modules/employees/employee.routes.js';
 import { createPlatformAdminRoutes } from './modules/platform/platform-admin.routes.js';
@@ -30,6 +32,13 @@ export const createApp = () => {
       credentials: true,
     })
   );
+
+  app.post(
+    '/api/v1/billing/webhook',
+    express.raw({ type: 'application/json' }),
+    stripeWebhookHandler(env)
+  );
+
   app.use(express.json());
   app.use(cookieParser());
 
@@ -61,6 +70,7 @@ export const createApp = () => {
   app.use('/api/v1/timesheets', createTimesheetRoutes(env));
   app.use('/api/v1/expenses', createExpenseRoutes(env));
   app.use('/api/v1/reports', createReportRoutes(env));
+  app.use('/api/v1/billing', createBillingRoutes(env));
 
   return app;
 }
