@@ -1,6 +1,6 @@
 # Module: Reporting (Stage 2 slice)
 
-**Stage:** Stage 2 (S2-6) — thin slice; full module in Stage 4  
+**Stage:** Stage 2 (S2-6)  
 **Status:** Done (S2-6)  
 **Depends on:** Employee Management, Leave & Absence
 
@@ -8,7 +8,7 @@
 
 ## 1. Purpose
 
-Basic operational reports for HR and company admins: headcount breakdown and absence summary. Stage 2 delivers a minimal reporting foundation; advanced analytics (Bradford Factor, turnover, exports) remain Stage 4.
+Basic operational reports for HR and company admins: headcount breakdown and absence summary. Stage 2 delivers a minimal reporting foundation; advanced analytics (Bradford Factor, turnover, exports) are out of scope.
 
 ---
 
@@ -18,7 +18,7 @@ Basic operational reports for HR and company admins: headcount breakdown and abs
 |------------|:-------------:|:----------:|:-------:|:--------:|
 | `report:read` | ✅ | ✅ | — | — |
 
-Managers may get team-scoped absence summary in Stage 4; Stage 2 is tenant-wide HR/admin only.
+Tenant-wide HR/admin only in S2-6.
 
 ---
 
@@ -29,8 +29,6 @@ No new collections in Stage 2. Reports are aggregation queries over existing:
 - `Employee` — headcount by department, status
 - `LeaveRequest` — absence days by type, period
 - `Department` — join for department names
-
-Stage 4 may add `ReportSnapshot` for precomputed nightly aggregates.
 
 ---
 
@@ -98,21 +96,21 @@ None.
 
 ## 8. Audit & Compliance
 
-- Report access not logged in S2-6 (read-only); consider Stage 4
+- Report access not logged in S2-6 (read-only)
 - Aggregated data only — suitable for management reporting
 
 ---
 
-## 9. Stage 2 vs Stage 4
+## 9. Out of scope (S2-6)
 
-| Feature | Stage 2 (S2-6) | Stage 4 |
-|---------|----------------|---------|
-| Headcount by department | ✅ | Enhanced trends |
-| Absence summary | ✅ | Bradford Factor |
-| Turnover rate | — | ✅ |
-| CSV/PDF export | — | ✅ |
-| Nightly precompute | — | ✅ |
-| Custom report builder | — | ✅ |
+| Feature | Notes |
+|---------|-------|
+| Bradford Factor | Not planned |
+| Turnover rate | Not planned |
+| CSV/PDF export | Not planned |
+| Nightly precompute | Not planned |
+| Custom report builder | Not planned |
+| Manager team-scoped reports | Not planned |
 
 ---
 
@@ -139,7 +137,6 @@ None.
 ## 11. Open Questions
 
 - [ ] Include pending leave in absence forecast view?
-- [ ] Manager team-scoped reports in Stage 2 or Stage 4?
 
 ---
 

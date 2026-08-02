@@ -3,7 +3,7 @@
 > Copy this file to create a new module plan, e.g. `02-employees.md`.
 > Remove this instruction block when done.
 
-**Stage:** Demo 1 | Stage 2 | Stage 3 | Stage 4  
+**Stage:** Demo 1 | Stage 2 | Stage 3  
 **Status:** Not started | In planning | In development | Done  
 **Depends on:** [list modules that must exist first]
 

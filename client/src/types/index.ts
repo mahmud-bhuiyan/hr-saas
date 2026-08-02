@@ -420,6 +420,79 @@ export interface PatchWorkLocationInput {
   isArchived?: boolean;
 }
 
+export type ShiftStatus = 'draft' | 'published' | 'open';
+
+export interface ShiftEmployeeSummary {
+  id: string;
+  firstName: string;
+  lastName: string;
+  email?: string;
+}
+
+export interface ShiftLocationSummary {
+  id: string;
+  name: string;
+}
+
+export interface Shift {
+  id: string;
+  employeeId: string | null;
+  employee?: ShiftEmployeeSummary;
+  date: string;
+  startTime: string;
+  endTime: string;
+  role?: string;
+  locationId: string;
+  location?: ShiftLocationSummary;
+  status: ShiftStatus;
+  publishedAt?: string;
+  claimedBy?: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface WeekRota {
+  weekOf: string;
+  shifts: Shift[];
+}
+
+export interface CreateShiftInput {
+  employeeId?: string | null;
+  date: string;
+  startTime: string;
+  endTime: string;
+  role?: string;
+  locationId: string;
+}
+
+export interface PatchShiftInput {
+  employeeId?: string | null;
+  date?: string;
+  startTime?: string;
+  endTime?: string;
+  role?: string;
+  locationId?: string;
+  status?: ShiftStatus;
+}
+
+export interface PublishRotaInput {
+  weekOf: string;
+}
+
+export interface PublishRotaResult {
+  weekOf: string;
+  publishedCount: number;
+}
+
+export interface CopyWeekInput {
+  weekOf: string;
+}
+
+export interface CopyRotaResult {
+  weekOf: string;
+  copiedCount: number;
+}
+
 export interface PayrollSettings {
   payPeriodType: PayPeriodType;
   defaultPayCurrency: string;

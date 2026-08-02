@@ -285,6 +285,56 @@ export const sendExpenseDeclinedEmail = async (
   });
 };
 
+export const sendRotaPublishedEmail = async (
+  env: ServerEnv,
+  params: {
+    to: string;
+    weekOf: string;
+    shiftCount: number;
+  }
+): Promise<void> => {
+  const text = [
+    'Your weekly rota has been published.',
+    '',
+    `Week of: ${params.weekOf}`,
+    `You have ${params.shiftCount} assigned shift${params.shiftCount === 1 ? '' : 's'}.`,
+    '',
+    'View your shifts in the HR platform.',
+  ].join('\n');
+
+  await sendEmail(env, {
+    to: params.to,
+    subject: `Rota published — week of ${params.weekOf}`,
+    text,
+  });
+};
+
+export const sendShiftClaimedEmail = async (
+  env: ServerEnv,
+  params: {
+    to: string;
+    employeeName: string;
+    date: string;
+    startTime: string;
+    endTime: string;
+    locationName: string;
+  }
+): Promise<void> => {
+  const text = [
+    `${params.employeeName} claimed an open shift.`,
+    '',
+    `Date: ${params.date}`,
+    `Time: ${params.startTime} – ${params.endTime}`,
+    `Location: ${params.locationName}`,
+  ].join('\n');
+
+  await sendEmail(env, {
+    to: params.to,
+    subject: `Shift claimed by ${params.employeeName}`,
+    text,
+  });
+};
+
 export const sendDocumentExpiryReminderEmail = async (
   env: ServerEnv,
   params: {

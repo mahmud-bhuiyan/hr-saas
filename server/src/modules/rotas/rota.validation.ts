@@ -43,6 +43,11 @@ export const publishRotaSchema = z.object({
   weekOf: dateOnlySchema,
 });
 
+export const copyWeekSchema = z.object({
+  weekOf: dateOnlySchema,
+});
+
 export type CreateShiftInput = z.infer<typeof createShiftSchema>;
 export type PatchShiftInput = z.infer<typeof patchShiftSchema>;
 export type PublishRotaInput = z.infer<typeof publishRotaSchema>;
+export type CopyWeekInput = z.infer<typeof copyWeekSchema>;

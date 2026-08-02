@@ -131,7 +131,7 @@ Company admin opens billing → Subscribe → Stripe Checkout → webhook activa
 |---------|--------|---------|
 | Stripe billing | — | ✅ |
 | Free demo tenants | ✅ | ✅ via billingExempt |
-| Usage-based tiers | — | Stage 4+ |
+| Usage-based tiers | — | Future |
 
 ---
 

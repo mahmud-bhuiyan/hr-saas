@@ -10,7 +10,7 @@ Check off each step with the client/dev team before moving to the next.
 |------|-------|--------|
 | **S3-1** | Foundations — work locations, employee pay fields, tenant payroll settings, permissions | ✅ Done |
 | **S3-2** | Rotas backend — `Shift`, `RotaTemplate`, week CRUD, leave conflict detection | ✅ Done |
-| **S3-3** | Rotas UI — weekly grid, publish, employee shift view, open-shift claim | Not started |
+| **S3-3** | Rotas UI — weekly grid, publish, employee shift view, open-shift claim | ✅ Done |
 | **S3-4** | Payroll export backend — `PayrollPeriod`, aggregate timesheets + expenses + pay rates | Not started |
 | **S3-5** | Payroll export UI — generate, preview, CSV download | Not started |
 | **S3-6** | Accounting integration — Xero **or** QuickBooks OAuth push (client picks one) | Not started |
@@ -25,7 +25,7 @@ Features added during Stage 3 implementation that extend the original step list.
 
 | Added | Step | Description |
 |-------|------|-------------|
-| — | — | — |
+| Open-shift auto-assign on claim | S3-3 | Claim assigns shift immediately (no manager approval queue) |
 
 ---
 
@@ -69,16 +69,16 @@ Features added during Stage 3 implementation that extend the original step list.
 
 ## S3-3 — Done when
 
-- [ ] Rota page `/dashboard/rotas` — weekly grid (table-based v1)
-- [ ] HR/manager: create, edit, delete shifts; assign employees; select location
-- [ ] Publish week action with confirmation
-- [ ] Employee tab: my shifts for selected week
-- [ ] Open shifts board — employees claim unassigned shifts; manager approval optional
-- [ ] Copy previous week action
-- [ ] Leave conflict warnings shown in UI
-- [ ] Notifications: shift published, open shift available, shift claimed
-- [ ] Nav link in app shell for authorized roles
-- [ ] `docs/openapi.yaml` and Postman collection updated (if new endpoints)
+- [x] Rota page `/dashboard/rotas` — weekly grid (table-based v1)
+- [x] HR/manager: create, edit, delete shifts; assign employees; select location
+- [x] Publish week action with confirmation
+- [x] Employee tab: my shifts for selected week
+- [x] Open shifts board — employees claim unassigned shifts; manager approval optional
+- [x] Copy previous week action
+- [x] Leave conflict warnings shown in UI
+- [x] Notifications: shift published, open shift available, shift claimed
+- [x] Nav link in app shell for authorized roles
+- [x] `docs/openapi.yaml` and Postman collection updated (claim + copy-week endpoints)
 
 **Review:** Test full rota walkthrough before S3-4.
 
@@ -136,7 +136,7 @@ Features added during Stage 3 implementation that extend the original step list.
 ## S3-7 — Done when
 
 - [ ] Rota/leave clash warnings on shift create and leave approval
-- [ ] Optional break deductions on timesheets (if client wants — else defer to Stage 4)
+- [ ] Optional break deductions on timesheets (if client wants — else defer)
 - [ ] Employee `fteFactor` used in leave accrual (if not already)
 - [ ] Bug fixes from internal walkthrough
 

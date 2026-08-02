@@ -112,14 +112,10 @@ Be explicit with the client so expectations stay aligned.
 | Bulk CSV employee import | Stage 2 | Manual add only in Demo 1 |
 | Advanced leave rules (accrual, carry-over, Bradford Factor) | Stage 2–3 | Fixed entitlement in Demo 1 |
 | Multi-step approval chains | Stage 2 | Single approver in Demo 1 |
-| Performance reviews & goals | Stage 4 | |
-| Recruitment / ATS | Stage 4 | |
-| E-learning / LMS | Stage 4 | |
-| Reporting dashboards & exports | Stage 2–4 | Basic counts on dashboard only |
+| Reporting dashboards & exports | Stage 2 | Basic counts on dashboard only |
 | SMS notifications | Stage 2 | Email only in Demo 1 |
 | GPS on clock-in | Stage 2 | |
 | SSO / Microsoft Google login | Stage 3+ | |
-| Mobile native apps | Stage 4+ | Responsive web first |
 | Per-tenant white-label (each company’s own theme/logo) | Demo 1 (partial) | Logo + primary color override for company admin; full profile in Step 7 |
 
 ---
@@ -223,10 +219,9 @@ Brief teaser only; detailed plans will be separate documents.
 | Stage | Focus | Indicative duration |
 |-------|-------|---------------------|
 | **Stage 2 — Operations** | Attendance, timesheets, expenses, notifications, billing | 6–8 weeks |
+| **Stage 3 — Scheduling & Payroll** | Rotas, payroll export, integrations | 6–8 weeks |
 
 Detailed plan: [10-stage-2-operations-plan.md](./10-stage-2-operations-plan.md) · Dev steps: [STAGE-2-IMPLEMENTATION-STEPS.md](./STAGE-2-IMPLEMENTATION-STEPS.md)
-| **Stage 3 — Scheduling & Payroll** | Rotas, payroll export, integrations | 6–8 weeks |
-| **Stage 4 — Growth** | Reporting, performance, recruitment, LMS | Ongoing |
 
 Full roadmap: [hr-saas-mern-project-plan.md](./hr-saas-mern-project-plan.md)
 

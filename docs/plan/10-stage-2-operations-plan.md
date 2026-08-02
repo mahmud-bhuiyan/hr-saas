@@ -117,11 +117,6 @@ This flow covers **time → pay data → expenses → compliance → monetizatio
 | Shift rota / scheduling | Stage 3 | Drag-and-drop weekly grid |
 | Payroll calculation / RTI | Stage 3 | Export to Xero/QuickBooks instead |
 | Payroll data export module | Stage 3 | Aggregates timesheets + expenses |
-| Advanced reporting (Bradford Factor, turnover) | Stage 4 | Basic headcount/absence only in S2-6 |
-| Performance reviews & goals | Stage 4 | |
-| Recruitment / ATS | Stage 4 | |
-| E-learning / LMS | Stage 4 | |
-| Native mobile apps | Stage 4+ | Responsive web clock-in for Stage 2 |
 | SSO / Microsoft Google login | Stage 3+ | |
 | OCR for receipt scanning | Stage 3+ | Manual receipt upload in Stage 2 |
 | SMS notifications | S2-8 optional | Twilio if client wants; otherwise defer |
@@ -231,7 +226,6 @@ The client approves moving to Stage 3 when all of the following are true:
 | Stage | Focus | Indicative duration |
 |-------|-------|---------------------|
 | **Stage 3 — Scheduling & Payroll** | Rotas, payroll export, Xero/QuickBooks integration | 6–8 weeks |
-| **Stage 4 — Growth** | Advanced reporting, performance, recruitment, LMS | Ongoing |
 
 Full roadmap: [hr-saas-mern-project-plan.md](./hr-saas-mern-project-plan.md)
 

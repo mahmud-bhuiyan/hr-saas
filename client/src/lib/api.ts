@@ -94,6 +94,14 @@ import type {
   AbsenceSummaryQuery,
   BillingStatus,
   BillingSession,
+  WeekRota,
+  Shift,
+  CreateShiftInput,
+  PatchShiftInput,
+  PublishRotaInput,
+  PublishRotaResult,
+  CopyWeekInput,
+  CopyRotaResult,
 } from '../types';
 
 const apiBase = import.meta.env.VITE_API_URL || '';
@@ -574,6 +582,56 @@ export const updateWorkLocation = async (
       body: JSON.stringify(input),
     }
   );
+  return json.data;
+};
+
+export const fetchRotaWeek = async (weekOf: string): Promise<WeekRota> => {
+  const json = await apiFetch<ApiSuccessResponse<WeekRota>>(`/api/v1/rotas/${weekOf}`);
+  return json.data;
+};
+
+export const createShift = async (input: CreateShiftInput): Promise<Shift> => {
+  const json = await apiFetch<ApiSuccessResponse<Shift>>('/api/v1/rotas/shifts', {
+    method: 'POST',
+    body: JSON.stringify(input),
+  });
+  return json.data;
+};
+
+export const patchShift = async (shiftId: string, input: PatchShiftInput): Promise<Shift> => {
+  const json = await apiFetch<ApiSuccessResponse<Shift>>(`/api/v1/rotas/shifts/${shiftId}`, {
+    method: 'PATCH',
+    body: JSON.stringify(input),
+  });
+  return json.data;
+};
+
+export const deleteShift = async (shiftId: string): Promise<void> => {
+  await apiFetch<ApiSuccessResponse<{ deleted: true }>>(`/api/v1/rotas/shifts/${shiftId}`, {
+    method: 'DELETE',
+  });
+};
+
+export const publishRotaWeek = async (input: PublishRotaInput): Promise<PublishRotaResult> => {
+  const json = await apiFetch<ApiSuccessResponse<PublishRotaResult>>('/api/v1/rotas/publish', {
+    method: 'POST',
+    body: JSON.stringify(input),
+  });
+  return json.data;
+};
+
+export const copyRotaWeek = async (input: CopyWeekInput): Promise<CopyRotaResult> => {
+  const json = await apiFetch<ApiSuccessResponse<CopyRotaResult>>('/api/v1/rotas/copy-week', {
+    method: 'POST',
+    body: JSON.stringify(input),
+  });
+  return json.data;
+};
+
+export const claimShift = async (shiftId: string): Promise<Shift> => {
+  const json = await apiFetch<ApiSuccessResponse<Shift>>(`/api/v1/rotas/shifts/${shiftId}/claim`, {
+    method: 'POST',
+  });
   return json.data;
 };
 
