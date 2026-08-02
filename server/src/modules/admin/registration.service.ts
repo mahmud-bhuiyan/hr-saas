@@ -2,6 +2,7 @@ import mongoose from 'mongoose';
 import type { TenantApprovalStatus } from '../auth/tenant.model.js';
 import { Tenant } from '../auth/tenant.model.js';
 import { hashPassword } from '../../utils/password.js';
+import { ensureEmployeeRecordForUser } from '../employees/employee.service.js';
 import { findUserByEmail } from './admin.service.js';
 import { User } from './user.model.js';
 import type { CreateCompanyInput, UpdateCompanyInput } from './registration.validation.js';
@@ -160,6 +161,17 @@ export const createCompany = async (
 
     await session.commitTransaction();
 
+    await ensureEmployeeRecordForUser(
+      tenant._id.toString(),
+      {
+        userId: admin._id.toString(),
+        email: admin.email,
+        firstName: admin.firstName,
+        lastName: admin.lastName,
+      },
+      { createdByUserId: createdByUserId }
+    );
+
     const actor = await User.findById(createdByUserId).select('email firstName lastName').lean();
     const auditUsers = new Map<string, UserSummary>();
     if (actor) {
@@ -260,6 +272,17 @@ export const approveRegistration = async (
 
   admin.isActive = true;
   await admin.save();
+
+  await ensureEmployeeRecordForUser(
+    tenant._id.toString(),
+    {
+      userId: admin._id.toString(),
+      email: admin.email,
+      firstName: admin.firstName,
+      lastName: admin.lastName,
+    },
+    { createdByUserId: approvedByUserId }
+  );
 
   const auditUsers = await loadAuditUsers([tenant]);
 

@@ -176,7 +176,7 @@ export type EmployeeSortField =
   | 'department'
   | 'manager';
 
-export type LeaveType = 'annual' | 'sick' | 'unpaid';
+export type LeaveType = 'annual' | 'sick' | 'unpaid' | 'planned';
 export type LeaveRequestStatus = 'pending' | 'approved' | 'declined' | 'cancelled';
 
 export interface LeaveEmployeeSummary {
@@ -221,7 +221,7 @@ export interface CreateLeaveRequestInput {
   startDate: string;
   endDate: string;
   halfDay?: boolean;
-  reason?: string;
+  reason: string;
 }
 
 export interface ListLeaveRequestsQuery {
@@ -427,7 +427,7 @@ export interface DocumentDownloadResponse {
 
 export type AuditAction = 'create' | 'update' | 'delete';
 
-export type AuditEntityType = 'Employee' | 'HrDocument' | 'User' | 'LeaveRequest';
+export type AuditEntityType = 'Employee' | 'HrDocument' | 'User' | 'LeaveRequest' | 'AttendanceLog';
 
 export interface AuditLogEntry {
   id: string;
@@ -478,4 +478,58 @@ export interface MessageResponse {
 
 export interface InviteEmployeeInput {
   role?: 'employee' | 'manager' | 'hr_manager';
+}
+
+export type AttendanceMethod = 'web' | 'app' | 'kiosk';
+
+export interface AttendanceLog {
+  id: string;
+  employeeId: string;
+  employee?: {
+    id: string;
+    firstName: string;
+    lastName: string;
+    email?: string;
+    jobTitle?: string;
+    department?: string;
+  };
+  clockIn: string;
+  clockOut: string | null;
+  method: AttendanceMethod;
+  location?: { lat: number; lng: number } | null;
+  notes?: string;
+  correctedBy?: string;
+  durationMinutes: number | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface AttendanceStatus {
+  clockedIn: boolean;
+  session: AttendanceLog | null;
+}
+
+export interface AttendanceSettings {
+  attendanceGpsEnabled: boolean;
+}
+
+export interface PaginatedAttendanceLogs {
+  logs: AttendanceLog[];
+  total: number;
+  page: number;
+  limit: number;
+}
+
+export interface ClockInInput {
+  location?: { lat: number; lng: number };
+}
+
+export interface PatchAttendanceInput {
+  clockIn?: string;
+  clockOut?: string | null;
+  notes: string;
+}
+
+export interface PatchAttendanceSettingsInput {
+  attendanceGpsEnabled: boolean;
 }

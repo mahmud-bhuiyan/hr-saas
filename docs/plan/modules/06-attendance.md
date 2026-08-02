@@ -1,7 +1,7 @@
 # Module: Attendance
 
 **Stage:** Stage 2 (S2-2)  
-**Status:** Not started  
+**Status:** Done  
 **Depends on:** Platform foundations (S2-1 — audit log, notifications)
 
 ---

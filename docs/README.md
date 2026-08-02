@@ -5,7 +5,7 @@
 | [openapi.yaml](./openapi.yaml) | **API spec (source of truth)** — OpenAPI 3.0, all endpoints |
 | [postman/hr-saas.postman_collection.json](./postman/hr-saas.postman_collection.json) | **Postman collection** — runnable requests for every endpoint |
 | [postman/hr-saas.local.postman_environment.json](./postman/hr-saas.local.postman_environment.json) | Local Postman environment (`baseUrl`, `accessToken`) |
-| [plan/](./plan/) | Product roadmap and implementation steps — start at [plan/IMPLEMENTATION-STEPS.md](./plan/IMPLEMENTATION-STEPS.md) |
+| [plan/](./plan/) | Product roadmap and implementation steps — [Demo 1](./plan/IMPLEMENTATION-STEPS.md) · [Stage 2](./plan/STAGE-2-IMPLEMENTATION-STEPS.md) |
 
 ## Using the API docs
 

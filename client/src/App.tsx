@@ -21,6 +21,8 @@ import { TenantBrandingPage } from "./pages/settings/branding/TenantBrandingPage
 import { AuditLogPage } from "./pages/settings/audit-log/AuditLogPage";
 import { LeavePage } from "./pages/leave/LeavePage";
 import { DocumentsPage } from "./pages/documents/DocumentsPage";
+import { AttendancePage } from "./pages/attendance/AttendancePage";
+import { AttendanceSettingsPage } from "./pages/settings/attendance/AttendanceSettingsPage";
 
 const App = () => {
   return (
@@ -44,6 +46,7 @@ const App = () => {
           <Route path="/dashboard/employees/:id/edit" element={<EmployeeEditPage />} />
           <Route path="/dashboard/employees/:id" element={<EmployeeViewPage />} />
           <Route path="/dashboard/leave" element={<LeavePage />} />
+          <Route path="/dashboard/attendance" element={<AttendancePage />} />
           <Route path="/dashboard/documents" element={<DocumentsPage />} />
           <Route
             path="/dashboard/platform/site-settings"
@@ -54,6 +57,7 @@ const App = () => {
           <Route path="/dashboard/settings/departments" element={<DepartmentsPage />} />
           <Route path="/dashboard/settings/users" element={<UsersPage />} />
           <Route path="/dashboard/settings/branding" element={<TenantBrandingPage />} />
+          <Route path="/dashboard/settings/attendance" element={<AttendanceSettingsPage />} />
           <Route path="/dashboard/settings/audit-log" element={<AuditLogPage />} />
         </Route>
       </Route>

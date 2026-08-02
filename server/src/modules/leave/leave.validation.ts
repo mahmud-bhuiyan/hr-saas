@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-const leaveTypeSchema = z.enum(['annual', 'sick', 'unpaid']);
+const leaveTypeSchema = z.enum(['annual', 'sick', 'unpaid', 'planned']);
 const leaveStatusSchema = z.enum(['pending', 'approved', 'declined', 'cancelled']);
 
 const dateStringSchema = z
@@ -13,7 +13,7 @@ export const createLeaveRequestSchema = z
     startDate: dateStringSchema,
     endDate: dateStringSchema,
     halfDay: z.boolean().optional().default(false),
-    reason: z.string().trim().max(500).optional(),
+    reason: z.string().trim().min(1, 'Reason is required').max(500),
   })
   .refine((data) => data.endDate >= data.startDate, {
     message: 'End date must be on or after start date',

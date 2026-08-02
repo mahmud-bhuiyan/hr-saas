@@ -29,6 +29,10 @@
     {
       "key": "documentId",
       "value": ""
+    },
+    {
+      "key": "attendanceLogId",
+      "value": ""
     }
   ],
   "item": [
@@ -812,6 +816,179 @@
             "header": [],
             "url": "{{baseUrl}}/api/v1/leave/pending-count",
             "description": "Count pending requests for dashboard."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Attendance",
+      "item": [
+        {
+          "name": "Get Attendance Settings",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+            },
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/attendance/settings",
+            "description": "Tenant attendance options (GPS toggle)."
+          },
+          "response": []
+        },
+        {
+          "name": "Patch Attendance Settings",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+            },
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"attendanceGpsEnabled\": false\n}"
+            },
+            "url": "{{baseUrl}}/api/v1/attendance/settings",
+            "description": "Company admin only."
+          },
+          "response": []
+        },
+        {
+          "name": "Clock In",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "  const json = pm.response.json();",
+                  "  pm.collectionVariables.set('attendanceLogId', json.data.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+            },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": "{{baseUrl}}/api/v1/attendance/clock-in",
+            "description": "Start attendance session. Optional location when GPS enabled."
+          },
+          "response": []
+        },
+        {
+          "name": "Clock Out",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+            },
+            "method": "POST",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/attendance/clock-out",
+            "description": "End open attendance session."
+          },
+          "response": []
+        },
+        {
+          "name": "Get My Attendance Status",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+            },
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/attendance/me/status",
+            "description": "Current clock-in state and open session."
+          },
+          "response": []
+        },
+        {
+          "name": "List My Attendance",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/attendance/me?page=1&limit=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "attendance", "me"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "20" }
+              ]
+            },
+            "description": "Paginated attendance history for current user."
+          },
+          "response": []
+        },
+        {
+          "name": "List Employee Attendance",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/attendance/employee/{{employeeId}}?page=1&limit=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "attendance", "employee", "{{employeeId}}"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "20" }
+              ]
+            },
+            "description": "HR or manager views employee history."
+          },
+          "response": []
+        },
+        {
+          "name": "Team Live Attendance",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+            },
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/attendance/team/live",
+            "description": "Employees currently clocked in."
+          },
+          "response": []
+        },
+        {
+          "name": "Correct Attendance Log",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+            },
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"clockIn\": \"2026-08-02T09:00:00.000Z\",\n  \"clockOut\": \"2026-08-02T17:30:00.000Z\",\n  \"notes\": \"Forgot to clock out — corrected by HR\"\n}"
+            },
+            "url": "{{baseUrl}}/api/v1/attendance/{{attendanceLogId}}",
+            "description": "HR correction with required notes."
           },
           "response": []
         }

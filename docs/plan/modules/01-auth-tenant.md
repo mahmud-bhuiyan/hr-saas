@@ -1,7 +1,7 @@
 # Module: Auth & Tenant
 
-**Stage:** Demo 1 (done) · Stage 2 extensions (S2-1)  
-**Status:** Done (Demo 1) · Stage 2 not started  
+**Stage:** Demo 1 (done) · Stage 2 extensions (S2-1 done)  
+**Status:** Done  
 **Depends on:** Step 1 (Foundation)
 
 ---
@@ -85,8 +85,9 @@ Authentication, multi-tenant isolation, and company onboarding. Every business r
 
 1. Self-registration creates tenant + company admin with `approvalStatus: pending`; login blocked until approved.
 2. Super admin can create a company in one step — tenant and admin are active immediately.
-3. `tenantId` comes from JWT only; never trust client-supplied tenant id.
-4. Super admin bootstrap: `npm run seed:superadmin` or first `POST /api/v1/admins` when DB has zero users.
+3. On company approval or direct company creation, a linked employee record is created for the company admin so they can use leave, attendance, and other self-service features while keeping admin role permissions.
+4. `tenantId` comes from JWT only; never trust client-supplied tenant id.
+5. Super admin bootstrap: `npm run seed:superadmin` or first `POST /api/v1/admins` when DB has zero users.
 
 ---
 
@@ -99,8 +100,8 @@ Authentication, multi-tenant isolation, and company onboarding. Every business r
 | My profile | `/dashboard/profile` | ✅ |
 | Companies (super admin) | `/dashboard/registrations` | ✅ |
 | Platform site settings (super admin) | `/dashboard/platform/site-settings` | ✅ Complete |
-| Forgot password | `/forgot-password` | ⬜ Stage 2 (S2-1) |
-| Reset password | `/reset-password` | ⬜ Stage 2 (S2-1) |
+| Forgot password | `/forgot-password` | ✅ |
+| Reset password | `/reset-password` | ✅ |
 
 ---
 
@@ -112,7 +113,7 @@ Authentication, multi-tenant isolation, and company onboarding. Every business r
 | Registration approval | ✅ | |
 | Super admin add company | ✅ | |
 | Profile + change password | ✅ | |
-| Forgot password (email) | — | S2-1 |
+| Forgot password (email) | — | ✅ S2-1 |
 
 ---
 
@@ -144,4 +145,4 @@ Authentication, multi-tenant isolation, and company onboarding. Every business r
 - [x] Pending companies cannot log in until super admin approves
 - [x] Super admin can add company directly without approval step
 - [x] JWT + refresh cookie session works; 401 triggers client refresh
-- [ ] Forgot password flow (Stage 2 S2-1)
+- [x] Forgot password flow (Stage 2 S2-1)

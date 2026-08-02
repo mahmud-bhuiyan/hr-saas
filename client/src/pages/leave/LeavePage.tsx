@@ -151,6 +151,7 @@ export const LeavePage = () => {
       type: createForm.type,
       startDate: createForm.startDate,
       endDate: createForm.endDate,
+      reason: createForm.reason,
     }),
     [createForm]
   );
@@ -159,13 +160,14 @@ export const LeavePage = () => {
     'type',
     'startDate',
     'endDate',
+    'reason',
   ]);
 
   const handleCreateSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     createMutation.mutate({
       ...createForm,
-      reason: createForm.reason?.trim() || undefined,
+      reason: createForm.reason.trim(),
     });
   };
 

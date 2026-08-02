@@ -1,7 +1,7 @@
 # Module: Notifications
 
 **Stage:** Stage 2 (S2-1)  
-**Status:** Not started  
+**Status:** Done  
 **Depends on:** Foundation (Demo 1), Redis in docker-compose
 
 ---

@@ -19,6 +19,7 @@ export interface ITenant {
   createdBy?: mongoose.Types.ObjectId;
   updatedBy?: mongoose.Types.ObjectId;
   branding?: TenantBranding;
+  attendanceGpsEnabled?: boolean;
 }
 
 export interface ITenantDocument extends ITenant, Document {
@@ -47,6 +48,7 @@ const tenantSchema = new Schema<ITenantDocument>(
       logoUrl: { type: String, default: null },
       primaryColor: { type: String, default: null },
     },
+    attendanceGpsEnabled: { type: Boolean, default: false },
   },
   { timestamps: true }
 );

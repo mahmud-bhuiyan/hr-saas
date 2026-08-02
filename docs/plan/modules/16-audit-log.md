@@ -1,7 +1,7 @@
 # Module: Audit Log
 
 **Stage:** Stage 2 (S2-1)  
-**Status:** Not started  
+**Status:** Done  
 **Depends on:** Auth & Tenant (Demo 1)
 
 ---

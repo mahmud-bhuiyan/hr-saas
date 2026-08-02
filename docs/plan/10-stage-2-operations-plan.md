@@ -131,17 +131,17 @@ This flow covers **time → pay data → expenses → compliance → monetizatio
 ## 4. Screens Checklist (Stage 2)
 
 ### Public
-- [ ] Forgot password (`/forgot-password`)
-- [ ] Reset password (`/reset-password?token=…`)
+- [x] Forgot password (`/forgot-password`)
+- [x] Reset password (`/reset-password?token=…`)
 
 ### App shell
-- [ ] Notification bell + dropdown (unread count, mark read)
+- [x] Notification bell + dropdown (unread count, mark read)
 
 ### Attendance
-- [ ] Clock in/out (`/dashboard/attendance`)
-- [ ] My attendance history (tab on attendance page)
-- [ ] Live team board (`/dashboard/attendance/team`) — manager/HR
-- [ ] HR attendance correction modal
+- [x] Clock in/out (`/dashboard/attendance`)
+- [x] My attendance history (tab on attendance page)
+- [x] Live team board (tab on attendance page) — manager/HR
+- [x] HR attendance correction modal
 
 ### Timesheets
 - [ ] My timesheet — weekly grid (`/dashboard/timesheets`)
@@ -157,7 +157,7 @@ This flow covers **time → pay data → expenses → compliance → monetizatio
 - [ ] Tenant leave policy settings (accrual, carry-over) — company admin
 
 ### Employees
-- [ ] Employee invite action on profile
+- [x] Employee invite action on profile
 - [ ] Bulk CSV import wizard on directory page
 
 ### Reports
@@ -165,9 +165,9 @@ This flow covers **time → pay data → expenses → compliance → monetizatio
 - [ ] Absence summary (`/dashboard/reports/absence`)
 
 ### Settings
-- [ ] Audit log viewer (`/dashboard/settings/audit-log`) — HR/admin
+- [x] Audit log viewer (`/dashboard/settings/audit-log`) — HR/admin
 - [ ] Billing & subscription (`/dashboard/settings/billing`) — company admin
-- [ ] Attendance settings (GPS toggle) — company admin
+- [x] Attendance settings (GPS toggle) — company admin
 
 ### Super admin
 - [ ] Subscription status column on companies list
@@ -269,8 +269,8 @@ Full roadmap: [hr-saas-mern-project-plan.md](./hr-saas-mern-project-plan.md)
 
 | Step | Scope | Status |
 |------|-------|--------|
-| S2-1 | Platform foundations | ⬜ Not started |
-| S2-2 | Attendance | ⬜ Not started |
+| S2-1 | Platform foundations | ✅ Done |
+| S2-2 | Attendance | ✅ Done |
 | S2-3 | Timesheets | ⬜ Not started |
 | S2-4 | Expenses | ⬜ Not started |
 | S2-5 | Leave enhancements | ⬜ Not started |
@@ -278,4 +278,4 @@ Full roadmap: [hr-saas-mern-project-plan.md](./hr-saas-mern-project-plan.md)
 | S2-7 | Stripe billing | ⬜ Not started |
 | S2-8 | Polish & sign-off | ⬜ Not started |
 
-**Next step:** S2-1 — platform foundations. See [STAGE-2-IMPLEMENTATION-STEPS.md](./STAGE-2-IMPLEMENTATION-STEPS.md).
+**Next step:** S2-3 — timesheets. See [STAGE-2-IMPLEMENTATION-STEPS.md](./STAGE-2-IMPLEMENTATION-STEPS.md).

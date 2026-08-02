@@ -87,7 +87,7 @@ HR records for each person in a company: directory, profile, manager hierarchy, 
 | Employee profile | `/dashboard/employees/:id` | ✅ |
 | Edit details + deactivate | Profile page | ✅ |
 | Direct reports | Profile page section | ✅ |
-| Link to login user | Profile invite action | ⬜ Stage 2 (S2-1) |
+| Link to login user | Profile invite action | ✅ S2-1 |
 | Bulk CSV import | Directory page wizard | ⬜ Stage 2 (S2-6) |
 
 ---
@@ -100,7 +100,7 @@ HR records for each person in a company: directory, profile, manager hierarchy, 
 | Search / filter | ✅ | Done |
 | Manager → direct reports | ✅ | Done |
 | Department as managed entity | Step 7 | Free text for now |
-| Employee ↔ User link / invite | Stage 2 S2-1 | Not started |
+| Employee ↔ User link / invite | Stage 2 S2-1 | Done |
 | Bulk CSV import | Stage 2 S2-6 | Not started |
 | departmentId FK migration | Stage 2 S2-6 | Optional |
 
@@ -158,5 +158,5 @@ HR records for each person in a company: directory, profile, manager hierarchy, 
 - [x] Directory supports search and filter by department/status
 - [x] Profile shows manager and direct reports
 - [x] Deactivate sets status to terminated
-- [ ] Link employee record to login user via invite (Stage 2 S2-1)
+- [x] Link employee record to login user via invite (Stage 2 S2-1)
 - [ ] Bulk CSV import with validation preview (Stage 2 S2-6)

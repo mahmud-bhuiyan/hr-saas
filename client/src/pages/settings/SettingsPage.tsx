@@ -5,6 +5,7 @@ import {
   HiRectangleGroup,
   HiUsers,
   HiClipboardDocumentList,
+  HiClock,
 } from 'react-icons/hi2';
 import { PageContainer } from '../../components/ui/PageContainer';
 import { PageHeader } from '../../components/ui/PageHeader';
@@ -46,6 +47,13 @@ const settingsLinks: SettingsLink[] = [
     label: 'Audit log',
     description: 'Review sensitive changes across your organization.',
     icon: HiClipboardDocumentList,
+    roles: ['company_admin', 'hr_manager'],
+  },
+  {
+    to: '/dashboard/settings/attendance',
+    label: 'Attendance',
+    description: 'Configure GPS tracking and attendance policies.',
+    icon: HiClock,
     roles: ['company_admin', 'hr_manager'],
   },
   {

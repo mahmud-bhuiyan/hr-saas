@@ -8,6 +8,8 @@ export const leaveTypeLabel = (type: LeaveType): string => {
       return 'Sick';
     case 'unpaid':
       return 'Unpaid';
+    case 'planned':
+      return 'Planned leave';
     default:
       return type;
   }
