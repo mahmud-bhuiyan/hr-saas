@@ -23,6 +23,7 @@ import { LeavePage } from "./pages/leave/LeavePage";
 import { DocumentsPage } from "./pages/documents/DocumentsPage";
 import { AttendancePage } from "./pages/attendance/AttendancePage";
 import { TimesheetsPage } from "./pages/timesheets/TimesheetsPage";
+import { ExpensesPage } from "./pages/expenses/ExpensesPage";
 import { AttendanceSettingsPage } from "./pages/settings/attendance/AttendanceSettingsPage";
 
 const App = () => {
@@ -49,6 +50,7 @@ const App = () => {
           <Route path="/dashboard/leave" element={<LeavePage />} />
           <Route path="/dashboard/attendance" element={<AttendancePage />} />
           <Route path="/dashboard/timesheets" element={<TimesheetsPage />} />
+          <Route path="/dashboard/expenses" element={<ExpensesPage />} />
           <Route path="/dashboard/documents" element={<DocumentsPage />} />
           <Route
             path="/dashboard/platform/site-settings"

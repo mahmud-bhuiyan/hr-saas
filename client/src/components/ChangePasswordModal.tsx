@@ -49,6 +49,7 @@ export const ChangePasswordModal = ({ open, onClose, onSuccess }: ChangePassword
             tenantId: data.user.tenantId,
             firstName: data.user.firstName,
             lastName: data.user.lastName,
+            colorScheme: data.user.colorScheme,
           },
           data.accessToken
         );

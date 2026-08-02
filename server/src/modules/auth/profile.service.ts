@@ -1,5 +1,5 @@
 import type { ServerEnv } from '../../config/env.js';
-import type { UserRole } from '../../types/index.js';
+import type { ColorScheme, UserRole } from '../../types/index.js';
 import { findUserByEmail } from '../admin/admin.service.js';
 import { User, type IUserDocument } from '../admin/user.model.js';
 import { hashPassword, comparePassword } from '../../utils/password.js';
@@ -16,6 +16,7 @@ export interface UserProfile {
   lastName?: string;
   tenantId?: string;
   companyName?: string;
+  colorScheme: ColorScheme;
   isActive: boolean;
   createdAt: string;
   updatedAt: string;
@@ -42,6 +43,7 @@ const toUserProfile = async (user: IUserDocument): Promise<UserProfile> => {
     lastName: user.lastName,
     tenantId: user.tenantId?.toString(),
     companyName,
+    colorScheme: user.colorScheme ?? 'light',
     isActive: user.isActive,
     createdAt: user.createdAt.toISOString(),
     updatedAt: user.updatedAt.toISOString(),
@@ -82,6 +84,10 @@ export const updateProfile = async (
 
   if (input.lastName !== undefined) {
     user.lastName = input.lastName || undefined;
+  }
+
+  if (input.colorScheme !== undefined) {
+    user.colorScheme = input.colorScheme;
   }
 
   if (input.currentPassword && input.newPassword) {

@@ -9,14 +9,14 @@ const SummaryItem = ({ label, value }: { label: string; value: string }) => {
   return (
     <div>
       <dt className="text-xs font-medium uppercase tracking-wide text-slate-400">{label}</dt>
-      <dd className="mt-1 text-sm font-medium capitalize text-slate-900">{value}</dd>
+      <dd className="mt-1 text-sm font-medium capitalize text-slate-900 dark:text-slate-100">{value}</dd>
     </div>
   );
 }
 
 export const ProfileSummary = ({ profile }: { profile: UserProfile }) => {
   return (
-    <dl className="grid gap-4 rounded-xl border border-slate-200 bg-white p-6 shadow-sm sm:grid-cols-2">
+    <dl className="card-surface grid gap-4 p-6 sm:grid-cols-2">
       <SummaryItem label="Role" value={roleLabel(profile.role)} />
       <SummaryItem label="Status" value={profile.isActive ? 'Active' : 'Inactive'} />
       {profile.companyName && <SummaryItem label="Company" value={profile.companyName} />}

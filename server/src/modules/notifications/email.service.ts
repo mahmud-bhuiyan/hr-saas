@@ -196,3 +196,89 @@ export const sendTimesheetDeclinedEmail = async (
     text,
   });
 };
+
+export const sendExpenseSubmittedEmail = async (
+  env: ServerEnv,
+  params: {
+    to: string;
+    employeeName: string;
+    category: string;
+    amount: number;
+    currency: string;
+    date: string;
+    description: string;
+  }
+): Promise<void> => {
+  const text = [
+    `${params.employeeName} has submitted an expense claim.`,
+    '',
+    `Category: ${params.category}`,
+    `Amount: ${params.currency} ${params.amount.toFixed(2)}`,
+    `Date: ${params.date}`,
+    `Description: ${params.description}`,
+    '',
+    'Please review and approve or decline in the HR platform.',
+  ].join('\n');
+
+  await sendEmail(env, {
+    to: params.to,
+    subject: `Expense claim from ${params.employeeName}`,
+    text,
+  });
+};
+
+export const sendExpenseApprovedEmail = async (
+  env: ServerEnv,
+  params: {
+    to: string;
+    category: string;
+    amount: number;
+    currency: string;
+    date: string;
+    approverName: string;
+  }
+): Promise<void> => {
+  const text = [
+    'Your expense claim has been approved.',
+    '',
+    `Category: ${params.category}`,
+    `Amount: ${params.currency} ${params.amount.toFixed(2)}`,
+    `Date: ${params.date}`,
+    `Approved by: ${params.approverName}`,
+  ].join('\n');
+
+  await sendEmail(env, {
+    to: params.to,
+    subject: 'Expense claim approved',
+    text,
+  });
+};
+
+export const sendExpenseDeclinedEmail = async (
+  env: ServerEnv,
+  params: {
+    to: string;
+    category: string;
+    amount: number;
+    currency: string;
+    date: string;
+    declineReason?: string;
+  }
+): Promise<void> => {
+  const text = [
+    'Your expense claim has been declined.',
+    '',
+    `Category: ${params.category}`,
+    `Amount: ${params.currency} ${params.amount.toFixed(2)}`,
+    `Date: ${params.date}`,
+    params.declineReason ? `Reason: ${params.declineReason}` : '',
+  ]
+    .filter(Boolean)
+    .join('\n');
+
+  await sendEmail(env, {
+    to: params.to,
+    subject: 'Expense claim declined',
+    text,
+  });
+};

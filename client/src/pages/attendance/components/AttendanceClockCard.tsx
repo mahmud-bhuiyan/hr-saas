@@ -57,22 +57,24 @@ export const AttendanceClockCard = ({
   };
 
   return (
-    <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+    <div className="card-surface p-6">
       <div className="flex flex-col items-center gap-4 text-center">
         <div
           className={`flex h-20 w-20 items-center justify-center rounded-full ${
-            clockedIn ? 'bg-emerald-100 text-emerald-600' : 'bg-slate-100 text-slate-500'
+            clockedIn
+              ? 'bg-emerald-100 text-emerald-600 dark:bg-emerald-500/15 dark:text-emerald-400'
+              : 'bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400'
           }`}
         >
           <HiClock className="h-10 w-10" />
         </div>
 
         <div>
-          <p className="text-lg font-semibold text-slate-900">
+          <p className="text-lg font-semibold text-slate-900 dark:text-slate-100">
             {clockedIn ? 'You are clocked in' : 'You are clocked out'}
           </p>
           {clockedIn && session && (
-            <p className="mt-1 text-sm text-slate-600">
+            <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">
               Since {formatAttendanceDateTime(session.clockIn)}
               {elapsed ? ` · ${elapsed}` : ''}
             </p>

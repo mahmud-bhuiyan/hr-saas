@@ -19,11 +19,11 @@ export const Input = ({ error, className = '', id, icon, ...props }: InputProps)
         )}
         <input
           id={id}
-          className={`block w-full rounded-lg border py-2.5 text-sm shadow-sm transition focus:outline-none focus:ring-2 focus:ring-brand-500 ${
+          className={`block w-full rounded-lg border bg-white py-2.5 text-sm text-slate-900 shadow-sm transition focus:outline-none focus:ring-2 focus:ring-brand-500 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 ${
             icon ? 'pl-9 pr-3' : 'px-3'
           } ${
             error
-              ? 'border-red-300 focus:border-red-500 focus:ring-red-500'
+              ? 'border-red-300 focus:border-red-500 focus:ring-red-500 dark:border-red-500/60'
               : 'border-slate-300 focus:border-brand-500'
           } ${className}`}
           {...props}

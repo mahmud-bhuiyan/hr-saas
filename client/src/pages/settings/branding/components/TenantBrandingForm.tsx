@@ -31,11 +31,11 @@ export const TenantBrandingForm = ({
   return (
     <form
       onSubmit={(e) => void onSubmit(e)}
-      className="space-y-6 rounded-xl border border-slate-200 bg-white p-6 shadow-sm"
+      className="card-surface space-y-6 p-6"
     >
       <div>
-        <h2 className="text-lg font-semibold text-slate-900">Company branding</h2>
-        <p className="mt-1 text-sm text-slate-600">
+        <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100">Company branding</h2>
+        <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">
           Override the platform logo and primary color for your company. Leave a field empty and save
           to revert to the platform default.
         </p>
@@ -48,7 +48,7 @@ export const TenantBrandingForm = ({
             type="color"
             value={values.primaryColor || platformPrimaryColor}
             onChange={(e) => onChange('primaryColor', e.target.value)}
-            className="h-10 w-14 cursor-pointer rounded border border-slate-200 bg-white p-1"
+            className="h-10 w-14 cursor-pointer rounded border border-slate-200 bg-white p-1 dark:border-slate-600 dark:bg-slate-800"
             aria-label="Pick primary color"
           />
           <Input
@@ -93,7 +93,7 @@ export const TenantBrandingForm = ({
         Platform default color: <span className="font-medium">{platformPrimaryColor}</span>
       </div>
 
-      <div className="flex items-center gap-2 text-xs text-slate-500">
+      <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
         <HiLink className="h-4 w-4 text-brand-600" />
         URL-only uploads until document storage is available.
       </div>
@@ -120,10 +120,10 @@ export const TenantBrandingPreview = ({
   const effectiveColor = values.primaryColor || platformPrimaryColor;
 
   return (
-    <div className="space-y-4 rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-      <h2 className="text-lg font-semibold text-slate-900">Preview</h2>
-      <div className="rounded-lg border border-slate-200 bg-slate-50 p-4">
-        <div className="flex items-center justify-between border-b border-slate-200 bg-white px-4 py-3">
+    <div className="card-surface space-y-4 p-6">
+      <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100">Preview</h2>
+      <div className="rounded-lg border border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-800/50">
+        <div className="flex items-center justify-between border-b border-slate-200 bg-white px-4 py-3 dark:border-slate-700 dark:bg-slate-900">
           {values.logoUrl ? (
             <img src={values.logoUrl} alt={displayName} className="h-8 max-w-[140px] object-contain" />
           ) : (

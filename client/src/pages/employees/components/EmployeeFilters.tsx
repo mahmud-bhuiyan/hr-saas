@@ -26,7 +26,7 @@ export const EmployeeFilters = ({
   pageSizeOptions = PAGE_SIZE_OPTIONS,
 }: EmployeeFiltersProps) => {
   return (
-    <div className="flex flex-col gap-3 rounded-xl border border-slate-200 bg-white p-4 shadow-sm sm:flex-row sm:items-end">
+    <div className="card-surface flex flex-col gap-3 p-4 sm:flex-row sm:items-end">
       <FormField label="Rows per page" htmlFor="employee-page-size">
         <Select
           id="employee-page-size"

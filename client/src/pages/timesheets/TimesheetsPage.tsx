@@ -174,10 +174,10 @@ export const TimesheetsPage = () => {
             </div>
           ) : (
             <>
-              <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-slate-200 bg-white px-4 py-3 shadow-sm">
+              <div className="card-surface flex flex-wrap items-center justify-between gap-3 px-4 py-3">
                 <div>
-                  <p className="text-xs font-medium uppercase tracking-wide text-slate-500">Week</p>
-                  <p className="text-sm font-semibold text-slate-900">{formatWeekRange(weekOf)}</p>
+                  <p className="text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">Week</p>
+                  <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">{formatWeekRange(weekOf)}</p>
                 </div>
                 <div className="flex items-center gap-2">
                   <Button

@@ -39,15 +39,15 @@ Planning documents for the HR SaaS platform. Use these to align with the client,
 | Step | Scope | Status |
 |------|-------|--------|
 | S2-1 | Platform foundations | ✅ Done |
-| S2-2 | Attendance | ⬜ Not started |
+| S2-2 | Attendance | ✅ Done |
 | S2-3 | Timesheets | ✅ Done |
-| S2-4 | Expenses | ⬜ Not started |
+| S2-4 | Expenses | ✅ Done |
 | S2-5 | Leave enhancements | ⬜ Not started |
 | S2-6 | Import & reporting | ⬜ Not started |
 | S2-7 | Stripe billing | ⬜ Not started |
 | S2-8 | Polish & sign-off | ⬜ Not started |
 
-**Next step:** S2-2 — attendance. See [STAGE-2-IMPLEMENTATION-STEPS.md](./STAGE-2-IMPLEMENTATION-STEPS.md).
+**Next step:** S2-5 — leave enhancements. See [STAGE-2-IMPLEMENTATION-STEPS.md](./STAGE-2-IMPLEMENTATION-STEPS.md).
 
 ---
 
@@ -87,7 +87,7 @@ Detailed plans live in `modules/`. Each file follows [modules/_template.md](./mo
 | Notifications | [modules/07-notifications.md](./modules/07-notifications.md) | Stage 2 | Not started |
 | Shifts & Rotas | [modules/08-rotas.md](./modules/08-rotas.md) | Stage 3 | Not started |
 | Timesheets | [modules/09-timesheets.md](./modules/09-timesheets.md) | Stage 2 | Not started |
-| Expenses | [modules/10-expenses.md](./modules/10-expenses.md) | Stage 2 | Not started |
+| Expenses | [modules/10-expenses.md](./modules/10-expenses.md) | Stage 2 | Done |
 | Payroll Export | [modules/11-payroll.md](./modules/11-payroll.md) | Stage 3 | Not started |
 | Reporting | [modules/12-reporting.md](./modules/12-reporting.md) | S2 slice / Stage 4 | Not started |
 | Performance | [modules/13-performance.md](./modules/13-performance.md) | Stage 4 | Not started |

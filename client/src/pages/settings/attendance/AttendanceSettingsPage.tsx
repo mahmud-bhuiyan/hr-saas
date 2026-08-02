@@ -62,7 +62,7 @@ export const AttendanceSettingsPage = () => {
         description="Configure attendance options for your company."
       />
 
-      <div className="max-w-lg rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+      <div className="card-surface max-w-lg p-6">
         <FormField label="GPS on clock-in">
           <Select
             value={gpsEnabled}

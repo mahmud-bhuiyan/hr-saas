@@ -5,6 +5,8 @@ export type UserRole =
   | 'manager'
   | 'employee';
 
+export type ColorScheme = 'light' | 'dark';
+
 export interface ApiHealthResponse {
   status: 'ok';
   service: string;
@@ -28,10 +30,12 @@ export interface AuthUser {
   tenantId?: string;
   firstName?: string;
   lastName?: string;
+  colorScheme?: ColorScheme;
 }
 
 export interface UserProfile extends AuthUser {
   companyName?: string;
+  colorScheme: ColorScheme;
   isActive: boolean;
   createdAt: string;
   updatedAt: string;
@@ -43,6 +47,7 @@ export interface UpdateProfileInput {
   email?: string;
   currentPassword?: string;
   newPassword?: string;
+  colorScheme?: ColorScheme;
 }
 
 export interface UpdateProfileResponse {
@@ -433,7 +438,8 @@ export type AuditEntityType =
   | 'User'
   | 'LeaveRequest'
   | 'AttendanceLog'
-  | 'Timesheet';
+  | 'Timesheet'
+  | 'Expense';
 
 export interface AuditLogEntry {
   id: string;
@@ -599,4 +605,95 @@ export interface PatchTimesheetInput {
 
 export interface DeclineTimesheetInput {
   declineReason?: string;
+}
+
+export type ExpenseCategory = 'travel' | 'meals' | 'equipment' | 'other';
+
+export type ExpenseStatus = 'pending' | 'approved' | 'declined' | 'reimbursed';
+
+export interface ExpenseEmployeeSummary {
+  id: string;
+  firstName: string;
+  lastName: string;
+  email?: string;
+}
+
+export interface Expense {
+  id: string;
+  employeeId: string;
+  employee?: ExpenseEmployeeSummary;
+  category: ExpenseCategory;
+  amount: number;
+  currency: string;
+  date: string;
+  description: string;
+  receiptFileName: string;
+  mimeType: string;
+  fileSize: number;
+  status: ExpenseStatus;
+  approverId?: string;
+  approvedAt?: string;
+  declineReason?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface PaginatedExpenses {
+  expenses: Expense[];
+  total: number;
+  page: number;
+  limit: number;
+}
+
+export interface PresignExpenseInput {
+  fileName: string;
+  mimeType: string;
+  fileSize: number;
+}
+
+export interface PresignExpenseResponse {
+  uploadUrl: string;
+  fileKey: string;
+}
+
+export interface CreateExpenseInput {
+  category: ExpenseCategory;
+  amount: number;
+  currency?: string;
+  date: string;
+  description: string;
+  receiptFileKey: string;
+  receiptFileName: string;
+  mimeType: string;
+  fileSize: number;
+}
+
+export interface PatchExpenseInput {
+  category?: ExpenseCategory;
+  amount?: number;
+  currency?: string;
+  date?: string;
+  description?: string;
+}
+
+export interface ListExpensesQuery {
+  scope?: 'own' | 'approval';
+  status?: ExpenseStatus;
+  page?: number;
+  limit?: number;
+}
+
+export interface ExportExpensesQuery {
+  from?: string;
+  to?: string;
+  status?: ExpenseStatus;
+}
+
+export interface DeclineExpenseInput {
+  declineReason?: string;
+}
+
+export interface ExpenseReceiptDownloadResponse {
+  downloadUrl: string;
+  fileName: string;
 }

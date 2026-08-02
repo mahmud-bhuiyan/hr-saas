@@ -17,7 +17,7 @@ export const FormField = ({
 }: FormFieldProps) => {
   return (
     <div className={className}>
-      <label htmlFor={htmlFor} className="mb-1.5 block text-sm font-medium text-slate-700">
+      <label htmlFor={htmlFor} className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">
         {label}
         {required && (
           <span className="text-red-600" aria-hidden="true">

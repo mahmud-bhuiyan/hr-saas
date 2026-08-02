@@ -7,11 +7,11 @@ interface ProfileSecuritySectionProps {
 
 export const ProfileSecuritySection = ({ onChangePassword }: ProfileSecuritySectionProps) => {
   return (
-    <section className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+    <section className="card-surface p-6">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
-          <h2 className="text-lg font-semibold text-slate-900">Security</h2>
-          <p className="mt-1 text-sm text-slate-500">
+          <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100">Security</h2>
+          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
             Update your password to keep your account secure.
           </p>
         </div>

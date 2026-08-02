@@ -35,7 +35,7 @@ Authentication, multi-tenant isolation, and company onboarding. Every business r
 
 ### Collection: `User`
 
-- `email`, `passwordHash`, `role`, `tenantId`, `firstName`, `lastName`, `isActive`
+- `email`, `passwordHash`, `role`, `tenantId`, `firstName`, `lastName`, `colorScheme` (`light` | `dark`, default `light`), `isActive`
 
 ### Collection: `PasswordResetToken` (Stage 2 — S2-1)
 
@@ -61,8 +61,8 @@ Authentication, multi-tenant isolation, and company onboarding. Every business r
 | POST | `/api/v1/auth/login` | Public | Login; blocks pending/rejected tenants |
 | POST | `/api/v1/auth/refresh` | Cookie | New access token |
 | POST | `/api/v1/auth/logout` | Public | Clear refresh cookie |
-| GET | `/api/v1/auth/me` | Authenticated | Current user profile |
-| PATCH | `/api/v1/auth/me` | Authenticated | Update profile / password |
+| GET | `/api/v1/auth/me` | Authenticated | Current user profile (includes `colorScheme`) |
+| PATCH | `/api/v1/auth/me` | Authenticated | Update profile / password / `colorScheme` |
 | POST | `/api/v1/admins` | Bootstrap or super_admin | Create admin user |
 | GET | `/api/v1/admin/registrations` | super_admin | List registrations |
 | POST | `/api/v1/admin/registrations` | super_admin | Create approved company + admin |
@@ -88,6 +88,7 @@ Authentication, multi-tenant isolation, and company onboarding. Every business r
 3. On company approval or direct company creation, a linked employee record is created for the company admin so they can use leave, attendance, and other self-service features while keeping admin role permissions.
 4. `tenantId` comes from JWT only; never trust client-supplied tenant id.
 5. Super admin bootstrap: `npm run seed:superadmin` or first `POST /api/v1/admins` when DB has zero users.
+6. User UI theme preference (`colorScheme`) is stored on the User document. Login, refresh, and `GET /auth/me` return it; clients may cache in localStorage for instant paint. `PATCH /auth/me` with `{ colorScheme }` is the source of truth when authenticated.
 
 ---
 
@@ -98,6 +99,7 @@ Authentication, multi-tenant isolation, and company onboarding. Every business r
 | Login | `/login` | ✅ |
 | Register company | `/register` | ✅ |
 | My profile | `/dashboard/profile` | ✅ |
+| Theme toggle (light/dark) | App shell header | ✅ |
 | Companies (super admin) | `/dashboard/registrations` | ✅ |
 | Platform site settings (super admin) | `/dashboard/platform/site-settings` | ✅ Complete |
 | Forgot password | `/forgot-password` | ✅ |
@@ -113,6 +115,7 @@ Authentication, multi-tenant isolation, and company onboarding. Every business r
 | Registration approval | ✅ | |
 | Super admin add company | ✅ | |
 | Profile + change password | ✅ | |
+| User light/dark theme (DB + localStorage) | ✅ | |
 | Forgot password (email) | — | ✅ S2-1 |
 
 ---
@@ -145,4 +148,5 @@ Authentication, multi-tenant isolation, and company onboarding. Every business r
 - [x] Pending companies cannot log in until super admin approves
 - [x] Super admin can add company directly without approval step
 - [x] JWT + refresh cookie session works; 401 triggers client refresh
+- [x] User light/dark theme preference persisted on User (`colorScheme`); synced via `PATCH /auth/me`; client uses `ThemeContext` + localStorage
 - [x] Forgot password flow (Stage 2 S2-1)

@@ -49,7 +49,7 @@ export const NotificationBell = () => {
       <button
         type="button"
         onClick={() => setOpen((value) => !value)}
-        className="relative rounded-lg p-2 text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+        className="relative rounded-lg p-2 text-slate-600 transition hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white"
         aria-label="Notifications"
       >
         <HiBell className="h-5 w-5" />
@@ -68,9 +68,9 @@ export const NotificationBell = () => {
             aria-label="Close notifications"
             onClick={() => setOpen(false)}
           />
-          <div className="absolute right-0 z-40 mt-2 w-80 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-lg">
-            <div className="flex items-center justify-between border-b border-slate-100 px-4 py-3">
-              <h3 className="text-sm font-semibold text-slate-900">Notifications</h3>
+          <div className="absolute right-0 z-40 mt-2 w-80 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-lg dark:border-slate-700 dark:bg-slate-900">
+            <div className="flex items-center justify-between border-b border-slate-100 px-4 py-3 dark:border-slate-800">
+              <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100">Notifications</h3>
               {unreadCount > 0 && (
                 <button
                   type="button"
@@ -90,7 +90,7 @@ export const NotificationBell = () => {
               )}
 
               {!listQuery.isLoading && (listQuery.data?.length ?? 0) === 0 && (
-                <p className="px-4 py-8 text-center text-sm text-slate-500">No notifications yet</p>
+                <p className="px-4 py-8 text-center text-sm text-slate-500 dark:text-slate-400">No notifications yet</p>
               )}
 
               {listQuery.data?.map((notification) => (
@@ -102,13 +102,13 @@ export const NotificationBell = () => {
                       void handleMarkRead(notification.id);
                     }
                   }}
-                  className={`block w-full border-b border-slate-50 px-4 py-3 text-left transition hover:bg-slate-50 ${
-                    notification.readAt ? 'opacity-70' : 'bg-brand-50/40'
+                  className={`block w-full border-b border-slate-50 px-4 py-3 text-left transition hover:bg-slate-50 dark:border-slate-800 dark:hover:bg-slate-800 ${
+                    notification.readAt ? 'opacity-70' : 'bg-brand-50/40 dark:bg-brand-500/10'
                   }`}
                 >
-                  <p className="text-sm font-medium text-slate-900">{notification.title}</p>
-                  <p className="mt-0.5 text-xs text-slate-600">{notification.body}</p>
-                  <p className="mt-1 text-[10px] text-slate-400">
+                  <p className="text-sm font-medium text-slate-900 dark:text-slate-100">{notification.title}</p>
+                  <p className="mt-0.5 text-xs text-slate-600 dark:text-slate-400">{notification.body}</p>
+                  <p className="mt-1 text-[10px] text-slate-400 dark:text-slate-500">
                     {new Date(notification.createdAt).toLocaleString()}
                   </p>
                 </button>

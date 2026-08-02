@@ -205,7 +205,7 @@ export const EmployeeEditPage = () => {
         <form
           id={FORM_ID}
           onSubmit={(e) => void handleSubmit(e)}
-          className="space-y-6 rounded-xl border border-slate-200 bg-white p-5 shadow-sm"
+          className="card-surface space-y-6 p-5"
         >
           <EmployeeEditFields
             form={form!}
@@ -215,7 +215,7 @@ export const EmployeeEditPage = () => {
             idPrefix="edit-"
           />
 
-          <div className="flex flex-wrap items-center justify-between gap-3 border-t border-slate-100 pt-5">
+          <div className="flex flex-wrap items-center justify-between gap-3 border-t border-slate-100 pt-5 dark:border-slate-800">
             {employee?.status !== 'terminated' && (
               <Button
                 type="button"

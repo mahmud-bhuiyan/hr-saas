@@ -123,14 +123,14 @@ export const EmployeeViewPage = () => {
 
           <EmployeeProfileSummary employee={employee} showMetadata />
 
-          <section className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
-            <div className="flex items-center justify-between gap-3 border-b border-slate-100 bg-slate-50 px-5 py-3">
+          <section className="card-surface overflow-hidden">
+            <div className="flex items-center justify-between gap-3 border-b border-slate-100 bg-slate-50 px-5 py-3 dark:border-slate-800 dark:bg-slate-800/50">
               <div className="flex items-center gap-2">
                 <HiUserGroup className="h-4 w-4 text-brand-600" />
-                <h2 className="text-sm font-semibold text-slate-900">Direct reports</h2>
+                <h2 className="text-sm font-semibold text-slate-900 dark:text-slate-100">Direct reports</h2>
               </div>
               {!reportsQuery.isLoading && (
-                <span className="rounded-full bg-white px-2.5 py-0.5 text-xs font-medium text-slate-600 ring-1 ring-slate-200">
+                <span className="rounded-full bg-white px-2.5 py-0.5 text-xs font-medium text-slate-600 ring-1 ring-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:ring-slate-700">
                   {reportCount}
                 </span>
               )}

@@ -30,9 +30,9 @@ export const ProfileEditForm = ({
   return (
     <form
       onSubmit={(e) => void onSubmit(e)}
-      className="space-y-6 rounded-xl border border-slate-200 bg-white p-6 shadow-sm"
+      className="card-surface space-y-6 p-6"
     >
-      <h2 className="text-lg font-semibold text-slate-900">Edit profile</h2>
+      <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100">Edit profile</h2>
 
       <div className="grid gap-4 sm:grid-cols-2">
         <FormField label="First name" htmlFor="firstName">

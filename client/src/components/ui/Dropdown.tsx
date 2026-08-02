@@ -64,8 +64,8 @@ export const Dropdown = ({ trigger, items, align = 'right', menuClassName = 'w-4
   }
 
   const itemClassName = (item: DropdownItem) =>
-    `flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50 ${
-      item.variant === 'danger' ? 'text-red-600' : 'text-slate-700'
+    `flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50 dark:hover:bg-slate-800 ${
+      item.variant === 'danger' ? 'text-red-600' : 'text-slate-700 dark:text-slate-200'
     }`;
 
   return (
@@ -75,7 +75,7 @@ export const Dropdown = ({ trigger, items, align = 'right', menuClassName = 'w-4
       {open && (
         <div
           role="menu"
-          className={`absolute z-20 mt-2 overflow-hidden rounded-lg border border-slate-200 bg-white py-1 shadow-lg ${
+          className={`absolute z-20 mt-2 overflow-hidden rounded-lg border border-slate-200 bg-white py-1 shadow-lg dark:border-slate-700 dark:bg-slate-900 ${
             align === 'right' ? 'right-0' : 'left-0'
           } ${menuClassName}`}
         >

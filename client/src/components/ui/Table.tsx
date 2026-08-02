@@ -62,7 +62,7 @@ const columnWidthStyle = (width?: number): CSSProperties | undefined => {
 }
 
 const cellWrapClass = 'whitespace-normal break-words [overflow-wrap:anywhere]';
-const columnBorderClass = 'border-r border-slate-200 last:border-r-0';
+const columnBorderClass = 'border-r border-slate-200 last:border-r-0 dark:border-slate-700';
 
 const sortAlignClass: Record<TableAlign, string> = {
   left: 'justify-start',
@@ -102,16 +102,16 @@ const SortableHeader = ({ label, columnKey, align, sort, onSortChange }: Sortabl
     <button
       type="button"
       onClick={handleClick}
-      className={`inline-flex w-full items-center gap-1 text-xs font-semibold uppercase tracking-wide text-slate-500 transition hover:text-slate-700 ${sortAlignClass[align]}`}
+      className={`inline-flex w-full items-center gap-1 text-xs font-semibold uppercase tracking-wide text-slate-500 transition hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 ${sortAlignClass[align]}`}
     >
       <span>{label}</span>
       <span className="inline-flex shrink-0 flex-col -space-y-1">
         <HiChevronUp
-          className={`h-3 w-3 ${direction === 'asc' ? 'text-brand-600' : 'text-slate-300'}`}
+          className={`h-3 w-3 ${direction === 'asc' ? 'text-brand-600' : 'text-slate-300 dark:text-slate-600'}`}
           aria-hidden
         />
         <HiChevronDown
-          className={`h-3 w-3 ${direction === 'desc' ? 'text-brand-600' : 'text-slate-300'}`}
+          className={`h-3 w-3 ${direction === 'desc' ? 'text-brand-600' : 'text-slate-300 dark:text-slate-600'}`}
           aria-hidden
         />
       </span>
@@ -135,12 +135,12 @@ export const Table = <T,>({
   pagination,
 }: TableProps<T>) => {
   const cellColumnBorderClass = bordered ? columnBorderClass : '';
-  const containerBorderClass = borderless ? '' : 'border border-slate-200 shadow-sm';
+  const containerBorderClass = borderless ? '' : 'border border-slate-200 shadow-sm dark:border-slate-700';
 
   if (loading) {
     return (
       <div
-        className={`flex items-center justify-center gap-2 rounded-xl bg-white px-6 py-12 text-sm text-slate-500 ${containerBorderClass} ${className}`}
+        className={`flex items-center justify-center gap-2 rounded-xl bg-white px-6 py-12 text-sm text-slate-500 dark:bg-slate-900 dark:text-slate-400 ${containerBorderClass} ${className}`}
       >
         <Spinner />
         {loadingMessage}
@@ -151,7 +151,7 @@ export const Table = <T,>({
   if (data.length === 0) {
     return (
       <div
-        className={`rounded-xl bg-white px-6 py-12 text-center text-sm text-slate-500 ${containerBorderClass} ${className}`}
+        className={`rounded-xl bg-white px-6 py-12 text-center text-sm text-slate-500 dark:bg-slate-900 dark:text-slate-400 ${containerBorderClass} ${className}`}
       >
         {emptyMessage}
       </div>
@@ -159,15 +159,15 @@ export const Table = <T,>({
   }
 
   return (
-    <div className={`overflow-hidden rounded-xl bg-white ${containerBorderClass} ${className}`}>
+    <div className={`overflow-hidden rounded-xl bg-white dark:bg-slate-900 ${containerBorderClass} ${className}`}>
       <div className="overflow-x-auto">
-        <table className="w-full table-fixed divide-y divide-slate-200 text-sm">
+        <table className="w-full table-fixed divide-y divide-slate-200 text-sm dark:divide-slate-700">
           <colgroup>
             {columns.map((column) => (
               <col key={column.key} style={columnWidthStyle(column.width)} />
             ))}
           </colgroup>
-          <thead className="bg-slate-50">
+          <thead className="bg-slate-50 dark:bg-slate-800/50">
             <tr>
               {columns.map((column) => {
                 const cellAlign = columnAlign(column, align);
@@ -187,7 +187,7 @@ export const Table = <T,>({
                         onSortChange={onSortChange}
                       />
                     ) : (
-                      <span className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                      <span className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
                         {column.header}
                       </span>
                     )}
@@ -196,16 +196,16 @@ export const Table = <T,>({
               })}
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-100">
+          <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
             {data.map((row) => (
-              <tr key={getRowKey(row)} className="hover:bg-slate-50/80">
+              <tr key={getRowKey(row)} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/50">
                 {columns.map((column) => {
                   const cellAlign = columnAlign(column, align);
                   return (
                     <td
                       key={column.key}
                       style={columnWidthStyle(column.width)}
-                      className={`px-4 py-3 text-slate-700 ${cellWrapClass} ${alignClasses[cellAlign]} ${cellColumnBorderClass} ${column.className ?? ''}`}
+                      className={`px-4 py-3 text-slate-700 dark:text-slate-300 ${cellWrapClass} ${alignClasses[cellAlign]} ${cellColumnBorderClass} ${column.className ?? ''}`}
                     >
                       {column.render(row)}
                     </td>

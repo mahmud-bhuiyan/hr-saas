@@ -67,22 +67,22 @@ export const Modal = ({
         role="dialog"
         aria-modal="true"
         aria-labelledby={title ? 'modal-title' : undefined}
-        className={`relative w-full ${sizes[size]} rounded-2xl border border-slate-200 bg-white shadow-xl`}
+        className={`relative w-full ${sizes[size]} rounded-2xl border border-slate-200 bg-white shadow-xl dark:border-slate-700 dark:bg-slate-900`}
       >
         {(title || description) && (
-          <div className="border-b border-slate-100 px-6 py-4">
+          <div className="border-b border-slate-100 px-6 py-4 dark:border-slate-800">
             {title && (
-              <h2 id="modal-title" className="text-lg font-semibold text-slate-900">
+              <h2 id="modal-title" className="text-lg font-semibold text-slate-900 dark:text-slate-100">
                 {title}
               </h2>
             )}
-            {description && <p className="mt-1 text-sm text-slate-600">{description}</p>}
+            {description && <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">{description}</p>}
           </div>
         )}
 
         <div className="px-6 py-4">{children}</div>
 
-        {footer && <div className="border-t border-slate-100 px-6 py-4">{footer}</div>}
+        {footer && <div className="border-t border-slate-100 px-6 py-4 dark:border-slate-800">{footer}</div>}
       </div>
     </div>,
     document.body

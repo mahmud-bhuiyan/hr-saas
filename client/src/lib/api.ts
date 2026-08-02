@@ -69,6 +69,16 @@ import type {
   GenerateTimesheetInput,
   PatchTimesheetInput,
   DeclineTimesheetInput,
+  Expense,
+  PaginatedExpenses,
+  PresignExpenseInput,
+  PresignExpenseResponse,
+  CreateExpenseInput,
+  PatchExpenseInput,
+  ListExpensesQuery,
+  ExportExpensesQuery,
+  DeclineExpenseInput,
+  ExpenseReceiptDownloadResponse,
 } from '../types';
 
 const apiBase = import.meta.env.VITE_API_URL || '';
@@ -284,6 +294,11 @@ export const updateProfile = async (input: UpdateProfileInput): Promise<UpdatePr
   return json.data;
 }
 
+export const updateColorScheme = async (colorScheme: AuthUser['colorScheme']): Promise<UserProfile> => {
+  const result = await updateProfile({ colorScheme });
+  return result.user;
+}
+
 const profileToAuthUser = (profile: UserProfile): AuthUser => {
   return {
     id: profile.id,
@@ -292,6 +307,7 @@ const profileToAuthUser = (profile: UserProfile): AuthUser => {
     tenantId: profile.tenantId,
     firstName: profile.firstName,
     lastName: profile.lastName,
+    colorScheme: profile.colorScheme,
   };
 }
 
@@ -917,4 +933,130 @@ export const declineTimesheet = async (
     body: JSON.stringify(input),
   });
   return json.data;
+};
+
+const buildExpensesQuery = (query: ListExpensesQuery = {}): string => {
+  const params = new URLSearchParams();
+  if (query.scope) params.set('scope', query.scope);
+  if (query.status) params.set('status', query.status);
+  if (query.page) params.set('page', String(query.page));
+  if (query.limit) params.set('limit', String(query.limit));
+  const qs = params.toString();
+  return qs ? `?${qs}` : '';
+};
+
+const buildExportExpensesQuery = (query: ExportExpensesQuery = {}): string => {
+  const params = new URLSearchParams();
+  if (query.from) params.set('from', query.from);
+  if (query.to) params.set('to', query.to);
+  if (query.status) params.set('status', query.status);
+  const qs = params.toString();
+  return qs ? `?${qs}` : '';
+};
+
+export const presignExpenseUpload = async (
+  input: PresignExpenseInput
+): Promise<PresignExpenseResponse> => {
+  const json = await apiFetch<ApiSuccessResponse<PresignExpenseResponse>>(
+    '/api/v1/expenses/presign',
+    {
+      method: 'POST',
+      body: JSON.stringify(input),
+    }
+  );
+  return json.data;
+};
+
+export const createExpense = async (input: CreateExpenseInput): Promise<Expense> => {
+  const json = await apiFetch<ApiSuccessResponse<Expense>>('/api/v1/expenses', {
+    method: 'POST',
+    body: JSON.stringify(input),
+  });
+  return json.data;
+};
+
+export const fetchExpenses = async (query: ListExpensesQuery = {}): Promise<PaginatedExpenses> => {
+  const json = await apiFetch<ApiSuccessResponse<PaginatedExpenses>>(
+    `/api/v1/expenses${buildExpensesQuery(query)}`
+  );
+  return json.data;
+};
+
+export const fetchMyExpenses = async (page = 1, limit = 20): Promise<PaginatedExpenses> =>
+  fetchExpenses({ scope: 'own', page, limit });
+
+export const fetchExpenseApprovalQueue = async (
+  page = 1,
+  limit = 20
+): Promise<PaginatedExpenses> =>
+  fetchExpenses({ scope: 'approval', status: 'pending', page, limit });
+
+export const patchExpense = async (id: string, input: PatchExpenseInput): Promise<Expense> => {
+  const json = await apiFetch<ApiSuccessResponse<Expense>>(`/api/v1/expenses/${id}`, {
+    method: 'PATCH',
+    body: JSON.stringify(input),
+  });
+  return json.data;
+};
+
+export const approveExpense = async (id: string): Promise<Expense> => {
+  const json = await apiFetch<ApiSuccessResponse<Expense>>(`/api/v1/expenses/${id}/approve`, {
+    method: 'POST',
+  });
+  return json.data;
+};
+
+export const declineExpense = async (
+  id: string,
+  input: DeclineExpenseInput = {}
+): Promise<Expense> => {
+  const json = await apiFetch<ApiSuccessResponse<Expense>>(`/api/v1/expenses/${id}/decline`, {
+    method: 'POST',
+    body: JSON.stringify(input),
+  });
+  return json.data;
+};
+
+export const fetchExpenseReceiptUrl = async (
+  expenseId: string
+): Promise<ExpenseReceiptDownloadResponse> => {
+  const json = await apiFetch<ApiSuccessResponse<ExpenseReceiptDownloadResponse>>(
+    `/api/v1/expenses/${expenseId}/receipt`
+  );
+  return json.data;
+};
+
+export const exportExpensesCsv = async (query: ExportExpensesQuery = {}): Promise<void> => {
+  const token = getAccessToken();
+  const headers = new Headers();
+  if (token) {
+    headers.set('Authorization', `Bearer ${token}`);
+  }
+
+  const response = await fetch(
+    `${apiBase}/api/v1/expenses/export${buildExportExpensesQuery(query)}`,
+    {
+      method: 'GET',
+      headers,
+      credentials: 'include',
+    }
+  );
+
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({
+      status: 'error' as const,
+      message: 'Export failed',
+    }));
+    throw new ApiError(error.message, response.status);
+  }
+
+  const blob = await response.blob();
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = 'expenses-export.csv';
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
 };

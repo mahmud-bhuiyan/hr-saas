@@ -34,6 +34,7 @@ Features added during implementation that extend the original step list. Keep th
 | ImgBB logo/favicon upload | 7 | Super admin: upload or URL for platform logo/favicon via `IMGBB_API_KEY` |
 | Logo/favicon display settings | 7 | Super admin: logo size/fit/name toggle; favicon MIME type + preview |
 | Document storage (Step 6) | 6 | S3 presigned upload/download; `document:read:own` for employees; MinIO in docker compose |
+| User light/dark theme preference | 3 | Per-user `colorScheme` on User model; `PATCH /api/v1/auth/me`; header toggle; `ThemeContext` + localStorage cache; dark-mode styling on dashboard surfaces |
 
 ---
 
@@ -57,8 +58,8 @@ Features added during implementation that extend the original step list. Keep th
 - [x] `POST /api/v1/auth/login` returns access token and sets refresh cookie
 - [x] `POST /api/v1/auth/refresh` returns a new access token (with cookie)
 - [x] `POST /api/v1/auth/logout` clears refresh cookie
-- [x] `GET /api/v1/auth/me` returns current user when Bearer token is valid
-- [x] `PATCH /api/v1/auth/me` updates profile and optional password
+- [x] `GET /api/v1/auth/me` returns current user when Bearer token is valid (includes `colorScheme`)
+- [x] `PATCH /api/v1/auth/me` updates profile, optional password, and optional `colorScheme` (`light` | `dark`)
 - [x] JWT middleware rejects invalid/expired tokens (401)
 - [x] RBAC `authorize()` and `authorizePermission()` middleware in place
 - [x] Tenant middleware (`resolveTenant`, `requireTenant`) in place
@@ -81,6 +82,7 @@ Features added during implementation that extend the original step list. Keep th
 - [x] Reusable UI component kit (`client/src/components/ui/`)
 - [x] User profile page (`/dashboard/profile`) with change password
 - [x] Companies page for super admin (`/dashboard/registrations`)
+- [x] User light/dark theme toggle in app shell header (`ThemeContext` + localStorage; synced to DB via `PATCH /api/v1/auth/me`)
 
 **Review:** Confirm UI shell and auth UX before Step 4.
 

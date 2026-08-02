@@ -11,7 +11,7 @@ Check off each step with the client/dev team before moving to the next.
 | **S2-1** | Platform foundations — audit log, notifications, forgot password, employee invite | ✅ Done |
 | **S2-2** | Attendance — clock in/out, history, live board, HR corrections | ✅ Done |
 | **S2-3** | Timesheets — weekly grid, auto-generate, submit/approve, overtime | ✅ Done |
-| **S2-4** | Expenses — submit with receipt, approval, CSV export | ⬜ Not started |
+| **S2-4** | Expenses — submit with receipt, approval, CSV export | ✅ Done |
 | **S2-5** | Leave enhancements — accrual, carry-over, multi-step approval, doc expiry emails | ⬜ Not started |
 | **S2-6** | Employee ops & reporting — CSV import, headcount + absence reports | ⬜ Not started |
 | **S2-7** | Stripe billing — checkout, portal, webhooks, seat metering | ⬜ Not started |
@@ -25,7 +25,7 @@ Features added during Stage 2 implementation that extend the original step list.
 
 | Added | Step | Description |
 |-------|------|-------------|
-| *(none yet)* | | |
+| User light/dark theme preference | 3 / S2-8 | Per-user `colorScheme` on User model; returned on login/`GET /auth/me`; updated via `PATCH /auth/me`; client `ThemeContext` + localStorage cache + header toggle; dark-mode card surfaces |
 
 ---
 
@@ -97,17 +97,17 @@ Features added during Stage 2 implementation that extend the original step list.
 
 ## S2-4 — Done when
 
-- [ ] `Expense` model (`category`, `amount`, `currency`, `date`, `receiptFileKey`, `status`, `employeeId`)
-- [ ] Categories: `travel`, `meals`, `equipment`, `other`
-- [ ] Presigned receipt upload (reuse S3 pattern from documents module)
-- [ ] `GET /api/v1/expenses`, `POST /api/v1/expenses`, `GET /api/v1/expenses/:id`, `PATCH /api/v1/expenses/:id`
-- [ ] `POST /api/v1/expenses/:id/approve`, `POST /api/v1/expenses/:id/decline`
-- [ ] `GET /api/v1/expenses/export` — CSV for finance (HR/admin)
-- [ ] Expenses page `/dashboard/expenses` with submit form + receipt upload
-- [ ] Approval queue tab for manager/HR
-- [ ] Notification on submit and approve/decline
-- [ ] Permissions: `expense:create:own`, `expense:read:own`, `expense:approve:team`, `expense:approve`, `expense:export`
-- [ ] `docs/openapi.yaml` and Postman collection updated
+- [x] `Expense` model (`category`, `amount`, `currency`, `date`, `receiptFileKey`, `status`, `employeeId`)
+- [x] Categories: `travel`, `meals`, `equipment`, `other`
+- [x] Presigned receipt upload (reuse S3 pattern from documents module)
+- [x] `GET /api/v1/expenses`, `POST /api/v1/expenses`, `GET /api/v1/expenses/:id`, `PATCH /api/v1/expenses/:id`
+- [x] `POST /api/v1/expenses/:id/approve`, `POST /api/v1/expenses/:id/decline`
+- [x] `GET /api/v1/expenses/export` — CSV for finance (HR/admin)
+- [x] Expenses page `/dashboard/expenses` with submit form + receipt upload
+- [x] Approval queue tab for manager/HR
+- [x] Notification on submit and approve/decline
+- [x] Permissions: `expense:create:own`, `expense:read:own`, `expense:approve:team`, `expense:approve`, `expense:export`
+- [x] `docs/openapi.yaml` and Postman collection updated
 
 **Review:** Test expense submit with receipt and CSV export before S2-5.
 
@@ -172,6 +172,7 @@ Features added during Stage 2 implementation that extend the original step list.
 
 ## S2-8 — Done when
 
+- [x] User light/dark theme preference — `colorScheme` on User; `PATCH /auth/me`; `ThemeContext` + localStorage; header toggle; dark-mode card surfaces
 - [ ] Extended demo seed — attendance sessions, timesheets, expenses, sample notifications
 - [ ] Staging deploy updated with Redis worker and Stripe test keys
 - [ ] Bug fixes on Stage 2 walkthrough path ([10-stage-2-operations-plan.md](./10-stage-2-operations-plan.md) Section 1)
