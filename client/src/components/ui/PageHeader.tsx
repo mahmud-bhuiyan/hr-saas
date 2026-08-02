@@ -40,8 +40,8 @@ export const PageHeader = ({
     >
       <div>
         <p className="text-sm font-medium uppercase tracking-wide text-brand-600">{label}</p>
-        <h1 className="mt-1 text-3xl font-semibold text-slate-900">{title}</h1>
-        {description && <p className="mt-2 text-slate-600">{description}</p>}
+        <h1 className="mt-1 text-3xl font-semibold text-slate-900 dark:text-slate-100">{title}</h1>
+        {description && <p className="mt-2 text-slate-600 dark:text-slate-400">{description}</p>}
       </div>
       {action && <div className={`shrink-0 ${align.action}`}>{action}</div>}
     </section>

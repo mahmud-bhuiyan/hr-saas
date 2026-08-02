@@ -5,6 +5,8 @@ export type UserRole =
   | 'manager'
   | 'employee';
 
+export type ColorScheme = 'light' | 'dark';
+
 export interface ApiHealthResponse {
   status: 'ok';
   service: string;
@@ -38,6 +40,7 @@ export interface AuthUser {
   tenantId?: string;
   firstName?: string;
   lastName?: string;
+  colorScheme?: ColorScheme;
 }
 
 export interface AuthResponse {

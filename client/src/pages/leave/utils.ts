@@ -33,15 +33,15 @@ export const leaveStatusLabel = (status: LeaveRequestStatus): string => {
 export const leaveStatusClass = (status: LeaveRequestStatus): string => {
   switch (status) {
     case 'pending':
-      return 'bg-amber-50 text-amber-700 border-amber-200';
+      return 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-500/15 dark:text-amber-400 dark:border-amber-500/30';
     case 'approved':
-      return 'bg-green-50 text-green-700 border-green-200';
+      return 'bg-green-50 text-green-700 border-green-200 dark:bg-emerald-500/15 dark:text-emerald-400 dark:border-emerald-500/30';
     case 'declined':
-      return 'bg-red-50 text-red-700 border-red-200';
+      return 'bg-red-50 text-red-700 border-red-200 dark:bg-red-500/15 dark:text-red-400 dark:border-red-500/30';
     case 'cancelled':
-      return 'bg-slate-50 text-slate-600 border-slate-200';
+      return 'bg-slate-50 text-slate-600 border-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-600';
     default:
-      return 'bg-slate-50 text-slate-600 border-slate-200';
+      return 'bg-slate-50 text-slate-600 border-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-600';
   }
 };
 
@@ -51,21 +51,6 @@ export const formatDateRange = (startDate: string, endDate: string, halfDay: boo
   }
   return `${startDate} – ${endDate}`;
 };
-
-export const MONTH_NAMES = [
-  'January',
-  'February',
-  'March',
-  'April',
-  'May',
-  'June',
-  'July',
-  'August',
-  'September',
-  'October',
-  'November',
-  'December',
-];
 
 export type LeaveTab = 'my-leave' | 'employee-leave' | 'approvals' | 'calendar';
 

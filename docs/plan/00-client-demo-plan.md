@@ -138,6 +138,7 @@ Be explicit with the client so expectations stay aligned.
 
 ### Dashboard
 - [x] Home dashboard (summary cards + quick links — **placeholders**; real counts in Step 7)
+- [x] App shell theme toggle (light/dark) — per-user preference in DB + localStorage via `ThemeContext`
 
 ### Account
 - [x] My profile (view / edit, change password)
@@ -262,7 +263,7 @@ Full roadmap: [hr-saas-mern-project-plan.md](./hr-saas-mern-project-plan.md)
 |------|--------|-------|
 | Foundation (Step 1) | ✅ Complete | |
 | Auth & tenant (Step 2) | ✅ Complete | Includes approval workflow + super admin add company |
-| App shell (Step 3) | ✅ Complete | UI kit, profile, companies page |
+| App shell (Step 3) | ✅ Complete | UI kit, profile, companies page, user light/dark theme toggle (DB + localStorage) |
 | Employees (Step 4) | ✅ Ready for review | User link deferred |
 | Leave (Step 5) | ✅ Complete | Email via SendGrid; user→employee via email fallback |
 | Documents (Step 6) | ✅ Ready for review | MinIO for local dev; AWS S3 or Cloudflare R2 in production |

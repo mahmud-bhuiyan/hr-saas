@@ -136,6 +136,7 @@ This flow covers **time → pay data → expenses → compliance → monetizatio
 
 ### App shell
 - [x] Notification bell + dropdown (unread count, mark read)
+- [x] Theme toggle (light/dark) — per-user `colorScheme` in DB; `ThemeContext` + localStorage on client
 
 ### Attendance
 - [x] Clock in/out (`/dashboard/attendance`)
@@ -278,4 +279,6 @@ Full roadmap: [hr-saas-mern-project-plan.md](./hr-saas-mern-project-plan.md)
 | S2-7 | Stripe billing | ⬜ Not started |
 | S2-8 | Polish & sign-off | ⬜ Not started |
 
-**Next step:** S2-4 — expenses. See [STAGE-2-IMPLEMENTATION-STEPS.md](./STAGE-2-IMPLEMENTATION-STEPS.md).
+**Cross-cutting (Stage 2):** User light/dark theme preference — `colorScheme` on User; `PATCH /auth/me`; header toggle; `ThemeContext` + localStorage cache.
+
+**Next step:** S2-5 — leave enhancements. See [STAGE-2-IMPLEMENTATION-STEPS.md](./STAGE-2-IMPLEMENTATION-STEPS.md).

@@ -24,7 +24,7 @@ export const EmployeeProfileSummary = ({ employee, showMetadata = false }: Emplo
     : '—';
 
   return (
-    <section className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+    <section className="card-surface overflow-hidden">
       <div className="grid gap-5 p-5 sm:grid-cols-2">
         <SummaryItem
           label="Email"

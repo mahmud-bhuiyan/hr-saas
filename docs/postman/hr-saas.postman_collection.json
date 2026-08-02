@@ -37,6 +37,10 @@
     {
       "key": "timesheetId",
       "value": ""
+    },
+    {
+      "key": "expenseId",
+      "value": ""
     }
   ],
   "item": [
@@ -210,7 +214,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"firstName\": \"Jane\",\n  \"lastName\": \"Admin\",\n  \"email\": \"admin@acme.com\"\n}"
+              "raw": "{\n  \"firstName\": \"Jane\",\n  \"lastName\": \"Admin\",\n  \"email\": \"admin@acme.com\",\n  \"colorScheme\": \"dark\"\n}"
             },
             "url": "{{baseUrl}}/api/v1/auth/me",
             "description": "Update own profile. Include currentPassword + newPassword to change password."
@@ -1153,6 +1157,187 @@
             },
             "url": "{{baseUrl}}/api/v1/timesheets/{{timesheetId}}/decline",
             "description": "Manager/HR declines submitted timesheet."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Expenses",
+      "item": [
+        {
+          "name": "Presign Expense Receipt",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+            },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fileName\": \"taxi-receipt.jpg\",\n  \"mimeType\": \"image/jpeg\",\n  \"fileSize\": 102400\n}"
+            },
+            "url": "{{baseUrl}}/api/v1/expenses/presign",
+            "description": "Returns presigned PUT URL and fileKey. Upload receipt to uploadUrl, then call Create Expense."
+          },
+          "response": []
+        },
+        {
+          "name": "Create Expense",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "  const json = pm.response.json();",
+                  "  pm.collectionVariables.set('expenseId', json.data.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+            },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"category\": \"travel\",\n  \"amount\": 45.5,\n  \"currency\": \"GBP\",\n  \"date\": \"2026-08-01\",\n  \"description\": \"Client meeting taxi\",\n  \"receiptFileKey\": \"tenant-id/expenses/uuid/receipt.jpg\",\n  \"receiptFileName\": \"taxi-receipt.jpg\",\n  \"mimeType\": \"image/jpeg\",\n  \"fileSize\": 102400\n}"
+            },
+            "url": "{{baseUrl}}/api/v1/expenses",
+            "description": "Submit expense after uploading receipt to S3."
+          },
+          "response": []
+        },
+        {
+          "name": "List My Expenses",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/expenses?scope=own&page=1&limit=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "expenses"],
+              "query": [
+                { "key": "scope", "value": "own" },
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "20" }
+              ]
+            },
+            "description": "Paginated list of own expenses."
+          },
+          "response": []
+        },
+        {
+          "name": "List Expense Approval Queue",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/expenses?scope=approval&status=pending&page=1&limit=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "expenses"],
+              "query": [
+                { "key": "scope", "value": "approval" },
+                { "key": "status", "value": "pending" },
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "20" }
+              ]
+            },
+            "description": "Manager/HR approval queue."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Expense",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+            },
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/expenses/{{expenseId}}",
+            "description": "Get expense by ID."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Expense Receipt",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+            },
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/expenses/{{expenseId}}/receipt",
+            "description": "Presigned download URL for expense receipt."
+          },
+          "response": []
+        },
+        {
+          "name": "Approve Expense",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+            },
+            "method": "POST",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/expenses/{{expenseId}}/approve",
+            "description": "Manager/HR approves pending expense."
+          },
+          "response": []
+        },
+        {
+          "name": "Decline Expense",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+            },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"declineReason\": \"Receipt is unclear\"\n}"
+            },
+            "url": "{{baseUrl}}/api/v1/expenses/{{expenseId}}/decline",
+            "description": "Manager/HR declines pending expense."
+          },
+          "response": []
+        },
+        {
+          "name": "Export Expenses CSV",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/expenses/export?status=approved",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "expenses", "export"],
+              "query": [{ "key": "status", "value": "approved" }]
+            },
+            "description": "Download approved expenses as CSV (HR/admin)."
           },
           "response": []
         }

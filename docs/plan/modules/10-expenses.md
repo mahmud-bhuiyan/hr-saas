@@ -1,7 +1,7 @@
 # Module: Expenses
 
 **Stage:** Stage 2 (S2-4)  
-**Status:** Not started  
+**Status:** Done  
 **Depends on:** Document storage (S3 pattern), Notifications (S2-1)
 
 ---

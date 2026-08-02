@@ -69,7 +69,7 @@ export const SiteSettingsForm = ({
   return (
     <form
       onSubmit={(e) => void onSubmit(e)}
-      className="space-y-6 rounded-xl border border-slate-200 bg-white p-6 shadow-sm"
+      className="card-surface space-y-6 p-6"
     >
       <h2 className="text-lg font-semibold text-slate-900">Platform branding</h2>
 
@@ -91,7 +91,7 @@ export const SiteSettingsForm = ({
               type="color"
               value={values.primaryColor}
               onChange={(e) => onChange('primaryColor', e.target.value)}
-              className="h-10 w-14 shrink-0 cursor-pointer rounded border border-slate-200 bg-white p-1"
+              className="h-10 w-14 shrink-0 cursor-pointer rounded border border-slate-200 bg-white p-1 dark:border-slate-600 dark:bg-slate-800"
               aria-label="Pick primary color"
               disabled={colorSaving}
             />
@@ -229,12 +229,12 @@ export const SiteSettingsPreview = ({ values }: { values: SiteSettingsFormValues
   };
 
   return (
-    <div className="space-y-4 rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+    <div className="card-surface space-y-4 p-6">
       <h2 className="text-lg font-semibold text-slate-900">Preview</h2>
 
       <div className="rounded-lg border border-slate-200 bg-slate-50 p-4">
         <p className="mb-2 text-xs font-medium uppercase tracking-wide text-slate-500">App header</p>
-        <div className="flex items-center justify-between border-b border-slate-200 bg-white px-4 py-3">
+        <div className="flex items-center justify-between border-b border-slate-200 bg-white px-4 py-3 dark:border-slate-700 dark:bg-slate-900">
           <div className="flex items-center gap-2">
             {values.logoUrl ? (
               <img src={values.logoUrl} alt={values.siteName} style={logoStyle} />
@@ -261,7 +261,7 @@ export const SiteSettingsPreview = ({ values }: { values: SiteSettingsFormValues
 
       <div className="rounded-lg border border-slate-200 bg-slate-50 p-4">
         <p className="mb-2 text-xs font-medium uppercase tracking-wide text-slate-500">Browser tab</p>
-        <div className="inline-flex max-w-full items-center gap-2 rounded-t-lg border border-b-0 border-slate-200 bg-white px-3 py-2 shadow-sm">
+        <div className="inline-flex max-w-full items-center gap-2 rounded-t-lg border border-b-0 border-slate-200 bg-white px-3 py-2 shadow-sm dark:border-slate-700 dark:bg-slate-900">
           {values.faviconUrl ? (
             <img src={values.faviconUrl} alt="" className="h-4 w-4 object-contain" />
           ) : (

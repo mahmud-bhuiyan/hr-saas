@@ -20,6 +20,10 @@ export const PERMISSIONS: Record<UserRole, string[]> = {
     'timesheet:read:own',
     'timesheet:submit:own',
     'timesheet:approve',
+    'expense:create:own',
+    'expense:read:own',
+    'expense:approve',
+    'expense:export',
   ],
   manager: [
     'leave:approve:team',
@@ -33,6 +37,9 @@ export const PERMISSIONS: Record<UserRole, string[]> = {
     'timesheet:read:own',
     'timesheet:submit:own',
     'timesheet:approve:team',
+    'expense:create:own',
+    'expense:read:own',
+    'expense:approve:team',
   ],
   employee: [
     'leave:create:own',
@@ -44,6 +51,8 @@ export const PERMISSIONS: Record<UserRole, string[]> = {
     'attendance:read:own',
     'timesheet:read:own',
     'timesheet:submit:own',
+    'expense:create:own',
+    'expense:read:own',
   ],
 };
 

@@ -7,6 +7,7 @@ export const updateProfileSchema = z
     email: z.string().email().transform((v) => v.toLowerCase().trim()).optional(),
     currentPassword: z.string().min(1).optional(),
     newPassword: z.string().min(8, 'New password must be at least 8 characters').optional(),
+    colorScheme: z.enum(['light', 'dark']).optional(),
   })
   .superRefine((data, ctx) => {
     const hasCurrent = Boolean(data.currentPassword);

@@ -107,7 +107,7 @@ export const TimesheetWeekGrid = ({
 
   if (loading) {
     return (
-      <div className="rounded-xl border border-slate-200 bg-white p-8 text-center text-sm text-slate-500">
+      <div className="card-surface p-8 text-center text-sm text-slate-500 dark:text-slate-400">
         Loading timesheet…
       </div>
     );
@@ -116,7 +116,7 @@ export const TimesheetWeekGrid = ({
   return (
     <div className="space-y-4">
       {!timesheet && (
-        <div className="rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600">
+        <div className="rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600 dark:border-slate-700 dark:bg-slate-800/50 dark:text-slate-400">
           No timesheet for this week yet. Generate one from your attendance logs to get started.
         </div>
       )}
@@ -129,13 +129,13 @@ export const TimesheetWeekGrid = ({
             {timesheetStatusLabel(timesheet.status)}
           </span>
           {timesheet.status === 'declined' && timesheet.declineReason && (
-            <p className="text-sm text-red-700">Declined: {timesheet.declineReason}</p>
+            <p className="text-sm text-red-700 dark:text-red-400">Declined: {timesheet.declineReason}</p>
           )}
         </div>
       )}
 
-      <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
-        <div className="grid grid-cols-[minmax(0,1fr)_repeat(7,minmax(0,1fr))] border-b border-slate-200 bg-slate-50 text-center text-xs font-semibold uppercase tracking-wide text-slate-500">
+      <div className="card-surface overflow-hidden">
+        <div className="grid grid-cols-[minmax(0,1fr)_repeat(7,minmax(0,1fr))] border-b border-slate-200 bg-slate-50 text-center text-xs font-semibold uppercase tracking-wide text-slate-500 dark:border-slate-700 dark:bg-slate-800/50 dark:text-slate-400">
           <div className="px-3 py-3 text-left">Day</div>
           {DAY_LABELS.map((label) => (
             <div key={label} className="px-2 py-3">
@@ -144,13 +144,13 @@ export const TimesheetWeekGrid = ({
           ))}
         </div>
 
-        <div className="grid grid-cols-[minmax(0,1fr)_repeat(7,minmax(0,1fr))] border-b border-slate-100">
-          <div className="px-3 py-4 text-sm font-medium text-slate-700">Hours</div>
+        <div className="grid grid-cols-[minmax(0,1fr)_repeat(7,minmax(0,1fr))] border-b border-slate-100 dark:border-slate-700">
+          <div className="px-3 py-4 text-sm font-medium text-slate-700 dark:text-slate-300">Hours</div>
           {draftEntries.map((entry) => {
             const editable =
               canEdit && (!timesheet || timesheet.status === 'draft' || timesheet.status === 'declined');
             return (
-              <div key={entry.date} className="border-l border-slate-100 px-2 py-3">
+              <div key={entry.date} className="border-l border-slate-100 px-2 py-3 dark:border-slate-700">
                 <Input
                   type="number"
                   min={0}
@@ -163,7 +163,7 @@ export const TimesheetWeekGrid = ({
                   icon={<HiClock className="h-4 w-4 text-brand-600" />}
                 />
                 {entry.source === 'attendance' && entry.hours > 0 && (
-                  <p className="mt-1 text-center text-[10px] text-slate-400">From attendance</p>
+                  <p className="mt-1 text-center text-[10px] text-slate-400 dark:text-slate-500">From attendance</p>
                 )}
               </div>
             );
@@ -171,15 +171,15 @@ export const TimesheetWeekGrid = ({
         </div>
 
         <div className="grid grid-cols-[minmax(0,1fr)_repeat(7,minmax(0,1fr))]">
-          <div className="px-3 py-3 text-sm font-medium text-slate-700">Notes</div>
+          <div className="px-3 py-3 text-sm font-medium text-slate-700 dark:text-slate-300">Notes</div>
           {draftEntries.map((entry) => {
             const editable =
               canEdit && (!timesheet || timesheet.status === 'draft' || timesheet.status === 'declined');
             return (
-              <div key={`${entry.date}-notes`} className="border-l border-slate-100 px-2 py-2">
+              <div key={`${entry.date}-notes`} className="border-l border-slate-100 px-2 py-2 dark:border-slate-700">
                 <button
                   type="button"
-                  className="w-full rounded-lg border border-slate-200 px-2 py-2 text-xs text-slate-500 hover:bg-slate-50 disabled:opacity-50"
+                  className="w-full rounded-lg border border-slate-200 px-2 py-2 text-xs text-slate-500 hover:bg-slate-50 disabled:opacity-50 dark:border-slate-600 dark:text-slate-400 dark:hover:bg-slate-800"
                   disabled={!editable}
                   onClick={() => setShowNotes(entry.date)}
                 >
@@ -192,22 +192,22 @@ export const TimesheetWeekGrid = ({
       </div>
 
       <div className="grid gap-4 sm:grid-cols-3">
-        <div className="rounded-xl border border-slate-200 bg-white p-4">
-          <p className="text-xs font-medium uppercase tracking-wide text-slate-500">Total hours</p>
-          <p className="mt-1 text-2xl font-semibold text-slate-900">{totalHours.toFixed(2)}</p>
+        <div className="card-surface p-4">
+          <p className="text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">Total hours</p>
+          <p className="mt-1 text-2xl font-semibold text-slate-900 dark:text-slate-100">{totalHours.toFixed(2)}</p>
         </div>
-        <div className="rounded-xl border border-slate-200 bg-white p-4">
-          <p className="text-xs font-medium uppercase tracking-wide text-slate-500">Overtime</p>
+        <div className="card-surface p-4">
+          <p className="text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">Overtime</p>
           <p
-            className={`mt-1 text-2xl font-semibold ${overtimeHours > 0 ? 'text-amber-600' : 'text-slate-900'}`}
+            className={`mt-1 text-2xl font-semibold ${overtimeHours > 0 ? 'text-amber-600 dark:text-amber-400' : 'text-slate-900 dark:text-slate-100'}`}
           >
             {overtimeHours.toFixed(2)}
           </p>
-          <p className="mt-1 text-xs text-slate-500">Threshold: {threshold}h / week</p>
+          <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">Threshold: {threshold}h / week</p>
         </div>
-        <div className="rounded-xl border border-slate-200 bg-white p-4">
-          <p className="text-xs font-medium uppercase tracking-wide text-slate-500">Week days</p>
-          <p className="mt-1 text-sm text-slate-700">
+        <div className="card-surface p-4">
+          <p className="text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">Week days</p>
+          <p className="mt-1 text-sm text-slate-700 dark:text-slate-300">
             {weekDays.map((date) => formatDayLabel(date)).join(' · ')}
           </p>
         </div>
@@ -253,8 +253,8 @@ export const TimesheetWeekGrid = ({
 
       {showNotes && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-          <div className="w-full max-w-md rounded-xl bg-white p-6 shadow-xl">
-            <h3 className="text-lg font-semibold text-slate-900">
+          <div className="w-full max-w-md rounded-xl border border-slate-200 bg-white p-6 shadow-xl dark:border-slate-700 dark:bg-slate-900">
+            <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
               Notes — {formatDayLabel(showNotes)}
             </h3>
             <FormField label="Notes" htmlFor="timesheet-day-notes" className="mt-4">
@@ -281,15 +281,15 @@ export const TimesheetWeekGrid = ({
 const timesheetStatusClass = (status: string): string => {
   switch (status) {
     case 'draft':
-      return 'bg-slate-100 text-slate-700';
+      return 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300';
     case 'submitted':
-      return 'bg-amber-100 text-amber-800';
+      return 'bg-amber-100 text-amber-800 dark:bg-amber-500/15 dark:text-amber-400';
     case 'approved':
-      return 'bg-green-100 text-green-800';
+      return 'bg-green-100 text-green-800 dark:bg-emerald-500/15 dark:text-emerald-400';
     case 'declined':
-      return 'bg-red-100 text-red-800';
+      return 'bg-red-100 text-red-800 dark:bg-red-500/15 dark:text-red-400';
     default:
-      return 'bg-slate-100 text-slate-700';
+      return 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300';
   }
 };
 

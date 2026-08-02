@@ -63,6 +63,7 @@ export const ProfilePage = () => {
         tenantId: data.user.tenantId,
         firstName: data.user.firstName,
         lastName: data.user.lastName,
+        colorScheme: data.user.colorScheme,
       });
       if (data.accessToken && accessToken) {
         setAuth(
@@ -73,6 +74,7 @@ export const ProfilePage = () => {
             tenantId: data.user.tenantId,
             firstName: data.user.firstName,
             lastName: data.user.lastName,
+            colorScheme: data.user.colorScheme,
           },
           data.accessToken
         );

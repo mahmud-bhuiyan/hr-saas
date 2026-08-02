@@ -59,6 +59,11 @@ export const buildDocumentFileKey = (tenantId: string, fileName: string): string
   return `${tenantId}/documents/${randomUUID()}/${safeName}`;
 };
 
+export const buildExpenseFileKey = (tenantId: string, fileName: string): string => {
+  const safeName = sanitizeFileName(fileName);
+  return `${tenantId}/expenses/${randomUUID()}/${safeName}`;
+};
+
 export const createPresignedUploadUrl = async (
   env: ServerEnv,
   fileKey: string,

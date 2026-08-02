@@ -46,11 +46,11 @@ export const LeaveBalanceSummary = ({
       {cards.map((card) => (
         <div
           key={card.label}
-          className="rounded-xl border border-slate-200 bg-white px-4 py-4 shadow-sm"
+          className="card-surface px-4 py-4"
         >
-          <p className="text-sm font-medium text-slate-500">{card.label}</p>
-          <p className="mt-1 text-2xl font-semibold text-slate-900">{card.value}</p>
-          <p className="mt-1 text-xs text-slate-500">{card.note}</p>
+          <p className="text-sm font-medium text-slate-500 dark:text-slate-400">{card.label}</p>
+          <p className="mt-1 text-2xl font-semibold text-slate-900 dark:text-slate-100">{card.value}</p>
+          <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">{card.note}</p>
         </div>
       ))}
     </div>

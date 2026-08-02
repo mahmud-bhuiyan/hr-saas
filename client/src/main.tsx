@@ -6,8 +6,12 @@ import { ToastContainer } from 'react-toastify';
 import App from './App';
 import { AuthProvider } from './contexts/AuthContext';
 import { SiteConfigProvider } from './contexts/SiteConfigContext';
+import { ThemeProvider } from './contexts/ThemeContext';
+import { initColorSchemeFromStorage } from './lib/theme-storage';
 import './index.css';
 import 'react-toastify/dist/ReactToastify.css';
+
+initColorSchemeFromStorage();
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -22,10 +26,12 @@ createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
-        <AuthProvider>
-          <SiteConfigProvider>
-            <App />
-          </SiteConfigProvider>
+        <ThemeProvider>
+          <AuthProvider>
+            <SiteConfigProvider>
+              <App />
+            </SiteConfigProvider>
+          </AuthProvider>
           <ToastContainer
             position="top-right"
             autoClose={5000}
@@ -36,7 +42,7 @@ createRoot(document.getElementById('root')!).render(
             draggable
             theme="colored"
           />
-        </AuthProvider>
+        </ThemeProvider>
       </BrowserRouter>
     </QueryClientProvider>
   </StrictMode>

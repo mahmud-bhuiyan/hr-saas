@@ -43,7 +43,7 @@ export const TablePageSizeControl = ({
 }: TablePageSizeControlProps) => {
   return (
     <div className={`flex items-center justify-end ${className}`}>
-      <label className="flex items-center gap-2 text-sm text-slate-600">
+      <label className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
         <span>Rows per page</span>
         <Select
           value={String(pageSize)}
@@ -62,7 +62,7 @@ export const TablePageSizeControl = ({
   );
 };
 
-export const TablePagination = ({ pagination, footerClassName = 'border-slate-200 bg-slate-50' }: TablePaginationProps) => {
+export const TablePagination = ({ pagination, footerClassName = 'border-slate-200 bg-slate-50 dark:border-slate-700 dark:bg-slate-800/50' }: TablePaginationProps) => {
   const {
     page,
     total,
@@ -78,7 +78,7 @@ export const TablePagination = ({ pagination, footerClassName = 'border-slate-20
 
   return (
     <div className={`flex flex-col gap-3 border-t px-4 py-3 lg:flex-row lg:items-center lg:justify-between ${footerClassName}`}>
-      <p className="text-sm text-slate-600">
+      <p className="text-sm text-slate-600 dark:text-slate-400">
         {total === 0
           ? 'No records'
           : `Showing ${rangeStart}–${rangeEnd} of ${total}`}

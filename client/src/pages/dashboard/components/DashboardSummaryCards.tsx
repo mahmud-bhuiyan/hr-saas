@@ -12,10 +12,10 @@ export const DashboardSummaryCards = ({ cards, loading }: DashboardSummaryCardsP
       {cards.map((card) => (
         <div
           key={card.label}
-          className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm"
+          className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-900"
         >
-          <p className="text-sm text-slate-500">{card.label}</p>
-          <p className="mt-2 text-3xl font-semibold text-slate-900">
+          <p className="text-sm text-slate-500 dark:text-slate-400">{card.label}</p>
+          <p className="mt-2 text-3xl font-semibold text-slate-900 dark:text-slate-100">
             {loading ? (
               <span className="inline-flex items-center text-slate-400">
                 <Spinner className="h-7 w-7" />
