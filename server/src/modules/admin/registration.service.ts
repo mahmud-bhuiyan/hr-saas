@@ -415,50 +415,15 @@ export const updateCompany = async (
     admin.lastName = input.adminLastName || undefined;
   }
 
+  if (input.isActive !== undefined && input.isActive !== tenant.isActive) {
+    tenant.isActive = input.isActive;
+    await User.updateMany({ tenantId: tenant._id }, { isActive: input.isActive });
+  }
+
   tenant.updatedBy = new mongoose.Types.ObjectId(updatedByUserId);
   await tenant.save();
   await admin.save();
 
-  const auditUsers = await loadAuditUsers([tenant]);
-  return toRegistrationRequest(tenant, admin, auditUsers);
-}
-
-export const deactivateCompany = async (
-  tenantId: string,
-  updatedByUserId: string
-): Promise<RegistrationRequest> => {
-  const tenant = await findApprovedTenant(tenantId);
-
-  if (!tenant.isActive) {
-    throw new RegistrationServiceError('Company is already inactive', 409);
-  }
-
-  tenant.isActive = false;
-  tenant.updatedBy = new mongoose.Types.ObjectId(updatedByUserId);
-  await tenant.save();
-  await User.updateMany({ tenantId: tenant._id }, { isActive: false });
-
-  const admin = await User.findOne({ tenantId: tenant._id, role: 'company_admin' });
-  const auditUsers = await loadAuditUsers([tenant]);
-  return toRegistrationRequest(tenant, admin, auditUsers);
-}
-
-export const activateCompany = async (
-  tenantId: string,
-  updatedByUserId: string
-): Promise<RegistrationRequest> => {
-  const tenant = await findApprovedTenant(tenantId);
-
-  if (tenant.isActive) {
-    throw new RegistrationServiceError('Company is already active', 409);
-  }
-
-  tenant.isActive = true;
-  tenant.updatedBy = new mongoose.Types.ObjectId(updatedByUserId);
-  await tenant.save();
-  await User.updateMany({ tenantId: tenant._id }, { isActive: true });
-
-  const admin = await User.findOne({ tenantId: tenant._id, role: 'company_admin' });
   const auditUsers = await loadAuditUsers([tenant]);
   return toRegistrationRequest(tenant, admin, auditUsers);
 }

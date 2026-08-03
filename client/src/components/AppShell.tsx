@@ -60,8 +60,6 @@ const navItems: Array<{
 
   label: string;
 
-  shortLabel: string;
-
   icon: IconType;
 
   end?: boolean;
@@ -74,9 +72,9 @@ const navItems: Array<{
 
 }> = [
 
-  { to: '/dashboard', label: 'Dashboard', shortLabel: 'Home', icon: HiHome, end: true },
+  { to: '/dashboard', label: 'Dashboard', icon: HiHome, end: true },
 
-  { to: '/dashboard/registrations', label: 'Companies', shortLabel: 'Cos', icon: HiBuildingOffice2, roles: ['super_admin'] },
+  { to: '/dashboard/registrations', label: 'Companies', icon: HiBuildingOffice2, roles: ['super_admin'] },
 
   {
 
@@ -84,39 +82,35 @@ const navItems: Array<{
 
     label: 'Site settings',
 
-    shortLabel: 'Site',
-
     icon: HiCog6Tooth,
 
     roles: ['super_admin'],
 
   },
 
-  { to: '/dashboard/employees', label: 'Employees', shortLabel: 'Team', icon: HiUserGroup, roles: ['company_admin', 'hr_manager', 'manager'], module: 'employees' },
+  { to: '/dashboard/employees', label: 'Employees', icon: HiUserGroup, roles: ['company_admin', 'hr_manager', 'manager'], module: 'employees' },
 
-  { to: '/dashboard/leave', label: 'Leave', shortLabel: 'Leave', icon: HiCalendarDays, roles: ['company_admin', 'hr_manager', 'manager', 'employee'], module: 'leave' },
+  { to: '/dashboard/leave', label: 'Leave', icon: HiCalendarDays, roles: ['company_admin', 'hr_manager', 'manager', 'employee'], module: 'leave' },
 
-  { to: '/dashboard/attendance', label: 'Attendance', shortLabel: 'Attend', icon: HiClock, roles: ['company_admin', 'hr_manager', 'manager', 'employee'], module: 'attendance' },
+  { to: '/dashboard/attendance', label: 'Attendance', icon: HiClock, roles: ['company_admin', 'hr_manager', 'manager', 'employee'], module: 'attendance' },
 
-  { to: '/dashboard/timesheets', label: 'Timesheets', shortLabel: 'Times', icon: HiTableCells, roles: ['company_admin', 'hr_manager', 'manager', 'employee'], module: 'timesheets' },
+  { to: '/dashboard/timesheets', label: 'Timesheets', icon: HiTableCells, roles: ['company_admin', 'hr_manager', 'manager', 'employee'], module: 'timesheets' },
 
-  { to: '/dashboard/rotas', label: 'Rotas', shortLabel: 'Rotas', icon: HiBriefcase, roles: ['company_admin', 'hr_manager', 'manager', 'employee'], module: 'rotas' },
+  { to: '/dashboard/rotas', label: 'Rotas', icon: HiBriefcase, roles: ['company_admin', 'hr_manager', 'manager', 'employee'], module: 'rotas' },
 
-  { to: '/dashboard/expenses', label: 'Expenses', shortLabel: 'Expense', icon: HiCurrencyDollar, roles: ['company_admin', 'hr_manager', 'manager', 'employee'], module: 'expenses' },
+  { to: '/dashboard/expenses', label: 'Expenses', icon: HiCurrencyDollar, roles: ['company_admin', 'hr_manager', 'manager', 'employee'], module: 'expenses' },
 
-  { to: '/dashboard/payroll', label: 'Payroll', shortLabel: 'Payroll', icon: HiCurrencyDollar, roles: ['company_admin', 'hr_manager'], module: 'payroll' },
+  { to: '/dashboard/payroll', label: 'Payroll', icon: HiCurrencyDollar, roles: ['company_admin', 'hr_manager'], module: 'payroll' },
 
-  { to: '/dashboard/reports', label: 'Reports', shortLabel: 'Reports', icon: HiChartBar, roles: ['company_admin', 'hr_manager'], module: 'reports' },
+  { to: '/dashboard/reports', label: 'Reports', icon: HiChartBar, roles: ['company_admin', 'hr_manager'], module: 'reports' },
 
-  { to: '/dashboard/documents', label: 'Documents', shortLabel: 'Docs', icon: HiDocumentText, roles: ['company_admin', 'hr_manager', 'employee'], module: 'documents' },
+  { to: '/dashboard/documents', label: 'Documents', icon: HiDocumentText, roles: ['company_admin', 'hr_manager', 'employee'], module: 'documents' },
 
   {
 
     to: '/dashboard/settings',
 
     label: 'Settings',
-
-    shortLabel: 'Settings',
 
     icon: HiCog6Tooth,
 
@@ -146,9 +140,9 @@ export const AppShell = () => {
 
 
 
-  const sidebarWidthClass = sidebarExpanded ? 'w-64' : 'w-20';
+  const sidebarWidthClass = sidebarExpanded ? 'w-64' : 'w-[5.5rem]';
 
-  const mainOffsetClass = sidebarExpanded ? 'md:left-64' : 'md:left-20';
+  const mainOffsetClass = sidebarExpanded ? 'md:left-64' : 'md:left-[5.5rem]';
 
   const navItemLayoutClass = sidebarExpanded
 
@@ -268,7 +262,7 @@ export const AppShell = () => {
 
                     ) : (
 
-                      <span className="max-w-full truncate font-medium">{item.shortLabel}</span>
+                      <span className="max-w-full text-center text-[10px] font-medium leading-tight">{item.label}</span>
 
                     )}
 
@@ -314,7 +308,7 @@ export const AppShell = () => {
 
                   ) : (
 
-                    <span className="max-w-full truncate">{item.shortLabel}</span>
+                    <span className="max-w-full text-center font-medium leading-tight">{item.label}</span>
 
                   )}
 
@@ -364,7 +358,7 @@ export const AppShell = () => {
 
                 <HiChevronRight className="h-[18px] w-[18px] shrink-0" aria-hidden />
 
-                <span className="max-w-full truncate text-[10px] font-medium leading-tight">Expand</span>
+                <span className="max-w-full text-center text-[10px] font-medium leading-tight">Expand</span>
 
               </>
 

@@ -2,6 +2,7 @@ import type { RegistrationRequest } from '../../../types';
 import { getModuleLabel } from '../../../types/modules';
 import { adminDisplayName, formatDate } from '../utils';
 import { CompanyStatusBadge } from './CompanyStatusBadge';
+import { SubscriptionStatusBadge } from './SubscriptionStatusBadge';
 
 export const CompanyDetailsContent = ({ company }: { company: RegistrationRequest }) => {
   return (
@@ -28,6 +29,15 @@ export const CompanyDetailsContent = ({ company }: { company: RegistrationReques
         <dt className="text-slate-500 dark:text-slate-400">Account status</dt>
         <dd className="text-right">
           <CompanyStatusBadge isActive={company.isActive} />
+        </dd>
+      </div>
+      <div className="flex justify-between gap-4 py-2.5 text-sm">
+        <dt className="text-slate-500 dark:text-slate-400">Subscription</dt>
+        <dd className="text-right">
+          <SubscriptionStatusBadge
+            status={company.subscriptionStatus}
+            seatCount={company.seatCount}
+          />
         </dd>
       </div>
       <div className="flex justify-between gap-4 py-2.5 text-sm">

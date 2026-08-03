@@ -523,46 +523,6 @@
           "response": []
         },
         {
-          "name": "Deactivate Company",
-          "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{accessToken}}",
-                  "type": "string"
-                }
-              ]
-            },
-            "method": "POST",
-            "header": [],
-            "url": "{{baseUrl}}/api/v1/admin/registrations/{{tenantId}}/deactivate",
-            "description": "Deactivates an approved company and all tenant users."
-          },
-          "response": []
-        },
-        {
-          "name": "Activate Company",
-          "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{accessToken}}",
-                  "type": "string"
-                }
-              ]
-            },
-            "method": "POST",
-            "header": [],
-            "url": "{{baseUrl}}/api/v1/admin/registrations/{{tenantId}}/activate",
-            "description": "Reactivates a deactivated approved company."
-          },
-          "response": []
-        },
-        {
           "name": "Get Company Modules",
           "request": {
             "auth": {

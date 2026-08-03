@@ -69,9 +69,7 @@ Authentication, multi-tenant isolation, and company onboarding. Every business r
 | POST | `/api/v1/admin/registrations` | super_admin | Create approved company + admin |
 | POST | `/api/v1/admin/registrations/:tenantId/approve` | super_admin | Approve pending registration |
 | POST | `/api/v1/admin/registrations/:tenantId/reject` | super_admin | Reject pending registration |
-| PATCH | `/api/v1/admin/registrations/:tenantId` | super_admin | Update approved company |
-| POST | `/api/v1/admin/registrations/:tenantId/deactivate` | super_admin | Deactivate company |
-| POST | `/api/v1/admin/registrations/:tenantId/activate` | super_admin | Reactivate company |
+| PATCH | `/api/v1/admin/registrations/:tenantId` | super_admin | Update approved company (incl. `isActive`) |
 | GET | `/api/v1/admin/registrations/:tenantId/modules` | super_admin | Read tenant module flags |
 | PATCH | `/api/v1/admin/registrations/:tenantId/modules` | super_admin | Update tenant module flags |
 

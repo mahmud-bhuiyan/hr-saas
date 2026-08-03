@@ -102,6 +102,7 @@ export interface UpdateCompanyInput {
   adminEmail?: string;
   adminFirstName?: string;
   adminLastName?: string;
+  isActive?: boolean;
 }
 
 export interface RegisterPendingResponse {

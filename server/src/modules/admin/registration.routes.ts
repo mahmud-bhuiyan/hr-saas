@@ -2,10 +2,8 @@ import { Router } from 'express';
 import type { ServerEnv } from '../../config/env.js';
 import { authenticate, authorize } from '../../middleware/auth.js';
 import {
-  activateCompanyHandler,
   approveRegistrationHandler,
   createCompanyHandler,
-  deactivateCompanyHandler,
   getTenantModulesHandler,
   listRegistrationsHandler,
   rejectRegistrationHandler,
@@ -44,14 +42,6 @@ export const createRegistrationRoutes = (env: ServerEnv): Router => {
 
   router.patch('/:tenantId/modules', (req, res) => {
     void updateTenantModulesHandler(req, res);
-  });
-
-  router.post('/:tenantId/deactivate', (req, res) => {
-    void deactivateCompanyHandler(req, res);
-  });
-
-  router.post('/:tenantId/activate', (req, res) => {
-    void activateCompanyHandler(req, res);
   });
 
   return router;

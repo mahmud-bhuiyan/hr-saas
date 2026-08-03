@@ -282,22 +282,6 @@ export const updateCompany = async (
   return json.data;
 }
 
-export const deactivateCompany = async (tenantId: string): Promise<RegistrationRequest> => {
-  const json = await apiFetch<ApiSuccessResponse<RegistrationRequest>>(
-    `/api/v1/admin/registrations/${tenantId}/deactivate`,
-    { method: 'POST' }
-  );
-  return json.data;
-}
-
-export const activateCompany = async (tenantId: string): Promise<RegistrationRequest> => {
-  const json = await apiFetch<ApiSuccessResponse<RegistrationRequest>>(
-    `/api/v1/admin/registrations/${tenantId}/activate`,
-    { method: 'POST' }
-  );
-  return json.data;
-}
-
 export const fetchCompanyModules = async (tenantId: string): Promise<TenantModulesResult> => {
   const json = await apiFetch<ApiSuccessResponse<TenantModulesResult>>(
     `/api/v1/admin/registrations/${tenantId}/modules`

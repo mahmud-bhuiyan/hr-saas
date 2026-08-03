@@ -20,13 +20,15 @@ export const updateCompanySchema = z
     adminEmail: z.string().email().transform((v) => v.toLowerCase().trim()).optional(),
     adminFirstName: z.string().trim().optional(),
     adminLastName: z.string().trim().optional(),
+    isActive: z.boolean().optional(),
   })
   .refine(
     (data) =>
       data.companyName !== undefined ||
       data.adminEmail !== undefined ||
       data.adminFirstName !== undefined ||
-      data.adminLastName !== undefined,
+      data.adminLastName !== undefined ||
+      data.isActive !== undefined,
     { message: 'At least one field must be provided' }
   );
 

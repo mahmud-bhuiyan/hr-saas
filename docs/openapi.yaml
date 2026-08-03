@@ -655,7 +655,7 @@ paths:
     patch:
       tags: [Admin]
       summary: Update approved company
-      description: Updates company name and/or company admin profile fields. Requires `super_admin`.
+      description: Updates company name, company admin profile fields, and/or account status (`isActive`). Setting `isActive` to false deactivates the tenant and all its users. Requires `super_admin`.
       operationId: updateCompany
       security:
         - bearerAuth: []
@@ -676,6 +676,7 @@ paths:
               adminEmail: admin@acme.com
               adminFirstName: Jane
               adminLastName: Admin
+              isActive: true
       responses:
         '200':
           description: Company updated
@@ -704,96 +705,6 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
         '409':
           description: Email already in use or company not approved
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-
-  /api/v1/admin/registrations/{tenantId}/deactivate:
-    post:
-      tags: [Admin]
-      summary: Deactivate approved company
-      description: Sets tenant and all users to inactive. Requires `super_admin`.
-      operationId: deactivateCompany
-      security:
-        - bearerAuth: []
-      parameters:
-        - name: tenantId
-          in: path
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: Company deactivated
-          content:
-            application/json:
-              schema:
-                type: object
-                required: [status, data]
-                properties:
-                  status:
-                    type: string
-                    enum: [ok]
-                  data:
-                    $ref: '#/components/schemas/RegistrationRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '404':
-          description: Company not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '409':
-          description: Company already inactive or not approved
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-
-  /api/v1/admin/registrations/{tenantId}/activate:
-    post:
-      tags: [Admin]
-      summary: Reactivate approved company
-      description: Sets tenant and all users to active. Requires `super_admin`.
-      operationId: activateCompany
-      security:
-        - bearerAuth: []
-      parameters:
-        - name: tenantId
-          in: path
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: Company reactivated
-          content:
-            application/json:
-              schema:
-                type: object
-                required: [status, data]
-                properties:
-                  status:
-                    type: string
-                    enum: [ok]
-                  data:
-                    $ref: '#/components/schemas/RegistrationRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '404':
-          description: Company not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '409':
-          description: Company already active or not approved
           content:
             application/json:
               schema:
@@ -5559,6 +5470,9 @@ components:
           type: string
         adminLastName:
           type: string
+        isActive:
+          type: boolean
+          description: When false, deactivates the company and all tenant users
 
     AuthSuccessResponse:
       type: object

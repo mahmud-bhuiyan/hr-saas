@@ -17,6 +17,7 @@ export const toEditForm = (row: RegistrationRequest): EditCompanyForm => {
     adminEmail: row.adminEmail,
     adminFirstName: row.adminFirstName ?? '',
     adminLastName: row.adminLastName ?? '',
+    isActive: row.isActive,
   };
 }
 
@@ -25,6 +26,7 @@ export type EditCompanyForm = {
   adminEmail: string;
   adminFirstName: string;
   adminLastName: string;
+  isActive: boolean;
 };
 
 export const editFormKeys: Array<keyof EditCompanyForm> = [
@@ -32,6 +34,7 @@ export const editFormKeys: Array<keyof EditCompanyForm> = [
   'adminEmail',
   'adminFirstName',
   'adminLastName',
+  'isActive',
 ];
 
 export type CompaniesTab = 'pending' | 'registered';

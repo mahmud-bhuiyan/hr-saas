@@ -8,10 +8,8 @@ import { PageHeader } from '../../components/ui/PageHeader';
 import { Tabs } from '../../components/ui/Tabs';
 import {
   ApiError,
-  activateCompany,
   approveRegistration,
   createCompany,
-  deactivateCompany,
   fetchApprovedCompanies,
   fetchCompanyModules,
   fetchPendingRegistrations,
@@ -29,11 +27,9 @@ import {
 import type { CreateCompanyInput, RegistrationRequest, UpdateCompanyInput } from '../../types';
 import { areRequiredFieldsFilled, hasFormChanges, pickChangedFields } from '../../utils/form';
 import {
-  ActivateCompanyModal,
   ApproveRegistrationModal,
   CompanyDetailsModal,
   CreateCompanyModal,
-  DeactivateCompanyModal,
   EditCompanyModal,
   RejectRegistrationModal,
 } from './components/RegistrationsModals';
@@ -62,8 +58,6 @@ export const RegistrationsPage = () => {
   const [editTarget, setEditTarget] = useState<RegistrationRequest | null>(null);
   const [editForm, setEditForm] = useState<EditCompanyForm | null>(null);
   const [editOriginal, setEditOriginal] = useState<EditCompanyForm | null>(null);
-  const [deactivateTarget, setDeactivateTarget] = useState<RegistrationRequest | null>(null);
-  const [activateTarget, setActivateTarget] = useState<RegistrationRequest | null>(null);
   const [detailsTarget, setDetailsTarget] = useState<RegistrationRequest | null>(null);
   const [modulesTarget, setModulesTarget] = useState<RegistrationRequest | null>(null);
   const [modulesSelection, setModulesSelection] = useState<TenantModuleId[]>([]);
@@ -140,32 +134,6 @@ export const RegistrationsPage = () => {
     },
     onError: (err) => {
       toast.error(err instanceof ApiError ? err.message : 'Update failed');
-    },
-  });
-
-  const deactivateMutation = useMutation({
-    mutationFn: deactivateCompany,
-    onSuccess: (company) => {
-      setDeactivateTarget(null);
-      toast.success(`${company.companyName} was deactivated. Users can no longer sign in.`);
-      invalidateRegistrations();
-    },
-    onError: (err) => {
-      toast.error(err instanceof ApiError ? err.message : 'Deactivation failed');
-      setDeactivateTarget(null);
-    },
-  });
-
-  const activateMutation = useMutation({
-    mutationFn: activateCompany,
-    onSuccess: (company) => {
-      setActivateTarget(null);
-      toast.success(`${company.companyName} was reactivated.`);
-      invalidateRegistrations();
-    },
-    onError: (err) => {
-      toast.error(err instanceof ApiError ? err.message : 'Activation failed');
-      setActivateTarget(null);
     },
   });
 
@@ -288,6 +256,7 @@ export const RegistrationsPage = () => {
       adminEmail: editForm.adminEmail.trim(),
       adminFirstName: editForm.adminFirstName.trim(),
       adminLastName: editForm.adminLastName.trim(),
+      isActive: editForm.isActive,
     };
 
     const changes = pickChangedFields(
@@ -348,10 +317,7 @@ export const RegistrationsPage = () => {
     JSON.stringify([...modulesOriginal].sort());
 
   const companyActionPending =
-    updateMutation.isPending ||
-    deactivateMutation.isPending ||
-    activateMutation.isPending ||
-    updateModulesMutation.isPending;
+    updateMutation.isPending || updateModulesMutation.isPending;
 
   return (
     <PageContainer>
@@ -403,8 +369,6 @@ export const RegistrationsPage = () => {
             onManageModules={(row) => {
               void openModulesModal(row);
             }}
-            onDeactivate={setDeactivateTarget}
-            onActivate={setActivateTarget}
             companyActionPending={companyActionPending}
           />
         )}
@@ -454,36 +418,6 @@ export const RegistrationsPage = () => {
         onFormChange={(updater) => setEditForm((f) => (f ? updater(f) : f))}
         loading={updateMutation.isPending}
         submitDisabled={!canSubmitEdit}
-      />
-
-      <DeactivateCompanyModal
-        target={deactivateTarget}
-        onClose={() => {
-          if (!deactivateMutation.isPending) {
-            setDeactivateTarget(null);
-          }
-        }}
-        onConfirm={() => {
-          if (deactivateTarget) {
-            deactivateMutation.mutate(deactivateTarget.tenantId);
-          }
-        }}
-        loading={deactivateMutation.isPending}
-      />
-
-      <ActivateCompanyModal
-        target={activateTarget}
-        onClose={() => {
-          if (!activateMutation.isPending) {
-            setActivateTarget(null);
-          }
-        }}
-        onConfirm={() => {
-          if (activateTarget) {
-            activateMutation.mutate(activateTarget.tenantId);
-          }
-        }}
-        loading={activateMutation.isPending}
       />
 
       <ManageCompanyModulesModal
