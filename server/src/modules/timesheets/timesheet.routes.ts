@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import type { ServerEnv } from '../../config/env.js';
 import { authenticate, authorizePermission } from '../../middleware/auth.js';
+import { requireModule } from '../../middleware/module-access.js';
 import { requireTenant } from '../../middleware/tenant.js';
 import {
   approveTimesheetHandler,
@@ -16,7 +17,7 @@ import {
 export const createTimesheetRoutes = (env: ServerEnv): Router => {
   const router = Router();
 
-  router.use(authenticate(env), requireTenant());
+  router.use(authenticate(env), requireTenant(), requireModule('timesheets'));
 
   router.post('/generate', authorizePermission('timesheet:read:own'), (req, res) => {
     void generateTimesheetHandler(env)(req, res);

@@ -1,3 +1,5 @@
+import type { TenantModuleId } from './modules';
+
 export type UserRole =
   | 'super_admin'
   | 'company_admin'
@@ -35,6 +37,7 @@ export interface AuthUser {
   avatarUrl?: string;
   colorScheme?: ColorScheme;
   themeColor?: ThemeColor;
+  enabledModules?: TenantModuleId[];
 }
 
 export interface UserProfile extends AuthUser {
@@ -91,6 +94,7 @@ export interface CreateCompanyInput {
   password: string;
   firstName?: string;
   lastName?: string;
+  enabledModules?: TenantModuleId[];
 }
 
 export interface UpdateCompanyInput {
@@ -133,6 +137,16 @@ export interface RegistrationRequest {
     | 'exempt'
     | 'none';
   seatCount?: number;
+  enabledModules?: TenantModuleId[];
+}
+
+export interface TenantModulesResult {
+  tenantId: string;
+  enabledModules: TenantModuleId[];
+}
+
+export interface UpdateTenantModulesInput {
+  enabledModules: TenantModuleId[];
 }
 
 export type EmployeeStatus = 'active' | 'on_leave' | 'terminated';
@@ -772,6 +786,26 @@ export interface PaginatedAttendanceLogs {
   total: number;
   page: number;
   limit: number;
+}
+
+export interface AttendanceCalendarDay {
+  date: string;
+  totalMinutes: number;
+  sessions: AttendanceLog[];
+}
+
+export interface AttendanceCalendarSummary {
+  totalMinutes: number;
+  daysPresent: number;
+  weekMinutes: number;
+  todayMinutes: number;
+}
+
+export interface AttendanceCalendar {
+  year: number;
+  month: number;
+  days: AttendanceCalendarDay[];
+  summary: AttendanceCalendarSummary;
 }
 
 export interface ClockInInput {

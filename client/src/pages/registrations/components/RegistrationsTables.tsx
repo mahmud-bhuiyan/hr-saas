@@ -1,5 +1,6 @@
 import {
   HiCheckCircle,
+  HiCog6Tooth,
   HiEye,
   HiPencilSquare,
   HiXCircle,
@@ -165,6 +166,7 @@ interface RegisteredCompaniesTableProps {
   isError: boolean;
   onViewDetails: (row: RegistrationRequest) => void;
   onEdit: (row: RegistrationRequest) => void;
+  onManageModules: (row: RegistrationRequest) => void;
   onDeactivate: (row: RegistrationRequest) => void;
   onActivate: (row: RegistrationRequest) => void;
   companyActionPending: boolean;
@@ -176,6 +178,7 @@ export const RegisteredCompaniesTable = ({
   isError,
   onViewDetails,
   onEdit,
+  onManageModules,
   onDeactivate,
   onActivate,
   companyActionPending,
@@ -257,6 +260,16 @@ export const RegisteredCompaniesTable = ({
             ),
           },
           {
+            key: "modules",
+            header: "Modules",
+            width: 10,
+            render: (row) => (
+              <span className="text-slate-600 dark:text-slate-400">
+                {row.enabledModules?.length ?? 0}/10
+              </span>
+            ),
+          },
+          {
             key: "registered",
             header: "Registered",
             width: 10,
@@ -288,6 +301,15 @@ export const RegisteredCompaniesTable = ({
                   icon={<HiPencilSquare className="h-4 w-4 text-brand-600" />}
                 >
                   Edit
+                </Button>
+                <Button
+                  display="both"
+                  variant="secondary"
+                  onClick={() => onManageModules(row)}
+                  disabled={companyActionPending}
+                  icon={<HiCog6Tooth className="h-4 w-4 text-brand-600" />}
+                >
+                  Modules
                 </Button>
                 {row.isActive ? (
                   <Button

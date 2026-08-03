@@ -1,5 +1,6 @@
 import type { ServerEnv } from '../../config/env.js';
 import type { ColorScheme, ThemeColor, UserRole } from '../../types/index.js';
+import { resolveEnabledModules, type TenantModuleId } from '../../types/modules.js';
 import { findUserByEmail } from '../admin/admin.service.js';
 import { User, type IUserDocument } from '../admin/user.model.js';
 import { hashPassword, comparePassword } from '../../utils/password.js';
@@ -24,6 +25,7 @@ export interface UserProfile {
   isActive: boolean;
   createdAt: string;
   updatedAt: string;
+  enabledModules?: TenantModuleId[];
 }
 
 export interface UpdateProfileResult {
@@ -33,10 +35,12 @@ export interface UpdateProfileResult {
 
 const toUserProfile = async (user: IUserDocument): Promise<UserProfile> => {
   let companyName: string | undefined;
+  let enabledModules: TenantModuleId[] | undefined;
 
   if (user.tenantId) {
-    const tenant = await Tenant.findById(user.tenantId).select('name');
+    const tenant = await Tenant.findById(user.tenantId).select('name enabledModules').lean();
     companyName = tenant?.name;
+    enabledModules = resolveEnabledModules(tenant?.enabledModules);
   }
 
   return {
@@ -53,6 +57,7 @@ const toUserProfile = async (user: IUserDocument): Promise<UserProfile> => {
     isActive: user.isActive,
     createdAt: user.createdAt.toISOString(),
     updatedAt: user.updatedAt.toISOString(),
+    enabledModules,
   };
 }
 

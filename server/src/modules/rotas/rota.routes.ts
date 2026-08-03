@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import type { ServerEnv } from '../../config/env.js';
 import { authenticate, authorizePermission } from '../../middleware/auth.js';
+import { requireModule } from '../../middleware/module-access.js';
 import { requireTenant } from '../../middleware/tenant.js';
 import {
   claimShiftHandler,
@@ -15,7 +16,7 @@ import {
 export const createRotaRoutes = (env: ServerEnv): Router => {
   const router = Router();
 
-  router.use(authenticate(env), requireTenant());
+  router.use(authenticate(env), requireTenant(), requireModule('rotas'));
 
   router.post('/publish', authorizePermission('rota:manage'), (req, res) => {
     void publishRotaHandler(env)(req, res);

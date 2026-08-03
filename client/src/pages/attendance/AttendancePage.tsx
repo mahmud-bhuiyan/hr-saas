@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Navigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { PageContainer } from '../../components/ui/PageContainer';
@@ -13,27 +13,45 @@ import {
   clockOut,
   fetchAttendanceSettings,
   fetchMyAttendance,
+  fetchMyAttendanceCalendar,
   fetchTeamLiveAttendance,
   patchAttendanceLog,
 } from '../../lib/api';
 import type { AttendanceLog, PatchAttendanceInput } from '../../types';
 import { hasPermission } from '../../utils/permissions';
+import './attendance-keka.css';
+import { AttendanceActionsCard } from './components/AttendanceActionsCard';
 import { AttendanceEmployeeCorrections } from './components/AttendanceEmployeeCorrections';
-import { AttendanceClockCard } from './components/AttendanceClockCard';
 import { AttendanceCorrectionModal } from './components/AttendanceCorrectionModal';
-import { AttendanceHistoryTable } from './components/AttendanceHistoryTable';
+import { AttendanceLogsSection } from './components/AttendanceLogsSection';
+import { AttendanceStatsCard } from './components/AttendanceStatsCard';
 import { AttendanceTeamBoard } from './components/AttendanceTeamBoard';
-import type { AttendanceTab } from './utils';
+import { AttendanceTimingsCard } from './components/AttendanceTimingsCard';
+import type { AttendanceDisplayMode, AttendanceLogsTab, AttendanceTab } from './utils';
+import { ATTENDANCE_24H_KEY, todayDateString } from './utils';
 
 const TENANT_ATTENDANCE_ROLES = ['company_admin', 'hr_manager', 'manager', 'employee'] as const;
 
 export const AttendancePage = () => {
   const { user } = useAuth();
   const queryClient = useQueryClient();
+  const now = new Date();
 
   const [activeTab, setActiveTab] = useState<AttendanceTab>('my-attendance');
+  const [logsTab, setLogsTab] = useState<AttendanceLogsTab>('attendance-log');
+  const [displayMode, setDisplayMode] = useState<AttendanceDisplayMode>('calendar');
   const [historyPage, setHistoryPage] = useState(1);
   const [correctLog, setCorrectLog] = useState<AttendanceLog | null>(null);
+  const [calendarYear, setCalendarYear] = useState(now.getFullYear());
+  const [calendarMonth, setCalendarMonth] = useState(now.getMonth() + 1);
+  const [selectedDate, setSelectedDate] = useState<string | null>(todayDateString());
+  const [use24Hour, setUse24Hour] = useState(
+    () => localStorage.getItem(ATTENDANCE_24H_KEY) === 'true'
+  );
+
+  useEffect(() => {
+    localStorage.setItem(ATTENDANCE_24H_KEY, String(use24Hour));
+  }, [use24Hour]);
 
   const canAccess =
     user &&
@@ -41,6 +59,11 @@ export const AttendancePage = () => {
   const canClock = user && hasPermission(user.role, 'attendance:clock:own');
   const canReadTeam = user && hasPermission(user.role, 'attendance:read:team');
   const canManage = user && hasPermission(user.role, 'attendance:manage');
+  const showSettingsLink = user?.role === 'company_admin';
+
+  const currentYear = now.getFullYear();
+  const currentMonth = now.getMonth() + 1;
+  const viewingCurrentMonth = calendarYear === currentYear && calendarMonth === currentMonth;
 
   const settingsQuery = useQuery({
     queryKey: ['attendance', 'settings'],
@@ -50,10 +73,36 @@ export const AttendancePage = () => {
 
   const statusQuery = useMyAttendanceStatus();
 
+  const calendarQuery = useQuery({
+    queryKey: ['attendance', 'me', 'calendar', calendarYear, calendarMonth],
+    queryFn: () => fetchMyAttendanceCalendar(calendarYear, calendarMonth),
+    enabled: Boolean(canClock && activeTab === 'my-attendance'),
+    retry: false,
+  });
+
+  const currentMonthCalendarQuery = useQuery({
+    queryKey: ['attendance', 'me', 'calendar', currentYear, currentMonth],
+    queryFn: () => fetchMyAttendanceCalendar(currentYear, currentMonth),
+    enabled: Boolean(canClock && activeTab === 'my-attendance' && !viewingCurrentMonth),
+    retry: false,
+  });
+
+  const statsCalendar = viewingCurrentMonth ? calendarQuery.data : currentMonthCalendarQuery.data;
+  const statsLoading = viewingCurrentMonth
+    ? calendarQuery.isLoading
+    : currentMonthCalendarQuery.isLoading;
+
+  const sessionCalendarDays = useMemo(
+    () => statsCalendar?.days ?? calendarQuery.data?.days ?? [],
+    [statsCalendar?.days, calendarQuery.data?.days]
+  );
+
   const historyQuery = useQuery({
     queryKey: ['attendance', 'me', historyPage],
     queryFn: () => fetchMyAttendance(historyPage),
-    enabled: Boolean(canClock),
+    enabled: Boolean(
+      canClock && activeTab === 'my-attendance' && logsTab === 'attendance-log' && displayMode === 'list'
+    ),
     retry: false,
   });
 
@@ -134,6 +183,12 @@ export const AttendancePage = () => {
     },
   });
 
+  const handleMonthSelect = (year: number, month: number): void => {
+    setCalendarYear(year);
+    setCalendarMonth(month);
+    setSelectedDate(null);
+  };
+
   if (!canAccess) {
     return <Navigate to="/dashboard" replace />;
   }
@@ -144,26 +199,35 @@ export const AttendancePage = () => {
     ...(canManage ? [{ id: 'hr-corrections' as const, label: 'HR corrections' }] : []),
   ];
 
+  const clockedIn = statusQuery.data?.clockedIn ?? false;
+  const session = statusQuery.data?.session ?? null;
+  const clockLoading = clockInMutation.isPending || clockOutMutation.isPending;
+
   return (
     <PageContainer>
-      <PageHeader
-        label="Operations"
-        title="Attendance"
-        description={
-          canReadTeam
-            ? 'Clock in and out, view history, and see who is working now.'
-            : 'Clock in and out and view your attendance history.'
-        }
-      />
+      {activeTab !== 'my-attendance' && (
+        <PageHeader
+          label="Operations"
+          title="Attendance"
+          description={
+            canReadTeam
+              ? 'Clock in and out, view history, and see who is working now.'
+              : 'Clock in and out and view your attendance history.'
+          }
+        />
+      )}
 
       <Tabs tabs={tabs} activeId={activeTab} onChange={(id) => setActiveTab(id as AttendanceTab)} className="mb-6" />
 
       {activeTab === 'my-attendance' && canClock && (
-        <div className="space-y-6">
+        <div className="keka-attendance space-y-5">
           {missingEmployeeLink ? (
-            <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+            <div
+              className="rounded-lg border px-4 py-3 text-sm"
+              style={{ borderColor: '#f59e0b66', backgroundColor: '#f59e0b15', color: '#fcd34d' }}
+            >
               <p className="font-medium">No employee profile linked to your account</p>
-              <p className="mt-1">
+              <p className="mt-1 keka-muted">
                 Attendance is recorded against employee records. Your user account is not linked to
                 one, so personal clock-in and history are unavailable.
                 {canReadTeam
@@ -173,48 +237,53 @@ export const AttendancePage = () => {
             </div>
           ) : (
             <>
-              <AttendanceClockCard
-                clockedIn={statusQuery.data?.clockedIn ?? false}
-                session={statusQuery.data?.session ?? null}
-                gpsEnabled={settingsQuery.data?.attendanceGpsEnabled ?? false}
-                loading={clockInMutation.isPending || clockOutMutation.isPending}
-                onClockIn={(withGps) => clockInMutation.mutate(withGps)}
-                onClockOut={() => clockOutMutation.mutate()}
-              />
-
-              <div>
-                <h2 className="mb-3 text-lg font-semibold text-slate-900">My history</h2>
-                <AttendanceHistoryTable
-                  logs={historyQuery.data?.logs ?? []}
-                  loading={historyQuery.isLoading}
-                  canCorrect={Boolean(canManage)}
-                  onCorrect={setCorrectLog}
+              <div className="grid gap-4 xl:grid-cols-3">
+                <AttendanceStatsCard
+                  summary={statsCalendar?.summary}
+                  canReadTeam={Boolean(canReadTeam)}
+                  loading={statsLoading}
                 />
-                {(historyQuery.data?.total ?? 0) > (historyQuery.data?.limit ?? 20) && (
-                  <div className="mt-4 flex justify-center gap-2">
-                    <button
-                      type="button"
-                      className="rounded-lg border border-slate-200 px-3 py-1 text-sm disabled:opacity-50"
-                      disabled={historyPage <= 1}
-                      onClick={() => setHistoryPage((p) => p - 1)}
-                    >
-                      Previous
-                    </button>
-                    <span className="px-2 py-1 text-sm text-slate-600">Page {historyPage}</span>
-                    <button
-                      type="button"
-                      className="rounded-lg border border-slate-200 px-3 py-1 text-sm disabled:opacity-50"
-                      disabled={
-                        historyPage * (historyQuery.data?.limit ?? 20) >=
-                        (historyQuery.data?.total ?? 0)
-                      }
-                      onClick={() => setHistoryPage((p) => p + 1)}
-                    >
-                      Next
-                    </button>
-                  </div>
-                )}
+                <AttendanceTimingsCard
+                  session={session}
+                  clockedIn={clockedIn}
+                  calendarDays={sessionCalendarDays}
+                  use24Hour={use24Hour}
+                />
+                <AttendanceActionsCard
+                  clockedIn={clockedIn}
+                  session={session}
+                  gpsEnabled={settingsQuery.data?.attendanceGpsEnabled ?? false}
+                  loading={clockLoading}
+                  showSettingsLink={showSettingsLink}
+                  use24Hour={use24Hour}
+                  onClockIn={(withGps) => clockInMutation.mutate(withGps)}
+                  onClockOut={() => clockOutMutation.mutate()}
+                />
               </div>
+
+              <AttendanceLogsSection
+                logsTab={logsTab}
+                onLogsTabChange={setLogsTab}
+                displayMode={displayMode}
+                onDisplayModeChange={setDisplayMode}
+                use24Hour={use24Hour}
+                onUse24HourChange={setUse24Hour}
+                calendarYear={calendarYear}
+                calendarMonth={calendarMonth}
+                calendarDays={calendarQuery.data?.days ?? []}
+                calendarLoading={calendarQuery.isLoading}
+                selectedDate={selectedDate}
+                onMonthSelect={handleMonthSelect}
+                onDaySelect={setSelectedDate}
+                historyLogs={historyQuery.data?.logs ?? []}
+                historyLoading={historyQuery.isLoading}
+                historyPage={historyPage}
+                historyTotal={historyQuery.data?.total ?? 0}
+                historyLimit={historyQuery.data?.limit ?? 20}
+                onHistoryPageChange={setHistoryPage}
+                canCorrect={Boolean(canManage)}
+                onCorrect={setCorrectLog}
+              />
             </>
           )}
         </div>

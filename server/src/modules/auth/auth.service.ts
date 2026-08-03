@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 import type { ServerEnv } from '../../config/env.js';
 import type { ColorScheme, ThemeColor, UserRole } from '../../types/index.js';
+import { resolveEnabledModules, type TenantModuleId } from '../../types/modules.js';
 import { hashPassword, comparePassword } from '../../utils/password.js';
 import {
   signAccessToken,
@@ -22,6 +23,7 @@ export interface AuthUser {
   avatarUrl?: string;
   colorScheme?: ColorScheme;
   themeColor?: ThemeColor;
+  enabledModules?: TenantModuleId[];
 }
 
 export interface AuthTokens {
@@ -42,7 +44,14 @@ export interface RegisterPendingResult {
   message: string;
 }
 
-const toAuthUser = (user: IUserDocument): AuthUser => {
+const toAuthUser = async (user: IUserDocument): Promise<AuthUser> => {
+  let enabledModules: TenantModuleId[] | undefined;
+
+  if (user.tenantId) {
+    const tenant = await Tenant.findById(user.tenantId).select('enabledModules').lean();
+    enabledModules = resolveEnabledModules(tenant?.enabledModules);
+  }
+
   return {
     id: user._id.toString(),
     email: user.email,
@@ -53,6 +62,7 @@ const toAuthUser = (user: IUserDocument): AuthUser => {
     avatarUrl: user.avatarUrl,
     colorScheme: user.colorScheme ?? 'light',
     themeColor: user.themeColor ?? 'green',
+    enabledModules,
   };
 }
 
@@ -188,7 +198,7 @@ export const loginUser = async (input: LoginInput, env: ServerEnv): Promise<Auth
   await assertUserCanAuthenticate(user);
 
   return {
-    user: toAuthUser(user),
+    user: await toAuthUser(user),
     tokens: issueTokens(user, env),
   };
 }
@@ -205,7 +215,7 @@ export const getUserById = async (userId: string): Promise<AuthUser | null> => {
     return null;
   }
 
-  return toAuthUser(user);
+  return await toAuthUser(user);
 }
 
 export class AuthServiceError extends Error {

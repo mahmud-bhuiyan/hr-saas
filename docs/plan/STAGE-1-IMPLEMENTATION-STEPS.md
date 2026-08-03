@@ -35,6 +35,7 @@ Features added during implementation that extend the original step list. Keep th
 | Logo/favicon display settings | 7 | Super admin: logo size/fit/name toggle; favicon MIME type + preview |
 | Document storage (Step 6) | 6 | S3 presigned upload/download; `document:read:own` for employees; MinIO in docker compose |
 | User light/dark theme preference | 3 | Per-user `colorScheme` on User model; `PATCH /api/v1/auth/me`; header toggle; `ThemeContext` + localStorage cache; dark-mode styling on dashboard surfaces |
+| Per-company module access control | 2 | Super admin toggles tenant `enabledModules`; server middleware + client nav guards — see [18-module-access-control.md](./modules/18-module-access-control.md) |
 
 ---
 
@@ -159,6 +160,19 @@ Features added during implementation that extend the original step list. Keep th
 - [x] Automated demo seed scripts and demo-era unit tests removed intentionally — manual staging data only (`npm run seed:superadmin` for platform bootstrap)
 
 **Review:** Stage 1 complete. See [STAGE-3-IMPLEMENTATION-STEPS.md](./STAGE-3-IMPLEMENTATION-STEPS.md) for Stage 3.
+
+---
+
+## Module access control — Done when
+
+- [x] `enabledModules` on Tenant model with defaults for backward compatibility
+- [x] Super admin GET/PATCH `/api/v1/admin/registrations/:tenantId/modules`
+- [x] `requireModule` middleware on all gated module routers
+- [x] Login and `GET /auth/me` return `enabledModules` for tenant users
+- [x] Client nav, global search, dashboard links, and route guards respect enabled modules
+- [x] Super admin Manage modules modal on companies page
+- [x] OpenAPI + Postman updated
+- [x] Plan: [modules/18-module-access-control.md](./modules/18-module-access-control.md)
 
 ---
 

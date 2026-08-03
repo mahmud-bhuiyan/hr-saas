@@ -138,6 +138,10 @@ This flow covers **time → pay data → expenses → compliance → monetizatio
 - [x] My attendance history (tab on attendance page)
 - [x] Live team board (tab on attendance page) — manager/HR
 - [x] HR attendance correction modal
+- [x] Summary stat cards (hours today/week, days present, status)
+- [x] Month calendar view with day detail panel
+- [x] Logs sub-tabs (Calendar + Attendance log list)
+- [x] 24-hour format toggle on attendance logs
 
 ### Timesheets
 - [x] My timesheet — weekly grid (`/dashboard/timesheets`)

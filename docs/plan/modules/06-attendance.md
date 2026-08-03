@@ -66,6 +66,10 @@ Employees clock in and out via the web app. Managers see who is currently workin
 | POST | `/api/v1/attendance/clock-out` | `attendance:clock:own` | End open session |
 | GET | `/api/v1/attendance/me` | `attendance:read:own` | Own history (paginated) |
 | GET | `/api/v1/attendance/me/status` | `attendance:read:own` | Current open session or null |
+| GET | `/api/v1/attendance/me/calendar` | `attendance:read:own` | Month calendar with daily totals and summary stats |
+| GET | `/api/v1/attendance/settings` | `attendance:clock:own` | Tenant GPS setting |
+| PATCH | `/api/v1/attendance/settings` | `company_admin` | Update `attendanceGpsEnabled` |
+| GET | `/api/v1/attendance/employee/{employeeId}` | `attendance:manage` / `attendance:read:team` | Employee history (paginated) |
 | GET | `/api/v1/attendance/team/live` | `attendance:read:team` | Employees currently clocked in |
 | PATCH | `/api/v1/attendance/:id` | `attendance:manage` | HR correction (clockIn/clockOut/notes) |
 
@@ -99,21 +103,38 @@ Employees clock in and out via the web app. Managers see who is currently workin
 
 ## 6. UI Screens & Flows
 
-### Screen: Attendance (employee)
-- **Route:** `/dashboard/attendance`
-- **Access:** all tenant roles
-- **Elements:** large clock-in/out button, current session timer, history table
-- **States:** loading, not clocked in, clocked in, error (already in)
+### Screen: Attendance — My attendance tab (Keka-inspired)
+- **Route:** `/dashboard/attendance` (tab: My attendance)
+- **Access:** all tenant roles with linked employee record
+- **Elements:**
+  - **Summary cards:** hours today, hours this week, days present this month, clock status
+  - **Timings card:** week strip (M–S), active session / today duration, progress bar
+  - **Actions card:** live clock, clock in/out (with GPS consent when enabled), quick links (timesheet, settings)
+  - **Logs section:** sub-tabs **Calendar** (default) and **Attendance log**
+  - **Calendar:** month grid with daily hour badges; day detail panel (sessions, gross/effective hours, HR correct)
+  - **Attendance log:** paginated history table (unchanged behaviour)
+  - **24-hour format toggle** (local preference, display only)
+- **States:** loading, not clocked in, clocked in, missing employee link
 
-### Screen: Live team board
-- **Route:** `/dashboard/attendance/team`
+### Screen: Attendance — Team live board tab
+- **Route:** `/dashboard/attendance` (tab: Team live board)
 - **Access:** manager, hr_manager, company_admin
 - **Elements:** table of clocked-in employees with clock-in time
 
+### Screen: Attendance — HR corrections tab
+- **Route:** `/dashboard/attendance` (tab: HR corrections)
+- **Access:** hr_manager, company_admin
+- **Elements:** employee picker + history table + correction modal
+
 ### Screen: HR correction modal
-- **Route:** modal on attendance history (HR view)
+- **Route:** modal on attendance history or calendar day detail (HR view)
 - **Access:** hr_manager, company_admin
 - **Elements:** edit clockIn/clockOut, notes field
+
+### Screen: Attendance settings
+- **Route:** `/dashboard/settings/attendance`
+- **Access:** company_admin
+- **Elements:** GPS toggle
 
 ### User flow
 
@@ -156,22 +177,27 @@ HR opens employee history → corrects missed punch → audit log entry
 ## 10. Tasks Breakdown
 
 ### Backend
-- [ ] Model + indexes
-- [ ] Validation (Zod)
-- [ ] Service layer (clock-in/out, live board, corrections)
-- [ ] Routes + RBAC
-- [ ] Audit log hooks
+- [x] Model + indexes
+- [x] Validation (Zod)
+- [x] Service layer (clock-in/out, live board, corrections)
+- [x] Routes + RBAC
+- [x] Audit log hooks
+- [x] `GET /me/calendar` — month grouping + summary stats
 
 ### Frontend
-- [ ] Attendance page with clock button
-- [ ] History table with pagination
-- [ ] Team live board
-- [ ] HR correction modal
-- [ ] GPS consent banner (conditional)
+- [x] Attendance page with clock button
+- [x] History table with pagination
+- [x] Team live board
+- [x] HR correction modal
+- [x] GPS consent banner (conditional)
+- [x] Keka-style My attendance tab — summary cards, timings card, actions card
+- [x] Month calendar with day detail panel
+- [x] Logs sub-tabs (Calendar + Attendance log)
+- [x] 24-hour format toggle
 
 ### Integration
 - [x] Sample attendance sessions on staging (manual setup)
-- [ ] OpenAPI + Postman
+- [x] OpenAPI + Postman
 
 **Estimate:** 5 days
 
@@ -181,13 +207,19 @@ HR opens employee history → corrects missed punch → audit log entry
 
 - [ ] Auto clock-out at midnight for forgotten sessions?
 - [ ] Break tracking in Stage 2 or defer to Stage 3?
+- [ ] On-time arrival % and break minutes (Keka-style stats — needs shift/schedule data)
+- [ ] Overtime / attendance request tabs (Keka reference — future scope)
 
 ---
 
 ## 12. Acceptance Criteria
 
-- [ ] Employee can clock in and out; cannot double clock-in
-- [ ] Manager sees live team attendance for direct reports
-- [ ] HR can correct a missed punch with audit trail
-- [ ] GPS off by default; works when tenant enables it
-- [ ] OpenAPI and Postman updated
+- [x] Employee can clock in and out; cannot double clock-in
+- [x] Manager sees live team attendance for direct reports
+- [x] HR can correct a missed punch with audit trail
+- [x] GPS off by default; works when tenant enables it
+- [x] OpenAPI and Postman updated
+- [x] Employee sees month calendar with daily hour indicators
+- [x] Summary cards reflect today/week/month totals
+- [x] Calendar day detail shows sessions and hours
+- [x] Team live board and HR corrections tabs unchanged

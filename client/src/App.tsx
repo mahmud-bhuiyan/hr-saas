@@ -1,6 +1,7 @@
 import { Navigate, Route, Routes } from "react-router-dom";
 import { AppShell } from "./components/AppShell";
 import { GuestRoute } from "./components/GuestRoute";
+import { ModuleRoute } from "./components/ModuleRoute";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { DashboardPage } from "./pages/dashboard/DashboardPage";
 import { EmployeeEditPage } from "./pages/employees/EmployeeEditPage";
@@ -53,34 +54,202 @@ const App = () => {
             path="/dashboard/registrations"
             element={<RegistrationsPage />}
           />
-          <Route path="/dashboard/employees" element={<EmployeesPage />} />
-          <Route path="/dashboard/employees/:id/edit" element={<EmployeeEditPage />} />
-          <Route path="/dashboard/employees/:id" element={<EmployeeViewPage />} />
-          <Route path="/dashboard/leave" element={<LeavePage />} />
-          <Route path="/dashboard/attendance" element={<AttendancePage />} />
-          <Route path="/dashboard/timesheets" element={<TimesheetsPage />} />
-          <Route path="/dashboard/rotas" element={<RotasPage />} />
-          <Route path="/dashboard/expenses" element={<ExpensesPage />} />
-          <Route path="/dashboard/payroll" element={<PayrollPage />} />
-          <Route path="/dashboard/reports" element={<ReportsPage />} />
-          <Route path="/dashboard/reports/headcount" element={<HeadcountReportPage />} />
-          <Route path="/dashboard/reports/absence" element={<AbsenceReportPage />} />
-          <Route path="/dashboard/documents" element={<DocumentsPage />} />
+          <Route
+            path="/dashboard/employees"
+            element={
+              <ModuleRoute module="employees">
+                <EmployeesPage />
+              </ModuleRoute>
+            }
+          />
+          <Route
+            path="/dashboard/employees/:id/edit"
+            element={
+              <ModuleRoute module="employees">
+                <EmployeeEditPage />
+              </ModuleRoute>
+            }
+          />
+          <Route
+            path="/dashboard/employees/:id"
+            element={
+              <ModuleRoute module="employees">
+                <EmployeeViewPage />
+              </ModuleRoute>
+            }
+          />
+          <Route
+            path="/dashboard/leave"
+            element={
+              <ModuleRoute module="leave">
+                <LeavePage />
+              </ModuleRoute>
+            }
+          />
+          <Route
+            path="/dashboard/attendance"
+            element={
+              <ModuleRoute module="attendance">
+                <AttendancePage />
+              </ModuleRoute>
+            }
+          />
+          <Route
+            path="/dashboard/timesheets"
+            element={
+              <ModuleRoute module="timesheets">
+                <TimesheetsPage />
+              </ModuleRoute>
+            }
+          />
+          <Route
+            path="/dashboard/rotas"
+            element={
+              <ModuleRoute module="rotas">
+                <RotasPage />
+              </ModuleRoute>
+            }
+          />
+          <Route
+            path="/dashboard/expenses"
+            element={
+              <ModuleRoute module="expenses">
+                <ExpensesPage />
+              </ModuleRoute>
+            }
+          />
+          <Route
+            path="/dashboard/payroll"
+            element={
+              <ModuleRoute module="payroll">
+                <PayrollPage />
+              </ModuleRoute>
+            }
+          />
+          <Route
+            path="/dashboard/reports"
+            element={
+              <ModuleRoute module="reports">
+                <ReportsPage />
+              </ModuleRoute>
+            }
+          />
+          <Route
+            path="/dashboard/reports/headcount"
+            element={
+              <ModuleRoute module="reports">
+                <HeadcountReportPage />
+              </ModuleRoute>
+            }
+          />
+          <Route
+            path="/dashboard/reports/absence"
+            element={
+              <ModuleRoute module="reports">
+                <AbsenceReportPage />
+              </ModuleRoute>
+            }
+          />
+          <Route
+            path="/dashboard/documents"
+            element={
+              <ModuleRoute module="documents">
+                <DocumentsPage />
+              </ModuleRoute>
+            }
+          />
           <Route
             path="/dashboard/platform/site-settings"
             element={<PlatformSiteSettingsPage />}
           />
-          <Route path="/dashboard/settings" element={<SettingsPage />} />
-          <Route path="/dashboard/settings/company" element={<CompanyProfilePage />} />
-          <Route path="/dashboard/settings/departments" element={<DepartmentsPage />} />
-          <Route path="/dashboard/settings/locations" element={<LocationsPage />} />
-          <Route path="/dashboard/settings/payroll" element={<PayrollSettingsPage />} />
-          <Route path="/dashboard/settings/users" element={<UsersPage />} />
-          <Route path="/dashboard/settings/branding" element={<TenantBrandingPage />} />
-          <Route path="/dashboard/settings/attendance" element={<AttendanceSettingsPage />} />
-          <Route path="/dashboard/settings/leave" element={<LeaveSettingsPage />} />
-          <Route path="/dashboard/settings/billing" element={<BillingPage />} />
-          <Route path="/dashboard/settings/audit-log" element={<AuditLogPage />} />
+          <Route
+            path="/dashboard/settings"
+            element={
+              <ModuleRoute module="settings">
+                <SettingsPage />
+              </ModuleRoute>
+            }
+          />
+          <Route
+            path="/dashboard/settings/company"
+            element={
+              <ModuleRoute module="settings">
+                <CompanyProfilePage />
+              </ModuleRoute>
+            }
+          />
+          <Route
+            path="/dashboard/settings/departments"
+            element={
+              <ModuleRoute module="settings">
+                <DepartmentsPage />
+              </ModuleRoute>
+            }
+          />
+          <Route
+            path="/dashboard/settings/locations"
+            element={
+              <ModuleRoute module="settings">
+                <LocationsPage />
+              </ModuleRoute>
+            }
+          />
+          <Route
+            path="/dashboard/settings/payroll"
+            element={
+              <ModuleRoute module="settings">
+                <PayrollSettingsPage />
+              </ModuleRoute>
+            }
+          />
+          <Route
+            path="/dashboard/settings/users"
+            element={
+              <ModuleRoute module="settings">
+                <UsersPage />
+              </ModuleRoute>
+            }
+          />
+          <Route
+            path="/dashboard/settings/branding"
+            element={
+              <ModuleRoute module="settings">
+                <TenantBrandingPage />
+              </ModuleRoute>
+            }
+          />
+          <Route
+            path="/dashboard/settings/attendance"
+            element={
+              <ModuleRoute module="settings">
+                <AttendanceSettingsPage />
+              </ModuleRoute>
+            }
+          />
+          <Route
+            path="/dashboard/settings/leave"
+            element={
+              <ModuleRoute module="settings">
+                <LeaveSettingsPage />
+              </ModuleRoute>
+            }
+          />
+          <Route
+            path="/dashboard/settings/billing"
+            element={
+              <ModuleRoute module="settings">
+                <BillingPage />
+              </ModuleRoute>
+            }
+          />
+          <Route
+            path="/dashboard/settings/audit-log"
+            element={
+              <ModuleRoute module="settings">
+                <AuditLogPage />
+              </ModuleRoute>
+            }
+          />
         </Route>
       </Route>
 
@@ -91,4 +260,3 @@ const App = () => {
 }
 
 export default App;
-

@@ -13,12 +13,19 @@ import {
   createCompany,
   deactivateCompany,
   fetchApprovedCompanies,
+  fetchCompanyModules,
   fetchPendingRegistrations,
   rejectRegistration,
   updateCompany,
+  updateCompanyModules,
 } from '../../lib/api';
 import { toast } from 'react-toastify';
 import { useAuth } from '../../contexts/AuthContext';
+import {
+  ALL_TENANT_MODULE_IDS,
+  resolveEnabledModules,
+  type TenantModuleId,
+} from '../../types/modules';
 import type { CreateCompanyInput, RegistrationRequest, UpdateCompanyInput } from '../../types';
 import { areRequiredFieldsFilled, hasFormChanges, pickChangedFields } from '../../utils/form';
 import {
@@ -30,6 +37,7 @@ import {
   EditCompanyModal,
   RejectRegistrationModal,
 } from './components/RegistrationsModals';
+import { ManageCompanyModulesModal } from './components/ManageCompanyModulesModal';
 import {
   PendingRegistrationsTable,
   RegisteredCompaniesTable,
@@ -45,7 +53,7 @@ import {
 export const RegistrationsPage = () => {
   const { user } = useAuth();
   const queryClient = useQueryClient();
-  const [activeTab, setActiveTab] = useState<CompaniesTab>('pending');
+  const [activeTab, setActiveTab] = useState<CompaniesTab>('registered');
   const [createOpen, setCreateOpen] = useState(false);
   const [createForm, setCreateForm] = useState<CreateCompanyInput>(emptyCreateForm);
   const [approveTarget, setApproveTarget] = useState<RegistrationRequest | null>(null);
@@ -57,6 +65,9 @@ export const RegistrationsPage = () => {
   const [deactivateTarget, setDeactivateTarget] = useState<RegistrationRequest | null>(null);
   const [activateTarget, setActivateTarget] = useState<RegistrationRequest | null>(null);
   const [detailsTarget, setDetailsTarget] = useState<RegistrationRequest | null>(null);
+  const [modulesTarget, setModulesTarget] = useState<RegistrationRequest | null>(null);
+  const [modulesSelection, setModulesSelection] = useState<TenantModuleId[]>([]);
+  const [modulesOriginal, setModulesOriginal] = useState<TenantModuleId[]>([]);
 
   const pendingQuery = useQuery({
     queryKey: ['registrations', 'pending'],
@@ -155,6 +166,26 @@ export const RegistrationsPage = () => {
     onError: (err) => {
       toast.error(err instanceof ApiError ? err.message : 'Activation failed');
       setActivateTarget(null);
+    },
+  });
+
+  const updateModulesMutation = useMutation({
+    mutationFn: ({
+      tenantId,
+      enabledModules,
+    }: {
+      tenantId: string;
+      enabledModules: TenantModuleId[];
+    }) => updateCompanyModules(tenantId, { enabledModules }),
+    onSuccess: () => {
+      setModulesTarget(null);
+      setModulesSelection([]);
+      setModulesOriginal([]);
+      invalidateRegistrations();
+      toast.success('Company modules updated.');
+    },
+    onError: (err) => {
+      toast.error(err instanceof ApiError ? err.message : 'Failed to update modules');
     },
   });
 
@@ -268,10 +299,59 @@ export const RegistrationsPage = () => {
     updateMutation.mutate({ tenantId: editTarget.tenantId, input: changes });
   }
 
+  const openModulesModal = async (item: RegistrationRequest) => {
+    setModulesTarget(item);
+    try {
+      const modules = await fetchCompanyModules(item.tenantId);
+      setModulesSelection([...modules.enabledModules]);
+      setModulesOriginal([...modules.enabledModules]);
+    } catch (error) {
+      const fallback = resolveEnabledModules(item.enabledModules);
+      setModulesSelection([...fallback]);
+      setModulesOriginal([...fallback]);
+      if (error instanceof ApiError) {
+        toast.error(error.message);
+      }
+    }
+  }
+
+  const closeModulesModal = () => {
+    if (!updateModulesMutation.isPending) {
+      setModulesTarget(null);
+      setModulesSelection([]);
+      setModulesOriginal([]);
+    }
+  }
+
+  const toggleModuleSelection = (moduleId: TenantModuleId) => {
+    setModulesSelection((current) =>
+      current.includes(moduleId)
+        ? current.filter((id) => id !== moduleId)
+        : [...current, moduleId]
+    );
+  }
+
+  const handleModulesSubmit = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (!modulesTarget) {
+      return;
+    }
+
+    updateModulesMutation.mutate({
+      tenantId: modulesTarget.tenantId,
+      enabledModules: modulesSelection,
+    });
+  }
+
+  const modulesChanged =
+    JSON.stringify([...modulesSelection].sort()) !==
+    JSON.stringify([...modulesOriginal].sort());
+
   const companyActionPending =
     updateMutation.isPending ||
     deactivateMutation.isPending ||
-    activateMutation.isPending;
+    activateMutation.isPending ||
+    updateModulesMutation.isPending;
 
   return (
     <PageContainer>
@@ -295,8 +375,8 @@ export const RegistrationsPage = () => {
           activeId={activeTab}
           onChange={(id) => setActiveTab(id as CompaniesTab)}
           tabs={[
-            { id: 'pending', label: 'Pending registrations', count: pending.length },
             { id: 'registered', label: 'Registered companies', count: registered.length },
+            { id: 'pending', label: 'Pending registrations', count: pending.length },
           ]}
         />
 
@@ -320,6 +400,9 @@ export const RegistrationsPage = () => {
             isError={approvedQuery.isError}
             onViewDetails={setDetailsTarget}
             onEdit={openEditModal}
+            onManageModules={(row) => {
+              void openModulesModal(row);
+            }}
             onDeactivate={setDeactivateTarget}
             onActivate={setActivateTarget}
             companyActionPending={companyActionPending}
@@ -401,6 +484,19 @@ export const RegistrationsPage = () => {
           }
         }}
         loading={activateMutation.isPending}
+      />
+
+      <ManageCompanyModulesModal
+        open={!!modulesTarget}
+        onClose={closeModulesModal}
+        onSubmit={handleModulesSubmit}
+        companyName={modulesTarget?.companyName ?? ''}
+        selectedModules={modulesSelection}
+        onToggleModule={toggleModuleSelection}
+        onSelectAll={() => setModulesSelection([...ALL_TENANT_MODULE_IDS])}
+        onClearAll={() => setModulesSelection([])}
+        loading={updateModulesMutation.isPending}
+        submitDisabled={!modulesChanged}
       />
     </PageContainer>
   );

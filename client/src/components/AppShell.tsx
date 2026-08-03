@@ -49,6 +49,8 @@ import { UserMenu } from './UserMenu';
 import { NotificationBell } from './NotificationBell';
 
 import type { UserRole } from '../types';
+import type { TenantModuleId } from '../types/modules';
+import { isModuleEnabledForUser } from '../utils/modules';
 
 
 
@@ -67,6 +69,8 @@ const navItems: Array<{
   disabled?: boolean;
 
   roles?: UserRole[];
+
+  module?: TenantModuleId;
 
 }> = [
 
@@ -88,23 +92,23 @@ const navItems: Array<{
 
   },
 
-  { to: '/dashboard/employees', label: 'Employees', shortLabel: 'Team', icon: HiUserGroup, roles: ['company_admin', 'hr_manager', 'manager'] },
+  { to: '/dashboard/employees', label: 'Employees', shortLabel: 'Team', icon: HiUserGroup, roles: ['company_admin', 'hr_manager', 'manager'], module: 'employees' },
 
-  { to: '/dashboard/leave', label: 'Leave', shortLabel: 'Leave', icon: HiCalendarDays, roles: ['company_admin', 'hr_manager', 'manager', 'employee'] },
+  { to: '/dashboard/leave', label: 'Leave', shortLabel: 'Leave', icon: HiCalendarDays, roles: ['company_admin', 'hr_manager', 'manager', 'employee'], module: 'leave' },
 
-  { to: '/dashboard/attendance', label: 'Attendance', shortLabel: 'Attend', icon: HiClock, roles: ['company_admin', 'hr_manager', 'manager', 'employee'] },
+  { to: '/dashboard/attendance', label: 'Attendance', shortLabel: 'Attend', icon: HiClock, roles: ['company_admin', 'hr_manager', 'manager', 'employee'], module: 'attendance' },
 
-  { to: '/dashboard/timesheets', label: 'Timesheets', shortLabel: 'Times', icon: HiTableCells, roles: ['company_admin', 'hr_manager', 'manager', 'employee'] },
+  { to: '/dashboard/timesheets', label: 'Timesheets', shortLabel: 'Times', icon: HiTableCells, roles: ['company_admin', 'hr_manager', 'manager', 'employee'], module: 'timesheets' },
 
-  { to: '/dashboard/rotas', label: 'Rotas', shortLabel: 'Rotas', icon: HiBriefcase, roles: ['company_admin', 'hr_manager', 'manager', 'employee'] },
+  { to: '/dashboard/rotas', label: 'Rotas', shortLabel: 'Rotas', icon: HiBriefcase, roles: ['company_admin', 'hr_manager', 'manager', 'employee'], module: 'rotas' },
 
-  { to: '/dashboard/expenses', label: 'Expenses', shortLabel: 'Expense', icon: HiCurrencyDollar, roles: ['company_admin', 'hr_manager', 'manager', 'employee'] },
+  { to: '/dashboard/expenses', label: 'Expenses', shortLabel: 'Expense', icon: HiCurrencyDollar, roles: ['company_admin', 'hr_manager', 'manager', 'employee'], module: 'expenses' },
 
-  { to: '/dashboard/payroll', label: 'Payroll', shortLabel: 'Payroll', icon: HiCurrencyDollar, roles: ['company_admin', 'hr_manager'] },
+  { to: '/dashboard/payroll', label: 'Payroll', shortLabel: 'Payroll', icon: HiCurrencyDollar, roles: ['company_admin', 'hr_manager'], module: 'payroll' },
 
-  { to: '/dashboard/reports', label: 'Reports', shortLabel: 'Reports', icon: HiChartBar, roles: ['company_admin', 'hr_manager'] },
+  { to: '/dashboard/reports', label: 'Reports', shortLabel: 'Reports', icon: HiChartBar, roles: ['company_admin', 'hr_manager'], module: 'reports' },
 
-  { to: '/dashboard/documents', label: 'Documents', shortLabel: 'Docs', icon: HiDocumentText, roles: ['company_admin', 'hr_manager', 'employee'] },
+  { to: '/dashboard/documents', label: 'Documents', shortLabel: 'Docs', icon: HiDocumentText, roles: ['company_admin', 'hr_manager', 'employee'], module: 'documents' },
 
   {
 
@@ -117,6 +121,8 @@ const navItems: Array<{
     icon: HiCog6Tooth,
 
     roles: ['company_admin', 'hr_manager'],
+
+    module: 'settings',
 
   },
 
@@ -216,7 +222,17 @@ export const AppShell = () => {
 
           {navItems
 
-            .filter((item) => !item.roles || (user && item.roles.includes(user.role)))
+            .filter((item) => {
+              if (item.roles && (!user || !item.roles.includes(user.role))) {
+                return false;
+              }
+
+              if (item.module && !isModuleEnabledForUser(user, item.module)) {
+                return false;
+              }
+
+              return true;
+            })
 
             .map((item) => {
 

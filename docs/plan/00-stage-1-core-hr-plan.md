@@ -130,6 +130,7 @@ Be explicit with the client so expectations stay aligned.
 ### Super admin
 - [x] Companies — pending queue, approve/reject, add company directly
 - [x] Platform site settings — site name, theme color, logo, favicon (`/dashboard/platform/site-settings`)
+- [x] Manage company modules — enable/disable HR modules per tenant (modal on companies page)
 - [x] Company branding overrides — logo + primary color (`/dashboard/settings/branding`)
 
 ### Dashboard
@@ -264,5 +265,6 @@ Full roadmap: [hr-saas-mern-project-plan.md](./hr-saas-mern-project-plan.md)
 | Documents (Step 6) | ✅ Ready for review | MinIO for local dev; AWS S3 or Cloudflare R2 in production |
 | Settings (Step 7) | ✅ Ready for review | Company profile, departments CRUD, users/roles; branding was done earlier |
 | Demo polish (Step 8) | ✅ Complete | Manual staging data only; automated seeds/tests removed |
+| Module access control | ✅ Done | Super admin per-tenant module toggles — [18-module-access-control.md](./modules/18-module-access-control.md) |
 
 **Next step:** Stage 3 — S3-8 sign-off. See [STAGE-3-IMPLEMENTATION-STEPS.md](./STAGE-3-IMPLEMENTATION-STEPS.md).

@@ -1,11 +1,13 @@
 import { Router } from 'express';
 import type { ServerEnv } from '../../config/env.js';
 import { authenticate, authorize, authorizePermission } from '../../middleware/auth.js';
+import { requireModule } from '../../middleware/module-access.js';
 import { requireTenant } from '../../middleware/tenant.js';
 import {
   clockInHandler,
   clockOutHandler,
   getAttendanceSettingsHandler,
+  getMyAttendanceCalendarHandler,
   getMyAttendanceStatusHandler,
   listEmployeeAttendanceHandler,
   listMyAttendanceHandler,
@@ -17,7 +19,7 @@ import {
 export const createAttendanceRoutes = (env: ServerEnv): Router => {
   const router = Router();
 
-  router.use(authenticate(env), requireTenant());
+  router.use(authenticate(env), requireTenant(), requireModule('attendance'));
 
   router.get('/settings', authorizePermission('attendance:clock:own'), (req, res) => {
     void getAttendanceSettingsHandler(req, res);
@@ -37,6 +39,10 @@ export const createAttendanceRoutes = (env: ServerEnv): Router => {
 
   router.get('/me/status', authorizePermission('attendance:read:own'), (req, res) => {
     void getMyAttendanceStatusHandler(req, res);
+  });
+
+  router.get('/me/calendar', authorizePermission('attendance:read:own'), (req, res) => {
+    void getMyAttendanceCalendarHandler(req, res);
   });
 
   router.get('/me', authorizePermission('attendance:read:own'), (req, res) => {

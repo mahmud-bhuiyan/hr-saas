@@ -1,4 +1,5 @@
 import type { RegistrationRequest } from '../../../types';
+import { getModuleLabel } from '../../../types/modules';
 import { adminDisplayName, formatDate } from '../utils';
 import { CompanyStatusBadge } from './CompanyStatusBadge';
 
@@ -50,6 +51,14 @@ export const CompanyDetailsContent = ({ company }: { company: RegistrationReques
       <div className="flex justify-between gap-4 py-2.5 text-sm">
         <dt className="text-slate-500 dark:text-slate-400">Company ID</dt>
         <dd className="text-right font-mono text-xs text-slate-600 dark:text-slate-400">{company.tenantId}</dd>
+      </div>
+      <div className="flex justify-between gap-4 py-2.5 text-sm">
+        <dt className="text-slate-500 dark:text-slate-400">Enabled modules</dt>
+        <dd className="max-w-[60%] text-right text-slate-900 dark:text-slate-100">
+          {company.enabledModules && company.enabledModules.length > 0
+            ? company.enabledModules.map(getModuleLabel).join(', ')
+            : 'None'}
+        </dd>
       </div>
       {company.rejectedReason && (
         <div className="flex justify-between gap-4 py-2.5 text-sm">
