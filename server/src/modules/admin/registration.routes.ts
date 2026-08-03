@@ -2,13 +2,13 @@ import { Router } from 'express';
 import type { ServerEnv } from '../../config/env.js';
 import { authenticate, authorize } from '../../middleware/auth.js';
 import {
-  activateCompanyHandler,
   approveRegistrationHandler,
   createCompanyHandler,
-  deactivateCompanyHandler,
+  getTenantModulesHandler,
   listRegistrationsHandler,
   rejectRegistrationHandler,
   updateCompanyHandler,
+  updateTenantModulesHandler,
 } from './registration.controller.js';
 
 export const createRegistrationRoutes = (env: ServerEnv): Router => {
@@ -36,12 +36,12 @@ export const createRegistrationRoutes = (env: ServerEnv): Router => {
     void updateCompanyHandler(req, res);
   });
 
-  router.post('/:tenantId/deactivate', (req, res) => {
-    void deactivateCompanyHandler(req, res);
+  router.get('/:tenantId/modules', (req, res) => {
+    void getTenantModulesHandler(req, res);
   });
 
-  router.post('/:tenantId/activate', (req, res) => {
-    void activateCompanyHandler(req, res);
+  router.patch('/:tenantId/modules', (req, res) => {
+    void updateTenantModulesHandler(req, res);
   });
 
   return router;

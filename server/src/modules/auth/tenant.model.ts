@@ -1,4 +1,5 @@
 import mongoose, { Schema, type Document, type Model } from 'mongoose';
+import { ALL_TENANT_MODULE_IDS, type TenantModuleId } from '../../types/modules.js';
 
 export type TenantApprovalStatus = 'pending' | 'approved' | 'rejected';
 
@@ -34,6 +35,7 @@ export interface ITenant {
   payrollWeekStartDay?: number;
   xeroExpenseAccountCode?: string;
   xeroPayableAccountCode?: string;
+  enabledModules?: TenantModuleId[];
 }
 
 export interface ITenantDocument extends ITenant, Document {
@@ -77,6 +79,11 @@ const tenantSchema = new Schema<ITenantDocument>(
     payrollWeekStartDay: { type: Number, default: 1, min: 0, max: 6 },
     xeroExpenseAccountCode: { type: String, default: '477', trim: true },
     xeroPayableAccountCode: { type: String, default: '804', trim: true },
+    enabledModules: {
+      type: [String],
+      enum: ALL_TENANT_MODULE_IDS,
+      default: () => [...ALL_TENANT_MODULE_IDS],
+    },
   },
   { timestamps: true }
 );

@@ -2,18 +2,19 @@ import type { Response } from 'express';
 import type { AuthenticatedRequest } from '../../middleware/auth.js';
 import {
   RegistrationServiceError,
-  activateCompany,
   approveRegistration,
   createCompany,
-  deactivateCompany,
+  getTenantModules,
   listRegistrationRequests,
   rejectRegistration,
   updateCompany,
+  updateTenantModules,
 } from './registration.service.js';
 import {
   createCompanySchema,
   rejectRegistrationSchema,
   updateCompanySchema,
+  updateTenantModulesSchema,
 } from './registration.validation.js';
 import type { TenantApprovalStatus } from '../auth/tenant.model.js';
 
@@ -145,18 +146,13 @@ export const updateCompanyHandler = async (
   }
 }
 
-export const deactivateCompanyHandler = async (
+export const getTenantModulesHandler = async (
   req: AuthenticatedRequest,
   res: Response
 ): Promise<void> => {
   try {
-    if (!req.user) {
-      res.status(401).json({ status: 'error', message: 'Authentication required' });
-      return;
-    }
-
-    const company = await deactivateCompany(req.params.tenantId!, req.user.sub);
-    res.json({ status: 'ok', data: company });
+    const modules = await getTenantModules(req.params.tenantId!);
+    res.json({ status: 'ok', data: modules });
   } catch (error) {
     if (error instanceof RegistrationServiceError) {
       res.status(error.statusCode).json({ status: 'error', message: error.message });
@@ -166,7 +162,7 @@ export const deactivateCompanyHandler = async (
   }
 }
 
-export const activateCompanyHandler = async (
+export const updateTenantModulesHandler = async (
   req: AuthenticatedRequest,
   res: Response
 ): Promise<void> => {
@@ -176,8 +172,21 @@ export const activateCompanyHandler = async (
       return;
     }
 
-    const company = await activateCompany(req.params.tenantId!, req.user.sub);
-    res.json({ status: 'ok', data: company });
+    const parsed = updateTenantModulesSchema.safeParse(req.body ?? {});
+    if (!parsed.success) {
+      res.status(400).json({
+        status: 'error',
+        message: parsed.error.issues[0]?.message ?? 'Invalid request body',
+      });
+      return;
+    }
+
+    const modules = await updateTenantModules(
+      req.params.tenantId!,
+      parsed.data,
+      req.user.sub
+    );
+    res.json({ status: 'ok', data: modules });
   } catch (error) {
     if (error instanceof RegistrationServiceError) {
       res.status(error.statusCode).json({ status: 'error', message: error.message });

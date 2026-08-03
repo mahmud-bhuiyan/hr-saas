@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import type { ServerEnv } from '../../config/env.js';
 import { authenticate, authorize } from '../../middleware/auth.js';
+import { requireModule } from '../../middleware/module-access.js';
 import { requireTenant } from '../../middleware/tenant.js';
 import {
   billingStatusHandler,
@@ -11,7 +12,7 @@ import {
 export const createBillingRoutes = (env: ServerEnv): Router => {
   const router = Router();
 
-  router.use(authenticate(env), requireTenant(), authorize('company_admin'));
+  router.use(authenticate(env), requireTenant(), requireModule('settings'), authorize('company_admin'));
 
   router.get('/status', (req, res) => {
     void billingStatusHandler(req, res);

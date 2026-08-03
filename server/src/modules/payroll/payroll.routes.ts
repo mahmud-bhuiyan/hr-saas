@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import type { ServerEnv } from '../../config/env.js';
 import { authenticate, authorize, authorizePermission } from '../../middleware/auth.js';
+import { requireModule } from '../../middleware/module-access.js';
 import { requireTenant } from '../../middleware/tenant.js';
 import {
   accountingCallbackHandler,
@@ -22,7 +23,7 @@ export const createPayrollRoutes = (env: ServerEnv): Router => {
 
   router.get('/accounting/callback', accountingCallbackHandler(env));
 
-  router.use(authenticate(env), requireTenant());
+  router.use(authenticate(env), requireTenant(), requireModule('payroll'));
 
   router.get('/accounting/status', authorizePermission('payroll:export'), accountingStatusHandler(env));
   router.get('/accounting/connect', authorize('company_admin'), accountingConnectHandler(env));

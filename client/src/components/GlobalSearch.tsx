@@ -36,6 +36,7 @@ import {
   type GlobalSearchActionDef,
 } from '../utils/global-search-actions';
 import { hasPermission } from '../utils/permissions';
+import { isModuleEnabledForUser } from '../utils/modules';
 import { Spinner } from './ui/Spinner';
 
 type SearchResult =
@@ -85,14 +86,15 @@ export const GlobalSearch = () => {
   const debouncedQuery = useDebouncedValue(query, 280);
   const isQuerySettled = query.trim() === debouncedQuery.trim();
 
-  const canSearchEmployees =
-    !!user &&
-    (hasPermission(user.role, 'employee:read') || hasPermission(user.role, 'employee:read:team'));
-
   const actions = useMemo(
-    () => (user ? filterGlobalSearchActions(query, user.role) : []),
+    () => (user ? filterGlobalSearchActions(query, user.role, user) : []),
     [query, user]
   );
+
+  const canSearchEmployees =
+    !!user &&
+    isModuleEnabledForUser(user, 'employees') &&
+    (hasPermission(user.role, 'employee:read') || hasPermission(user.role, 'employee:read:team'));
 
   const employeesQuery = useQuery({
     queryKey: ['global-search', 'employees', debouncedQuery],

@@ -4,10 +4,12 @@ import type { JwtPayload } from '../utils/jwt.js';
 import { verifyAccessToken } from '../utils/jwt.js';
 import { hasPermission } from '../utils/permissions.js';
 import type { UserRole } from '../types/index.js';
+import type { TenantModuleId } from '../types/modules.js';
 
 export interface AuthenticatedRequest extends Request {
   user?: JwtPayload;
   tenantId?: string;
+  tenantModules?: TenantModuleId[];
 }
 
 export const authenticate = (env: ServerEnv) => {

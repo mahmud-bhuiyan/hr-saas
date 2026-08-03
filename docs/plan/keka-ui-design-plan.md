@@ -7,7 +7,7 @@
 
 **Platform:** Web only (responsive). No native mobile app.
 
-**Status:** Phase 1 implemented (2026-08-03)
+**Status:** Phase 1–2 implemented (2026-08-03)
 
 ---
 
@@ -34,13 +34,66 @@ From Keka’s dashboard shell (reference screenshot, Aug 2026):
 | Phase | Scope | Status |
 |-------|-------|--------|
 | **Phase 1** | Global search bar in header + dashboard welcome banner | ✅ Done |
-| Phase 2+ | TBD — client/design details to be added later | Not started |
+| **Phase 2** | Keka-style My attendance tab — summary cards, calendar, day detail | ✅ Done |
+| Phase 3+ | TBD — client/design details to be added later | Not started |
 
 > **Rule:** Until a phase is marked “In development” or “Done” here, no code changes for that phase.
 
 ---
 
-## 3. Phase 1 — Global search + dashboard welcome
+## 3. Phase 2 — Attendance log UI (My attendance tab)
+
+**Goal:** Align the **My attendance** tab on `/dashboard/attendance` with Keka’s attendance log layout — top summary cards, timings/actions cards, and a month calendar with day detail — without changing team live board, HR corrections, or clock-in/out behaviour.
+
+**Route:** `/dashboard/attendance` (My attendance tab only — no new URL)
+
+### 3.1 Summary cards (top row)
+
+Four `card-surface` stat cards:
+
+| Card | Source |
+|------|--------|
+| Hours today | `GET /api/v1/attendance/me/calendar` → `summary.todayMinutes` |
+| Hours this week | `summary.weekMinutes` |
+| Days present | `summary.daysPresent` (current month) |
+| Status | `GET /api/v1/attendance/me/status` → clocked in / out |
+
+### 3.2 Timings + Actions cards
+
+- **Timings card:** week strip (M–S) with day indicators, active session info, duration progress bar
+- **Actions card:** live digital clock, clock in/out (GPS consent unchanged), links to timesheet and attendance settings
+
+### 3.3 Logs section
+
+- Section header **Logs** + **24 hour format** toggle (localStorage)
+- Sub-tabs: **Calendar** (default) | **Attendance log**
+- **Calendar:** shared `Calendar` component; daily hour badges; day detail sidebar (sessions, gross/effective hours, HR correct)
+- **Attendance log:** existing paginated `AttendanceHistoryTable`
+
+### 3.4 Out of scope (Phase 2)
+
+- Break tracking, on-time arrival %, team comparison stats (no shift data)
+- Overtime / attendance request sub-tabs
+- Keka dark chrome / Me-section sub-nav
+- Changes to Team live board or HR corrections tabs
+
+### 3.5 Files
+
+| File | Change |
+|------|--------|
+| `server/src/modules/attendance/*` | `GET /me/calendar` endpoint |
+| `client/src/pages/attendance/AttendancePage.tsx` | Compose new My attendance layout |
+| `client/src/pages/attendance/components/AttendanceSummaryCards.tsx` | **New** |
+| `client/src/pages/attendance/components/AttendanceSessionCard.tsx` | **New** |
+| `client/src/pages/attendance/components/AttendanceActionsCard.tsx` | **New** |
+| `client/src/pages/attendance/components/AttendanceLogsSection.tsx` | **New** |
+| `client/src/pages/attendance/components/AttendanceCalendar.tsx` | **New** |
+| `client/src/pages/attendance/components/AttendanceDayDetail.tsx` | **New** |
+| `docs/openapi.yaml` + Postman | Calendar endpoint |
+
+---
+
+## 4. Phase 1 — Global search + dashboard welcome
 
 **Goal:** Two Keka-inspired touches only. **Everything else stays as-is** (sidebar, colors, other pages, summary cards, quick links).
 
@@ -216,4 +269,5 @@ Details to be added when client provides direction. Candidates from Keka UI (not
 
 | Date | Change |
 |------|--------|
+| 2026-08-03 | Phase 2 implemented — Keka-style My attendance tab (summary cards, calendar, day detail) |
 | 2026-08-03 | Phase 1 implemented — `GlobalSearch`, `DashboardWelcomeBanner`, AppShell + dashboard wired |

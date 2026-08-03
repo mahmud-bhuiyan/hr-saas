@@ -655,7 +655,7 @@ paths:
     patch:
       tags: [Admin]
       summary: Update approved company
-      description: Updates company name and/or company admin profile fields. Requires `super_admin`.
+      description: Updates company name, company admin profile fields, and/or account status (`isActive`). Setting `isActive` to false deactivates the tenant and all its users. Requires `super_admin`.
       operationId: updateCompany
       security:
         - bearerAuth: []
@@ -676,6 +676,7 @@ paths:
               adminEmail: admin@acme.com
               adminFirstName: Jane
               adminLastName: Admin
+              isActive: true
       responses:
         '200':
           description: Company updated
@@ -709,12 +710,12 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
 
-  /api/v1/admin/registrations/{tenantId}/deactivate:
-    post:
+  /api/v1/admin/registrations/{tenantId}/modules:
+    get:
       tags: [Admin]
-      summary: Deactivate approved company
-      description: Sets tenant and all users to inactive. Requires `super_admin`.
-      operationId: deactivateCompany
+      summary: Get company module access
+      description: Returns enabled business modules for an approved company. Requires `super_admin`.
+      operationId: getTenantModules
       security:
         - bearerAuth: []
       parameters:
@@ -725,7 +726,7 @@ paths:
             type: string
       responses:
         '200':
-          description: Company deactivated
+          description: Module flags for the company
           content:
             application/json:
               schema:
@@ -736,7 +737,7 @@ paths:
                     type: string
                     enum: [ok]
                   data:
-                    $ref: '#/components/schemas/RegistrationRequest'
+                    $ref: '#/components/schemas/TenantModulesResult'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
@@ -748,18 +749,16 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '409':
-          description: Company already inactive or not approved
+          description: Company not approved
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-
-  /api/v1/admin/registrations/{tenantId}/activate:
-    post:
+    patch:
       tags: [Admin]
-      summary: Reactivate approved company
-      description: Sets tenant and all users to active. Requires `super_admin`.
-      operationId: activateCompany
+      summary: Update company module access
+      description: Replaces the enabled module list for an approved company. Requires `super_admin`.
+      operationId: updateTenantModules
       security:
         - bearerAuth: []
       parameters:
@@ -768,9 +767,17 @@ paths:
           required: true
           schema:
             type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateTenantModulesInput'
+            example:
+              enabledModules: [employees, leave, attendance]
       responses:
         '200':
-          description: Company reactivated
+          description: Updated module flags
           content:
             application/json:
               schema:
@@ -781,7 +788,13 @@ paths:
                     type: string
                     enum: [ok]
                   data:
-                    $ref: '#/components/schemas/RegistrationRequest'
+                    $ref: '#/components/schemas/TenantModulesResult'
+        '400':
+          description: Invalid module id
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
@@ -793,7 +806,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '409':
-          description: Company already active or not approved
+          description: Company not approved
           content:
             application/json:
               schema:
@@ -1815,6 +1828,54 @@ paths:
                     enum: [ok]
                   data:
                     $ref: '#/components/schemas/AttendanceStatus'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /api/v1/attendance/me/calendar:
+    get:
+      tags: [Attendance]
+      summary: My attendance calendar
+      description: |
+        Month view of attendance logs grouped by day with summary stats
+        (hours today, week total, days present in month).
+      operationId: getMyAttendanceCalendar
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: year
+          in: query
+          required: true
+          schema:
+            type: integer
+            minimum: 2000
+            maximum: 2100
+          example: 2026
+        - name: month
+          in: query
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 12
+          example: 8
+      responses:
+        '200':
+          description: Attendance calendar for the requested month
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, data]
+                properties:
+                  status:
+                    type: string
+                    enum: [ok]
+                  data:
+                    $ref: '#/components/schemas/AttendanceCalendar'
+        '400':
+          $ref: '#/components/responses/BadRequest'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
@@ -4985,6 +5046,45 @@ components:
           type: string
           enum: [purple, blue, pink, green, orange]
           description: User theme accent color and profile banner
+        enabledModules:
+          type: array
+          items:
+            $ref: '#/components/schemas/TenantModuleId'
+          description: Enabled business modules for tenant users (omitted for super_admin)
+
+    TenantModuleId:
+      type: string
+      enum:
+        - employees
+        - leave
+        - attendance
+        - timesheets
+        - rotas
+        - expenses
+        - payroll
+        - reports
+        - documents
+        - settings
+
+    TenantModulesResult:
+      type: object
+      required: [tenantId, enabledModules]
+      properties:
+        tenantId:
+          type: string
+        enabledModules:
+          type: array
+          items:
+            $ref: '#/components/schemas/TenantModuleId'
+
+    UpdateTenantModulesInput:
+      type: object
+      required: [enabledModules]
+      properties:
+        enabledModules:
+          type: array
+          items:
+            $ref: '#/components/schemas/TenantModuleId'
 
     ThemeColor:
       type: string
@@ -5294,6 +5394,11 @@ components:
           type: integer
           minimum: 1
           description: Billed seat count from Stripe (when subscribed)
+        enabledModules:
+          type: array
+          items:
+            $ref: '#/components/schemas/TenantModuleId'
+          description: Enabled business modules for the tenant
 
     BillingSubscription:
       type: object
@@ -5365,6 +5470,9 @@ components:
           type: string
         adminLastName:
           type: string
+        isActive:
+          type: boolean
+          description: When false, deactivates the company and all tenant users
 
     AuthSuccessResponse:
       type: object
@@ -6847,6 +6955,56 @@ components:
           type: integer
         limit:
           type: integer
+
+    AttendanceCalendarDay:
+      type: object
+      required: [date, totalMinutes, sessions]
+      properties:
+        date:
+          type: string
+          format: date
+          example: '2026-08-03'
+        totalMinutes:
+          type: integer
+          minimum: 0
+        sessions:
+          type: array
+          items:
+            $ref: '#/components/schemas/AttendanceLog'
+
+    AttendanceCalendarSummary:
+      type: object
+      required: [totalMinutes, daysPresent, weekMinutes, todayMinutes]
+      properties:
+        totalMinutes:
+          type: integer
+          minimum: 0
+        daysPresent:
+          type: integer
+          minimum: 0
+        weekMinutes:
+          type: integer
+          minimum: 0
+        todayMinutes:
+          type: integer
+          minimum: 0
+
+    AttendanceCalendar:
+      type: object
+      required: [year, month, days, summary]
+      properties:
+        year:
+          type: integer
+        month:
+          type: integer
+          minimum: 1
+          maximum: 12
+        days:
+          type: array
+          items:
+            $ref: '#/components/schemas/AttendanceCalendarDay'
+        summary:
+          $ref: '#/components/schemas/AttendanceCalendarSummary'
 
     ClockInRequest:
       type: object

@@ -108,6 +108,7 @@ Detailed plans live in `modules/`. Each file follows [modules/_template.md](./mo
 | Platform Site Settings | [modules/15-platform-site-settings.md](./modules/15-platform-site-settings.md) | Stage 1 | Complete |
 | Audit Log | [modules/16-audit-log.md](./modules/16-audit-log.md) | Stage 2 | Done |
 | Billing (Stripe) | [modules/17-billing-stripe.md](./modules/17-billing-stripe.md) | Stage 2 | Done |
+| Module Access Control | [modules/18-module-access-control.md](./modules/18-module-access-control.md) | Stage 1 ext | Done |
 
 ---
 

@@ -2,7 +2,6 @@ import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
   HiArrowRightOnRectangle,
-  HiCheck,
   HiChevronRight,
   HiClock,
   HiCog6Tooth,
@@ -23,14 +22,6 @@ import { UserAvatar } from './UserAvatar';
 import { displayName } from '../utils/user';
 
 type SubmenuKey = 'display' | 'theme';
-
-const withAlpha = (hex: string, alpha: number): string => {
-  const normalized = hex.replace('#', '');
-  const r = parseInt(normalized.slice(0, 2), 16);
-  const g = parseInt(normalized.slice(2, 4), 16);
-  const b = parseInt(normalized.slice(4, 6), 16);
-  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
-};
 
 const menuItemClass =
   'flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm text-slate-700 transition-colors hover:bg-slate-50 dark:text-slate-200 dark:hover:bg-slate-800/80';
@@ -134,20 +125,16 @@ const ThemeColorOption = ({
   selected: boolean;
   onSelect: () => void;
 }) => {
-  const [hovered, setHovered] = useState(false);
   const swatch = THEME_COLORS[color].swatch;
-  const highlighted = selected || hovered;
 
   return (
     <button
       type="button"
       role="menuitem"
-      className={submenuItemClass}
-      style={{
-        backgroundColor: highlighted ? withAlpha(swatch, selected ? 0.38 : 0.24) : undefined,
-      }}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
+      className={`${submenuItemClass} border ${
+        selected ? '' : 'border-transparent hover:border-white/20'
+      }`}
+      style={selected ? { borderColor: swatch } : undefined}
       onClick={onSelect}
     >
       <span
@@ -156,7 +143,6 @@ const ThemeColorOption = ({
         aria-hidden
       />
       <span className="flex-1 text-left">{THEME_COLORS[color].label}</span>
-      {selected && <HiCheck className="h-4 w-4 shrink-0 text-white" aria-hidden />}
     </button>
   );
 };
@@ -171,28 +157,19 @@ const DisplayModeOption = ({
   icon: ReactNode;
   selected: boolean;
   onSelect: () => void;
-}) => {
-  const [hovered, setHovered] = useState(false);
-  const highlighted = selected || hovered;
-
-  return (
-    <button
-      type="button"
-      role="menuitem"
-      className={submenuItemClass}
-      style={{
-        backgroundColor: highlighted ? 'rgba(255, 255, 255, 0.12)' : undefined,
-      }}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-      onClick={onSelect}
-    >
-      {icon}
-      <span className="flex-1 text-left">{label}</span>
-      {selected && <HiCheck className="h-4 w-4 shrink-0 text-white" aria-hidden />}
-    </button>
-  );
-};
+}) => (
+  <button
+    type="button"
+    role="menuitem"
+    className={`${submenuItemClass} border ${
+      selected ? 'border-brand-400' : 'border-transparent hover:border-white/20'
+    }`}
+    onClick={onSelect}
+  >
+    {icon}
+    <span className="flex-1 text-left">{label}</span>
+  </button>
+);
 
 export const UserMenu = () => {
   const navigate = useNavigate();

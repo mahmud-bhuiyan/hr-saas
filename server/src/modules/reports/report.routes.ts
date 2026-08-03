@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import type { ServerEnv } from '../../config/env.js';
 import { authenticate, authorizePermission } from '../../middleware/auth.js';
+import { requireModule } from '../../middleware/module-access.js';
 import { requireTenant } from '../../middleware/tenant.js';
 import {
   absenceSummaryReportHandler,
@@ -10,7 +11,7 @@ import {
 export const createReportRoutes = (_env: ServerEnv): Router => {
   const router = Router();
 
-  router.use(authenticate(_env), requireTenant());
+  router.use(authenticate(_env), requireTenant(), requireModule('reports'));
 
   router.get('/headcount', authorizePermission('report:read'), (req, res) => {
     void headcountReportHandler(req, res);

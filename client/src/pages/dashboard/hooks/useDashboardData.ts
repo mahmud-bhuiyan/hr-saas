@@ -146,19 +146,19 @@ export const useDashboardData = (): {
     }
 
     if (canReadAllEmployees) {
-      return tenantAdminLinks(canCreateEmployee);
+      return tenantAdminLinks(canCreateEmployee, user);
     }
 
     if (isManager) {
-      return managerLinks();
+      return managerLinks(user);
     }
 
     if (isEmployee) {
-      return employeeLinks();
+      return employeeLinks(user);
     }
 
     return [];
-  }, [role, isSuperAdmin, canReadAllEmployees, canCreateEmployee, isManager, isEmployee]);
+  }, [role, isSuperAdmin, canReadAllEmployees, canCreateEmployee, isManager, isEmployee, user]);
 
   const loading =
     (isSuperAdmin && (pendingQuery.isLoading || approvedQuery.isLoading)) ||

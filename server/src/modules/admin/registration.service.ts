@@ -4,9 +4,19 @@ import { Tenant } from '../auth/tenant.model.js';
 import { getTenantBillingSummaries } from '../billing/billing.service.js';
 import { hashPassword } from '../../utils/password.js';
 import { ensureEmployeeRecordForUser } from '../employees/employee.service.js';
+import { writeAuditLog } from '../audit/audit.service.js';
+import {
+  normalizeEnabledModules,
+  resolveEnabledModules,
+  type TenantModuleId,
+} from '../../types/modules.js';
 import { findUserByEmail } from './admin.service.js';
 import { User } from './user.model.js';
-import type { CreateCompanyInput, UpdateCompanyInput } from './registration.validation.js';
+import type {
+  CreateCompanyInput,
+  UpdateCompanyInput,
+  UpdateTenantModulesInput,
+} from './registration.validation.js';
 
 export interface RegistrationRequest {
   tenantId: string;
@@ -24,6 +34,12 @@ export interface RegistrationRequest {
   billingExempt?: boolean;
   subscriptionStatus?: 'trialing' | 'active' | 'past_due' | 'canceled' | 'incomplete' | 'exempt' | 'none';
   seatCount?: number;
+  enabledModules?: TenantModuleId[];
+}
+
+export interface TenantModulesResult {
+  tenantId: string;
+  enabledModules: TenantModuleId[];
 }
 
 interface UserSummary {
@@ -55,6 +71,7 @@ const toRegistrationRequest = (
     updatedAt: Date;
     createdBy?: mongoose.Types.ObjectId;
     updatedBy?: mongoose.Types.ObjectId;
+    enabledModules?: string[];
   },
   admin: UserSummary | null,
   auditUsers: Map<string, UserSummary>
@@ -75,6 +92,7 @@ const toRegistrationRequest = (
     createdByName: userDisplayName(createdBy),
     updatedByName: userDisplayName(updatedBy),
     updatedAt: tenant.updatedAt.toISOString(),
+    enabledModules: resolveEnabledModules(tenant.enabledModules),
   };
 }
 
@@ -141,6 +159,9 @@ export const createCompany = async (
           approvedBy: actorId,
           createdBy: actorId,
           updatedBy: actorId,
+          ...(input.enabledModules
+            ? { enabledModules: normalizeEnabledModules(input.enabledModules) }
+            : {}),
         },
       ],
       { session }
@@ -227,6 +248,7 @@ export const listRegistrationRequests = async (
           updatedAt: tenant.updatedAt,
           createdBy: tenant.createdBy,
           updatedBy: tenant.updatedBy,
+          enabledModules: tenant.enabledModules,
         },
         admin
           ? {
@@ -393,6 +415,11 @@ export const updateCompany = async (
     admin.lastName = input.adminLastName || undefined;
   }
 
+  if (input.isActive !== undefined && input.isActive !== tenant.isActive) {
+    tenant.isActive = input.isActive;
+    await User.updateMany({ tenantId: tenant._id }, { isActive: input.isActive });
+  }
+
   tenant.updatedBy = new mongoose.Types.ObjectId(updatedByUserId);
   await tenant.save();
   await admin.save();
@@ -401,44 +428,42 @@ export const updateCompany = async (
   return toRegistrationRequest(tenant, admin, auditUsers);
 }
 
-export const deactivateCompany = async (
-  tenantId: string,
-  updatedByUserId: string
-): Promise<RegistrationRequest> => {
+export const getTenantModules = async (tenantId: string): Promise<TenantModulesResult> => {
   const tenant = await findApprovedTenant(tenantId);
 
-  if (!tenant.isActive) {
-    throw new RegistrationServiceError('Company is already inactive', 409);
-  }
-
-  tenant.isActive = false;
-  tenant.updatedBy = new mongoose.Types.ObjectId(updatedByUserId);
-  await tenant.save();
-  await User.updateMany({ tenantId: tenant._id }, { isActive: false });
-
-  const admin = await User.findOne({ tenantId: tenant._id, role: 'company_admin' });
-  const auditUsers = await loadAuditUsers([tenant]);
-  return toRegistrationRequest(tenant, admin, auditUsers);
+  return {
+    tenantId: tenant._id.toString(),
+    enabledModules: resolveEnabledModules(tenant.enabledModules),
+  };
 }
 
-export const activateCompany = async (
+export const updateTenantModules = async (
   tenantId: string,
+  input: UpdateTenantModulesInput,
   updatedByUserId: string
-): Promise<RegistrationRequest> => {
+): Promise<TenantModulesResult> => {
   const tenant = await findApprovedTenant(tenantId);
+  const beforeModules = resolveEnabledModules(tenant.enabledModules);
+  const nextModules = normalizeEnabledModules(input.enabledModules);
 
-  if (tenant.isActive) {
-    throw new RegistrationServiceError('Company is already active', 409);
-  }
-
-  tenant.isActive = true;
+  tenant.enabledModules = nextModules;
   tenant.updatedBy = new mongoose.Types.ObjectId(updatedByUserId);
   await tenant.save();
-  await User.updateMany({ tenantId: tenant._id }, { isActive: true });
 
-  const admin = await User.findOne({ tenantId: tenant._id, role: 'company_admin' });
-  const auditUsers = await loadAuditUsers([tenant]);
-  return toRegistrationRequest(tenant, admin, auditUsers);
+  await writeAuditLog({
+    tenantId: tenant._id.toString(),
+    userId: updatedByUserId,
+    action: 'update',
+    entityType: 'Tenant',
+    entityId: tenant._id.toString(),
+    before: { enabledModules: beforeModules },
+    after: { enabledModules: nextModules },
+  });
+
+  return {
+    tenantId: tenant._id.toString(),
+    enabledModules: nextModules,
+  };
 }
 
 export class RegistrationServiceError extends Error {

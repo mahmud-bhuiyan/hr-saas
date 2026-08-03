@@ -1,5 +1,6 @@
 import {
   HiCheckCircle,
+  HiCog6Tooth,
   HiEye,
   HiPencilSquare,
   HiXCircle,
@@ -11,7 +12,6 @@ import { usePagination } from '../../../hooks/usePagination';
 import type { RegistrationRequest } from '../../../types';
 import { adminDisplayName, formatDate } from '../utils';
 import { CompanyStatusBadge } from './CompanyStatusBadge';
-import { SubscriptionStatusBadge } from './SubscriptionStatusBadge';
 
 interface PendingRegistrationsTableProps {
   pending: RegistrationRequest[];
@@ -68,7 +68,7 @@ export const PendingRegistrationsTable = ({
           {
             key: "company",
             header: "Company",
-            width: 18,
+            width: 20,
             render: (row) => (
               <span className="text-slate-900 dark:text-slate-100">
                 {row.companyName}
@@ -78,7 +78,7 @@ export const PendingRegistrationsTable = ({
           {
             key: "admin",
             header: "Admin",
-            width: 16,
+            width: 20,
             render: (row) => (
               <span className="text-slate-700 dark:text-slate-300">
                 {adminDisplayName(row.adminFirstName, row.adminLastName)}
@@ -96,7 +96,7 @@ export const PendingRegistrationsTable = ({
           {
             key: "submitted",
             header: "Submitted on",
-            width: 12,
+            width: 10,
             render: (row) => (
               <span className="text-slate-600 dark:text-slate-400">
                 {formatDate(row.submittedAt)}
@@ -106,7 +106,7 @@ export const PendingRegistrationsTable = ({
           {
             key: "actions",
             header: "Actions",
-            width: 34,
+            width: 30,
             render: (row) => (
               <div className="flex flex-wrap justify-center gap-2">
                 <Button
@@ -165,8 +165,7 @@ interface RegisteredCompaniesTableProps {
   isError: boolean;
   onViewDetails: (row: RegistrationRequest) => void;
   onEdit: (row: RegistrationRequest) => void;
-  onDeactivate: (row: RegistrationRequest) => void;
-  onActivate: (row: RegistrationRequest) => void;
+  onManageModules: (row: RegistrationRequest) => void;
   companyActionPending: boolean;
 }
 
@@ -176,8 +175,7 @@ export const RegisteredCompaniesTable = ({
   isError,
   onViewDetails,
   onEdit,
-  onDeactivate,
-  onActivate,
+  onManageModules,
   companyActionPending,
 }: RegisteredCompaniesTableProps) => {
   const {
@@ -214,7 +212,7 @@ export const RegisteredCompaniesTable = ({
           {
             key: "company",
             header: "Company",
-            width: 16,
+            width: 20,
             render: (row) => (
               <span className="text-slate-900 dark:text-slate-100">
                 {row.companyName}
@@ -224,7 +222,7 @@ export const RegisteredCompaniesTable = ({
           {
             key: "admin",
             header: "Admin",
-            width: 12,
+            width: 20,
             render: (row) => (
               <span className="text-slate-700 dark:text-slate-300">
                 {adminDisplayName(row.adminFirstName, row.adminLastName)}
@@ -234,7 +232,7 @@ export const RegisteredCompaniesTable = ({
           {
             key: "email",
             header: "Admin email",
-            width: 18,
+            width: 20,
             render: (row) => (
               <span className="text-slate-600 dark:text-slate-400">{row.adminEmail}</span>
             ),
@@ -246,30 +244,9 @@ export const RegisteredCompaniesTable = ({
             render: (row) => <CompanyStatusBadge isActive={row.isActive} />,
           },
           {
-            key: "billing",
-            header: "Subscription",
-            width: 12,
-            render: (row) => (
-              <SubscriptionStatusBadge
-                status={row.subscriptionStatus}
-                seatCount={row.seatCount}
-              />
-            ),
-          },
-          {
-            key: "registered",
-            header: "Registered",
-            width: 10,
-            render: (row) => (
-              <span className="text-slate-600 dark:text-slate-400">
-                {formatDate(row.submittedAt)}
-              </span>
-            ),
-          },
-          {
             key: "actions",
             header: "Actions",
-            width: 34,
+            width: 30,
             render: (row) => (
               <div className="flex flex-wrap justify-center gap-2">
                 <Button
@@ -289,27 +266,15 @@ export const RegisteredCompaniesTable = ({
                 >
                   Edit
                 </Button>
-                {row.isActive ? (
-                  <Button
-                    display="both"
-                    variant="secondary"
-                    onClick={() => onDeactivate(row)}
-                    disabled={companyActionPending}
-                    icon={<HiXCircle className="h-4 w-4 text-amber-600" />}
-                  >
-                    Deactivate
-                  </Button>
-                ) : (
-                  <Button
-                    display="both"
-                    variant="secondary"
-                    onClick={() => onActivate(row)}
-                    disabled={companyActionPending}
-                    icon={<HiCheckCircle className="h-4 w-4 text-green-600" />}
-                  >
-                    Activate
-                  </Button>
-                )}
+                <Button
+                  display="both"
+                  variant="secondary"
+                  onClick={() => onManageModules(row)}
+                  disabled={companyActionPending}
+                  icon={<HiCog6Tooth className="h-4 w-4 text-brand-600" />}
+                >
+                  Modules
+                </Button>
               </div>
             ),
           },

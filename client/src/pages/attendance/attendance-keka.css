@@ -1,0 +1,168 @@
+/* Keka attendance log — scoped dark theme matching reference UI */
+.keka-attendance {
+  --keka-bg: #0f1923;
+  --keka-card: #162028;
+  --keka-card-hover: #1a2832;
+  --keka-border: #243442;
+  --keka-accent: #5bbfa8;
+  --keka-accent-dim: #3d8f7c;
+  --keka-text: #e8edf2;
+  --keka-muted: #8b9aab;
+  --keka-w-off: #c4a574;
+  --keka-w-off-bg: #2a2418;
+  --keka-pill-active: #5bbfa8;
+  --keka-bar-track: #243442;
+}
+
+.keka-attendance {
+  @apply -mx-4 rounded-xl px-4 py-5 sm:-mx-6 sm:px-6;
+  background-color: var(--keka-bg);
+  color: var(--keka-text);
+}
+
+.keka-card {
+  background-color: var(--keka-card);
+  border: 1px solid var(--keka-border);
+  @apply rounded-lg;
+}
+
+.keka-card-header {
+  @apply border-b px-4 py-3 text-sm font-semibold;
+  border-color: var(--keka-border);
+  color: var(--keka-text);
+}
+
+.keka-muted {
+  color: var(--keka-muted);
+}
+
+.keka-accent-text {
+  color: var(--keka-accent);
+}
+
+.keka-link {
+  @apply flex items-center gap-2 text-sm transition;
+  color: var(--keka-accent);
+}
+
+.keka-link:hover {
+  color: #7dd4bc;
+}
+
+.keka-tab {
+  @apply px-4 py-2 text-xs font-medium uppercase tracking-wide transition;
+  color: var(--keka-muted);
+}
+
+.keka-tab:hover {
+  color: var(--keka-text);
+}
+
+.keka-tab-active {
+  @apply rounded-md;
+  background-color: var(--keka-pill-active);
+  color: #0f1923;
+}
+
+.keka-toggle {
+  @apply relative h-5 w-9 rounded-full transition;
+  background-color: var(--keka-border);
+}
+
+.keka-toggle-on {
+  background-color: var(--keka-accent);
+}
+
+.keka-toggle-thumb {
+  @apply absolute top-0.5 left-0.5 h-4 w-4 rounded-full bg-white shadow transition;
+}
+
+.keka-toggle-on .keka-toggle-thumb {
+  transform: translateX(1rem);
+}
+
+.keka-progress-track {
+  @apply h-2 overflow-hidden rounded-full;
+  background-color: var(--keka-bar-track);
+}
+
+.keka-progress-fill {
+  @apply h-full rounded-full;
+  background-color: var(--keka-accent);
+}
+
+.keka-month-pill {
+  @apply px-3 py-1 text-xs font-semibold uppercase tracking-wide transition;
+  color: var(--keka-muted);
+}
+
+.keka-month-pill-active {
+  @apply rounded;
+  background-color: var(--keka-accent);
+  color: #0f1923;
+}
+
+.keka-cal-cell {
+  @apply relative min-h-[5.5rem] border p-2;
+  border-color: var(--keka-border);
+  background-color: var(--keka-card);
+}
+
+.keka-cal-cell-weekend {
+  background-color: #121c26;
+}
+
+.keka-cal-cell-selected {
+  outline: 2px solid var(--keka-accent);
+  outline-offset: -2px;
+}
+
+.keka-cal-cell-today .keka-cal-day-num {
+  @apply rounded-full;
+  background-color: var(--keka-accent);
+  color: #0f1923;
+}
+
+.keka-w-off {
+  @apply absolute bottom-1 left-1 right-1 rounded px-1 py-0.5 text-center text-[10px] font-semibold uppercase;
+  background-color: var(--keka-w-off-bg);
+  color: var(--keka-w-off);
+}
+
+.keka-day-panel {
+  @apply flex flex-col border-l p-4;
+  border-color: var(--keka-border);
+  background-color: var(--keka-card);
+  min-width: 220px;
+}
+
+.keka-bar-chart {
+  @apply mt-4 flex items-end justify-center gap-1;
+  height: 80px;
+}
+
+.keka-bar {
+  @apply w-3 rounded-t;
+  background: linear-gradient(to top, var(--keka-accent-dim), var(--keka-accent));
+}
+
+.keka-attendance .card-surface,
+.keka-attendance table {
+  background-color: var(--keka-card) !important;
+  border-color: var(--keka-border) !important;
+  color: var(--keka-text);
+}
+
+.keka-attendance thead th {
+  color: var(--keka-muted) !important;
+  background-color: #121c26 !important;
+}
+
+.keka-attendance tbody td {
+  border-color: var(--keka-border) !important;
+  color: var(--keka-text) !important;
+}
+
+.keka-attendance tbody tr:hover {
+  background-color: var(--keka-card-hover) !important;
+}

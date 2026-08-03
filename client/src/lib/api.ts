@@ -17,6 +17,8 @@ import type {
   TenantApprovalStatus,
   CreateCompanyInput,
   UpdateCompanyInput,
+  UpdateTenantModulesInput,
+  TenantModulesResult,
   UpdateProfileInput,
   UpdateProfileResponse,
   UploadProfileAvatarInput,
@@ -73,6 +75,7 @@ import type {
   AttendanceLog,
   AttendanceStatus,
   AttendanceSettings,
+  AttendanceCalendar,
   PaginatedAttendanceLogs,
   ClockInInput,
   PatchAttendanceInput,
@@ -279,18 +282,23 @@ export const updateCompany = async (
   return json.data;
 }
 
-export const deactivateCompany = async (tenantId: string): Promise<RegistrationRequest> => {
-  const json = await apiFetch<ApiSuccessResponse<RegistrationRequest>>(
-    `/api/v1/admin/registrations/${tenantId}/deactivate`,
-    { method: 'POST' }
+export const fetchCompanyModules = async (tenantId: string): Promise<TenantModulesResult> => {
+  const json = await apiFetch<ApiSuccessResponse<TenantModulesResult>>(
+    `/api/v1/admin/registrations/${tenantId}/modules`
   );
   return json.data;
 }
 
-export const activateCompany = async (tenantId: string): Promise<RegistrationRequest> => {
-  const json = await apiFetch<ApiSuccessResponse<RegistrationRequest>>(
-    `/api/v1/admin/registrations/${tenantId}/activate`,
-    { method: 'POST' }
+export const updateCompanyModules = async (
+  tenantId: string,
+  input: UpdateTenantModulesInput
+): Promise<TenantModulesResult> => {
+  const json = await apiFetch<ApiSuccessResponse<TenantModulesResult>>(
+    `/api/v1/admin/registrations/${tenantId}/modules`,
+    {
+      method: 'PATCH',
+      body: JSON.stringify(input),
+    }
   );
   return json.data;
 }
@@ -1152,6 +1160,20 @@ export const fetchMyAttendanceStatus = async (): Promise<AttendanceStatus> => {
 export const fetchMyAttendance = async (page = 1, limit = 20): Promise<PaginatedAttendanceLogs> => {
   const json = await apiFetch<ApiSuccessResponse<PaginatedAttendanceLogs>>(
     `/api/v1/attendance/me?page=${page}&limit=${limit}`
+  );
+  return json.data;
+};
+
+export const fetchMyAttendanceCalendar = async (
+  year: number,
+  month: number
+): Promise<AttendanceCalendar> => {
+  const params = new URLSearchParams({
+    year: String(year),
+    month: String(month),
+  });
+  const json = await apiFetch<ApiSuccessResponse<AttendanceCalendar>>(
+    `/api/v1/attendance/me/calendar?${params.toString()}`
   );
   return json.data;
 };

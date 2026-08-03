@@ -1,4 +1,6 @@
-import type { Employee, LeaveBalance, RegistrationRequest, UserRole } from '../../types';
+import { isModuleEnabledForUser } from '../../utils/modules';
+import type { AuthUser, Employee, LeaveBalance, RegistrationRequest, UserRole } from '../../types';
+import type { TenantModuleId } from '../../types/modules';
 
 export type DashboardCard = {
   label: string;
@@ -11,7 +13,11 @@ export type DashboardLink = {
   to?: string;
   note?: string;
   disabled?: boolean;
+  module?: TenantModuleId;
 };
+
+const filterDashboardLinks = (links: DashboardLink[], user?: AuthUser | null): DashboardLink[] =>
+  links.filter((link) => !link.module || isModuleEnabledForUser(user, link.module));
 
 const countByStatus = (employees: Employee[], status: Employee['status']): number =>
   employees.filter((employee) => employee.status === status).length;
@@ -49,13 +55,27 @@ export const tenantAdminCards = (
   { label: 'Departments', value: departments.length, note: 'Unique departments' },
 ];
 
-export const tenantAdminLinks = (canCreate: boolean): DashboardLink[] => [
-  ...(canCreate ? [{ label: 'Add employee', to: '/dashboard/employees' }] : []),
-  { label: 'View employees', to: '/dashboard/employees' },
-  { label: 'Review leave requests', to: '/dashboard/leave' },
-  { label: 'Company settings', to: '/dashboard/settings' },
-  { label: 'Upload document', to: '/dashboard/documents' },
-];
+export const tenantAdminLinks = (canCreate: boolean, user?: AuthUser | null): DashboardLink[] =>
+  filterDashboardLinks(
+    [
+      ...(canCreate ? [{ label: 'Add employee', to: '/dashboard/employees', module: 'employees' as const }] : []),
+      { label: 'View employees', to: '/dashboard/employees', module: 'employees' },
+      { label: 'Review leave requests', to: '/dashboard/leave', module: 'leave' },
+      { label: 'Company settings', to: '/dashboard/settings', module: 'settings' },
+      { label: 'Upload document', to: '/dashboard/documents', module: 'documents' },
+    ],
+    user
+  );
+
+export const managerLinks = (user?: AuthUser | null): DashboardLink[] =>
+  filterDashboardLinks(
+    [
+      { label: 'View team', to: '/dashboard/employees', module: 'employees' },
+      { label: 'Review leave requests', to: '/dashboard/leave', module: 'leave' },
+      { label: 'Request leave', to: '/dashboard/leave', module: 'leave' },
+    ],
+    user
+  );
 
 export const managerCards = (team: Employee[], pendingLeave: number): DashboardCard[] => {
   const departments = new Set(team.map((member) => member.department).filter(Boolean));
@@ -67,12 +87,6 @@ export const managerCards = (team: Employee[], pendingLeave: number): DashboardC
     { label: 'Departments', value: departments.size, note: 'In your team' },
   ];
 };
-
-export const managerLinks = (): DashboardLink[] => [
-  { label: 'View team', to: '/dashboard/employees' },
-  { label: 'Review leave requests', to: '/dashboard/leave' },
-  { label: 'Request leave', to: '/dashboard/leave' },
-];
 
 export const employeeCards = (
   companyName?: string,
@@ -88,11 +102,15 @@ export const employeeCards = (
   { label: 'My requests', value: balance != null ? balance.pending : '—', note: 'Pending approval' },
 ];
 
-export const employeeLinks = (): DashboardLink[] => [
-  { label: 'My profile', to: '/dashboard/profile' },
-  { label: 'Request leave', to: '/dashboard/leave' },
-  { label: 'My documents', to: '/dashboard/documents' },
-];
+export const employeeLinks = (user?: AuthUser | null): DashboardLink[] =>
+  filterDashboardLinks(
+    [
+      { label: 'My profile', to: '/dashboard/profile' },
+      { label: 'Request leave', to: '/dashboard/leave', module: 'leave' },
+      { label: 'My documents', to: '/dashboard/documents', module: 'documents' },
+    ],
+    user
+  );
 
 export const dashboardDescription = (role: UserRole): string => {
   switch (role) {

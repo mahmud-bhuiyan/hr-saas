@@ -32,6 +32,7 @@ Authentication, multi-tenant isolation, and company onboarding. Every business r
 
 - `name`, `isActive`, `approvalStatus` (`pending` | `approved` | `rejected`)
 - `rejectedReason`, `approvedAt`, `approvedBy`, `createdBy`, `updatedBy`
+- `enabledModules` — per-tenant module entitlements (see [18-module-access-control.md](./18-module-access-control.md))
 
 ### Collection: `User`
 
@@ -68,9 +69,9 @@ Authentication, multi-tenant isolation, and company onboarding. Every business r
 | POST | `/api/v1/admin/registrations` | super_admin | Create approved company + admin |
 | POST | `/api/v1/admin/registrations/:tenantId/approve` | super_admin | Approve pending registration |
 | POST | `/api/v1/admin/registrations/:tenantId/reject` | super_admin | Reject pending registration |
-| PATCH | `/api/v1/admin/registrations/:tenantId` | super_admin | Update approved company |
-| POST | `/api/v1/admin/registrations/:tenantId/deactivate` | super_admin | Deactivate company |
-| POST | `/api/v1/admin/registrations/:tenantId/activate` | super_admin | Reactivate company |
+| PATCH | `/api/v1/admin/registrations/:tenantId` | super_admin | Update approved company (incl. `isActive`) |
+| GET | `/api/v1/admin/registrations/:tenantId/modules` | super_admin | Read tenant module flags |
+| PATCH | `/api/v1/admin/registrations/:tenantId/modules` | super_admin | Update tenant module flags |
 
 ### Stage 2 endpoints (S2-1 — planned)
 
@@ -102,6 +103,7 @@ Authentication, multi-tenant isolation, and company onboarding. Every business r
 | Theme toggle (light/dark) | App shell header | ✅ |
 | Companies (super admin) | `/dashboard/registrations` | ✅ |
 | Platform site settings (super admin) | `/dashboard/platform/site-settings` | ✅ Complete |
+| Manage company modules (super admin) | `/dashboard/registrations` modal | ✅ See [18-module-access-control.md](./18-module-access-control.md) |
 | Forgot password | `/forgot-password` | ✅ |
 | Reset password | `/reset-password` | ✅ |
 

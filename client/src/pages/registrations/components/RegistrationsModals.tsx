@@ -4,6 +4,7 @@ import {
   HiChatBubbleLeftEllipsis,
   HiEnvelope,
   HiLockClosed,
+  HiSignal,
   HiUser,
 } from 'react-icons/hi2';
 import { Button } from '../../../components/ui/Button';
@@ -12,6 +13,7 @@ import { FormModal } from '../../../components/ui/FormModal';
 import { Input } from '../../../components/ui/Input';
 import { Modal } from '../../../components/ui/Modal';
 import { PasswordInput } from '../../../components/ui/PasswordInput';
+import { Select } from '../../../components/ui/Select';
 import { Textarea } from '../../../components/ui/Textarea';
 import type { CreateCompanyInput, RegistrationRequest } from '../../../types';
 import type { EditCompanyForm } from '../utils';
@@ -292,93 +294,22 @@ export const EditCompanyModal = ({
               icon={<HiEnvelope className="h-4 w-4 text-brand-600" />}
             />
           </FormField>
+
+          <FormField label="Account status" htmlFor="edit-isActive">
+            <Select
+              id="edit-isActive"
+              value={form.isActive ? 'active' : 'inactive'}
+              onChange={(e) =>
+                onFormChange((f) => ({ ...f, isActive: e.target.value === 'active' }))
+              }
+              icon={<HiSignal className="h-4 w-4 text-brand-600" />}
+            >
+              <option value="active">Active — users can sign in</option>
+              <option value="inactive">Inactive — users cannot sign in</option>
+            </Select>
+          </FormField>
         </>
       )}
     </FormModal>
-  );
-}
-
-interface DeactivateCompanyModalProps {
-  target: RegistrationRequest | null;
-  onClose: () => void;
-  onConfirm: () => void;
-  loading: boolean;
-}
-
-export const DeactivateCompanyModal = ({
-  target,
-  onClose,
-  onConfirm,
-  loading,
-}: DeactivateCompanyModalProps) => {
-  return (
-    <Modal
-      open={Boolean(target)}
-      onClose={onClose}
-      title="Deactivate company"
-      description={
-        target
-          ? `Deactivate ${target.companyName}? All company users will lose access immediately.`
-          : undefined
-      }
-      footer={
-        <div className="flex justify-end gap-2">
-          <Button variant="secondary" onClick={onClose} disabled={loading}>
-            Cancel
-          </Button>
-          <Button
-            variant="danger"
-            loading={loading}
-            loadingText="Deactivating…"
-            onClick={onConfirm}
-          >
-            Confirm deactivate
-          </Button>
-        </div>
-      }
-      size="sm"
-    >
-      <></>
-    </Modal>
-  );
-}
-
-interface ActivateCompanyModalProps {
-  target: RegistrationRequest | null;
-  onClose: () => void;
-  onConfirm: () => void;
-  loading: boolean;
-}
-
-export const ActivateCompanyModal = ({
-  target,
-  onClose,
-  onConfirm,
-  loading,
-}: ActivateCompanyModalProps) => {
-  return (
-    <Modal
-      open={Boolean(target)}
-      onClose={onClose}
-      title="Activate company"
-      description={
-        target
-          ? `Reactivate ${target.companyName}? Company users will be able to sign in again.`
-          : undefined
-      }
-      footer={
-        <div className="flex justify-end gap-2">
-          <Button variant="secondary" onClick={onClose} disabled={loading}>
-            Cancel
-          </Button>
-          <Button loading={loading} loadingText="Activating…" onClick={onConfirm}>
-            Confirm activate
-          </Button>
-        </div>
-      }
-      size="sm"
-    >
-      <></>
-    </Modal>
   );
 }

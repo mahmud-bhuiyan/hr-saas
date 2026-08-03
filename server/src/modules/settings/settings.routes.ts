@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import type { ServerEnv } from '../../config/env.js';
 import { authenticate, authorize } from '../../middleware/auth.js';
+import { requireModule } from '../../middleware/module-access.js';
 import { requireTenant, resolveTenant } from '../../middleware/tenant.js';
 import {
   getLeaveSettingsHandler,
@@ -38,25 +39,26 @@ export const createSettingsRoutes = (env: ServerEnv): Router => {
     void getEffectiveBrandingHandler(req, res);
   });
 
-  router.get('/branding/overrides', requireTenant(), authorize('company_admin'), (req, res) => {
+  router.use(requireTenant(), requireModule('settings'));
+
+  router.get('/branding/overrides', authorize('company_admin'), (req, res) => {
     void getTenantBrandingSettingsHandler(req, res);
   });
 
-  router.patch('/branding', requireTenant(), authorize('company_admin'), (req, res) => {
+  router.patch('/branding', authorize('company_admin'), (req, res) => {
     void patchTenantBrandingHandler(req, res);
   });
 
-  router.get('/company', requireTenant(), authorize('company_admin'), (req, res) => {
+  router.get('/company', authorize('company_admin'), (req, res) => {
     void getCompanyProfileHandler(req, res);
   });
 
-  router.patch('/company', requireTenant(), authorize('company_admin'), (req, res) => {
+  router.patch('/company', authorize('company_admin'), (req, res) => {
     void patchCompanyProfileHandler(req, res);
   });
 
   router.get(
     '/departments',
-    requireTenant(),
     authorize('company_admin', 'hr_manager'),
     (req, res) => {
       void listDepartmentsHandler(req, res);
@@ -65,7 +67,6 @@ export const createSettingsRoutes = (env: ServerEnv): Router => {
 
   router.post(
     '/departments',
-    requireTenant(),
     authorize('company_admin', 'hr_manager'),
     (req, res) => {
       void createDepartmentHandler(req, res);
@@ -74,39 +75,37 @@ export const createSettingsRoutes = (env: ServerEnv): Router => {
 
   router.patch(
     '/departments/:id',
-    requireTenant(),
     authorize('company_admin', 'hr_manager'),
     (req, res) => {
       void patchDepartmentHandler(req, res);
     }
   );
 
-  router.get('/users', requireTenant(), authorize('company_admin'), (req, res) => {
+  router.get('/users', authorize('company_admin'), (req, res) => {
     void listTenantUsersHandler(req, res);
   });
 
-  router.patch('/users/:id', requireTenant(), authorize('company_admin'), (req, res) => {
+  router.patch('/users/:id', authorize('company_admin'), (req, res) => {
     void patchTenantUserHandler(req, res);
   });
 
   router.get(
     '/leave',
-    requireTenant(),
     authorize('company_admin', 'hr_manager', 'manager'),
     (req, res) => {
       void getLeaveSettingsHandler(req, res);
     }
   );
 
-  router.patch('/leave', requireTenant(), authorize('company_admin'), (req, res) => {
+  router.patch('/leave', authorize('company_admin'), (req, res) => {
     void patchLeaveSettingsHandler(req, res);
   });
 
-  router.get('/payroll', requireTenant(), authorize('company_admin'), (req, res) => {
+  router.get('/payroll', authorize('company_admin'), (req, res) => {
     void getPayrollSettingsHandler(req, res);
   });
 
-  router.patch('/payroll', requireTenant(), authorize('company_admin'), (req, res) => {
+  router.patch('/payroll', authorize('company_admin'), (req, res) => {
     void patchPayrollSettingsHandler(req, res);
   });
 

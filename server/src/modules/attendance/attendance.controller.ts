@@ -6,6 +6,7 @@ import {
   clockIn,
   clockOut,
   getAttendanceSettings,
+  getMyAttendanceCalendar,
   getMyAttendanceStatus,
   listEmployeeAttendance,
   listMyAttendance,
@@ -15,6 +16,7 @@ import {
   patchAttendanceSettings,
 } from './attendance.service.js';
 import {
+  attendanceCalendarQuerySchema,
   clockInSchema,
   listEmployeeAttendanceQuerySchema,
   listMyAttendanceQuerySchema,
@@ -111,6 +113,24 @@ export const getMyAttendanceStatusHandler = async (
   try {
     const status = await getMyAttendanceStatus(req.tenantId!, accessContext(req));
     res.json({ status: 'ok', data: status });
+  } catch (error) {
+    handleError(res, error);
+  }
+};
+
+export const getMyAttendanceCalendarHandler = async (
+  req: AuthenticatedRequest,
+  res: Response
+): Promise<void> => {
+  try {
+    const parsed = attendanceCalendarQuerySchema.safeParse(req.query);
+    if (!parsed.success) {
+      res.status(400).json({ status: 'error', message: parsed.error.issues[0]?.message });
+      return;
+    }
+
+    const result = await getMyAttendanceCalendar(req.tenantId!, parsed.data, accessContext(req));
+    res.json({ status: 'ok', data: result });
   } catch (error) {
     handleError(res, error);
   }

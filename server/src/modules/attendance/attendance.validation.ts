@@ -33,8 +33,14 @@ export const patchAttendanceSettingsSchema = z.object({
   attendanceGpsEnabled: z.boolean(),
 });
 
+export const attendanceCalendarQuerySchema = z.object({
+  year: z.coerce.number().int().min(2000).max(2100),
+  month: z.coerce.number().int().min(1).max(12),
+});
+
 export type ClockInInput = z.infer<typeof clockInSchema>;
 export type ListMyAttendanceQuery = z.infer<typeof listMyAttendanceQuerySchema>;
 export type ListEmployeeAttendanceQuery = z.infer<typeof listEmployeeAttendanceQuerySchema>;
 export type PatchAttendanceInput = z.infer<typeof patchAttendanceSchema>;
 export type PatchAttendanceSettingsInput = z.infer<typeof patchAttendanceSettingsSchema>;
+export type AttendanceCalendarQuery = z.infer<typeof attendanceCalendarQuerySchema>;

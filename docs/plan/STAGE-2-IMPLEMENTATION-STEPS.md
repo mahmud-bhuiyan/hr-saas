@@ -29,6 +29,7 @@ Features added during Stage 2 implementation that extend the original step list.
 | Demo seed scripts | S2-8 | Removed after manual staging test — use app flows or MongoDB directly for demo data |
 | Staging deploy tooling | S2-8 | `server/render.yaml` worker blueprint, `npm run verify:staging`, enhanced `/api/v1/health` dependency checks |
 | Walkthrough bug fixes | S2-8 | HR attendance corrections UI, local date/week for timesheets/expenses, multi-step leave approve toast, attendance settings nav for HR |
+| Keka-style My attendance UI | S2-2 | Summary cards, timings/actions cards, month calendar + day detail, logs sub-tabs on `/dashboard/attendance` |
 | SMS via Twilio | S2-8 | Deferred — email + in-app notifications sufficient for Stage 2 |
 | Demo-era unit tests | S2-8 | Removed intentionally after manual staging validation |
 

@@ -16,6 +16,7 @@ One detailed plan file per business module. Use these for sprint planning and as
 | 04 | Document Storage | [04-documents.md](./04-documents.md) | Ready for review |
 | 05 | Admin & Settings | [05-admin-settings.md](./05-admin-settings.md) | Ready for review |
 | 15 | Platform Site Settings | [15-platform-site-settings.md](./15-platform-site-settings.md) | Complete |
+| 18 | Module Access Control | [18-module-access-control.md](./18-module-access-control.md) | Done |
 
 **Stage 1 tracker:** [STAGE-1-IMPLEMENTATION-STEPS.md](../STAGE-1-IMPLEMENTATION-STEPS.md) · **Client plan:** [00-stage-1-core-hr-plan.md](../00-stage-1-core-hr-plan.md)
 
@@ -74,3 +75,4 @@ Features not in the original Stage 1 write-up but implemented — also tracked i
 | Manager team-scoped employee read | 02 Employees | Step 4 |
 | Direct reports on profile | 02 Employees | Step 4 |
 | Platform site customization | 15 Platform Site Settings | Step 7 |
+| Per-company module access control | 18 Module Access Control | Out-of-plan |
