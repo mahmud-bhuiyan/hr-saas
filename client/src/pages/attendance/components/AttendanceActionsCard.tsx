@@ -1,15 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
-import {
-  HiBriefcase,
-  HiClock,
-  HiComputerDesktop,
-  HiDocumentText,
-  HiGlobeAlt,
-  HiHomeModern,
-  HiMapPin,
-  HiSun,
-} from 'react-icons/hi2';
+import { HiClock, HiComputerDesktop, HiMapPin } from 'react-icons/hi2';
 import { Button } from '../../../components/ui/Button';
 import type { AttendanceLog } from '../../../types';
 import { formatKekaDate } from '../utils';
@@ -19,7 +9,6 @@ type AttendanceActionsCardProps = {
   session: AttendanceLog | null;
   gpsEnabled: boolean;
   loading: boolean;
-  showSettingsLink: boolean;
   use24Hour: boolean;
   onClockIn: (withGps: boolean) => void;
   onClockOut: () => void;
@@ -30,7 +19,6 @@ export const AttendanceActionsCard = ({
   session,
   gpsEnabled,
   loading,
-  showSettingsLink,
   use24Hour,
   onClockIn,
   onClockOut,
@@ -69,23 +57,7 @@ export const AttendanceActionsCard = ({
 
   const dateLabel = formatKekaDate(now.toISOString().slice(0, 10));
 
-  const actions = [
-    {
-      label: clockedIn ? 'Web Clock-Out' : 'Web Clock-In',
-      icon: HiComputerDesktop,
-      onClick: handleWebClockIn,
-      primary: true,
-    },
-    { label: 'Remote Clock-In', icon: HiGlobeAlt, onClick: handleWebClockIn },
-    { label: 'Work From Home', icon: HiHomeModern, onClick: undefined },
-    { label: 'On Duty', icon: HiBriefcase, onClick: undefined },
-    { label: 'Partial Day Request', icon: HiSun, onClick: undefined },
-    {
-      label: 'Attendance Policy',
-      icon: HiDocumentText,
-      href: showSettingsLink ? '/dashboard/settings/attendance' : undefined,
-    },
-  ];
+  const clockActionLabel = clockedIn ? 'Web Clock-Out' : 'Web Clock-In';
 
   return (
     <div className="keka-card flex h-full flex-col">
@@ -124,38 +96,17 @@ export const AttendanceActionsCard = ({
           )}
 
           <ul className="space-y-3">
-            {actions.map((action) => {
-              const Icon = action.icon;
-              const content = (
-                <>
-                  <Icon className="h-5 w-5 shrink-0" style={{ color: 'var(--keka-accent)' }} />
-                  <span className="text-[15px]">{action.label}</span>
-                </>
-              );
-
-              if (action.href) {
-                return (
-                  <li key={action.label}>
-                    <Link to={action.href} className="keka-link hover:text-white">
-                      {content}
-                    </Link>
-                  </li>
-                );
-              }
-
-              return (
-                <li key={action.label}>
-                  <button
-                    type="button"
-                    className="keka-link w-full text-left disabled:opacity-40 hover:text-white"
-                    onClick={action.onClick}
-                    disabled={!action.onClick || loading}
-                  >
-                    {content}
-                  </button>
-                </li>
-              );
-            })}
+            <li>
+              <button
+                type="button"
+                className="keka-link w-full text-left disabled:opacity-40 hover:text-white"
+                onClick={handleWebClockIn}
+                disabled={loading}
+              >
+                <HiComputerDesktop className="h-5 w-5 shrink-0" style={{ color: 'var(--keka-accent)' }} />
+                <span className="text-[15px]">{clockActionLabel}</span>
+              </button>
+            </li>
           </ul>
 
           {clockedIn && session && (

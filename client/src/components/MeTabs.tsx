@@ -8,7 +8,6 @@ export const MeTabs = () => {
     { label: "LEAVE", path: "/me/leave" },
     { label: "PERFORMANCE", path: "/me/performance" },
     { label: "EXPENSES & TRAVEL", path: "/me/expenses" },
-    { label: "APPS", path: "/me/apps" },
   ];
 
   return (
