@@ -60,7 +60,7 @@ export const tenantAdminLinks = (canCreate: boolean, user?: AuthUser | null): Da
     [
       ...(canCreate ? [{ label: 'Add employee', to: '/dashboard/employees', module: 'employees' as const }] : []),
       { label: 'View employees', to: '/dashboard/employees', module: 'employees' },
-      { label: 'Review leave requests', to: '/dashboard/leave', module: 'leave' },
+      { label: 'Review leave requests', to: '/me/leave', module: 'leave' },
       { label: 'Company settings', to: '/dashboard/settings', module: 'settings' },
       { label: 'Upload document', to: '/dashboard/documents', module: 'documents' },
     ],
@@ -71,8 +71,8 @@ export const managerLinks = (user?: AuthUser | null): DashboardLink[] =>
   filterDashboardLinks(
     [
       { label: 'View team', to: '/dashboard/employees', module: 'employees' },
-      { label: 'Review leave requests', to: '/dashboard/leave', module: 'leave' },
-      { label: 'Request leave', to: '/dashboard/leave', module: 'leave' },
+      { label: 'Review leave requests', to: '/me/leave', module: 'leave' },
+      { label: 'Request leave', to: '/me/leave', module: 'leave' },
     ],
     user
   );
@@ -106,7 +106,7 @@ export const employeeLinks = (user?: AuthUser | null): DashboardLink[] =>
   filterDashboardLinks(
     [
       { label: 'My profile', to: '/dashboard/profile' },
-      { label: 'Request leave', to: '/dashboard/leave', module: 'leave' },
+      { label: 'Request leave', to: '/me/leave', module: 'leave' },
       { label: 'My documents', to: '/dashboard/documents', module: 'documents' },
     ],
     user
