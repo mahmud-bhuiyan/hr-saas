@@ -27,7 +27,6 @@ import { TimesheetsPage } from "./pages/timesheets/TimesheetsPage";
 import { RotasPage } from "./pages/rotas/RotasPage";
 import { ExpensesPage } from "./pages/expenses/ExpensesPage";
 import { PerformancePage } from "./pages/performance/PerformancePage";
-import { AppsPage } from "./pages/apps/AppsPage";
 import { AttendanceSettingsPage } from "./pages/settings/attendance/AttendanceSettingsPage";
 import { LeaveSettingsPage } from "./pages/settings/leave/LeaveSettingsPage";
 import { LocationsPage } from "./pages/settings/locations/LocationsPage";
@@ -121,7 +120,6 @@ const App = () => {
             }
           />
           <Route path="/me/performance" element={<PerformancePage />} />
-          <Route path="/me/apps" element={<AppsPage />} />
           <Route
             path="/dashboard/payroll"
             element={

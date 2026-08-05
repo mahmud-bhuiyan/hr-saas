@@ -74,8 +74,6 @@ export const AttendancePage = () => {
   const canClock = user && hasPermission(user.role, "attendance:clock:own");
   const canReadTeam = user && hasPermission(user.role, "attendance:read:team");
   const canManage = user && hasPermission(user.role, "attendance:manage");
-  const showSettingsLink = user?.role === "company_admin";
-
   const currentYear = now.getFullYear();
   const currentMonth = now.getMonth() + 1;
   const viewingCurrentMonth =
@@ -306,7 +304,6 @@ export const AttendancePage = () => {
                   session={session}
                   gpsEnabled={settingsQuery.data?.attendanceGpsEnabled ?? false}
                   loading={clockLoading}
-                  showSettingsLink={showSettingsLink}
                   use24Hour={use24Hour}
                   onClockIn={(withGps) => clockInMutation.mutate(withGps)}
                   onClockOut={() => clockOutMutation.mutate()}
