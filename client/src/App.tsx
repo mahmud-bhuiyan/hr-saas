@@ -26,6 +26,8 @@ import { AttendancePage } from "./pages/attendance/AttendancePage";
 import { TimesheetsPage } from "./pages/timesheets/TimesheetsPage";
 import { RotasPage } from "./pages/rotas/RotasPage";
 import { ExpensesPage } from "./pages/expenses/ExpensesPage";
+import { PerformancePage } from "./pages/performance/PerformancePage";
+import { AppsPage } from "./pages/apps/AppsPage";
 import { AttendanceSettingsPage } from "./pages/settings/attendance/AttendanceSettingsPage";
 import { LeaveSettingsPage } from "./pages/settings/leave/LeaveSettingsPage";
 import { LocationsPage } from "./pages/settings/locations/LocationsPage";
@@ -79,7 +81,7 @@ const App = () => {
             }
           />
           <Route
-            path="/dashboard/leave"
+            path="/me/leave"
             element={
               <ModuleRoute module="leave">
                 <LeavePage />
@@ -87,7 +89,7 @@ const App = () => {
             }
           />
           <Route
-            path="/dashboard/attendance"
+            path="/me/attendance"
             element={
               <ModuleRoute module="attendance">
                 <AttendancePage />
@@ -111,13 +113,15 @@ const App = () => {
             }
           />
           <Route
-            path="/dashboard/expenses"
+            path="/me/expenses"
             element={
               <ModuleRoute module="expenses">
                 <ExpensesPage />
               </ModuleRoute>
             }
           />
+          <Route path="/me/performance" element={<PerformancePage />} />
+          <Route path="/me/apps" element={<AppsPage />} />
           <Route
             path="/dashboard/payroll"
             element={
@@ -257,6 +261,6 @@ const App = () => {
       <Route path="*" element={<Navigate to="/dashboard" replace />} />
     </Routes>
   );
-}
+};
 
 export default App;
