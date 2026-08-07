@@ -36,6 +36,7 @@ import { BillingPage } from "./pages/settings/billing/BillingPage";
 import { ReportsPage } from "./pages/reports/ReportsPage";
 import { HeadcountReportPage } from "./pages/reports/HeadcountReportPage";
 import { AbsenceReportPage } from "./pages/reports/AbsenceReportPage";
+import { MyTeamPage } from "./pages/myteam/MyTeamPage";
 
 const App = () => {
   return (
@@ -95,6 +96,7 @@ const App = () => {
               </ModuleRoute>
             }
           />
+          <Route path="/myteam" element={<MyTeamPage />} />
           <Route
             path="/dashboard/timesheets"
             element={
