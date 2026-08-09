@@ -1,4 +1,4 @@
-import { FormEvent } from 'react';
+import { FormEvent, useEffect } from 'react';
 import {
   HiBuildingOffice2,
   HiEnvelope,
@@ -13,6 +13,9 @@ import { Input } from '../../../components/ui/Input';
 import { PasswordInput } from '../../../components/ui/PasswordInput';
 import { useSiteConfig } from '../../../contexts/SiteConfigContext';
 import type { RegisterPendingResponse } from '../../../types';
+import { reportFormValidity, reportInputValidity } from '../../../utils/native-validation';
+
+type RegisterField = 'companyName' | 'firstName' | 'lastName' | 'email' | 'password';
 
 interface RegisterFormProps {
   companyName: string;
@@ -21,13 +24,14 @@ interface RegisterFormProps {
   email: string;
   password: string;
   loading: boolean;
-  canSubmit: boolean;
+  fieldErrors?: Partial<Record<RegisterField, string>>;
+  formError?: string | null;
   onCompanyNameChange: (value: string) => void;
   onFirstNameChange: (value: string) => void;
   onLastNameChange: (value: string) => void;
   onEmailChange: (value: string) => void;
   onPasswordChange: (value: string) => void;
-  onSubmit: (event: FormEvent) => void;
+  onSubmit: (event: FormEvent<HTMLFormElement>) => void;
 }
 
 export const RegisterForm = ({
@@ -37,7 +41,8 @@ export const RegisterForm = ({
   email,
   password,
   loading,
-  canSubmit,
+  fieldErrors = {},
+  formError,
   onCompanyNameChange,
   onFirstNameChange,
   onLastNameChange,
@@ -46,6 +51,35 @@ export const RegisterForm = ({
   onSubmit,
 }: RegisterFormProps) => {
   const { displayName } = useSiteConfig();
+
+  useEffect(() => {
+    const field = Object.keys(fieldErrors)[0] as RegisterField | undefined;
+
+    if (field && fieldErrors[field]) {
+      reportInputValidity(
+        document.getElementById(field) as HTMLInputElement | null,
+        fieldErrors[field]!
+      );
+      return;
+    }
+
+    if (formError) {
+      reportInputValidity(
+        document.getElementById('companyName') as HTMLInputElement | null,
+        formError
+      );
+    }
+  }, [fieldErrors, formError]);
+
+  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    if (!reportFormValidity(event.currentTarget)) {
+      return;
+    }
+
+    onSubmit(event);
+  };
 
   return (
     <AuthLayout
@@ -59,11 +93,13 @@ export const RegisterForm = ({
         </>
       }
     >
-      <form onSubmit={(e) => void onSubmit(e)} className="space-y-5">
-        <FormField label="Company name" htmlFor="companyName">
+      <form onSubmit={handleSubmit} className="space-y-5">
+        <FormField label="Company name" htmlFor="companyName" required>
           <Input
             id="companyName"
+            name="companyName"
             required
+            minLength={2}
             value={companyName}
             onChange={(e) => onCompanyNameChange(e.target.value)}
             placeholder="Acme Ltd"
@@ -72,18 +108,22 @@ export const RegisterForm = ({
         </FormField>
 
         <div className="grid grid-cols-2 gap-3">
-          <FormField label="First name" htmlFor="firstName">
+          <FormField label="First name" htmlFor="firstName" required>
             <Input
               id="firstName"
+              name="firstName"
+              required
               value={firstName}
               onChange={(e) => onFirstNameChange(e.target.value)}
               placeholder="Jane"
               icon={<HiUser className="h-4 w-4 text-brand-600" />}
             />
           </FormField>
-          <FormField label="Last name" htmlFor="lastName">
+          <FormField label="Last name" htmlFor="lastName" required>
             <Input
               id="lastName"
+              name="lastName"
+              required
               value={lastName}
               onChange={(e) => onLastNameChange(e.target.value)}
               placeholder="Admin"
@@ -92,9 +132,10 @@ export const RegisterForm = ({
           </FormField>
         </div>
 
-        <FormField label="Work email" htmlFor="email">
+        <FormField label="Work email" htmlFor="email" required>
           <Input
             id="email"
+            name="email"
             type="email"
             autoComplete="email"
             required
@@ -105,9 +146,10 @@ export const RegisterForm = ({
           />
         </FormField>
 
-        <FormField label="Password" htmlFor="password">
+        <FormField label="Password" htmlFor="password" required>
           <PasswordInput
             id="password"
+            name="password"
             autoComplete="new-password"
             required
             minLength={8}
@@ -123,14 +165,13 @@ export const RegisterForm = ({
           loading={loading}
           loadingText="Submitting…"
           className="w-full py-3"
-          disabled={!canSubmit}
         >
           Continue
         </Button>
       </form>
     </AuthLayout>
   );
-}
+};
 
 export const RegisterSuccessView = ({ submitted }: { submitted: RegisterPendingResponse }) => {
   const { displayName } = useSiteConfig();
@@ -169,4 +210,4 @@ export const RegisterSuccessView = ({ submitted }: { submitted: RegisterPendingR
       </div>
     </AuthLayout>
   );
-}
+};

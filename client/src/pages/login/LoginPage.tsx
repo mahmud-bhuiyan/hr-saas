@@ -1,42 +1,91 @@
-import { FormEvent, useEffect, useState } from 'react';
+import { FormEvent, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { ApiError, login } from '../../lib/api';
-import { toast } from 'react-toastify';
 import {
   clearSavedCredentials,
   loadSavedCredentials,
   saveSavedCredentials,
 } from '../../lib/saved-credentials-storage';
-import { areRequiredFieldsFilled } from '../../utils/form';
 import { LoginForm } from './components/LoginForm';
+
+const mapLoginApiError = (message: string): { passwordError?: string; formError?: string } => {
+  const lower = message.toLowerCase();
+
+  if (lower.includes('invalid email') || lower === 'invalid email or password') {
+    return { passwordError: message };
+  }
+
+  if (lower.includes('email')) {
+    return { formError: message };
+  }
+
+  return { formError: message };
+};
+
+const getInitialLoginState = () => {
+  const saved = loadSavedCredentials();
+
+  if (saved) {
+    return {
+      email: saved.email,
+      password: saved.password,
+      saveForLater: true,
+      initialStep: 2 as const,
+    };
+  }
+
+  return {
+    email: '',
+    password: '',
+    saveForLater: false,
+    initialStep: 1 as const,
+  };
+};
 
 export const LoginPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { setAuth } = useAuth();
 
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [saveForLater, setSaveForLater] = useState(false);
+  const [loginState] = useState(getInitialLoginState);
+  const [email, setEmail] = useState(loginState.email);
+  const [password, setPassword] = useState(loginState.password);
+  const [saveForLater, setSaveForLater] = useState(loginState.saveForLater);
+  const [step, setStep] = useState<1 | 2>(loginState.initialStep);
   const [loading, setLoading] = useState(false);
+  const [passwordError, setPasswordError] = useState<string | null>(null);
+  const [formError, setFormError] = useState<string | null>(null);
 
   const from = (location.state as { from?: string } | null)?.from ?? '/dashboard';
 
-  useEffect(() => {
-    const saved = loadSavedCredentials();
-    if (saved) {
-      setEmail(saved.email);
-      setPassword(saved.password);
-      setSaveForLater(true);
-    }
-  }, []);
+  const handleEmailChange = (value: string) => {
+    setEmail(value);
+    setFormError(null);
+  };
 
-  const canSubmit = areRequiredFieldsFilled({ email, password }, ['email', 'password']);
+  const handlePasswordChange = (value: string) => {
+    setPassword(value);
+    setPasswordError(null);
+    setFormError(null);
+  };
+
+  const handleEmailContinue = () => {
+    setFormError(null);
+    setStep(2);
+  };
+
+  const handleBackToEmail = () => {
+    setStep(1);
+    setPasswordError(null);
+    setFormError(null);
+  };
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    setPasswordError(null);
+    setFormError(null);
 
     try {
       const data = await login({ email, password });
@@ -50,11 +99,14 @@ export const LoginPage = () => {
       setAuth(data.user, data.accessToken);
       navigate(from, { replace: true });
     } catch (err) {
-      toast.error(err instanceof ApiError ? err.message : 'Login failed');
+      const message = err instanceof ApiError ? err.message : 'Login failed';
+      const mapped = mapLoginApiError(message);
+      setPasswordError(mapped.passwordError ?? null);
+      setFormError(mapped.formError ?? null);
     } finally {
       setLoading(false);
     }
-  }
+  };
 
   return (
     <LoginForm
@@ -62,11 +114,15 @@ export const LoginPage = () => {
       password={password}
       saveForLater={saveForLater}
       loading={loading}
-      canSubmit={canSubmit}
-      onEmailChange={setEmail}
-      onPasswordChange={setPassword}
+      step={step}
+      passwordError={passwordError}
+      formError={formError}
+      onEmailChange={handleEmailChange}
+      onPasswordChange={handlePasswordChange}
       onSaveForLaterChange={setSaveForLater}
+      onEmailContinue={handleEmailContinue}
+      onBackToEmail={handleBackToEmail}
       onSubmit={handleSubmit}
     />
   );
-}
+};

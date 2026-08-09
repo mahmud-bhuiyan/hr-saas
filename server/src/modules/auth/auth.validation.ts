@@ -4,8 +4,8 @@ export const registerSchema = z.object({
   companyName: z.string().trim().min(2, 'Company name must be at least 2 characters'),
   email: z.string().email().transform((v) => v.toLowerCase().trim()),
   password: z.string().min(8, 'Password must be at least 8 characters'),
-  firstName: z.string().trim().optional(),
-  lastName: z.string().trim().optional(),
+  firstName: z.string().trim().min(1, 'First name is required').max(100),
+  lastName: z.string().trim().min(1, 'Last name is required').max(100),
 });
 
 export const loginSchema = z.object({

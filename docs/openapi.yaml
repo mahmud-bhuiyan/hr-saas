@@ -5174,7 +5174,7 @@ components:
 
     RegisterRequest:
       type: object
-      required: [companyName, email, password]
+      required: [companyName, email, password, firstName, lastName]
       properties:
         companyName:
           type: string
@@ -5187,8 +5187,10 @@ components:
           minLength: 8
         firstName:
           type: string
+          minLength: 1
         lastName:
           type: string
+          minLength: 1
 
     CreateCompanyRequest:
       type: object

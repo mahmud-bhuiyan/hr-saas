@@ -1,9 +1,41 @@
-import { FormEvent, useState } from 'react';
+import { useState } from 'react';
 import { ApiError, register } from '../../lib/api';
-import { toast } from 'react-toastify';
 import type { RegisterPendingResponse } from '../../types';
-import { areRequiredFieldsFilled } from '../../utils/form';
 import { RegisterForm, RegisterSuccessView } from './components/RegisterForm';
+
+type RegisterField = 'companyName' | 'firstName' | 'lastName' | 'email' | 'password';
+
+type RegisterFieldErrors = Partial<Record<RegisterField, string>>;
+
+const mapRegisterApiError = (message: string): { fieldErrors: RegisterFieldErrors; formError?: string } => {
+  const lower = message.toLowerCase();
+
+  if (lower.includes('email already')) {
+    return { fieldErrors: { email: message } };
+  }
+
+  if (lower.includes('company name')) {
+    return { fieldErrors: { companyName: message } };
+  }
+
+  if (lower.includes('first name')) {
+    return { fieldErrors: { firstName: message } };
+  }
+
+  if (lower.includes('last name')) {
+    return { fieldErrors: { lastName: message } };
+  }
+
+  if (lower.includes('password')) {
+    return { fieldErrors: { password: message } };
+  }
+
+  if (lower.includes('email')) {
+    return { fieldErrors: { email: message } };
+  }
+
+  return { fieldErrors: {}, formError: message };
+};
 
 export const RegisterPage = () => {
   const [companyName, setCompanyName] = useState('');
@@ -13,13 +45,17 @@ export const RegisterPage = () => {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState<RegisterPendingResponse | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<RegisterFieldErrors>({});
+  const [formError, setFormError] = useState<string | null>(null);
 
-  const canSubmit =
-    areRequiredFieldsFilled({ companyName, email, password }, ['companyName', 'email', 'password']) &&
-    password.length >= 8;
+  const clearErrors = () => {
+    setFieldErrors({});
+    setFormError(null);
+  };
 
-  const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async () => {
+    setFieldErrors({});
+    setFormError(null);
     setLoading(true);
 
     try {
@@ -27,16 +63,19 @@ export const RegisterPage = () => {
         companyName,
         email,
         password,
-        firstName: firstName || undefined,
-        lastName: lastName || undefined,
+        firstName,
+        lastName,
       });
       setSubmitted(result);
     } catch (err) {
-      toast.error(err instanceof ApiError ? err.message : 'Registration failed');
+      const message = err instanceof ApiError ? err.message : 'Registration failed';
+      const mapped = mapRegisterApiError(message);
+      setFieldErrors(mapped.fieldErrors);
+      setFormError(mapped.formError ?? null);
     } finally {
       setLoading(false);
     }
-  }
+  };
 
   if (submitted) {
     return <RegisterSuccessView submitted={submitted} />;
@@ -50,13 +89,29 @@ export const RegisterPage = () => {
       email={email}
       password={password}
       loading={loading}
-      canSubmit={canSubmit}
-      onCompanyNameChange={setCompanyName}
-      onFirstNameChange={setFirstName}
-      onLastNameChange={setLastName}
-      onEmailChange={setEmail}
-      onPasswordChange={setPassword}
+      fieldErrors={fieldErrors}
+      formError={formError}
+      onCompanyNameChange={(value) => {
+        setCompanyName(value);
+        clearErrors();
+      }}
+      onFirstNameChange={(value) => {
+        setFirstName(value);
+        clearErrors();
+      }}
+      onLastNameChange={(value) => {
+        setLastName(value);
+        clearErrors();
+      }}
+      onEmailChange={(value) => {
+        setEmail(value);
+        clearErrors();
+      }}
+      onPasswordChange={(value) => {
+        setPassword(value);
+        clearErrors();
+      }}
       onSubmit={handleSubmit}
     />
   );
-}
+};

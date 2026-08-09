@@ -84,8 +84,8 @@ export interface RegisterInput {
   companyName: string;
   email: string;
   password: string;
-  firstName?: string;
-  lastName?: string;
+  firstName: string;
+  lastName: string;
 }
 
 export interface CreateCompanyInput {
