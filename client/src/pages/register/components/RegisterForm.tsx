@@ -11,6 +11,7 @@ import { Button } from '../../../components/ui/Button';
 import { FormField } from '../../../components/ui/FormField';
 import { Input } from '../../../components/ui/Input';
 import { PasswordInput } from '../../../components/ui/PasswordInput';
+import { useSiteConfig } from '../../../contexts/SiteConfigContext';
 import type { RegisterPendingResponse } from '../../../types';
 
 interface RegisterFormProps {
@@ -44,10 +45,11 @@ export const RegisterForm = ({
   onPasswordChange,
   onSubmit,
 }: RegisterFormProps) => {
+  const { displayName } = useSiteConfig();
+
   return (
     <AuthLayout
-      title="Register your company"
-      subtitle="Submit your company for super admin approval"
+      title={`Register with ${displayName}`}
       footer={
         <>
           Already have an account?{' '}
@@ -57,7 +59,7 @@ export const RegisterForm = ({
         </>
       }
     >
-      <form onSubmit={(e) => void onSubmit(e)} className="space-y-4">
+      <form onSubmit={(e) => void onSubmit(e)} className="space-y-5">
         <FormField label="Company name" htmlFor="companyName">
           <Input
             id="companyName"
@@ -120,10 +122,10 @@ export const RegisterForm = ({
           type="submit"
           loading={loading}
           loadingText="Submitting…"
-          className="w-full"
+          className="w-full py-3"
           disabled={!canSubmit}
         >
-          Submit for approval
+          Continue
         </Button>
       </form>
     </AuthLayout>
@@ -131,10 +133,12 @@ export const RegisterForm = ({
 }
 
 export const RegisterSuccessView = ({ submitted }: { submitted: RegisterPendingResponse }) => {
+  const { displayName } = useSiteConfig();
+
   return (
     <AuthLayout
       title="Registration submitted"
-      subtitle="Your request is awaiting super admin approval"
+      subtitle={`Your request is awaiting ${displayName} super admin approval`}
       footer={
         <Link to="/login" className="font-medium text-brand-600 hover:text-brand-700">
           Back to sign in

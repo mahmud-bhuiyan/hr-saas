@@ -3,9 +3,9 @@ import { HiEnvelope, HiLockClosed } from 'react-icons/hi2';
 import { Link } from 'react-router-dom';
 import { AuthLayout } from '../../../components/AuthLayout';
 import { Button } from '../../../components/ui/Button';
-import { FormField } from '../../../components/ui/FormField';
 import { Input } from '../../../components/ui/Input';
 import { PasswordInput } from '../../../components/ui/PasswordInput';
+import { useSiteConfig } from '../../../contexts/SiteConfigContext';
 
 interface LoginFormProps {
   email: string;
@@ -30,10 +30,11 @@ export const LoginForm = ({
   onSaveForLaterChange,
   onSubmit,
 }: LoginFormProps) => {
+  const { displayName } = useSiteConfig();
+
   return (
     <AuthLayout
-      title="Sign in"
-      subtitle="Access your company HR workspace"
+      title={`Login to ${displayName}`}
       footer={
         <>
           No account?{' '}
@@ -44,30 +45,28 @@ export const LoginForm = ({
       }
     >
       <form onSubmit={(e) => void onSubmit(e)} className="space-y-4">
-        <FormField label="Email" htmlFor="email">
-          <Input
-            id="email"
-            type="email"
-            autoComplete="email"
-            required
-            value={email}
-            onChange={(e) => onEmailChange(e.target.value)}
-            placeholder="you@company.com"
-            icon={<HiEnvelope className="h-4 w-4 text-brand-600" />}
-          />
-        </FormField>
+        <Input
+          id="email"
+          type="email"
+          autoComplete="email"
+          required
+          value={email}
+          onChange={(e) => onEmailChange(e.target.value)}
+          placeholder="Email"
+          aria-label="Email"
+          icon={<HiEnvelope className="h-4 w-4 text-brand-600" />}
+        />
 
-        <FormField label="Password" htmlFor="password">
-          <PasswordInput
-            id="password"
-            autoComplete="current-password"
-            required
-            value={password}
-            onChange={(e) => onPasswordChange(e.target.value)}
-            placeholder="••••••••"
-            icon={<HiLockClosed className="h-4 w-4 text-brand-600" />}
-          />
-        </FormField>
+        <PasswordInput
+          id="password"
+          autoComplete="current-password"
+          required
+          value={password}
+          onChange={(e) => onPasswordChange(e.target.value)}
+          placeholder="Password"
+          aria-label="Password"
+          icon={<HiLockClosed className="h-4 w-4 text-brand-600" />}
+        />
 
         <div className="flex items-center justify-between">
           <label className="flex cursor-pointer items-center gap-2 text-sm text-slate-600">
@@ -90,11 +89,11 @@ export const LoginForm = ({
         <Button
           type="submit"
           loading={loading}
-          className="w-full"
+          className="w-full py-3"
           loadingText="Signing in…"
           disabled={!canSubmit}
         >
-          Sign in
+          Continue
         </Button>
       </form>
     </AuthLayout>
