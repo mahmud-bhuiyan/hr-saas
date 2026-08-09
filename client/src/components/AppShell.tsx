@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-import { NavLink, Outlet } from "react-router-dom";
+import { matchPath, NavLink, Outlet, useLocation } from "react-router-dom";
 
 import {
   HiBriefcase,
@@ -49,6 +49,9 @@ const navItems: Array<{
 
   end?: boolean;
 
+  /** Highlight when the current path starts with this prefix (e.g. /me/ sub-tabs). */
+  activePrefix?: string;
+
   disabled?: boolean;
 
   roles?: UserRole[];
@@ -86,8 +89,15 @@ const navItems: Array<{
     to: "/me/attendance",
     label: "Me",
     icon: HiUser,
+    activePrefix: "/me/",
     roles: ["company_admin", "hr_manager", "manager", "employee"],
-    module: "attendance",
+  },
+
+  {
+    to: "/myteam",
+    label: "My Team",
+    icon: HiUserGroup,
+    roles: ["company_admin", "hr_manager", "manager", "employee"],
   },
 
   {
@@ -143,8 +153,22 @@ const navItems: Array<{
   },
 ];
 
+const isNavItemActive = (
+  pathname: string,
+  item: (typeof navItems)[number],
+): boolean => {
+  if (item.activePrefix) {
+    return pathname.startsWith(item.activePrefix);
+  }
+
+  return Boolean(
+    matchPath({ path: item.to, end: item.end ?? false }, pathname),
+  );
+};
+
 export const AppShell = () => {
   const { user } = useAuth();
+  const location = useLocation();
 
   const [sidebarExpanded, setSidebarExpanded] = useState(loadSidebarExpanded);
 
@@ -250,13 +274,15 @@ export const AppShell = () => {
                   key={item.to}
                   to={item.to}
                   end={item.end}
-                  className={({ isActive }) =>
-                    `flex rounded-md transition ${navItemLayoutClass} ${sidebarExpanded ? "text-sm" : "text-[10px] leading-tight"} ${
-                      isActive
+                  className={() => {
+                    const active = isNavItemActive(location.pathname, item);
+
+                    return `flex rounded-md transition ${navItemLayoutClass} ${sidebarExpanded ? "text-sm" : "text-[10px] leading-tight"} ${
+                      active
                         ? "bg-[#122E44] font-semibold text-white"
                         : "font-medium text-slate-400 hover:bg-[#122E44] hover:text-white"
-                    }`
-                  }
+                    }`;
+                  }}
                 >
                   <Icon
                     className={`shrink-0 ${sidebarExpanded ? "h-5 w-5" : "h-[18px] w-[18px]"}`}

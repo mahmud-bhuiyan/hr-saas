@@ -1,5 +1,6 @@
 import { Navigate, Route, Routes } from "react-router-dom";
 import { AppShell } from "./components/AppShell";
+import { ScrollToTop } from "./components/ScrollToTop";
 import { GuestRoute } from "./components/GuestRoute";
 import { ModuleRoute } from "./components/ModuleRoute";
 import { ProtectedRoute } from "./components/ProtectedRoute";
@@ -36,10 +37,15 @@ import { BillingPage } from "./pages/settings/billing/BillingPage";
 import { ReportsPage } from "./pages/reports/ReportsPage";
 import { HeadcountReportPage } from "./pages/reports/HeadcountReportPage";
 import { AbsenceReportPage } from "./pages/reports/AbsenceReportPage";
+import { MyTeamPage } from "./pages/myteam/MyTeamPage";
+import { TermsOfUsePage } from "./pages/legal/TermsOfUsePage";
+import { PrivacyPolicyPage } from "./pages/legal/PrivacyPolicyPage";
 
 const App = () => {
   return (
-    <Routes>
+    <>
+      <ScrollToTop />
+      <Routes>
       <Route element={<GuestRoute />}>
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
@@ -95,6 +101,7 @@ const App = () => {
               </ModuleRoute>
             }
           />
+          <Route path="/myteam" element={<MyTeamPage />} />
           <Route
             path="/dashboard/timesheets"
             element={
@@ -255,9 +262,13 @@ const App = () => {
         </Route>
       </Route>
 
+      <Route path="/terms" element={<TermsOfUsePage />} />
+      <Route path="/privacy" element={<PrivacyPolicyPage />} />
+
       <Route path="/" element={<Navigate to="/dashboard" replace />} />
       <Route path="*" element={<Navigate to="/dashboard" replace />} />
     </Routes>
+    </>
   );
 };
 

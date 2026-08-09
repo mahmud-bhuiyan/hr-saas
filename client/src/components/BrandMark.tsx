@@ -1,6 +1,7 @@
 import { useSiteConfig } from '../contexts/SiteConfigContext';
 import { useStyledBrandImage } from '../hooks/useStyledBrandImage';
 import { buildDefaultBrandImageUrl } from '../utils/favicon';
+import { FaviconImage } from './FaviconImage';
 import type { LogoDisplaySettings } from '../types';
 
 interface BrandMarkProps {
@@ -78,14 +79,11 @@ export const BrandMark = ({
   }
 
   if (compact) {
-    const initials = displayName.slice(0, 2).toUpperCase();
+    const iconSrc = config.faviconUrl ?? '/favicon.png';
 
     return (
-      <span
-        className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-white/15 text-xs font-bold text-white"
-        title={displayName}
-      >
-        {initials}
+      <span className={`${className} max-w-full justify-center`} title={displayName}>
+        <FaviconImage src={iconSrc} alt={displayName} className="h-7 w-7" />
       </span>
     );
   }
