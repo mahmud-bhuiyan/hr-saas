@@ -111,3 +111,13 @@ export const TENANT_MODULE_META: TenantModuleMeta[] = [
 
 export const getModuleLabel = (moduleId: TenantModuleId): string =>
   TENANT_MODULE_META.find((module) => module.id === moduleId)?.label ?? moduleId;
+
+/** Platform shell — always on for every approved tenant; not toggled in Manage modules. */
+export const ALWAYS_AVAILABLE_PLATFORM_FEATURES = [
+  { id: 'dashboard', label: 'Dashboard' },
+  { id: 'profile', label: 'Profile' },
+  { id: 'notifications', label: 'Notifications' },
+] as const;
+
+export const getAlwaysAvailableFeatureLabels = (): string[] =>
+  ALWAYS_AVAILABLE_PLATFORM_FEATURES.map((feature) => feature.label);

@@ -1,7 +1,7 @@
 import { FormEvent } from 'react';
 import { Button } from '../../../components/ui/Button';
 import { FormModal } from '../../../components/ui/FormModal';
-import { TENANT_MODULE_META, type TenantModuleId } from '../../../types/modules';
+import { TENANT_MODULE_META, getAlwaysAvailableFeatureLabels, type TenantModuleId } from '../../../types/modules';
 
 interface ManageCompanyModulesModalProps {
   open: boolean;
@@ -43,6 +43,13 @@ export const ManageCompanyModulesModal = ({
       submitDisabled={submitDisabled}
       size="lg"
     >
+      <p className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-600 dark:border-slate-700 dark:bg-slate-800/50 dark:text-slate-400">
+        Always available (not toggled here):{' '}
+        <span className="font-medium text-slate-700 dark:text-slate-300">
+          {getAlwaysAvailableFeatureLabels().join(', ')}
+        </span>
+      </p>
+
       <div className="flex flex-wrap items-center justify-between gap-3">
         <p className="text-sm text-slate-600 dark:text-slate-400">
           <span className="font-medium text-slate-900 dark:text-slate-100">{enabledCount}</span>

@@ -1,17 +1,15 @@
 import { FormEvent } from 'react';
-import { HiLink, HiPaintBrush, HiPhoto } from 'react-icons/hi2';
+import { HiLink, HiPhoto } from 'react-icons/hi2';
 import { FormActions } from '../../../../components/ui/FormActions';
 import { FormField } from '../../../../components/ui/FormField';
 import { Input } from '../../../../components/ui/Input';
 
 export interface TenantBrandingFormValues extends Record<string, unknown> {
-  primaryColor: string;
   logoUrl: string;
 }
 
 interface TenantBrandingFormProps {
   values: TenantBrandingFormValues;
-  platformPrimaryColor: string;
   onChange: (field: keyof TenantBrandingFormValues, value: string) => void;
   onClearField: (field: keyof TenantBrandingFormValues) => void;
   onSubmit: (event: FormEvent) => void;
@@ -21,7 +19,6 @@ interface TenantBrandingFormProps {
 
 export const TenantBrandingForm = ({
   values,
-  platformPrimaryColor,
   onChange,
   onClearField,
   onSubmit,
@@ -36,39 +33,10 @@ export const TenantBrandingForm = ({
       <div>
         <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100">Company branding</h2>
         <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">
-          Override the platform logo and primary color for your company. Leave a field empty and save
-          to revert to the platform default.
+          Override the platform logo for your company. Leave the field empty and save to revert to the
+          platform default. Theme colors are controlled by each user&apos;s personal theme choice.
         </p>
       </div>
-
-      <FormField label="Primary color override" htmlFor="primaryColor">
-        <div className="flex items-center gap-3">
-          <input
-            id="primaryColorPicker"
-            type="color"
-            value={values.primaryColor || platformPrimaryColor}
-            onChange={(e) => onChange('primaryColor', e.target.value)}
-            className="h-10 w-14 cursor-pointer rounded border border-slate-200 bg-white p-1 dark:border-slate-600 dark:bg-slate-800"
-            aria-label="Pick primary color"
-          />
-          <Input
-            id="primaryColor"
-            value={values.primaryColor}
-            onChange={(e) => onChange('primaryColor', e.target.value)}
-            placeholder={platformPrimaryColor}
-            icon={<HiPaintBrush className="h-4 w-4 text-brand-600" />}
-          />
-        </div>
-        {values.primaryColor && (
-          <button
-            type="button"
-            onClick={() => onClearField('primaryColor')}
-            className="mt-2 text-sm text-brand-600 hover:text-brand-700"
-          >
-            Clear color override
-          </button>
-        )}
-      </FormField>
 
       <FormField label="Logo URL override" htmlFor="logoUrl">
         <Input
@@ -89,10 +57,6 @@ export const TenantBrandingForm = ({
         )}
       </FormField>
 
-      <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
-        Platform default color: <span className="font-medium">{platformPrimaryColor}</span>
-      </div>
-
       <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
         <HiLink className="h-4 w-4 text-brand-600" />
         URL-only uploads until document storage is available.
@@ -110,15 +74,11 @@ export const TenantBrandingForm = ({
 
 export const TenantBrandingPreview = ({
   values,
-  platformPrimaryColor,
   displayName,
 }: {
   values: TenantBrandingFormValues;
-  platformPrimaryColor: string;
   displayName: string;
 }) => {
-  const effectiveColor = values.primaryColor || platformPrimaryColor;
-
   return (
     <div className="card-surface space-y-4 p-6">
       <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100">Preview</h2>
@@ -127,16 +87,9 @@ export const TenantBrandingPreview = ({
           {values.logoUrl ? (
             <img src={values.logoUrl} alt={displayName} className="h-8 max-w-[140px] object-contain" />
           ) : (
-            <span className="text-base font-semibold" style={{ color: effectiveColor }}>
-              {displayName}
-            </span>
+            <span className="text-base font-semibold text-brand-700 dark:text-brand-400">{displayName}</span>
           )}
-          <span
-            className="rounded-full px-3 py-1 text-xs text-white"
-            style={{ backgroundColor: effectiveColor }}
-          >
-            Primary
-          </span>
+          <span className="rounded-full bg-brand-600 px-3 py-1 text-xs text-white">Logo</span>
         </div>
       </div>
     </div>

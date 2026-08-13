@@ -4,10 +4,12 @@ import {
   DEFAULT_FAVICON_DISPLAY,
   DEFAULT_LOGO_DISPLAY,
   DEFAULT_PLATFORM_SETTINGS,
+  DEFAULT_SIDEBAR_DISPLAY,
   PLATFORM_SETTINGS_KEY,
   type FaviconDisplaySettings,
   type LogoDisplaySettings,
   type PlatformSiteSettings,
+  type SidebarDisplaySettings,
   type SiteConfig,
   type EffectiveBranding,
   type TenantBrandingOverrides,
@@ -55,20 +57,28 @@ const mergeFaviconDisplay = (
   mimeType: current?.mimeType ?? DEFAULT_FAVICON_DISPLAY.mimeType,
 });
 
+const mergeSidebarDisplay = (
+  current?: Partial<SidebarDisplaySettings> | null
+): SidebarDisplaySettings => ({
+  behavior: current?.behavior ?? DEFAULT_SIDEBAR_DISPLAY.behavior,
+  collapsedWidthPx: current?.collapsedWidthPx ?? DEFAULT_SIDEBAR_DISPLAY.collapsedWidthPx,
+  expandedWidthPx: current?.expandedWidthPx ?? DEFAULT_SIDEBAR_DISPLAY.expandedWidthPx,
+});
+
 const toSiteConfig = (doc: {
   siteName: string;
   logoUrl: string | null;
   faviconUrl: string | null;
-  primaryColor: string;
   logoDisplay?: Partial<LogoDisplaySettings> | null;
   faviconDisplay?: Partial<FaviconDisplaySettings> | null;
+  sidebarDisplay?: Partial<SidebarDisplaySettings> | null;
 }): SiteConfig => ({
   siteName: doc.siteName,
   logoUrl: doc.logoUrl ?? null,
   faviconUrl: doc.faviconUrl ?? null,
-  primaryColor: doc.primaryColor,
   logoDisplay: mergeLogoDisplay(doc.logoDisplay),
   faviconDisplay: mergeFaviconDisplay(doc.faviconDisplay),
+  sidebarDisplay: mergeSidebarDisplay(doc.sidebarDisplay),
 });
 
 const getPlatformDocument = async () =>
@@ -81,6 +91,7 @@ export const getPlatformSiteConfig = async (): Promise<SiteConfig> => {
       ...DEFAULT_PLATFORM_SETTINGS,
       logoDisplay: { ...DEFAULT_LOGO_DISPLAY },
       faviconDisplay: { ...DEFAULT_FAVICON_DISPLAY },
+      sidebarDisplay: { ...DEFAULT_SIDEBAR_DISPLAY },
     };
   }
   return toSiteConfig(doc);
@@ -93,6 +104,7 @@ export const getPlatformSiteSettings = async (): Promise<PlatformSiteSettings> =
       ...DEFAULT_PLATFORM_SETTINGS,
       logoDisplay: { ...DEFAULT_LOGO_DISPLAY },
       faviconDisplay: { ...DEFAULT_FAVICON_DISPLAY },
+      sidebarDisplay: { ...DEFAULT_SIDEBAR_DISPLAY },
     };
   }
 
@@ -119,13 +131,25 @@ export const patchPlatformSiteSettings = async (
     ...(input.faviconDisplay ?? {}),
   });
 
+  const nextSidebarDisplay = mergeSidebarDisplay({
+    ...current.sidebarDisplay,
+    ...(input.sidebarDisplay ?? {}),
+  });
+
+  if (nextSidebarDisplay.expandedWidthPx <= nextSidebarDisplay.collapsedWidthPx) {
+    throw new PlatformSettingsServiceError(
+      'Expanded sidebar width must be greater than compact width',
+      400
+    );
+  }
+
   const next: SiteConfig = {
     siteName: input.siteName ?? current.siteName,
     logoUrl: input.logoUrl !== undefined ? normalizeUrl(input.logoUrl) : current.logoUrl,
     faviconUrl: input.faviconUrl !== undefined ? normalizeUrl(input.faviconUrl) : current.faviconUrl,
-    primaryColor: input.primaryColor ?? current.primaryColor,
     logoDisplay: nextLogoDisplay,
     faviconDisplay: nextFaviconDisplay,
+    sidebarDisplay: nextSidebarDisplay,
   };
 
   const doc = await PlatformSettings.findOneAndUpdate(
@@ -162,7 +186,6 @@ export const uploadPlatformAsset = async (
 
 const getTenantBrandingOverrides = (tenant: ITenantDocument): TenantBrandingOverrides => ({
   logoUrl: tenant.branding?.logoUrl ?? null,
-  primaryColor: tenant.branding?.primaryColor ?? null,
 });
 
 export const mergeBranding = (
@@ -171,7 +194,6 @@ export const mergeBranding = (
 ): SiteConfig => ({
   ...platform,
   logoUrl: overrides.logoUrl ?? platform.logoUrl,
-  primaryColor: overrides.primaryColor ?? platform.primaryColor,
 });
 
 export const getEffectiveBranding = async (tenantId?: string): Promise<EffectiveBranding> => {
@@ -213,14 +235,11 @@ export const patchTenantBranding = async (
   }
 
   if (!tenant.branding) {
-    tenant.branding = { logoUrl: null, primaryColor: null };
+    tenant.branding = { logoUrl: null };
   }
 
   if (input.logoUrl !== undefined) {
     tenant.branding.logoUrl = normalizeUrl(input.logoUrl);
-  }
-  if (input.primaryColor !== undefined) {
-    tenant.branding.primaryColor = input.primaryColor;
   }
 
   tenant.updatedBy = new mongoose.Types.ObjectId(userId);

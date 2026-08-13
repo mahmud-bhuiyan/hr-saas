@@ -8,29 +8,23 @@ import { useAuth } from '../../../contexts/AuthContext';
 import { useSiteConfig } from '../../../contexts/SiteConfigContext';
 import {
   ApiError,
-  fetchSiteConfig,
   fetchTenantBrandingOverrides,
   updateTenantBranding,
 } from '../../../lib/api';
 import { toast } from 'react-toastify';
 import { hasFormChanges, pickChangedFields } from '../../../utils/form';
+import type { PatchTenantBrandingInput } from '../../../types';
 import {
   TenantBrandingForm,
   TenantBrandingPreview,
   type TenantBrandingFormValues,
 } from './components/TenantBrandingForm';
 
-const formKeys = ['primaryColor', 'logoUrl'] as const;
+const formKeys = ['logoUrl'] as const;
 
-const toFormValues = (overrides: {
-  primaryColor: string | null;
-  logoUrl: string | null;
-}): TenantBrandingFormValues => ({
-  primaryColor: overrides.primaryColor ?? '',
+const toFormValues = (overrides: { logoUrl: string | null }): TenantBrandingFormValues => ({
   logoUrl: overrides.logoUrl ?? '',
 });
-
-import type { PatchTenantBrandingInput } from '../../../types';
 
 const toPatchInput = (
   values: TenantBrandingFormValues,
@@ -39,9 +33,6 @@ const toPatchInput = (
   const changed = pickChangedFields(values, original, [...formKeys]);
   const input: PatchTenantBrandingInput = {};
 
-  if (changed.primaryColor !== undefined) {
-    input.primaryColor = String(changed.primaryColor) || null;
-  }
   if (changed.logoUrl !== undefined) {
     input.logoUrl = String(changed.logoUrl) || null;
   }
@@ -55,12 +46,6 @@ export const TenantBrandingPage = () => {
   const queryClient = useQueryClient();
   const [values, setValues] = useState<TenantBrandingFormValues | null>(null);
   const [original, setOriginal] = useState<TenantBrandingFormValues | null>(null);
-
-  const platformQuery = useQuery({
-    queryKey: ['platform', 'site-config'],
-    queryFn: fetchSiteConfig,
-    enabled: user?.role === 'company_admin',
-  });
 
   const overridesQuery = useQuery({
     queryKey: ['settings', 'branding', 'overrides'],
@@ -115,7 +100,7 @@ export const TenantBrandingPage = () => {
     return <Navigate to="/dashboard" replace />;
   }
 
-  if (overridesQuery.isLoading || platformQuery.isLoading || !values) {
+  if (overridesQuery.isLoading || !values) {
     return (
       <PageContainer>
         <p className="text-sm text-slate-500">Loading branding settings…</p>
@@ -123,15 +108,13 @@ export const TenantBrandingPage = () => {
     );
   }
 
-  if (overridesQuery.isError || platformQuery.isError) {
+  if (overridesQuery.isError) {
     return (
       <PageContainer>
         <p className="text-sm text-red-600">Failed to load branding settings.</p>
       </PageContainer>
     );
   }
-
-  const platformPrimaryColor = platformQuery.data?.primaryColor ?? '#2563eb';
 
   return (
     <PageContainer className="space-y-8">
@@ -146,24 +129,19 @@ export const TenantBrandingPage = () => {
       <PageHeader
         label="Settings"
         title="Company branding"
-        description="Customize your company's logo and theme color. Overrides apply to all users in your organization."
+        description="Customize your company's logo. Theme colors are controlled by each user's personal theme choice."
       />
 
       <div className="grid gap-6 lg:grid-cols-2">
         <TenantBrandingForm
           values={values}
-          platformPrimaryColor={platformPrimaryColor}
           onChange={(field, value) => setValues((prev) => (prev ? { ...prev, [field]: value } : prev))}
           onClearField={handleClearField}
           onSubmit={handleSubmit}
           loading={updateMutation.isPending}
           hasChanges={hasChanges}
         />
-        <TenantBrandingPreview
-          values={values}
-          platformPrimaryColor={platformPrimaryColor}
-          displayName={displayName}
-        />
+        <TenantBrandingPreview values={values} displayName={displayName} />
       </div>
     </PageContainer>
   );

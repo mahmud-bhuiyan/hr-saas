@@ -101,7 +101,14 @@ const App = () => {
               </ModuleRoute>
             }
           />
-          <Route path="/myteam" element={<MyTeamPage />} />
+          <Route
+            path="/myteam"
+            element={
+              <ModuleRoute module="employees">
+                <MyTeamPage />
+              </ModuleRoute>
+            }
+          />
           <Route
             path="/dashboard/timesheets"
             element={

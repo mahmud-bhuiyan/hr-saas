@@ -35,7 +35,7 @@ const settingsLinks: SettingsLink[] = [
   {
     to: '/dashboard/settings/branding',
     label: 'Company branding',
-    description: 'Customize logo and theme color for your organization.',
+    description: 'Customize logo for your organization.',
     icon: HiPaintBrush,
     roles: ['company_admin'],
   },

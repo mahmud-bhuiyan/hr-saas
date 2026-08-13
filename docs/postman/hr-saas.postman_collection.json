@@ -2131,7 +2131,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"siteName\": \"Acme HR Platform\",\n  \"primaryColor\": \"#059669\"\n}"
+              "raw": "{\n  \"siteName\": \"Acme HR Platform\",\n  \"sidebarDisplay\": {\n    \"behavior\": \"collapsible\",\n    \"collapsedWidthPx\": 104,\n    \"expandedWidthPx\": 256\n  }\n}"
             },
             "url": "{{baseUrl}}/api/v1/admin/platform/site-settings",
             "description": "Super admin only. Partial update of platform branding."
@@ -2234,7 +2234,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"primaryColor\": \"#059669\",\n  \"logoUrl\": \"https://example.com/logo.png\"\n}"
+              "raw": "{\n  \"logoUrl\": \"https://example.com/logo.png\"\n}"
             },
             "url": "{{baseUrl}}/api/v1/settings/branding",
             "description": "Company admin only. Set null or empty to revert to platform default."

@@ -365,6 +365,7 @@ const profileToAuthUser = (profile: UserProfile): AuthUser => {
     avatarUrl: profile.avatarUrl,
     colorScheme: profile.colorScheme,
     themeColor: profile.themeColor,
+    enabledModules: profile.enabledModules,
   };
 }
 

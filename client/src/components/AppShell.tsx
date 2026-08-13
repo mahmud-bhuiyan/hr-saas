@@ -21,6 +21,8 @@ import type { IconType } from "react-icons";
 
 import { useAuth } from "../contexts/AuthContext";
 
+import { useSiteConfig } from "../contexts/SiteConfigContext";
+
 import {
   loadSidebarExpanded,
   saveSidebarExpanded,
@@ -30,15 +32,13 @@ import { GlobalSearch } from "./GlobalSearch";
 
 import { BrandMark } from "./BrandMark";
 
-import { SidebarUserBar } from "./SidebarUserBar";
-
 import { UserMenu } from "./UserMenu";
 
 import { NotificationBell } from "./NotificationBell";
 
 import type { UserRole } from "../types";
 import type { TenantModuleId } from "../types/modules";
-import { isModuleEnabledForUser } from "../utils/modules";
+import { hasAnyMeModuleEnabled, isModuleEnabledForUser } from "../utils/modules";
 
 const navItems: Array<{
   to: string;
@@ -98,6 +98,7 @@ const navItems: Array<{
     label: "My Team",
     icon: HiUserGroup,
     roles: ["company_admin", "hr_manager", "manager", "employee"],
+    module: "employees",
   },
 
   {
@@ -168,21 +169,61 @@ const isNavItemActive = (
 
 export const AppShell = () => {
   const { user } = useAuth();
+  const { config } = useSiteConfig();
   const location = useLocation();
 
-  const [sidebarExpanded, setSidebarExpanded] = useState(loadSidebarExpanded);
+  const { sidebarDisplay } = config;
+  const isCollapsible = sidebarDisplay.behavior === "collapsible";
+  const collapsedWidthPx = sidebarDisplay.collapsedWidthPx;
+  const expandedWidthPx = sidebarDisplay.expandedWidthPx;
+
+  const [sidebarExpanded, setSidebarExpanded] = useState(() =>
+    isCollapsible ? loadSidebarExpanded() : false,
+  );
+
+  const [isDesktopSidebar, setIsDesktopSidebar] = useState(() =>
+    typeof window !== "undefined"
+      ? window.matchMedia("(min-width: 768px)").matches
+      : false,
+  );
 
   useEffect(() => {
-    saveSidebarExpanded(sidebarExpanded);
-  }, [sidebarExpanded]);
+    const mediaQuery = window.matchMedia("(min-width: 768px)");
+    const handleChange = () => {
+      setIsDesktopSidebar(mediaQuery.matches);
+    };
 
-  const sidebarWidthClass = sidebarExpanded ? "w-64" : "w-[5.5rem]";
+    handleChange();
+    mediaQuery.addEventListener("change", handleChange);
+    return () => mediaQuery.removeEventListener("change", handleChange);
+  }, []);
 
-  const mainOffsetClass = sidebarExpanded ? "md:left-64" : "md:left-[5.5rem]";
+  useEffect(() => {
+    if (isCollapsible) {
+      saveSidebarExpanded(sidebarExpanded);
+    }
+  }, [isCollapsible, sidebarExpanded]);
 
-  const navItemLayoutClass = sidebarExpanded
-    ? "flex-row items-center gap-3 px-3 py-2"
-    : "flex-col items-center gap-0.5 px-1 py-2 text-center";
+  useEffect(() => {
+    if (!isCollapsible) {
+      setSidebarExpanded(false);
+    }
+  }, [isCollapsible]);
+
+  const isCompact = !isCollapsible || !sidebarExpanded;
+  const activeWidthPx = isCompact ? collapsedWidthPx : expandedWidthPx;
+  const sidebarWidthStyle = { width: activeWidthPx };
+  const mainOffsetStyle = isDesktopSidebar ? { left: activeWidthPx } : undefined;
+
+  const compactNavItemClass =
+    "flex flex-col items-center gap-0.5 px-1 py-2 text-center text-[10px] leading-tight";
+
+  const expandedNavItemClass =
+    "flex flex-row items-center gap-3 px-3 py-2 text-sm";
+
+  const navItemLayoutClass = isCompact ? compactNavItemClass : expandedNavItemClass;
+
+  const iconClass = isCompact ? "h-[18px] w-[18px]" : "h-5 w-5";
 
   const toggleSidebar = () => {
     setSidebarExpanded((current) => !current);
@@ -192,12 +233,13 @@ export const AppShell = () => {
     <div className="h-screen overflow-hidden bg-slate-50 dark:bg-slate-950">
       <header className="fixed inset-x-0 top-0 z-20 flex border-b border-brand-700 bg-brand-600 dark:border-brand-700 dark:bg-brand-700">
         <div
-          className={`hidden h-14 shrink-0 items-center overflow-hidden border-r border-black/15 transition-[width] duration-200 md:flex ${sidebarWidthClass} ${
-            sidebarExpanded ? "justify-start px-6" : "justify-center px-2"
+          className={`hidden h-14 shrink-0 items-center overflow-hidden border-r border-black/15 transition-[width] duration-200 md:flex ${
+            isCompact ? "justify-center px-2" : "justify-start px-6"
           }`}
+          style={sidebarWidthStyle}
         >
           <BrandMark
-            compact={!sidebarExpanded}
+            compact={isCompact}
             textClassName="text-lg font-semibold text-white"
           />
         </div>
@@ -220,10 +262,13 @@ export const AppShell = () => {
       </header>
 
       <aside
-        className={`fixed bottom-0 left-0 top-14 z-10 hidden flex-col overflow-visible border-r border-white/10 bg-[#0A1D2C] transition-[width] duration-200 md:flex ${sidebarWidthClass}`}
+        className="fixed bottom-0 left-0 top-14 z-10 hidden flex-col overflow-visible border-r border-white/10 bg-[#0A1D2C] transition-[width] duration-200 md:flex"
+        style={sidebarWidthStyle}
       >
         <nav
-          className={`thin-scrollbar min-h-0 flex-1 overflow-y-auto py-4 ${sidebarExpanded ? "space-y-0.5 px-2" : "space-y-1 px-1"}`}
+          className={`thin-scrollbar min-h-0 flex-1 overflow-y-auto py-4 ${
+            isCompact ? "space-y-1 px-1" : "space-y-0.5 px-2"
+          }`}
         >
           {navItems
 
@@ -233,6 +278,10 @@ export const AppShell = () => {
               }
 
               if (item.module && !isModuleEnabledForUser(user, item.module)) {
+                return false;
+              }
+
+              if (item.activePrefix === "/me/" && !hasAnyMeModuleEnabled(user)) {
                 return false;
               }
 
@@ -247,23 +296,19 @@ export const AppShell = () => {
                   <span
                     key={item.to}
                     title={item.label}
-                    className={`flex rounded-md text-slate-500 ${navItemLayoutClass} ${sidebarExpanded ? "text-sm" : "text-[10px] leading-tight"}`}
+                    className={`rounded-md text-slate-500 ${navItemLayoutClass}`}
                   >
-                    <Icon
-                      className={`shrink-0 ${sidebarExpanded ? "h-5 w-5" : "h-[18px] w-[18px]"}`}
-                      aria-hidden
-                    />
+                    <Icon className={`${iconClass} shrink-0`} aria-hidden />
 
-                    {sidebarExpanded ? (
-                      <>
-                        {item.label}
-
-                        <span className="ml-auto text-xs">Soon</span>
-                      </>
-                    ) : (
+                    {isCompact ? (
                       <span className="max-w-full text-center text-[10px] font-medium leading-tight">
                         {item.label}
                       </span>
+                    ) : (
+                      <>
+                        {item.label}
+                        <span className="ml-auto text-xs">Soon</span>
+                      </>
                     )}
                   </span>
                 );
@@ -277,70 +322,61 @@ export const AppShell = () => {
                   className={() => {
                     const active = isNavItemActive(location.pathname, item);
 
-                    return `flex rounded-md transition ${navItemLayoutClass} ${sidebarExpanded ? "text-sm" : "text-[10px] leading-tight"} ${
+                    return `rounded-md transition ${navItemLayoutClass} ${
                       active
                         ? "bg-[#122E44] font-semibold text-white"
                         : "font-medium text-slate-400 hover:bg-[#122E44] hover:text-white"
                     }`;
                   }}
                 >
-                  <Icon
-                    className={`shrink-0 ${sidebarExpanded ? "h-5 w-5" : "h-[18px] w-[18px]"}`}
-                    aria-hidden
-                  />
+                  <Icon className={`${iconClass} shrink-0`} aria-hidden />
 
-                  {sidebarExpanded ? (
-                    <span className="truncate">{item.label}</span>
-                  ) : (
+                  {isCompact ? (
                     <span className="max-w-full text-center font-medium leading-tight">
                       {item.label}
                     </span>
+                  ) : (
+                    <span className="truncate">{item.label}</span>
                   )}
                 </NavLink>
               );
             })}
         </nav>
 
-        <div
-          className={`shrink-0 border-t border-white/10 ${sidebarExpanded ? "px-3 py-2" : "px-2 py-2"}`}
-        >
-          <button
-            type="button"
-            onClick={toggleSidebar}
-            aria-label={sidebarExpanded ? "Collapse sidebar" : "Expand sidebar"}
-            title={sidebarExpanded ? "Collapse sidebar" : "Expand sidebar"}
-            className={`flex w-full rounded-md text-slate-400 transition hover:bg-[#122E44] hover:text-white ${
-              sidebarExpanded
-                ? "flex-row items-center gap-3 px-3 py-2"
-                : "flex-col items-center gap-0.5 px-1 py-2 text-center"
+        {isCollapsible && (
+          <div
+            className={`shrink-0 border-t border-white/10 ${
+              isCompact ? "px-2 py-2" : "px-3 py-2"
             }`}
           >
-            {sidebarExpanded ? (
-              <>
-                <HiChevronLeft className="h-5 w-5 shrink-0" aria-hidden />
-
-                <span className="truncate text-sm font-medium">Collapse</span>
-              </>
-            ) : (
-              <>
-                <HiChevronRight
-                  className="h-[18px] w-[18px] shrink-0"
-                  aria-hidden
-                />
-
-                <span className="max-w-full text-center text-[10px] font-medium leading-tight">
-                  Expand
-                </span>
-              </>
-            )}
-          </button>
-        </div>
-
-        <SidebarUserBar expanded={sidebarExpanded} />
+            <button
+              type="button"
+              onClick={toggleSidebar}
+              aria-label={sidebarExpanded ? "Collapse sidebar" : "Expand sidebar"}
+              title={sidebarExpanded ? "Collapse sidebar" : "Expand sidebar"}
+              className={`flex w-full rounded-md text-slate-400 transition hover:bg-[#122E44] hover:text-white ${navItemLayoutClass}`}
+            >
+              {sidebarExpanded ? (
+                <>
+                  <HiChevronLeft className={`${iconClass} shrink-0`} aria-hidden />
+                  <span className="truncate font-medium">Collapse</span>
+                </>
+              ) : (
+                <>
+                  <HiChevronRight className={`${iconClass} shrink-0`} aria-hidden />
+                  <span className="max-w-full text-center font-medium leading-tight">
+                    Expand
+                  </span>
+                </>
+              )}
+            </button>
+          </div>
+        )}
       </aside>
 
       <main
-        className={`thin-scrollbar fixed bottom-0 left-0 right-0 top-14 overflow-y-auto px-3 py-6 transition-[left] duration-200 md:px-4 ${mainOffsetClass}`}
+        className="thin-scrollbar fixed bottom-0 left-0 right-0 top-14 overflow-y-auto px-3 py-6 transition-[left] duration-200 md:px-4"
+        style={mainOffsetStyle}
       >
         <Outlet />
       </main>

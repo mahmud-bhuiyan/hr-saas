@@ -20,6 +20,15 @@ body {
   .card-surface {
     @apply rounded-xl border border-slate-200 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-900;
   }
+
+  .dark .ui-select {
+    color-scheme: dark;
+  }
+
+  .dark .ui-select option {
+    background-color: rgb(30 41 59);
+    color: rgb(248 250 252);
+  }
 }
 
 .dark .thin-scrollbar {

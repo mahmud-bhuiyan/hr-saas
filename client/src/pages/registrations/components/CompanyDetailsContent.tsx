@@ -1,12 +1,25 @@
 import type { RegistrationRequest } from '../../../types';
-import { getModuleLabel } from '../../../types/modules';
+import {
+  ALL_TENANT_MODULE_IDS,
+  getAlwaysAvailableFeatureLabels,
+  getModuleLabel,
+  resolveEnabledModules,
+} from '../../../types/modules';
 import { adminDisplayName, formatDate } from '../utils';
 import { CompanyStatusBadge } from './CompanyStatusBadge';
 import { SubscriptionStatusBadge } from './SubscriptionStatusBadge';
 
 export const CompanyDetailsContent = ({ company }: { company: RegistrationRequest }) => {
+  const enabledModules = resolveEnabledModules(company.enabledModules);
+  const enabledModuleLabels =
+    enabledModules.length > 0 ? enabledModules.map(getModuleLabel).join(', ') : 'None';
+
   return (
     <dl className="divide-y divide-slate-100 dark:divide-slate-800">
+      <div className="flex justify-between gap-4 py-2.5 text-sm">
+        <dt className="text-slate-500 dark:text-slate-400">Company ID</dt>
+        <dd className="text-right font-mono text-xs text-slate-600 dark:text-slate-400">{company.tenantId}</dd>
+      </div>
       <div className="flex justify-between gap-4 py-2.5 text-sm">
         <dt className="text-slate-500 dark:text-slate-400">Company</dt>
         <dd className="text-right font-medium text-slate-900 dark:text-slate-100">{company.companyName}</dd>
@@ -59,15 +72,17 @@ export const CompanyDetailsContent = ({ company }: { company: RegistrationReques
         </dd>
       </div>
       <div className="flex justify-between gap-4 py-2.5 text-sm">
-        <dt className="text-slate-500 dark:text-slate-400">Company ID</dt>
-        <dd className="text-right font-mono text-xs text-slate-600 dark:text-slate-400">{company.tenantId}</dd>
+        <dt className="text-slate-500 dark:text-slate-400">Always available</dt>
+        <dd className="max-w-[60%] text-right text-slate-900 dark:text-slate-100">
+          {getAlwaysAvailableFeatureLabels().join(', ')}
+        </dd>
       </div>
       <div className="flex justify-between gap-4 py-2.5 text-sm">
-        <dt className="text-slate-500 dark:text-slate-400">Enabled modules</dt>
+        <dt className="text-slate-500 dark:text-slate-400">
+          Enabled modules ({enabledModules.length} of {ALL_TENANT_MODULE_IDS.length})
+        </dt>
         <dd className="max-w-[60%] text-right text-slate-900 dark:text-slate-100">
-          {company.enabledModules && company.enabledModules.length > 0
-            ? company.enabledModules.map(getModuleLabel).join(', ')
-            : 'None'}
+          {enabledModuleLabels}
         </dd>
       </div>
       {company.rejectedReason && (

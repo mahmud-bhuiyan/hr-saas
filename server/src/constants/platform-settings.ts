@@ -23,13 +23,21 @@ export interface FaviconDisplaySettings {
   mimeType: FaviconMimeType;
 }
 
+export type SidebarBehavior = 'fixed_collapsed' | 'collapsible';
+
+export interface SidebarDisplaySettings {
+  behavior: SidebarBehavior;
+  collapsedWidthPx: number;
+  expandedWidthPx: number;
+}
+
 export interface SiteConfig {
   siteName: string;
   logoUrl: string | null;
   faviconUrl: string | null;
-  primaryColor: string;
   logoDisplay: LogoDisplaySettings;
   faviconDisplay: FaviconDisplaySettings;
+  sidebarDisplay: SidebarDisplaySettings;
 }
 
 export interface PlatformSiteSettings extends SiteConfig {
@@ -43,7 +51,6 @@ export interface EffectiveBranding extends SiteConfig {
 
 export interface TenantBrandingOverrides {
   logoUrl: string | null;
-  primaryColor: string | null;
 }
 
 export const DEFAULT_LOGO_DISPLAY: LogoDisplaySettings = {
@@ -58,11 +65,17 @@ export const DEFAULT_FAVICON_DISPLAY: FaviconDisplaySettings = {
   mimeType: 'auto',
 };
 
+export const DEFAULT_SIDEBAR_DISPLAY: SidebarDisplaySettings = {
+  behavior: 'fixed_collapsed',
+  collapsedWidthPx: 104,
+  expandedWidthPx: 256,
+};
+
 export const DEFAULT_PLATFORM_SETTINGS: SiteConfig = {
   siteName: 'Daily HR',
   logoUrl: null,
   faviconUrl: null,
-  primaryColor: '#2563eb',
   logoDisplay: { ...DEFAULT_LOGO_DISPLAY },
   faviconDisplay: { ...DEFAULT_FAVICON_DISPLAY },
+  sidebarDisplay: { ...DEFAULT_SIDEBAR_DISPLAY },
 };

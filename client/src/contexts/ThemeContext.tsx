@@ -60,10 +60,8 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
   }, [colorScheme]);
 
   useEffect(() => {
-    if (userId) {
-      applyThemeColor(themeColor);
-    }
-  }, [themeColor, userId]);
+    applyThemeColor(themeColor);
+  }, [themeColor]);
 
   useEffect(() => {
     if (userId) {
