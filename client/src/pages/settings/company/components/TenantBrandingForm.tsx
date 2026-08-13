@@ -1,5 +1,5 @@
 import { FormEvent } from 'react';
-import { HiLink, HiPhoto } from 'react-icons/hi2';
+import { HiPhoto } from 'react-icons/hi2';
 import { FormActions } from '../../../../components/ui/FormActions';
 import { FormField } from '../../../../components/ui/FormField';
 import { Input } from '../../../../components/ui/Input';
