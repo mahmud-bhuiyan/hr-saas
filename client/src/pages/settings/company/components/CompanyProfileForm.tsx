@@ -28,7 +28,7 @@ export const CompanyProfileForm = ({
   return (
     <form
       onSubmit={onSubmit}
-      className="card-surface max-w-xl space-y-4 p-6"
+      className="card-surface space-y-4 p-6"
     >
       <FormField label="Company name" htmlFor="company-name">
         <Input

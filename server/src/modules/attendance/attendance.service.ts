@@ -258,12 +258,18 @@ export const clockIn = async (
     throw new AttendanceServiceError('GPS location is not enabled for this company', 400);
   }
 
+  const method = input.method ?? 'web';
+
+  if (input.location && method === 'kiosk') {
+    throw new AttendanceServiceError('Location is not used for in-office clock-in', 400);
+  }
+
   const log = await AttendanceLog.create({
     tenantId: new mongoose.Types.ObjectId(tenantId),
     employeeId: employee._id,
     clockIn: new Date(),
     clockOut: null,
-    method: 'web' as const,
+    method,
     location: input.location ?? null,
   });
 

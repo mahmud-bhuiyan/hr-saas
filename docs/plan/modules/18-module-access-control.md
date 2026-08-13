@@ -50,7 +50,9 @@ enabledModules: [String]   // enum: employees | leave | attendance | timesheets 
 | `documents` | `/api/v1/documents` | `/dashboard/documents` |
 | `settings` | `/api/v1/settings`, `/api/v1/audit-logs`, `/api/v1/billing` | `/dashboard/settings/*` |
 
-**Always available:** auth, profile, notifications, platform config, dashboard shell.
+**Always available:** auth, profile, notifications, dashboard shell (Dashboard, Profile, Notifications — not toggled in Manage modules).
+
+Sellable business modules (10) are toggled per tenant; sidebar and routes respect enabled modules only.
 
 ---
 
@@ -103,7 +105,7 @@ Module routers return `403` when the module is disabled for the tenant.
 ### Screen: Company details (read-only modules)
 - **Route:** Details modal on companies page
 - **Access:** `super_admin`
-- **Elements:** List of enabled module labels
+- **Elements:** Always available platform features (Dashboard, Profile, Notifications); enabled sellable modules with count (e.g. `1 of 10`)
 
 ### Tenant user experience
 - Sidebar nav, global search, dashboard links, and direct URLs hide or redirect when module disabled

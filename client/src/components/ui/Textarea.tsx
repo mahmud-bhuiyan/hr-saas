@@ -3,11 +3,19 @@ import type { ReactNode, TextareaHTMLAttributes } from 'react';
 interface TextareaProps extends TextareaHTMLAttributes<HTMLTextAreaElement> {
   error?: string;
   icon?: ReactNode;
+  wrapperClassName?: string;
 }
 
-export const Textarea = ({ error, className = '', id, icon, ...props }: TextareaProps) => {
+export const Textarea = ({
+  error,
+  className = '',
+  id,
+  icon,
+  wrapperClassName = '',
+  ...props
+}: TextareaProps) => {
   return (
-    <div>
+    <div className={wrapperClassName}>
       <div className="relative">
         {icon && (
           <span className="pointer-events-none absolute left-3 top-3 text-slate-400" aria-hidden>

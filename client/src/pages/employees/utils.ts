@@ -2,6 +2,8 @@ import type { Employee } from '../../types';
 
 export type EmployeesTab = 'active' | 'inactive';
 
+export const EMPLOYEES_TAB_IDS = ['active', 'inactive'] as const satisfies readonly EmployeesTab[];
+
 export const isActiveEmployee = (employee: Employee): boolean => employee.status !== 'terminated';
 
 export const personName = (person: { firstName: string; lastName: string }): string => {

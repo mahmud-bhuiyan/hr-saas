@@ -6,6 +6,7 @@ const locationSchema = z.object({
 });
 
 export const clockInSchema = z.object({
+  method: z.enum(['web', 'kiosk']).optional(),
   location: locationSchema.optional(),
 });
 

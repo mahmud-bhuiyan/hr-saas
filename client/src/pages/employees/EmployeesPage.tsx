@@ -5,8 +5,9 @@ import { HiArrowUpTray, HiPlus } from 'react-icons/hi2';
 import { Button } from '../../components/ui/Button';
 import { PageContainer } from '../../components/ui/PageContainer';
 import { PageHeader } from '../../components/ui/PageHeader';
-import { Tabs } from '../../components/ui/Tabs';
+import { TabGroup } from '../../components/ui/TabGroup';
 import type { TableSortState } from '../../components/ui/Table';
+import { useTabUrlState } from '../../hooks/useTabUrlState';
 import { useAuth } from '../../contexts/AuthContext';
 import {
   ApiError,
@@ -24,7 +25,7 @@ import { CreateEmployeeModal } from './components/CreateEmployeeModal';
 import { EmployeeImportModal } from './components/EmployeeImportModal';
 import { EmployeeFilters } from './components/EmployeeFilters';
 import { EmployeesTable } from './components/EmployeesTable';
-import { employeeName, isActiveEmployee, type EmployeesTab } from './utils';
+import { employeeName, EMPLOYEES_TAB_IDS, isActiveEmployee, type EmployeesTab } from './utils';
 
 const emptyCreateForm: CreateEmployeeInput = {
   firstName: '',
@@ -43,7 +44,7 @@ export const EmployeesPage = () => {
 
   const [search, setSearch] = useState('');
   const [department, setDepartment] = useState('');
-  const [activeTab, setActiveTab] = useState<EmployeesTab>('active');
+  const { activeTab, setActiveTab } = useTabUrlState(EMPLOYEES_TAB_IDS, { defaultTab: 'active' });
   const [createOpen, setCreateOpen] = useState(false);
   const [importOpen, setImportOpen] = useState(false);
   const [createForm, setCreateForm] = useState<CreateEmployeeInput>(emptyCreateForm);
@@ -217,6 +218,31 @@ export const EmployeesPage = () => {
     activateMutation.mutate(employee.id);
   }
 
+  const tableBaseProps = {
+    employees: paginatedItems,
+    loading: employeesQuery.isLoading,
+    sort,
+    onSortChange: setSort,
+    pagination: {
+      page,
+      pageSize,
+      total,
+      totalPages,
+      rangeStart,
+      rangeEnd,
+      onPageChange: setPage,
+      onPageSizeChange: setPageSize,
+      pageSizeOptions,
+    },
+    canUpdate: Boolean(canUpdate),
+    onView: (employee: Employee) => navigate(`/dashboard/employees/${employee.id}`),
+    onEdit: canUpdate
+      ? (employee: Employee) => navigate(`/dashboard/employees/${employee.id}/edit`)
+      : undefined,
+    deactivateLoadingId,
+    activateLoadingId,
+  };
+
   return (
     <PageContainer>
       <PageHeader
@@ -256,51 +282,38 @@ export const EmployeesPage = () => {
         pageSizeOptions={pageSizeOptions}
       />
 
-      <section className="space-y-4">
-        <Tabs
-          activeId={activeTab}
-          onChange={(id) => setActiveTab(id as EmployeesTab)}
-          tabs={[
-            { id: 'active', label: 'Active employees', count: activeEmployees.length },
-            { id: 'inactive', label: 'Inactive employees', count: inactiveEmployees.length },
-          ]}
-        />
-
-        <EmployeesTable
-          employees={paginatedItems}
-          loading={employeesQuery.isLoading}
-          sort={sort}
-          onSortChange={setSort}
-          emptyMessage={
-            activeTab === 'active'
-              ? 'No active employees match your filters.'
-              : 'No inactive employees match your filters.'
-          }
-          pagination={{
-            page,
-            pageSize,
-            total,
-            totalPages,
-            rangeStart,
-            rangeEnd,
-            onPageChange: setPage,
-            onPageSizeChange: setPageSize,
-            pageSizeOptions,
-          }}
-          canUpdate={Boolean(canUpdate)}
-          showStatus={activeTab === 'inactive'}
-          onView={(employee) => navigate(`/dashboard/employees/${employee.id}`)}
-          onEdit={
-            canUpdate
-              ? (employee) => navigate(`/dashboard/employees/${employee.id}/edit`)
-              : undefined
-          }
-          onDeactivate={activeTab === 'active' && canUpdate ? handleDeactivate : undefined}
-          onActivate={activeTab === 'inactive' && canUpdate ? handleActivate : undefined}
-          deactivateLoadingId={deactivateLoadingId}
-          activateLoadingId={activateLoadingId}
-        />
-      </section>
+      <TabGroup<EmployeesTab>
+        activeId={activeTab}
+        onChange={setActiveTab}
+        className="space-y-4"
+        tabs={[
+          {
+            id: 'active',
+            label: 'Active employees',
+            count: activeEmployees.length,
+            content: (
+              <EmployeesTable
+                {...tableBaseProps}
+                emptyMessage="No active employees match your filters."
+                onDeactivate={canUpdate ? handleDeactivate : undefined}
+              />
+            ),
+          },
+          {
+            id: 'inactive',
+            label: 'Inactive employees',
+            count: inactiveEmployees.length,
+            content: (
+              <EmployeesTable
+                {...tableBaseProps}
+                emptyMessage="No inactive employees match your filters."
+                showStatus
+                onActivate={canUpdate ? handleActivate : undefined}
+              />
+            ),
+          },
+        ]}
+      />
 
       <CreateEmployeeModal
         open={createOpen}

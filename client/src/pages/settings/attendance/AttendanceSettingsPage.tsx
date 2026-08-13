@@ -6,7 +6,7 @@ import { toast } from 'react-toastify';
 import { Button } from '../../../components/ui/Button';
 import { FormField } from '../../../components/ui/FormField';
 import { PageContainer } from '../../../components/ui/PageContainer';
-import { PageHeader } from '../../../components/ui/PageHeader';
+import { SettingsPageHeader } from '../components/SettingsPageHeader';
 import { Select } from '../../../components/ui/Select';
 import { useAuth } from '../../../contexts/AuthContext';
 import { ApiError, fetchAttendanceSettings, patchAttendanceSettings } from '../../../lib/api';
@@ -55,14 +55,13 @@ export const AttendanceSettingsPage = () => {
   const changed = hasFormChanges({ gpsEnabled }, { gpsEnabled: original }, ['gpsEnabled']);
 
   return (
-    <PageContainer>
-      <PageHeader
-        label="Settings"
+    <PageContainer maxWidth="lg">
+      <SettingsPageHeader
         title="Attendance settings"
         description="Configure attendance options for your company."
       />
 
-      <div className="card-surface max-w-lg p-6">
+      <div className="card-surface p-6">
         <FormField label="GPS on clock-in">
           <Select
             value={gpsEnabled}

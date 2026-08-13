@@ -1,5 +1,24 @@
-/* Keka attendance log — scoped dark theme matching reference UI */
+/* Keka attendance log — theme-aware scoped styles */
 .keka-attendance {
+  --keka-bg: #f8fafc;
+  --keka-card: #ffffff;
+  --keka-card-hover: #f1f5f9;
+  --keka-border: #e2e8f0;
+  --keka-accent: #5bbfa8;
+  --keka-accent-dim: #3d8f7c;
+  --keka-text: #0f172a;
+  --keka-muted: #64748b;
+  --keka-w-off: #b45309;
+  --keka-w-off-bg: #fef3c7;
+  --keka-pill-active: #5bbfa8;
+  --keka-bar-track: #e2e8f0;
+  --keka-weekend-bg: #f8fafc;
+  --keka-thead-bg: #f1f5f9;
+  --keka-pill-text: #0f1923;
+  --keka-clock-bg: rgba(241, 245, 249, 0.8);
+}
+
+.dark .keka-attendance {
   --keka-bg: #0f1923;
   --keka-card: #162028;
   --keka-card-hover: #1a2832;
@@ -12,6 +31,10 @@
   --keka-w-off-bg: #2a2418;
   --keka-pill-active: #5bbfa8;
   --keka-bar-track: #243442;
+  --keka-weekend-bg: #121c26;
+  --keka-thead-bg: #121c26;
+  --keka-pill-text: #0f1923;
+  --keka-clock-bg: rgba(10, 16, 23, 0.3);
 }
 
 .keka-attendance {
@@ -44,6 +67,10 @@
 }
 
 .keka-link:hover {
+  color: var(--keka-accent-dim);
+}
+
+.dark .keka-link:hover {
   color: #7dd4bc;
 }
 
@@ -59,12 +86,12 @@
 .keka-tab-active {
   @apply rounded-md;
   background-color: var(--keka-pill-active);
-  color: #0f1923;
+  color: var(--keka-pill-text);
 }
 
 .keka-toggle {
   @apply relative h-5 w-9 rounded-full transition;
-  background-color: var(--keka-border);
+  background-color: var(--keka-bar-track);
 }
 
 .keka-toggle-on {
@@ -97,7 +124,7 @@
 .keka-month-pill-active {
   @apply rounded;
   background-color: var(--keka-accent);
-  color: #0f1923;
+  color: var(--keka-pill-text);
 }
 
 .keka-cal-cell {
@@ -107,7 +134,7 @@
 }
 
 .keka-cal-cell-weekend {
-  background-color: #121c26;
+  background-color: var(--keka-weekend-bg);
 }
 
 .keka-cal-cell-selected {
@@ -118,7 +145,7 @@
 .keka-cal-cell-today .keka-cal-day-num {
   @apply rounded-full;
   background-color: var(--keka-accent);
-  color: #0f1923;
+  color: var(--keka-pill-text);
 }
 
 .keka-w-off {
@@ -153,7 +180,7 @@
 
 .keka-attendance thead th {
   color: var(--keka-muted) !important;
-  background-color: #121c26 !important;
+  background-color: var(--keka-thead-bg) !important;
 }
 
 .keka-attendance tbody td {

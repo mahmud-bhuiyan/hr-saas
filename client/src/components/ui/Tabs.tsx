@@ -20,6 +20,7 @@ export const Tabs = ({ tabs, activeId, onChange, className = '' }: TabsProps) =>
           return (
             <button
               key={tab.id}
+              id={`tab-${tab.id}`}
               type="button"
               onClick={() => onChange(tab.id)}
               aria-current={isActive ? 'page' : undefined}

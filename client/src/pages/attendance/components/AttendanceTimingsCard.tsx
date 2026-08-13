@@ -79,7 +79,7 @@ export const AttendanceTimingsCard = ({
                 <span className="keka-muted text-[10px] font-semibold">{label}</span>
                 <span
                   className={`flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold ${
-                    isToday ? 'text-[#0f1923]' : hasLogs ? 'keka-accent-text' : 'keka-muted'
+                    isToday ? 'text-[var(--keka-pill-text)]' : hasLogs ? 'keka-accent-text' : 'keka-muted'
                   }`}
                   style={
                     isToday

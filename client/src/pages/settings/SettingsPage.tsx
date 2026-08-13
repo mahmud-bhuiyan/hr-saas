@@ -1,7 +1,6 @@
-import { Link, Navigate } from 'react-router-dom';
+import { Navigate } from "react-router-dom";
 import {
   HiBuildingOffice2,
-  HiPaintBrush,
   HiRectangleGroup,
   HiUsers,
   HiClipboardDocumentList,
@@ -10,97 +9,91 @@ import {
   HiCreditCard,
   HiMapPin,
   HiBanknotes,
-} from 'react-icons/hi2';
-import { PageContainer } from '../../components/ui/PageContainer';
-import { PageHeader } from '../../components/ui/PageHeader';
-import { useAuth } from '../../contexts/AuthContext';
-import type { UserRole } from '../../types';
+} from "react-icons/hi2";
+import {
+  NavCardGroup,
+  type NavCardGroupItem,
+} from "../../components/ui/NavCardGroup";
+import { PageContainer } from "../../components/ui/PageContainer";
+import { PageHeader } from "../../components/ui/PageHeader";
+import { useAuth } from "../../contexts/AuthContext";
+import type { UserRole } from "../../types";
 
-type SettingsLink = {
-  to: string;
-  label: string;
-  description: string;
-  icon: typeof HiBuildingOffice2;
+type SettingsLink = NavCardGroupItem & {
   roles: UserRole[];
 };
 
 const settingsLinks: SettingsLink[] = [
   {
-    to: '/dashboard/settings/company',
-    label: 'Company profile',
-    description: 'Update company name, address, and logo.',
+    to: "/dashboard/settings/company",
+    label: "Company",
+    description: "Update company profile, address, logo, and branding.",
     icon: HiBuildingOffice2,
-    roles: ['company_admin'],
+    roles: ["company_admin"],
   },
   {
-    to: '/dashboard/settings/branding',
-    label: 'Company branding',
-    description: 'Customize logo and theme color for your organization.',
-    icon: HiPaintBrush,
-    roles: ['company_admin'],
-  },
-  {
-    to: '/dashboard/settings/departments',
-    label: 'Departments',
-    description: 'Manage departments used when assigning employees.',
+    to: "/dashboard/settings/departments",
+    label: "Departments",
+    description: "Manage departments used when assigning employees.",
     icon: HiRectangleGroup,
-    roles: ['company_admin', 'hr_manager'],
+    roles: ["company_admin", "hr_manager"],
   },
   {
-    to: '/dashboard/settings/locations',
-    label: 'Work locations',
-    description: 'Manage sites for shift scheduling and rota planning.',
+    to: "/dashboard/settings/locations",
+    label: "Work locations",
+    description: "Manage sites for shift scheduling and rota planning.",
     icon: HiMapPin,
-    roles: ['company_admin', 'hr_manager'],
+    roles: ["company_admin", "hr_manager"],
   },
   {
-    to: '/dashboard/settings/payroll',
-    label: 'Payroll settings',
-    description: 'Pay period type, currency, and week start for payroll export.',
+    to: "/dashboard/settings/payroll",
+    label: "Payroll settings",
+    description:
+      "Pay period type, currency, and week start for payroll export.",
     icon: HiBanknotes,
-    roles: ['company_admin'],
+    roles: ["company_admin"],
   },
   {
-    to: '/dashboard/settings/audit-log',
-    label: 'Audit log',
-    description: 'Review sensitive changes across your organization.',
+    to: "/dashboard/settings/audit-log",
+    label: "Audit log",
+    description: "Review sensitive changes across your organization.",
     icon: HiClipboardDocumentList,
-    roles: ['company_admin', 'hr_manager'],
+    roles: ["company_admin", "hr_manager"],
   },
   {
-    to: '/dashboard/settings/attendance',
-    label: 'Attendance',
-    description: 'Configure GPS tracking and attendance policies.',
+    to: "/dashboard/settings/attendance",
+    label: "Attendance",
+    description: "Configure GPS tracking and attendance policies.",
     icon: HiClock,
-    roles: ['company_admin'],
+    roles: ["company_admin"],
   },
   {
-    to: '/dashboard/settings/leave',
-    label: 'Leave policy',
-    description: 'Annual entitlement, carry-over, and multi-step approval.',
+    to: "/dashboard/settings/leave",
+    label: "Leave policy",
+    description: "Annual entitlement, carry-over, and multi-step approval.",
     icon: HiCalendarDays,
-    roles: ['company_admin'],
+    roles: ["company_admin"],
   },
   {
-    to: '/dashboard/settings/billing',
-    label: 'Billing',
-    description: 'Manage your per-seat Stripe subscription and seat count.',
+    to: "/dashboard/settings/billing",
+    label: "Billing",
+    description: "Manage your per-seat Stripe subscription and seat count.",
     icon: HiCreditCard,
-    roles: ['company_admin'],
+    roles: ["company_admin"],
   },
   {
-    to: '/dashboard/settings/users',
-    label: 'Users & roles',
-    description: 'View users and assign roles within your company.',
+    to: "/dashboard/settings/users",
+    label: "Users & roles",
+    description: "View users and assign roles within your company.",
     icon: HiUsers,
-    roles: ['company_admin'],
+    roles: ["company_admin"],
   },
 ];
 
 export const SettingsPage = () => {
   const { user } = useAuth();
 
-  if (!user || !['company_admin', 'hr_manager'].includes(user.role)) {
+  if (!user || !["company_admin", "hr_manager"].includes(user.role)) {
     return <Navigate to="/dashboard" replace />;
   }
 
@@ -114,28 +107,7 @@ export const SettingsPage = () => {
         description="Manage your organization profile, departments, users, and branding."
       />
 
-      <div className="grid gap-4 sm:grid-cols-2">
-        {links.map((link) => {
-          const Icon = link.icon;
-          return (
-            <Link
-              key={link.to}
-              to={link.to}
-              className="rounded-xl border border-slate-200 bg-white p-5 transition hover:border-brand-200 hover:shadow-sm dark:border-slate-700 dark:bg-slate-900 dark:hover:border-brand-500/40"
-            >
-              <div className="flex items-start gap-4">
-                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-brand-50 dark:bg-brand-500/15">
-                  <Icon className="h-5 w-5 text-brand-600" />
-                </span>
-                <div>
-                  <h2 className="font-semibold text-slate-900 dark:text-slate-100">{link.label}</h2>
-                  <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">{link.description}</p>
-                </div>
-              </div>
-            </Link>
-          );
-        })}
-      </div>
+      <NavCardGroup items={links} columns={4} />
     </PageContainer>
   );
 };

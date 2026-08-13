@@ -1,11 +1,11 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useEffect } from 'react';
 import { HiArrowTopRightOnSquare, HiCreditCard, HiSignal, HiUserGroup } from 'react-icons/hi2';
-import { Link, Navigate, useSearchParams } from 'react-router-dom';
+import { Navigate, useSearchParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { Button } from '../../../components/ui/Button';
 import { PageContainer } from '../../../components/ui/PageContainer';
-import { PageHeader } from '../../../components/ui/PageHeader';
+import { SettingsPageHeader } from '../components/SettingsPageHeader';
 import { useAuth } from '../../../contexts/AuthContext';
 import {
   ApiError,
@@ -101,18 +101,8 @@ export const BillingPage = () => {
   const showManage = !isExempt && hasActive;
 
   return (
-    <PageContainer>
-      <div className="mb-6">
-        <Link
-          to="/dashboard/settings"
-          className="text-sm font-medium text-brand-600 hover:text-brand-700 dark:text-brand-400"
-        >
-          ← Back to settings
-        </Link>
-      </div>
-
-      <PageHeader
-        label="Settings"
+    <PageContainer maxWidth="2xl">
+      <SettingsPageHeader
         title="Billing"
         description="Manage your per-seat subscription. Seat count syncs with active employees."
       />
@@ -123,7 +113,7 @@ export const BillingPage = () => {
         </p>
       )}
 
-      <div className="card-surface max-w-2xl space-y-6 p-6">
+      <div className="card-surface space-y-6 p-6">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
             <p className="text-sm text-slate-500 dark:text-slate-400">Plan status</p>

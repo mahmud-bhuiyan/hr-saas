@@ -127,9 +127,7 @@ export const resolveUserThemeColor = (
 export const initColorSchemeFromStorage = (): void => {
   const { user } = loadAuth();
   applyColorScheme(resolveColorScheme(user?.id, user?.colorScheme));
-  if (user?.id) {
-    applyThemeColor(resolveUserThemeColor(user.id, user.themeColor));
-  }
+  applyThemeColor(resolveUserThemeColor(user?.id, user?.themeColor));
 };
 
 export { applyThemeColor };

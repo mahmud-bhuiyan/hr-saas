@@ -47,8 +47,7 @@
   address: String,           // optional
   logoUrl: String | null,    // company logo (tenant-scoped) — future company profile
   branding: {
-    logoUrl: String | null,
-    primaryColor: String | null   // overrides platform primaryColor when set
+    logoUrl: String | null
   }
 }
 ```

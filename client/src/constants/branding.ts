@@ -21,6 +21,12 @@ export const DEFAULT_FAVICON_DISPLAY = {
   mimeType: 'auto' as FaviconMimeType,
 };
 
+export const DEFAULT_SIDEBAR_DISPLAY = {
+  behavior: 'fixed_collapsed' as const,
+  collapsedWidthPx: 104,
+  expandedWidthPx: 256,
+};
+
 export const inferFaviconMimeType = (url: string | null): string | undefined => {
   if (!url) {
     return undefined;

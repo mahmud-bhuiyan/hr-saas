@@ -5,14 +5,15 @@ import { Input } from './Input';
 interface PasswordInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'type'> {
   error?: string;
   icon?: ReactNode;
+  wrapperClassName?: string;
 }
 
 export const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(
-  ({ error, className = '', id, disabled, icon, ...props }, ref) => {
+  ({ error, className = '', id, disabled, icon, wrapperClassName = '', ...props }, ref) => {
     const [visible, setVisible] = useState(false);
 
     return (
-      <div className="relative">
+      <div className={`relative ${wrapperClassName}`}>
         <Input
           ref={ref}
           id={id}

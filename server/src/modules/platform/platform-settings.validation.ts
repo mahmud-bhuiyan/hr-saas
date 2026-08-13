@@ -1,9 +1,5 @@
 import { z } from 'zod';
 
-const hexColorSchema = z
-  .string()
-  .regex(/^#[0-9A-Fa-f]{6}$/, 'Primary color must be a valid hex color (#RRGGBB)');
-
 const optionalUrlSchema = z.union([
   z.string().trim().url('Must be a valid URL'),
   z.null(),
@@ -28,14 +24,22 @@ const faviconDisplaySchema = z
   })
   .optional();
 
+const sidebarDisplaySchema = z
+  .object({
+    behavior: z.enum(['fixed_collapsed', 'collapsible']).optional(),
+    collapsedWidthPx: z.number().int().min(80).max(128).optional(),
+    expandedWidthPx: z.number().int().min(160).max(320).optional(),
+  })
+  .optional();
+
 export const patchPlatformSettingsSchema = z
   .object({
     siteName: z.string().trim().min(2, 'Site name must be at least 2 characters').max(64).optional(),
     logoUrl: optionalUrlSchema.optional(),
     faviconUrl: optionalUrlSchema.optional(),
-    primaryColor: hexColorSchema.optional(),
     logoDisplay: logoDisplaySchema,
     faviconDisplay: faviconDisplaySchema,
+    sidebarDisplay: sidebarDisplaySchema,
   })
   .refine((data) => Object.keys(data).length > 0, {
     message: 'At least one field is required',
@@ -50,7 +54,6 @@ export const uploadPlatformAssetSchema = z.object({
 export const patchTenantBrandingSchema = z
   .object({
     logoUrl: optionalUrlSchema.optional(),
-    primaryColor: z.union([hexColorSchema, z.null()]).optional(),
   })
   .refine((data) => Object.keys(data).length > 0, {
     message: 'At least one field is required',

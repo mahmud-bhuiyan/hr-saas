@@ -5,7 +5,8 @@ import { HiPlus } from 'react-icons/hi2';
 import { Button } from '../../components/ui/Button';
 import { PageContainer } from '../../components/ui/PageContainer';
 import { PageHeader } from '../../components/ui/PageHeader';
-import { Tabs } from '../../components/ui/Tabs';
+import { TabGroup } from '../../components/ui/TabGroup';
+import { useTabUrlState } from '../../hooks/useTabUrlState';
 import {
   ApiError,
   approveRegistration,
@@ -39,6 +40,7 @@ import {
   RegisteredCompaniesTable,
 } from './components/RegistrationsTables';
 import {
+  COMPANIES_TAB_IDS,
   type CompaniesTab,
   type EditCompanyForm,
   editFormKeys,
@@ -49,7 +51,9 @@ import {
 export const RegistrationsPage = () => {
   const { user } = useAuth();
   const queryClient = useQueryClient();
-  const [activeTab, setActiveTab] = useState<CompaniesTab>('registered');
+  const { activeTab, setActiveTab } = useTabUrlState(COMPANIES_TAB_IDS, {
+    defaultTab: 'registered',
+  });
   const [createOpen, setCreateOpen] = useState(false);
   const [createForm, setCreateForm] = useState<CreateCompanyInput>(emptyCreateForm);
   const [approveTarget, setApproveTarget] = useState<RegistrationRequest | null>(null);
@@ -336,43 +340,48 @@ export const RegistrationsPage = () => {
         }
       />
 
-      <section className="space-y-4">
-        <Tabs
-          activeId={activeTab}
-          onChange={(id) => setActiveTab(id as CompaniesTab)}
-          tabs={[
-            { id: 'registered', label: 'Registered companies', count: registered.length },
-            { id: 'pending', label: 'Pending registrations', count: pending.length },
-          ]}
-        />
-
-        {activeTab === 'pending' && (
-          <PendingRegistrationsTable
-            pending={pending}
-            loading={pendingQuery.isLoading}
-            isError={pendingQuery.isError}
-            onViewDetails={setDetailsTarget}
-            onApprove={(row) => setApproveTarget(row)}
-            onReject={openRejectModal}
-            approvePending={approveMutation.isPending}
-            rejectPending={rejectMutation.isPending}
-          />
-        )}
-
-        {activeTab === 'registered' && (
-          <RegisteredCompaniesTable
-            registered={registered}
-            loading={approvedQuery.isLoading}
-            isError={approvedQuery.isError}
-            onViewDetails={setDetailsTarget}
-            onEdit={openEditModal}
-            onManageModules={(row) => {
-              void openModulesModal(row);
-            }}
-            companyActionPending={companyActionPending}
-          />
-        )}
-      </section>
+      <TabGroup<CompaniesTab>
+        activeId={activeTab}
+        onChange={setActiveTab}
+        className="space-y-4"
+        tabs={[
+          {
+            id: 'registered',
+            label: 'Registered companies',
+            count: registered.length,
+            content: (
+              <RegisteredCompaniesTable
+                registered={registered}
+                loading={approvedQuery.isLoading}
+                isError={approvedQuery.isError}
+                onViewDetails={setDetailsTarget}
+                onEdit={openEditModal}
+                onManageModules={(row) => {
+                  void openModulesModal(row);
+                }}
+                companyActionPending={companyActionPending}
+              />
+            ),
+          },
+          {
+            id: 'pending',
+            label: 'Pending registrations',
+            count: pending.length,
+            content: (
+              <PendingRegistrationsTable
+                pending={pending}
+                loading={pendingQuery.isLoading}
+                isError={pendingQuery.isError}
+                onViewDetails={setDetailsTarget}
+                onApprove={(row) => setApproveTarget(row)}
+                onReject={openRejectModal}
+                approvePending={approveMutation.isPending}
+                rejectPending={rejectMutation.isPending}
+              />
+            ),
+          },
+        ]}
+      />
 
       <CreateCompanyModal
         open={createOpen}

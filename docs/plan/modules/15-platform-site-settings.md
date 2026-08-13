@@ -37,7 +37,6 @@ One document for the entire platform. Use a fixed `_id` or upsert by a constant 
   siteName: String,            // required, 2–64 chars
   logoUrl: String | null,      // optional; text siteName fallback in UI
   faviconUrl: String | null,   // optional; default favicon when null
-  primaryColor: String,        // hex, e.g. "#2563eb"
   logoDisplay: {
     heightPx: Number,          // 24–80, default 32
     maxWidthPx: Number,        // 80–320, default 160
@@ -46,6 +45,11 @@ One document for the entire platform. Use a fixed `_id` or upsert by a constant 
   },
   faviconDisplay: {
     mimeType: String           // 'auto' | image/png | image/x-icon | image/svg+xml | image/webp
+  },
+  sidebarDisplay: {
+    behavior: String,          // 'fixed_collapsed' | 'collapsible'
+    collapsedWidthPx: Number,  // 80–128, default 104
+    expandedWidthPx: Number    // 160–320, default 256 (collapsible mode)
   },
   updatedAt: Date,
   updatedBy: ObjectId          // ref User (super_admin)
@@ -59,7 +63,9 @@ One document for the entire platform. Use a fixed `_id` or upsert by a constant 
 | `siteName` | `Daily HR` |
 | `logoUrl` | `null` |
 | `faviconUrl` | `null` (client uses bundled default) |
-| `primaryColor` | `#2563eb` |
+| `sidebarDisplay.behavior` | `fixed_collapsed` |
+| `sidebarDisplay.collapsedWidthPx` | `104` |
+| `sidebarDisplay.expandedWidthPx` | `256` |
 
 **Asset storage:** ImgBB via server-side `IMGBB_API_KEY` for super-admin upload; URL fields remain supported. Tenant admins use URL-only overrides.
 
@@ -81,14 +87,12 @@ One document for the entire platform. Use a fixed `_id` or upsert by a constant 
 {
   "siteName": "Daily HR",
   "logoUrl": null,
-  "faviconUrl": null,
-  "primaryColor": "#2563eb"
+  "faviconUrl": null
 }
 
 // PATCH /api/v1/admin/platform/site-settings
 {
-  "siteName": "Acme HR Platform",
-  "primaryColor": "#059669"
+  "siteName": "Acme HR Platform"
 }
 ```
 
@@ -102,9 +106,8 @@ Update `docs/openapi.yaml` and Postman collection when implemented.
 2. Public `site-config` exposes branding fields only — no internal metadata (`updatedBy`, etc.).
 3. PATCH applies only fields present in request body (partial update).
 4. `siteName` required on create; cannot be empty string.
-5. `primaryColor` must be valid 6-digit hex (`#RRGGBB`).
-6. Logo/favicon uploads: PNG, SVG, WebP, or ICO; size limits enforced server-side.
-7. When settings document is missing, API returns hardcoded defaults (current app behavior).
+5. Logo/favicon uploads: PNG, SVG, WebP, or ICO; size limits enforced server-side.
+6. When settings document is missing, API returns hardcoded defaults (current app behavior).
 
 ---
 
@@ -117,23 +120,23 @@ Update `docs/openapi.yaml` and Postman collection when implemented.
 - **Layout:** `PageContainer` → `PageHeader` → form + live preview panel
 - **Fields:**
   - Site name (`Input` with icon)
-  - Primary color (color picker + hex input)
   - Logo: upload (ImgBB) or URL; height, max width, object-fit, show site name toggle
   - Favicon: upload (ImgBB) or URL; MIME type select; browser-tab preview
+  - Sidebar: mode (always compact vs allow expand/collapse); compact width (px)
 - **Save:** `FormModal` or inline form with `FormActions`; edit mode — save disabled until `hasFormChanges`
 - **Nav:** Sidebar item for `super_admin` only (alongside Companies)
 
 ### Client bootstrap (all users)
 
 1. Fetch `GET /api/v1/platform/site-config` at app mount (public, no auth).
-2. Apply CSS variables for `--brand-*` shades computed from `primaryColor`.
+2. Theme colors come from each user's personal theme choice (`ThemeContext`), not platform settings.
 3. Replace static `APP_NAME` in `AppShell`, `AuthLayout` via `useSiteConfig` hook / `SiteConfigProvider`.
 4. Set `document.title` and update `<link rel="icon">` dynamically.
 
 ### User flow
 
 ```
-Super admin opens Site settings → edits name/color/logo/favicon → saves
+Super admin opens Site settings → edits name/logo/favicon/sidebar → saves
 → Public config updated → all users see new branding on next page load
 ```
 
@@ -167,7 +170,7 @@ None for Stage 1.
 
 ### Per-tenant overrides (Stage 3)
 
-- Extend `Tenant` model with optional `branding` block (`logoUrl`, `primaryColor`, etc.).
+- Extend `Tenant` model with optional `branding` block (`logoUrl`, etc.).
 - Company admin manages tenant branding in Settings (module 05).
 - **Merge rule:** tenant override wins when set; otherwise fall back to platform defaults from this module.
 
@@ -178,7 +181,7 @@ None for Stage 1.
 ### Backend
 
 - [x] `PlatformSettings` model + singleton upsert
-- [x] Validation (Zod): siteName, primaryColor, logoUrl, faviconUrl
+- [x] Validation (Zod): siteName, logoUrl, faviconUrl
 - [x] Service: get defaults, get public config, patch settings
 - [x] Routes: public GET + super_admin GET/PATCH + POST upload (ImgBB)
 - [x] Logo/favicon display settings in model + public config
@@ -187,7 +190,7 @@ None for Stage 1.
 ### Frontend
 
 - [x] `SiteConfigProvider` + `useSiteConfig` hook
-- [x] CSS variable theme injection from `primaryColor`
+- [x] Personal theme colors via user theme picker (`ThemeContext`)
 - [x] Dynamic `document.title` and favicon
 - [x] Super admin page: `/dashboard/platform/site-settings`
 - [x] Sidebar nav item for super admin
@@ -220,3 +223,5 @@ None for Stage 1.
 - [x] Non–super-admin roles cannot read or edit platform admin settings
 - [x] Defaults match current app when no settings document exists
 - [x] Per-tenant branding overrides implemented (module 05)
+- [x] Super admin can set sidebar mode (always compact vs collapsible) and compact width (px)
+- [x] App shell applies sidebar layout from platform site config; collapsible mode persists user expand state in localStorage

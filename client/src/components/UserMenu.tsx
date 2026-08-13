@@ -4,7 +4,6 @@ import {
   HiArrowRightOnRectangle,
   HiChevronRight,
   HiClock,
-  HiCog6Tooth,
   HiKey,
   HiMoon,
   HiPaintBrush,
@@ -306,14 +305,6 @@ export const UserMenu = () => {
                 />
               ))}
             </HoverSubmenu>
-
-            <div onClick={closeMenu}>
-              <MenuRow
-                to="/dashboard/profile"
-                label="User preferences"
-                icon={<HiCog6Tooth className={menuIconClass} aria-hidden />}
-              />
-            </div>
 
             <button
               type="button"

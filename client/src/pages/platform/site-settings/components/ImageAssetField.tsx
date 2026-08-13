@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react';
-import { HiArrowUpTray, HiCheck, HiLink } from 'react-icons/hi2';
+import { HiArrowUpTray, HiLink } from 'react-icons/hi2';
 import { Button } from '../../../../components/ui/Button';
 import { FaviconImage } from '../../../../components/FaviconImage';
 import { FormField } from '../../../../components/ui/FormField';
@@ -12,12 +12,11 @@ interface ImageAssetFieldProps {
   htmlFor: string;
   asset: 'logo' | 'favicon';
   url: string;
-  savedUrl: string;
   onUrlChange: (value: string) => void;
-  onSave: (url: string) => Promise<void>;
-  saving?: boolean;
+  disabled?: boolean;
   icon: React.ReactNode;
   placeholder: string;
+  saveHint?: string;
 }
 
 export const ImageAssetField = ({
@@ -25,18 +24,16 @@ export const ImageAssetField = ({
   htmlFor,
   asset,
   url,
-  savedUrl,
   onUrlChange,
-  onSave,
-  saving = false,
+  disabled = false,
   icon,
   placeholder,
+  saveHint = 'Paste a URL or upload an image, then save to apply changes.',
 }: ImageAssetFieldProps) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
 
-  const urlDirty = url.trim() !== savedUrl.trim();
-  const busy = uploading || saving;
+  const busy = uploading || disabled;
 
   const handleUpload = async (file: File) => {
     setUploading(true);
@@ -48,7 +45,6 @@ export const ImageAssetField = ({
         filename: file.name,
       });
       onUrlChange(result.url);
-      await onSave(result.url);
     } catch (err) {
       toast.error(err instanceof ApiError ? err.message : 'Upload failed');
     } finally {
@@ -59,43 +55,17 @@ export const ImageAssetField = ({
     }
   };
 
-  const handleApplyUrl = async () => {
-    try {
-      await onSave(url.trim());
-    } catch (err) {
-      toast.error(err instanceof ApiError ? err.message : 'Failed to save URL');
-    }
-  };
-
   return (
     <FormField label={label} htmlFor={htmlFor}>
       <div className="space-y-3">
-        <div className="flex flex-col gap-2 sm:flex-row sm:items-start">
-          <div className="min-w-0 flex-1">
-            <Input
-              id={htmlFor}
-              value={url}
-              onChange={(e) => onUrlChange(e.target.value)}
-              placeholder={placeholder}
-              icon={icon}
-              disabled={busy}
-            />
-          </div>
-          {urlDirty && (
-            <Button
-              type="button"
-              variant="secondary"
-              icon={<HiCheck className="h-4 w-4 text-emerald-600" />}
-              loading={saving && !uploading}
-              loadingText="Saving…"
-              disabled={busy || !url.trim()}
-              onClick={() => void handleApplyUrl()}
-              className="shrink-0"
-            >
-              Apply URL
-            </Button>
-          )}
-        </div>
+        <Input
+          id={htmlFor}
+          value={url}
+          onChange={(e) => onUrlChange(e.target.value)}
+          placeholder={placeholder}
+          icon={icon}
+          disabled={busy}
+        />
         <div className="flex flex-wrap items-center gap-3">
           <input
             ref={fileInputRef}
@@ -114,8 +84,8 @@ export const ImageAssetField = ({
             type="button"
             variant="secondary"
             icon={<HiArrowUpTray className="h-4 w-4" />}
-            loading={uploading || saving}
-            loadingText={uploading ? 'Uploading…' : 'Saving…'}
+            loading={uploading}
+            loadingText="Uploading…"
             disabled={busy}
             onClick={() => fileInputRef.current?.click()}
           >
@@ -131,7 +101,7 @@ export const ImageAssetField = ({
             </div>
           )}
         </div>
-        <p className="text-xs text-slate-500">Upload saves automatically. Paste a URL and click Apply URL.</p>
+        <p className="text-xs text-slate-500">{saveHint}</p>
       </div>
     </FormField>
   );

@@ -345,13 +345,25 @@ export interface LeaveCalendarEntry {
   status: LeaveRequestStatus;
 }
 
+export interface FaviconDisplaySettings {
+  mimeType: FaviconMimeType;
+}
+
+export type SidebarBehavior = 'fixed_collapsed' | 'collapsible';
+
+export interface SidebarDisplaySettings {
+  behavior: SidebarBehavior;
+  collapsedWidthPx: number;
+  expandedWidthPx: number;
+}
+
 export interface SiteConfig {
   siteName: string;
   logoUrl: string | null;
   faviconUrl: string | null;
-  primaryColor: string;
   logoDisplay: LogoDisplaySettings;
   faviconDisplay: FaviconDisplaySettings;
+  sidebarDisplay: SidebarDisplaySettings;
 }
 
 export type LogoObjectFit = 'contain' | 'cover';
@@ -373,10 +385,6 @@ export interface LogoDisplaySettings {
   showSiteName: boolean;
 }
 
-export interface FaviconDisplaySettings {
-  mimeType: FaviconMimeType;
-}
-
 export interface EffectiveBranding extends SiteConfig {
   tenantDisplayName?: string;
 }
@@ -388,16 +396,15 @@ export interface PlatformSiteSettings extends SiteConfig {
 
 export interface TenantBrandingOverrides {
   logoUrl: string | null;
-  primaryColor: string | null;
 }
 
 export interface PatchPlatformSiteSettingsInput {
   siteName?: string;
   logoUrl?: string | null;
   faviconUrl?: string | null;
-  primaryColor?: string;
   logoDisplay?: Partial<LogoDisplaySettings>;
   faviconDisplay?: Partial<FaviconDisplaySettings>;
+  sidebarDisplay?: Partial<SidebarDisplaySettings>;
 }
 
 export interface UploadPlatformAssetInput {
@@ -413,7 +420,6 @@ export interface UploadPlatformAssetResponse {
 
 export interface PatchTenantBrandingInput {
   logoUrl?: string | null;
-  primaryColor?: string | null;
 }
 
 export interface CompanyProfile {
@@ -810,6 +816,7 @@ export interface AttendanceCalendar {
 }
 
 export interface ClockInInput {
+  method?: Extract<AttendanceMethod, 'web' | 'kiosk'>;
   location?: { lat: number; lng: number };
 }
 

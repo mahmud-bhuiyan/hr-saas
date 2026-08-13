@@ -32,6 +32,12 @@ export const fromDatetimeLocalValue = (value: string): string => {
 
 export type AttendanceTab = 'my-attendance' | 'team-live' | 'hr-corrections';
 
+export const ATTENDANCE_TAB_IDS = [
+  'my-attendance',
+  'team-live',
+  'hr-corrections',
+] as const satisfies readonly AttendanceTab[];
+
 export type AttendanceLogView = 'calendar' | 'list';
 
 export const ATTENDANCE_24H_KEY = 'hr-saas-attendance-24h';

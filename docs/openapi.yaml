@@ -1739,7 +1739,8 @@ paths:
       summary: Clock in
       description: |
         Starts an open attendance session for the authenticated user's employee record.
-        Returns 409 if already clocked in. Optional GPS location when tenant setting enabled.
+        Returns 409 if already clocked in. Optional `method` (`kiosk` for in-office, `web` for remote).
+        Optional GPS location when tenant setting enabled (web clock-in only).
       operationId: clockIn
       security:
         - bearerAuth: []
@@ -3323,7 +3324,6 @@ paths:
               $ref: '#/components/schemas/PatchPlatformSiteSettingsRequest'
             example:
               siteName: Acme HR Platform
-              primaryColor: '#059669'
       responses:
         '200':
           description: Updated platform site settings
@@ -3444,7 +3444,6 @@ paths:
             schema:
               $ref: '#/components/schemas/PatchTenantBrandingRequest'
             example:
-              primaryColor: '#059669'
               logoUrl: https://example.com/logo.png
       responses:
         '200':
@@ -5830,7 +5829,7 @@ components:
 
     SiteConfig:
       type: object
-      required: [siteName, logoUrl, faviconUrl, primaryColor, logoDisplay, faviconDisplay]
+      required: [siteName, logoUrl, faviconUrl, logoDisplay, faviconDisplay, sidebarDisplay]
       properties:
         siteName:
           type: string
@@ -5843,14 +5842,12 @@ components:
           type: string
           nullable: true
           format: uri
-        primaryColor:
-          type: string
-          pattern: '^#[0-9A-Fa-f]{6}$'
-          example: '#2563eb'
         logoDisplay:
           $ref: '#/components/schemas/LogoDisplay'
         faviconDisplay:
           $ref: '#/components/schemas/FaviconDisplay'
+        sidebarDisplay:
+          $ref: '#/components/schemas/SidebarDisplay'
 
     LogoDisplay:
       type: object
@@ -5883,6 +5880,28 @@ components:
         mimeType:
           type: string
           enum: [auto, image/png, image/x-icon, image/svg+xml, image/webp]
+
+    SidebarDisplay:
+      type: object
+      required: [behavior, collapsedWidthPx, expandedWidthPx]
+      properties:
+        behavior:
+          type: string
+          enum: [fixed_collapsed, collapsible]
+          description: fixed_collapsed locks compact sidebar; collapsible lets users expand/collapse
+          example: fixed_collapsed
+        collapsedWidthPx:
+          type: integer
+          minimum: 80
+          maximum: 128
+          description: Width in pixels when sidebar is compact
+          example: 104
+        expandedWidthPx:
+          type: integer
+          minimum: 160
+          maximum: 320
+          description: Width in pixels when sidebar is expanded (collapsible mode only)
+          example: 256
 
     UploadPlatformAssetRequest:
       type: object
@@ -5932,16 +5951,12 @@ components:
 
     TenantBrandingOverrides:
       type: object
-      required: [logoUrl, primaryColor]
+      required: [logoUrl]
       properties:
         logoUrl:
           type: string
           nullable: true
           format: uri
-        primaryColor:
-          type: string
-          nullable: true
-          pattern: '^#[0-9A-Fa-f]{6}$'
 
     PatchPlatformSiteSettingsRequest:
       type: object
@@ -5959,9 +5974,6 @@ components:
           type: string
           nullable: true
           format: uri
-        primaryColor:
-          type: string
-          pattern: '^#[0-9A-Fa-f]{6}$'
         logoDisplay:
           type: object
           properties:
@@ -5987,6 +5999,20 @@ components:
             mimeType:
               type: string
               enum: [auto, image/png, image/x-icon, image/svg+xml, image/webp]
+        sidebarDisplay:
+          type: object
+          properties:
+            behavior:
+              type: string
+              enum: [fixed_collapsed, collapsible]
+            collapsedWidthPx:
+              type: integer
+              minimum: 80
+              maximum: 128
+            expandedWidthPx:
+              type: integer
+              minimum: 160
+              maximum: 320
 
     PatchTenantBrandingRequest:
       type: object
@@ -5996,10 +6022,6 @@ components:
           type: string
           nullable: true
           format: uri
-        primaryColor:
-          type: string
-          nullable: true
-          pattern: '^#[0-9A-Fa-f]{6}$'
 
     CompanyProfile:
       type: object
@@ -7011,6 +7033,12 @@ components:
     ClockInRequest:
       type: object
       properties:
+        method:
+          type: string
+          enum: [web, kiosk]
+          description: |
+            Clock-in channel. Use `kiosk` for in-office clock-in and `web` for remote web clock-in.
+            Defaults to `web` when omitted.
         location:
           type: object
           properties:

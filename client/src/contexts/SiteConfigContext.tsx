@@ -8,10 +8,10 @@ import {
   type ReactNode,
 } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { APP_NAME, DEFAULT_PRIMARY_COLOR } from '../constants/app';
-import { DEFAULT_FAVICON_DISPLAY, DEFAULT_LOGO_DISPLAY } from '../constants/branding';
+import { APP_NAME } from '../constants/app';
+import { DEFAULT_FAVICON_DISPLAY, DEFAULT_LOGO_DISPLAY, DEFAULT_SIDEBAR_DISPLAY } from '../constants/branding';
 import { fetchEffectiveBranding, fetchSiteConfig } from '../lib/api';
-import { applyBrandShades, applyDocumentBranding } from '../utils/theme';
+import { applyDocumentBranding } from '../utils/theme';
 import type { SiteConfig } from '../types';
 import { useAuth } from './AuthContext';
 
@@ -26,9 +26,9 @@ const defaultConfig: SiteConfig = {
   siteName: APP_NAME,
   logoUrl: null,
   faviconUrl: null,
-  primaryColor: DEFAULT_PRIMARY_COLOR,
   logoDisplay: { ...DEFAULT_LOGO_DISPLAY },
   faviconDisplay: { ...DEFAULT_FAVICON_DISPLAY },
+  sidebarDisplay: { ...DEFAULT_SIDEBAR_DISPLAY },
 };
 
 const SiteConfigContext = createContext<SiteConfigContextValue | null>(null);
@@ -64,11 +64,8 @@ export const SiteConfigProvider = ({ children }: { children: ReactNode }) => {
   }, [isAuthenticated, publicQuery.data, effectiveQuery.data]);
 
   useEffect(() => {
-    if (!isAuthenticated) {
-      applyBrandShades(config.primaryColor);
-    }
     void applyDocumentBranding(config.siteName, config.faviconUrl, config.faviconDisplay);
-  }, [config, isAuthenticated]);
+  }, [config]);
 
   const refresh = useCallback(async () => {
     await queryClient.invalidateQueries({ queryKey: ['platform', 'site-config'] });

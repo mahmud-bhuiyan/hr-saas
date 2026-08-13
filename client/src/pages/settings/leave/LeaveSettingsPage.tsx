@@ -7,7 +7,7 @@ import { Button } from '../../../components/ui/Button';
 import { FormField } from '../../../components/ui/FormField';
 import { Input } from '../../../components/ui/Input';
 import { PageContainer } from '../../../components/ui/PageContainer';
-import { PageHeader } from '../../../components/ui/PageHeader';
+import { SettingsPageHeader } from '../components/SettingsPageHeader';
 import { Select } from '../../../components/ui/Select';
 import { useAuth } from '../../../contexts/AuthContext';
 import { ApiError, fetchLeaveSettings, patchLeaveSettings } from '../../../lib/api';
@@ -85,14 +85,13 @@ export const LeaveSettingsPage = () => {
   ]);
 
   return (
-    <PageContainer>
-      <PageHeader
-        label="Settings"
+    <PageContainer maxWidth="lg">
+      <SettingsPageHeader
         title="Leave policy"
         description="Configure annual entitlement, carry-over limits, and approval workflow."
       />
 
-      <div className="card-surface max-w-lg space-y-5 p-6">
+      <div className="card-surface space-y-5 p-6">
         <FormField label="Annual entitlement (days)" htmlFor="annual-entitlement">
           <Input
             id="annual-entitlement"
