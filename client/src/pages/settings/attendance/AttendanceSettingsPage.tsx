@@ -6,7 +6,7 @@ import { toast } from 'react-toastify';
 import { Button } from '../../../components/ui/Button';
 import { FormField } from '../../../components/ui/FormField';
 import { PageContainer } from '../../../components/ui/PageContainer';
-import { PageHeader } from '../../../components/ui/PageHeader';
+import { SettingsPageHeader } from '../components/SettingsPageHeader';
 import { Select } from '../../../components/ui/Select';
 import { useAuth } from '../../../contexts/AuthContext';
 import { ApiError, fetchAttendanceSettings, patchAttendanceSettings } from '../../../lib/api';
@@ -56,8 +56,7 @@ export const AttendanceSettingsPage = () => {
 
   return (
     <PageContainer maxWidth="lg">
-      <PageHeader
-        label="Settings"
+      <SettingsPageHeader
         title="Attendance settings"
         description="Configure attendance options for your company."
       />

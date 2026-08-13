@@ -3,7 +3,7 @@ import { FormEvent, useEffect, useMemo, useState } from 'react';
 import { Navigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { PageContainer } from '../../../components/ui/PageContainer';
-import { PageHeader } from '../../../components/ui/PageHeader';
+import { SettingsPageHeader } from '../components/SettingsPageHeader';
 import { useAuth } from '../../../contexts/AuthContext';
 import { useSiteConfig } from '../../../contexts/SiteConfigContext';
 import {
@@ -209,9 +209,7 @@ export const CompanySettingsPage = () => {
 
   return (
     <PageContainer className="space-y-6">
-      <PageHeader
-        back={{ to: '/dashboard/settings', label: 'Back to settings' }}
-        label="Settings"
+      <SettingsPageHeader
         title="Company"
         description="Update your company profile and customize branding shown across the platform."
       />

@@ -5,7 +5,7 @@ import { Navigate, useSearchParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { Button } from '../../../components/ui/Button';
 import { PageContainer } from '../../../components/ui/PageContainer';
-import { PageHeader } from '../../../components/ui/PageHeader';
+import { SettingsPageHeader } from '../components/SettingsPageHeader';
 import { useAuth } from '../../../contexts/AuthContext';
 import {
   ApiError,
@@ -102,9 +102,7 @@ export const BillingPage = () => {
 
   return (
     <PageContainer maxWidth="2xl">
-      <PageHeader
-        back={{ to: '/dashboard/settings', label: 'Back to settings' }}
-        label="Settings"
+      <SettingsPageHeader
         title="Billing"
         description="Manage your per-seat subscription. Seat count syncs with active employees."
       />

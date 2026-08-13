@@ -12,7 +12,7 @@ import { toast } from 'react-toastify';
 import { Button } from '../../../components/ui/Button';
 import { InputField, SelectField } from '../../../components/ui/formFields';
 import { PageContainer } from '../../../components/ui/PageContainer';
-import { PageHeader } from '../../../components/ui/PageHeader';
+import { SettingsPageHeader } from '../components/SettingsPageHeader';
 import { useAuth } from '../../../contexts/AuthContext';
 import {
   ApiError,
@@ -165,9 +165,7 @@ export const PayrollSettingsPage = () => {
 
   return (
     <PageContainer className="space-y-6" maxWidth="lg">
-      <PageHeader
-        back={{ to: '/dashboard/settings', label: 'Back to settings' }}
-        label="Settings"
+      <SettingsPageHeader
         title="Payroll settings"
         description="Configure pay period type, currency, week start, and Xero accounting integration."
       />

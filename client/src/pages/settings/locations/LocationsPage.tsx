@@ -5,8 +5,9 @@ import { HiPlus } from 'react-icons/hi2';
 import { toast } from 'react-toastify';
 import { Button } from '../../../components/ui/Button';
 import { PageContainer } from '../../../components/ui/PageContainer';
-import { PageHeader } from '../../../components/ui/PageHeader';
-import { Tabs } from '../../../components/ui/Tabs';
+import { SettingsPageHeader } from '../components/SettingsPageHeader';
+import { TabGroup } from '../../../components/ui/TabGroup';
+import { useTabUrlState } from '../../../hooks/useTabUrlState';
 import { useAuth } from '../../../contexts/AuthContext';
 import {
   ApiError,
@@ -22,10 +23,12 @@ import { LocationsTable } from './components/LocationsTable';
 
 type LocationsTab = 'active' | 'archived';
 
+const LOCATIONS_TAB_IDS = ['active', 'archived'] as const satisfies readonly LocationsTab[];
+
 export const LocationsPage = () => {
   const { user } = useAuth();
   const queryClient = useQueryClient();
-  const [activeTab, setActiveTab] = useState<LocationsTab>('active');
+  const { activeTab, setActiveTab } = useTabUrlState(LOCATIONS_TAB_IDS, { defaultTab: 'active' });
   const [createOpen, setCreateOpen] = useState(false);
   const [createForm, setCreateForm] = useState({ name: '', address: '', timezone: '' });
   const [editTarget, setEditTarget] = useState<WorkLocation | null>(null);
@@ -136,7 +139,22 @@ export const LocationsPage = () => {
   const allLocations = locationsQuery.data ?? [];
   const activeLocations = allLocations.filter((loc) => !loc.isArchived);
   const archivedLocations = allLocations.filter((loc) => loc.isArchived);
-  const displayedLocations = activeTab === 'active' ? activeLocations : archivedLocations;
+
+  const tableProps = {
+    loading: locationsQuery.isLoading,
+    onEdit: (location: WorkLocation) => {
+      setEditTarget(location);
+      setEditForm({
+        name: location.name,
+        address: location.address ?? '',
+        timezone: location.timezone ?? '',
+      });
+    },
+    onArchive: handleArchive,
+    onRestore: handleRestore,
+    archiveLoadingId,
+    restoreLoadingId,
+  };
 
   const editChanged =
     editTarget &&
@@ -146,9 +164,7 @@ export const LocationsPage = () => {
 
   return (
     <PageContainer className="space-y-6">
-      <PageHeader
-        back={{ to: '/dashboard/settings', label: 'Back to settings' }}
-        label="Settings"
+      <SettingsPageHeader
         title="Work locations"
         description="Sites where employees work — used for shift scheduling and rota planning."
         action={
@@ -163,30 +179,23 @@ export const LocationsPage = () => {
         }
       />
 
-      <Tabs
+      <TabGroup<LocationsTab>
         activeId={activeTab}
-        onChange={(id) => setActiveTab(id as LocationsTab)}
+        onChange={setActiveTab}
         tabs={[
-          { id: 'active', label: 'Active', count: activeLocations.length },
-          { id: 'archived', label: 'Archived', count: archivedLocations.length },
+          {
+            id: 'active',
+            label: 'Active',
+            count: activeLocations.length,
+            content: <LocationsTable locations={activeLocations} {...tableProps} />,
+          },
+          {
+            id: 'archived',
+            label: 'Archived',
+            count: archivedLocations.length,
+            content: <LocationsTable locations={archivedLocations} {...tableProps} />,
+          },
         ]}
-      />
-
-      <LocationsTable
-        locations={displayedLocations}
-        loading={locationsQuery.isLoading}
-        onEdit={(location) => {
-          setEditTarget(location);
-          setEditForm({
-            name: location.name,
-            address: location.address ?? '',
-            timezone: location.timezone ?? '',
-          });
-        }}
-        onArchive={handleArchive}
-        onRestore={handleRestore}
-        archiveLoadingId={archiveLoadingId}
-        restoreLoadingId={restoreLoadingId}
       />
 
       <LocationFormModal

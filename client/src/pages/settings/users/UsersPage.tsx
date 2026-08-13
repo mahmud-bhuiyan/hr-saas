@@ -3,7 +3,7 @@ import { FormEvent, useEffect, useMemo, useState } from 'react';
 import { Navigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { PageContainer } from '../../../components/ui/PageContainer';
-import { PageHeader } from '../../../components/ui/PageHeader';
+import { SettingsPageHeader } from '../components/SettingsPageHeader';
 import { useAuth } from '../../../contexts/AuthContext';
 import { ApiError, fetchTenantUsers, updateTenantUser } from '../../../lib/api';
 import type { TenantUser, UserRole } from '../../../types';
@@ -80,9 +80,7 @@ export const UsersPage = () => {
 
   return (
     <PageContainer className="space-y-6">
-      <PageHeader
-        back={{ to: '/dashboard/settings', label: 'Back to settings' }}
-        label="Settings"
+      <SettingsPageHeader
         title="Users & roles"
         description="View users in your company and assign their roles."
       />

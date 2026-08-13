@@ -7,7 +7,7 @@ import { Button } from '../../../components/ui/Button';
 import { FormField } from '../../../components/ui/FormField';
 import { Input } from '../../../components/ui/Input';
 import { PageContainer } from '../../../components/ui/PageContainer';
-import { PageHeader } from '../../../components/ui/PageHeader';
+import { SettingsPageHeader } from '../components/SettingsPageHeader';
 import { Select } from '../../../components/ui/Select';
 import { useAuth } from '../../../contexts/AuthContext';
 import { ApiError, fetchLeaveSettings, patchLeaveSettings } from '../../../lib/api';
@@ -86,8 +86,7 @@ export const LeaveSettingsPage = () => {
 
   return (
     <PageContainer maxWidth="lg">
-      <PageHeader
-        label="Settings"
+      <SettingsPageHeader
         title="Leave policy"
         description="Configure annual entitlement, carry-over limits, and approval workflow."
       />

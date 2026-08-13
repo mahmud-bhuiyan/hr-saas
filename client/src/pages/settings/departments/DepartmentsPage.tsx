@@ -5,8 +5,9 @@ import { HiPlus } from 'react-icons/hi2';
 import { toast } from 'react-toastify';
 import { Button } from '../../../components/ui/Button';
 import { PageContainer } from '../../../components/ui/PageContainer';
-import { PageHeader } from '../../../components/ui/PageHeader';
-import { Tabs } from '../../../components/ui/Tabs';
+import { SettingsPageHeader } from '../components/SettingsPageHeader';
+import { TabGroup } from '../../../components/ui/TabGroup';
+import { useTabUrlState } from '../../../hooks/useTabUrlState';
 import { useAuth } from '../../../contexts/AuthContext';
 import {
   ApiError,
@@ -21,10 +22,12 @@ import { DepartmentsTable } from './components/DepartmentsTable';
 
 type DepartmentsTab = 'active' | 'archived';
 
+const DEPARTMENTS_TAB_IDS = ['active', 'archived'] as const satisfies readonly DepartmentsTab[];
+
 export const DepartmentsPage = () => {
   const { user } = useAuth();
   const queryClient = useQueryClient();
-  const [activeTab, setActiveTab] = useState<DepartmentsTab>('active');
+  const { activeTab, setActiveTab } = useTabUrlState(DEPARTMENTS_TAB_IDS, { defaultTab: 'active' });
   const [createOpen, setCreateOpen] = useState(false);
   const [createName, setCreateName] = useState('');
   const [editTarget, setEditTarget] = useState<Department | null>(null);
@@ -112,13 +115,22 @@ export const DepartmentsPage = () => {
   const allDepartments = departmentsQuery.data ?? [];
   const activeDepartments = allDepartments.filter((dept) => !dept.isArchived);
   const archivedDepartments = allDepartments.filter((dept) => dept.isArchived);
-  const displayedDepartments = activeTab === 'active' ? activeDepartments : archivedDepartments;
+
+  const tableProps = {
+    loading: departmentsQuery.isLoading,
+    onEdit: (dept: Department) => {
+      setEditTarget(dept);
+      setEditName(dept.name);
+    },
+    onArchive: handleArchive,
+    onRestore: handleRestore,
+    archiveLoadingId,
+    restoreLoadingId,
+  };
 
   return (
     <PageContainer className="space-y-6">
-      <PageHeader
-        back={{ to: '/dashboard/settings', label: 'Back to settings' }}
-        label="Settings"
+      <SettingsPageHeader
         title="Departments"
         description="Manage departments for employee assignment and filtering."
         action={
@@ -131,26 +143,23 @@ export const DepartmentsPage = () => {
         }
       />
 
-      <Tabs
+      <TabGroup<DepartmentsTab>
         activeId={activeTab}
-        onChange={(id) => setActiveTab(id as DepartmentsTab)}
+        onChange={setActiveTab}
         tabs={[
-          { id: 'active', label: 'Active', count: activeDepartments.length },
-          { id: 'archived', label: 'Archived', count: archivedDepartments.length },
+          {
+            id: 'active',
+            label: 'Active',
+            count: activeDepartments.length,
+            content: <DepartmentsTable departments={activeDepartments} {...tableProps} />,
+          },
+          {
+            id: 'archived',
+            label: 'Archived',
+            count: archivedDepartments.length,
+            content: <DepartmentsTable departments={archivedDepartments} {...tableProps} />,
+          },
         ]}
-      />
-
-      <DepartmentsTable
-        departments={displayedDepartments}
-        loading={departmentsQuery.isLoading}
-        onEdit={(dept) => {
-          setEditTarget(dept);
-          setEditName(dept.name);
-        }}
-        onArchive={handleArchive}
-        onRestore={handleRestore}
-        archiveLoadingId={archiveLoadingId}
-        restoreLoadingId={restoreLoadingId}
       />
 
       <DepartmentFormModal

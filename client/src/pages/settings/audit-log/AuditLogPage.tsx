@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { Navigate } from 'react-router-dom';
 import { PageContainer } from '../../../components/ui/PageContainer';
-import { PageHeader } from '../../../components/ui/PageHeader';
+import { SettingsPageHeader } from '../components/SettingsPageHeader';
 import { Table } from '../../../components/ui/Table';
 import { useAuth } from '../../../contexts/AuthContext';
 import { fetchAuditLogs } from '../../../lib/api';
@@ -25,8 +25,7 @@ export const AuditLogPage = () => {
 
   return (
     <PageContainer className="space-y-6">
-      <PageHeader
-        label="Settings"
+      <SettingsPageHeader
         title="Audit log"
         description="Track sensitive changes to employees, documents, users, and leave records."
       />
