@@ -375,6 +375,7 @@ export const AppShell = () => {
       </aside>
 
       <main
+        id="app-main"
         className="thin-scrollbar fixed bottom-0 left-0 right-0 top-14 overflow-y-auto px-3 py-6 transition-[left] duration-200 md:px-4"
         style={mainOffsetStyle}
       >

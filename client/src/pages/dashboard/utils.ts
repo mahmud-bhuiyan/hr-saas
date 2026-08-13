@@ -38,9 +38,8 @@ export const superAdminCards = (
 };
 
 export const superAdminLinks = (): DashboardLink[] => [
-  { label: 'Review pending registrations', to: '/dashboard/registrations' },
-  { label: 'Add company', to: '/dashboard/registrations' },
   { label: 'View registered companies', to: '/dashboard/registrations' },
+  { label: 'Review pending registrations', to: '/dashboard/registrations?tab=pending' },
   { label: 'Platform site settings', to: '/dashboard/platform/site-settings' },
 ];
 

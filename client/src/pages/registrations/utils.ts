@@ -39,6 +39,8 @@ export const editFormKeys: Array<keyof EditCompanyForm> = [
 
 export type CompaniesTab = 'pending' | 'registered';
 
+export const COMPANIES_TAB_IDS = ['registered', 'pending'] as const satisfies readonly CompaniesTab[];
+
 export const emptyCreateForm = {
   companyName: '',
   email: '',
