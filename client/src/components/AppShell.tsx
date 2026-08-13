@@ -78,19 +78,19 @@ const navItems: Array<{
   },
 
   {
-    to: "/dashboard/employees",
-    label: "My Team",
-    icon: HiUserGroup,
-    roles: ["company_admin", "hr_manager", "manager"],
-    module: "employees",
-  },
-
-  {
     to: "/me/attendance",
     label: "Me",
     icon: HiUser,
     activePrefix: "/me/",
     roles: ["company_admin", "hr_manager", "manager", "employee"],
+  },
+
+  {
+    to: "/dashboard/employees",
+    label: "My Team",
+    icon: HiUserGroup,
+    roles: ["company_admin", "hr_manager", "manager"],
+    module: "employees",
   },
 
   {
