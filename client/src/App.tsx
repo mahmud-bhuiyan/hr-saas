@@ -36,7 +36,6 @@ import { BillingPage } from "./pages/settings/billing/BillingPage";
 import { ReportsPage } from "./pages/reports/ReportsPage";
 import { HeadcountReportPage } from "./pages/reports/HeadcountReportPage";
 import { AbsenceReportPage } from "./pages/reports/AbsenceReportPage";
-import { MyTeamPage } from "./pages/myteam/MyTeamPage";
 import { TermsOfUsePage } from "./pages/legal/TermsOfUsePage";
 import { PrivacyPolicyPage } from "./pages/legal/PrivacyPolicyPage";
 
@@ -97,14 +96,6 @@ const App = () => {
             element={
               <ModuleRoute module="attendance">
                 <AttendancePage />
-              </ModuleRoute>
-            }
-          />
-          <Route
-            path="/myteam"
-            element={
-              <ModuleRoute module="employees">
-                <MyTeamPage />
               </ModuleRoute>
             }
           />

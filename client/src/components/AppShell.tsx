@@ -79,7 +79,7 @@ const navItems: Array<{
 
   {
     to: "/dashboard/employees",
-    label: "Employees",
+    label: "My Team",
     icon: HiUserGroup,
     roles: ["company_admin", "hr_manager", "manager"],
     module: "employees",
@@ -91,14 +91,6 @@ const navItems: Array<{
     icon: HiUser,
     activePrefix: "/me/",
     roles: ["company_admin", "hr_manager", "manager", "employee"],
-  },
-
-  {
-    to: "/myteam",
-    label: "My Team",
-    icon: HiUserGroup,
-    roles: ["company_admin", "hr_manager", "manager", "employee"],
-    module: "employees",
   },
 
   {

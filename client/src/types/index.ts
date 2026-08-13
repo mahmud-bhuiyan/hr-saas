@@ -816,6 +816,7 @@ export interface AttendanceCalendar {
 }
 
 export interface ClockInInput {
+  method?: Extract<AttendanceMethod, 'web' | 'kiosk'>;
   location?: { lat: number; lng: number };
 }
 

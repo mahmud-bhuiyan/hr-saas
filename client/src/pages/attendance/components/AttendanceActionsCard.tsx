@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react';
-import { HiClock, HiComputerDesktop, HiMapPin } from 'react-icons/hi2';
+import { HiBuildingOffice2, HiClock, HiComputerDesktop, HiMapPin } from 'react-icons/hi2';
 import { Button } from '../../../components/ui/Button';
 import type { AttendanceLog } from '../../../types';
 import { formatKekaDate } from '../utils';
+
+type ClockInMethod = 'kiosk' | 'web';
 
 type AttendanceActionsCardProps = {
   clockedIn: boolean;
@@ -10,7 +12,7 @@ type AttendanceActionsCardProps = {
   gpsEnabled: boolean;
   loading: boolean;
   use24Hour: boolean;
-  onClockIn: (withGps: boolean) => void;
+  onClockIn: (params: { method: ClockInMethod; withGps: boolean }) => void;
   onClockOut: () => void;
 };
 
@@ -31,21 +33,21 @@ export const AttendanceActionsCard = ({
     return () => window.clearInterval(timer);
   }, []);
 
+  const handleOfficeClockIn = (): void => {
+    onClockIn({ method: 'kiosk', withGps: false });
+  };
+
   const handleWebClockIn = (): void => {
-    if (clockedIn) {
-      onClockOut();
-      return;
-    }
     if (gpsEnabled) {
       setShowGpsConsent(true);
       return;
     }
-    onClockIn(false);
+    onClockIn({ method: 'web', withGps: false });
   };
 
   const handleGpsConsent = (): void => {
     setShowGpsConsent(false);
-    onClockIn(true);
+    onClockIn({ method: 'web', withGps: true });
   };
 
   const timeLabel = now.toLocaleTimeString(undefined, {
@@ -57,32 +59,32 @@ export const AttendanceActionsCard = ({
 
   const dateLabel = formatKekaDate(now.toISOString().slice(0, 10));
 
-  const clockActionLabel = clockedIn ? 'Web Clock-Out' : 'Web Clock-In';
-
   return (
     <div className="keka-card flex h-full flex-col">
       <div className="keka-card-header">Actions</div>
 
-      <div className="flex flex-1 flex-row px-6 py-6 gap-8">
-        <div className="flex flex-col items-start shrink-0">
-          <div className="rounded-md border px-5 py-3 mb-3 bg-[#0a1017]/30" style={{ borderColor: 'var(--keka-border)' }}>
-            <span className="font-sans text-2xl font-medium tracking-wide text-white">{timeLabel}</span>
+      <div className="flex flex-1 flex-row gap-8 px-6 py-6">
+        <div className="flex shrink-0 flex-col items-start">
+          <div
+            className="mb-3 rounded-md border px-5 py-3"
+            style={{ borderColor: 'var(--keka-border)', backgroundColor: 'var(--keka-clock-bg)' }}
+          >
+            <span className="font-sans text-2xl font-medium tracking-wide text-[var(--keka-text)]">
+              {timeLabel}
+            </span>
           </div>
-          <p className="text-[13px] font-medium text-[#e8edf2]">{dateLabel}</p>
+          <p className="text-[13px] font-medium text-[var(--keka-text)]">{dateLabel}</p>
         </div>
 
-        <div className="flex flex-col flex-1">
+        <div className="flex flex-1 flex-col">
           {showGpsConsent && (
-            <div
-              className="mb-4 rounded-lg border px-3 py-3 text-left text-xs"
-              style={{ borderColor: '#f59e0b66', backgroundColor: '#f59e0b15' }}
-            >
-              <div className="mb-2 flex items-center gap-2 font-medium text-amber-300">
-                <HiMapPin className="h-4 w-4" />
+            <div className="mb-4 rounded-lg border border-amber-300/60 bg-amber-50 px-3 py-3 text-left text-xs text-amber-900 dark:border-amber-500/40 dark:bg-amber-500/10 dark:text-amber-200">
+              <div className="mb-2 flex items-center gap-2 font-medium">
+                <HiMapPin className="h-4 w-4 text-amber-600 dark:text-amber-300" />
                 Location sharing
               </div>
               <p className="keka-muted mb-3">
-                GPS is enabled for clock-in. Your location will be stored with this record.
+                GPS is enabled for web clock-in. Your location will be stored with this record.
               </p>
               <div className="flex justify-end gap-2">
                 <Button variant="secondary" className="px-2 py-1 text-xs" onClick={() => setShowGpsConsent(false)}>
@@ -96,17 +98,44 @@ export const AttendanceActionsCard = ({
           )}
 
           <ul className="space-y-3">
-            <li>
-              <button
-                type="button"
-                className="keka-link w-full text-left disabled:opacity-40 hover:text-white"
-                onClick={handleWebClockIn}
-                disabled={loading}
-              >
-                <HiComputerDesktop className="h-5 w-5 shrink-0" style={{ color: 'var(--keka-accent)' }} />
-                <span className="text-[15px]">{clockActionLabel}</span>
-              </button>
-            </li>
+            {clockedIn ? (
+              <li>
+                <button
+                  type="button"
+                  className="keka-link w-full text-left disabled:opacity-40"
+                  onClick={onClockOut}
+                  disabled={loading}
+                >
+                  <HiClock className="h-5 w-5 shrink-0" style={{ color: 'var(--keka-accent)' }} />
+                  <span className="text-[15px]">Clock Out</span>
+                </button>
+              </li>
+            ) : (
+              <>
+                <li>
+                  <button
+                    type="button"
+                    className="keka-link w-full text-left disabled:opacity-40"
+                    onClick={handleOfficeClockIn}
+                    disabled={loading || showGpsConsent}
+                  >
+                    <HiBuildingOffice2 className="h-5 w-5 shrink-0" style={{ color: 'var(--keka-accent)' }} />
+                    <span className="text-[15px]">Clock In</span>
+                  </button>
+                </li>
+                <li>
+                  <button
+                    type="button"
+                    className="keka-link w-full text-left disabled:opacity-40"
+                    onClick={handleWebClockIn}
+                    disabled={loading || showGpsConsent}
+                  >
+                    <HiComputerDesktop className="h-5 w-5 shrink-0" style={{ color: 'var(--keka-accent)' }} />
+                    <span className="text-[15px]">Web Clock-In</span>
+                  </button>
+                </li>
+              </>
+            )}
           </ul>
 
           {clockedIn && session && (

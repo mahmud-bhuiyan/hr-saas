@@ -1085,10 +1085,10 @@
             "header": [{ "key": "Content-Type", "value": "application/json" }],
             "body": {
               "mode": "raw",
-              "raw": "{}"
+              "raw": "{\n  \"method\": \"kiosk\"\n}"
             },
             "url": "{{baseUrl}}/api/v1/attendance/clock-in",
-            "description": "Start attendance session. Optional location when GPS enabled."
+            "description": "Start attendance session. Use method kiosk (in-office) or web (remote). Optional location when GPS enabled for web clock-in."
           },
           "response": []
         },

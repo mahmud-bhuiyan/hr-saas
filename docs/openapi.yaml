@@ -1739,7 +1739,8 @@ paths:
       summary: Clock in
       description: |
         Starts an open attendance session for the authenticated user's employee record.
-        Returns 409 if already clocked in. Optional GPS location when tenant setting enabled.
+        Returns 409 if already clocked in. Optional `method` (`kiosk` for in-office, `web` for remote).
+        Optional GPS location when tenant setting enabled (web clock-in only).
       operationId: clockIn
       security:
         - bearerAuth: []
@@ -7032,6 +7033,12 @@ components:
     ClockInRequest:
       type: object
       properties:
+        method:
+          type: string
+          enum: [web, kiosk]
+          description: |
+            Clock-in channel. Use `kiosk` for in-office clock-in and `web` for remote web clock-in.
+            Defaults to `web` when omitted.
         location:
           type: object
           properties:
