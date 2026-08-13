@@ -85,14 +85,14 @@ export const LeaveSettingsPage = () => {
   ]);
 
   return (
-    <PageContainer>
+    <PageContainer maxWidth="lg">
       <PageHeader
         label="Settings"
         title="Leave policy"
         description="Configure annual entitlement, carry-over limits, and approval workflow."
       />
 
-      <div className="card-surface max-w-lg space-y-5 p-6">
+      <div className="card-surface space-y-5 p-6">
         <FormField label="Annual entitlement (days)" htmlFor="annual-entitlement">
           <Input
             id="annual-entitlement"

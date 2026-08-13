@@ -1,8 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
-import { Link, Navigate, useSearchParams } from 'react-router-dom';
+import { Navigate, useSearchParams } from 'react-router-dom';
 import {
-  HiArrowLeft,
   HiBanknotes,
   HiCalendarDays,
   HiLink,
@@ -11,11 +10,9 @@ import {
 } from 'react-icons/hi2';
 import { toast } from 'react-toastify';
 import { Button } from '../../../components/ui/Button';
-import { FormField } from '../../../components/ui/FormField';
-import { Input } from '../../../components/ui/Input';
+import { InputField, SelectField } from '../../../components/ui/formFields';
 import { PageContainer } from '../../../components/ui/PageContainer';
 import { PageHeader } from '../../../components/ui/PageHeader';
-import { Select } from '../../../components/ui/Select';
 import { useAuth } from '../../../contexts/AuthContext';
 import {
   ApiError,
@@ -167,66 +164,53 @@ export const PayrollSettingsPage = () => {
   const accounting = accountingQuery.data;
 
   return (
-    <PageContainer className="space-y-6">
-      <Link
-        to="/dashboard/settings"
-        className="inline-flex items-center gap-1 text-sm text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200"
-      >
-        <HiArrowLeft className="h-4 w-4" />
-        Back to settings
-      </Link>
-
+    <PageContainer className="space-y-6" maxWidth="lg">
       <PageHeader
+        back={{ to: '/dashboard/settings', label: 'Back to settings' }}
         label="Settings"
         title="Payroll settings"
         description="Configure pay period type, currency, week start, and Xero accounting integration."
       />
 
-      <div className="card-surface max-w-lg space-y-5 p-6">
-        <FormField label="Pay period type">
-          <Select
-            value={form.payPeriodType}
-            onChange={(event) =>
-              setForm((prev) => ({
-                ...prev,
-                payPeriodType: event.target.value as PayPeriodType,
-              }))
-            }
-            icon={<HiCalendarDays className="h-4 w-4 text-brand-600" />}
-          >
-            <option value="weekly">Weekly</option>
-            <option value="biweekly">Biweekly</option>
-            <option value="monthly">Monthly</option>
-          </Select>
-        </FormField>
+      <div className="card-surface space-y-5 p-6">
+        <SelectField
+          label="Pay period type"
+          value={form.payPeriodType}
+          onChange={(event) =>
+            setForm((prev) => ({
+              ...prev,
+              payPeriodType: event.target.value as PayPeriodType,
+            }))
+          }
+          icon={<HiCalendarDays className="h-4 w-4 text-brand-600" />}
+          options={[
+            { value: 'weekly', label: 'Weekly' },
+            { value: 'biweekly', label: 'Biweekly' },
+            { value: 'monthly', label: 'Monthly' },
+          ]}
+        />
 
-        <FormField label="Default pay currency" htmlFor="pay-currency">
-          <Input
-            id="pay-currency"
-            value={form.defaultPayCurrency}
-            onChange={(event) =>
-              setForm((prev) => ({ ...prev, defaultPayCurrency: event.target.value.toUpperCase() }))
-            }
-            maxLength={3}
-            icon={<HiBanknotes className="h-4 w-4 text-brand-600" />}
-          />
-        </FormField>
+        <InputField
+          label="Default pay currency"
+          htmlFor="pay-currency"
+          id="pay-currency"
+          value={form.defaultPayCurrency}
+          onChange={(event) =>
+            setForm((prev) => ({ ...prev, defaultPayCurrency: event.target.value.toUpperCase() }))
+          }
+          maxLength={3}
+          icon={<HiBanknotes className="h-4 w-4 text-brand-600" />}
+        />
 
-        <FormField label="Payroll week starts on">
-          <Select
-            value={form.payrollWeekStartDay}
-            onChange={(event) =>
-              setForm((prev) => ({ ...prev, payrollWeekStartDay: event.target.value }))
-            }
-            icon={<HiSignal className="h-4 w-4 text-brand-600" />}
-          >
-            {WEEKDAY_OPTIONS.map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </Select>
-        </FormField>
+        <SelectField
+          label="Payroll week starts on"
+          value={form.payrollWeekStartDay}
+          onChange={(event) =>
+            setForm((prev) => ({ ...prev, payrollWeekStartDay: event.target.value }))
+          }
+          icon={<HiSignal className="h-4 w-4 text-brand-600" />}
+          options={WEEKDAY_OPTIONS}
+        />
 
         <div className="border-t border-slate-200 pt-5 dark:border-slate-700">
           <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100">
@@ -237,27 +221,27 @@ export const PayrollSettingsPage = () => {
           </p>
 
           <div className="mt-4 space-y-4">
-            <FormField label="Wages expense account" htmlFor="xero-expense-account">
-              <Input
-                id="xero-expense-account"
-                value={form.xeroExpenseAccountCode}
-                onChange={(event) =>
-                  setForm((prev) => ({ ...prev, xeroExpenseAccountCode: event.target.value }))
-                }
-                icon={<HiBanknotes className="h-4 w-4 text-brand-600" />}
-              />
-            </FormField>
+            <InputField
+              label="Wages expense account"
+              htmlFor="xero-expense-account"
+              id="xero-expense-account"
+              value={form.xeroExpenseAccountCode}
+              onChange={(event) =>
+                setForm((prev) => ({ ...prev, xeroExpenseAccountCode: event.target.value }))
+              }
+              icon={<HiBanknotes className="h-4 w-4 text-brand-600" />}
+            />
 
-            <FormField label="Wages payable account" htmlFor="xero-payable-account">
-              <Input
-                id="xero-payable-account"
-                value={form.xeroPayableAccountCode}
-                onChange={(event) =>
-                  setForm((prev) => ({ ...prev, xeroPayableAccountCode: event.target.value }))
-                }
-                icon={<HiBanknotes className="h-4 w-4 text-brand-600" />}
-              />
-            </FormField>
+            <InputField
+              label="Wages payable account"
+              htmlFor="xero-payable-account"
+              id="xero-payable-account"
+              value={form.xeroPayableAccountCode}
+              onChange={(event) =>
+                setForm((prev) => ({ ...prev, xeroPayableAccountCode: event.target.value }))
+              }
+              icon={<HiBanknotes className="h-4 w-4 text-brand-600" />}
+            />
           </div>
         </div>
 
@@ -273,7 +257,7 @@ export const PayrollSettingsPage = () => {
         </div>
       </div>
 
-      <div className="card-surface max-w-lg space-y-4 p-6">
+      <div className="card-surface space-y-4 p-6">
         <div>
           <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100">
             Xero accounting

@@ -55,14 +55,14 @@ export const AttendanceSettingsPage = () => {
   const changed = hasFormChanges({ gpsEnabled }, { gpsEnabled: original }, ['gpsEnabled']);
 
   return (
-    <PageContainer>
+    <PageContainer maxWidth="lg">
       <PageHeader
         label="Settings"
         title="Attendance settings"
         description="Configure attendance options for your company."
       />
 
-      <div className="card-surface max-w-lg p-6">
+      <div className="card-surface p-6">
         <FormField label="GPS on clock-in">
           <Select
             value={gpsEnabled}

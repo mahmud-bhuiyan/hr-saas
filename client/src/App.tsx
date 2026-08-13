@@ -16,10 +16,9 @@ import { RegisterPage } from "./pages/register/RegisterPage";
 import { RegistrationsPage } from "./pages/registrations/RegistrationsPage";
 import { PlatformSiteSettingsPage } from "./pages/platform/site-settings/PlatformSiteSettingsPage";
 import { SettingsPage } from "./pages/settings/SettingsPage";
-import { CompanyProfilePage } from "./pages/settings/company/CompanyProfilePage";
+import { CompanySettingsPage } from "./pages/settings/company/CompanySettingsPage";
 import { DepartmentsPage } from "./pages/settings/departments/DepartmentsPage";
 import { UsersPage } from "./pages/settings/users/UsersPage";
-import { TenantBrandingPage } from "./pages/settings/branding/TenantBrandingPage";
 import { AuditLogPage } from "./pages/settings/audit-log/AuditLogPage";
 import { LeavePage } from "./pages/leave/LeavePage";
 import { DocumentsPage } from "./pages/documents/DocumentsPage";
@@ -190,9 +189,13 @@ const App = () => {
             path="/dashboard/settings/company"
             element={
               <ModuleRoute module="settings">
-                <CompanyProfilePage />
+                <CompanySettingsPage />
               </ModuleRoute>
             }
+          />
+          <Route
+            path="/dashboard/settings/branding"
+            element={<Navigate to="/dashboard/settings/company?tab=branding" replace />}
           />
           <Route
             path="/dashboard/settings/departments"
@@ -223,14 +226,6 @@ const App = () => {
             element={
               <ModuleRoute module="settings">
                 <UsersPage />
-              </ModuleRoute>
-            }
-          />
-          <Route
-            path="/dashboard/settings/branding"
-            element={
-              <ModuleRoute module="settings">
-                <TenantBrandingPage />
               </ModuleRoute>
             }
           />

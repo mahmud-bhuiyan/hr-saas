@@ -1,7 +1,6 @@
 import { Navigate } from "react-router-dom";
 import {
   HiBuildingOffice2,
-  HiPaintBrush,
   HiRectangleGroup,
   HiUsers,
   HiClipboardDocumentList,
@@ -27,16 +26,9 @@ type SettingsLink = NavCardGroupItem & {
 const settingsLinks: SettingsLink[] = [
   {
     to: "/dashboard/settings/company",
-    label: "Company profile",
-    description: "Update company name, address, and logo.",
+    label: "Company",
+    description: "Update company profile, address, logo, and branding.",
     icon: HiBuildingOffice2,
-    roles: ["company_admin"],
-  },
-  {
-    to: "/dashboard/settings/branding",
-    label: "Company branding",
-    description: "Customize logo for your organization.",
-    icon: HiPaintBrush,
     roles: ["company_admin"],
   },
   {

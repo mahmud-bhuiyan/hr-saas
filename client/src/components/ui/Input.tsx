@@ -3,10 +3,11 @@ import { forwardRef, type ChangeEvent, type InputHTMLAttributes, type ReactNode 
 interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   error?: string;
   icon?: ReactNode;
+  wrapperClassName?: string;
 }
 
 export const Input = forwardRef<HTMLInputElement, InputProps>(
-  ({ error, className = '', id, icon, onChange, ...props }, ref) => {
+  ({ error, className = '', id, icon, onChange, wrapperClassName = '', ...props }, ref) => {
     const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
       event.target.setCustomValidity('');
       onChange?.(event);
@@ -19,7 +20,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
     }`;
 
     return (
-      <div>
+      <div className={wrapperClassName}>
         <div className={fieldClassName}>
           {icon && (
             <span className="pointer-events-none shrink-0 text-slate-400" aria-hidden>

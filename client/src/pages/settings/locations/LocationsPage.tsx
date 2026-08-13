@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { FormEvent, useState } from 'react';
-import { Link, Navigate } from 'react-router-dom';
-import { HiArrowLeft, HiPlus } from 'react-icons/hi2';
+import { Navigate } from 'react-router-dom';
+import { HiPlus } from 'react-icons/hi2';
 import { toast } from 'react-toastify';
 import { Button } from '../../../components/ui/Button';
 import { PageContainer } from '../../../components/ui/PageContainer';
@@ -146,15 +146,8 @@ export const LocationsPage = () => {
 
   return (
     <PageContainer className="space-y-6">
-      <Link
-        to="/dashboard/settings"
-        className="inline-flex items-center gap-1 text-sm text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200"
-      >
-        <HiArrowLeft className="h-4 w-4" />
-        Back to settings
-      </Link>
-
       <PageHeader
+        back={{ to: '/dashboard/settings', label: 'Back to settings' }}
         label="Settings"
         title="Work locations"
         description="Sites where employees work — used for shift scheduling and rota planning."
