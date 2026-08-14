@@ -1,8 +1,9 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { FormEvent, useMemo, useState } from 'react';
 import { Navigate, useNavigate } from 'react-router-dom';
-import { HiArrowUpTray, HiPlus } from 'react-icons/hi2';
+import { HiArrowUpTray, HiPlus, HiRectangleGroup } from 'react-icons/hi2';
 import { Button } from '../../../components/ui/Button';
+import { SearchToolbar } from '../../../components/ui/SearchToolbar';
 import { PageContainer } from '../../../components/ui/PageContainer';
 import { PageHeader } from '../../../components/layout/PageHeader';
 import type { TableSortState } from '../../../components/ui/Table';
@@ -21,7 +22,6 @@ import { hasPermission } from '../../../utils/permissions';
 import { usePagination } from '../../../hooks/usePagination';
 import { CreateEmployeeModal } from './CreateEmployeeModal';
 import { EmployeeImportModal } from './EmployeeImportModal';
-import { EmployeeFilters } from './EmployeeFilters';
 import { EmployeesTable } from './EmployeesTable';
 import { EmployeesTabs } from './EmployeesTabs';
 import { employeeName, employeeEditPath, employeeViewPath, isActiveEmployee } from '../utils';
@@ -222,6 +222,8 @@ export const EmployeesListPage = ({ variant }: EmployeesListPageProps) => {
   };
 
   const isActiveList = variant === 'active';
+  const hasEmployeeFilters = Boolean(search || department);
+  const showSearchToolbar = hasEmployeeFilters || filteredEmployees.length > 0;
 
   return (
     <PageContainer>
@@ -256,16 +258,36 @@ export const EmployeesListPage = ({ variant }: EmployeesListPageProps) => {
         }
       />
 
-      <EmployeeFilters
-        search={search}
-        onSearchChange={setSearch}
-        department={department}
-        onDepartmentChange={setDepartment}
-        departments={departmentsQuery.data ?? []}
-        pageSize={pageSize}
-        onPageSizeChange={setPageSize}
-        pageSizeOptions={pageSizeOptions}
-      />
+      {showSearchToolbar && (
+        <SearchToolbar
+          pageSize={{
+            id: `${variant}-employee-page-size`,
+            value: pageSize,
+            onChange: setPageSize,
+            options: pageSizeOptions,
+          }}
+          search={{
+            id: `${variant}-employee-search`,
+            value: search,
+            onChange: setSearch,
+            placeholder: 'Name, email, job title…',
+          }}
+          filters={[
+            {
+              id: `${variant}-employee-department`,
+              label: 'Department',
+              value: department,
+              onChange: setDepartment,
+              allOptionLabel: 'All departments',
+              icon: <HiRectangleGroup className="h-4 w-4 text-brand-600" />,
+              options: (departmentsQuery.data ?? []).map((dept) => ({
+                value: dept,
+                label: dept,
+              })),
+            },
+          ]}
+        />
+      )}
 
       <EmployeesTable
         employees={paginatedItems}
