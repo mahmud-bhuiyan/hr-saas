@@ -139,7 +139,31 @@ Do not place route components inside `components/ui/`.
 
 ---
 
-## 7. Naming Rules
+## 7. Arrow Functions
+
+Use **arrow functions** for all components and helpers in new client code. Do **not** use `function` declarations.
+
+```tsx
+// Components
+export const NavTabBar = ({ tabs }: NavTabBarProps) => { … };
+
+// Inner helpers in the same file
+const tabClassName = (isActive: boolean) => `…`;
+
+// Default export
+const App = () => { … };
+export default App;
+```
+
+- **Named exports:** `export const MyHelper = (arg: string): string => { … }`
+- **Async:** `export const fetchData = async (): Promise<Data> => { … }`
+- **Generics in `.tsx`:** trailing comma — `export const Table = <T,>(props: TableProps<T>) => { … }`
+
+See `AGENTS.md` → Code style for full patterns (middleware, factories, etc.).
+
+---
+
+## 8. Naming Rules
 
 React components must use PascalCase.
 
@@ -151,7 +175,7 @@ Avoid prefixes such as `Common`, `Reusable`, `Custom`, `Generic`, `Shared`. Pref
 
 ---
 
-## 8. Component Creation Process
+## 9. Component Creation Process
 
 Before creating a component:
 
@@ -168,7 +192,7 @@ Never create a duplicate because a new screen has slightly different styling.
 
 ---
 
-## 9. Generic vs Feature-Specific
+## 10. Generic vs Feature-Specific
 
 ```text
 Is the component reusable without knowing the application's business domain?
@@ -185,7 +209,7 @@ Examples: `Card` → primitives; `UserCard` → feature. `Input` → primitives;
 
 ---
 
-## 10. Avoid Generic Dumping Folders
+## 11. Avoid Generic Dumping Folders
 
 Do not create or use `components/common/`, `components/shared/`, `components/reusable/`, `components/misc/`, `components/other/`, or `components/custom/` unless there is a clear architectural reason.
 
@@ -193,7 +217,7 @@ Do not use `common` or `shared` as a dumping ground.
 
 ---
 
-## 11. Do Not Over-Componentize
+## 12. Do Not Over-Componentize
 
 Create a component when it is reused, has meaningful behavior or styling, represents a clear UI concept, or makes the parent easier to understand.
 
@@ -201,7 +225,7 @@ Avoid components that only wrap one simple HTML element without adding value.
 
 ---
 
-## 12. Tailwind CSS
+## 13. Tailwind CSS
 
 Use Tailwind CSS for component styling. Do not create separate CSS files for simple component styles.
 
@@ -209,7 +233,7 @@ Extract repeated UI into components instead of copying large Tailwind class stri
 
 ---
 
-## 13. Existing Components
+## 14. Existing Components
 
 Do not reorganize existing components unless:
 
@@ -221,7 +245,7 @@ Do not move unrelated files during normal feature development.
 
 ---
 
-## 14. Final Placement Decision (new files)
+## 15. Final Placement Decision (new files)
 
 ```text
 Generic low-level UI?              → components/ui/primitives/

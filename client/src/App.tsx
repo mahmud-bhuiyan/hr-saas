@@ -20,13 +20,13 @@ import { CompanySettingsPage } from "./pages/settings/company/CompanySettingsPag
 import { DepartmentsPage } from "./pages/settings/departments/DepartmentsPage";
 import { UsersPage } from "./pages/settings/users/UsersPage";
 import { AuditLogPage } from "./pages/settings/audit-log/AuditLogPage";
-import { LeavePage } from "./pages/leave/LeavePage";
+import { LeavePage } from "./pages/me/leave/LeavePage";
 import { DocumentsPage } from "./pages/documents/DocumentsPage";
-import { AttendancePage } from "./pages/attendance/AttendancePage";
+import { AttendancePage } from "./pages/me/attendance/AttendancePage";
 import { TimesheetsPage } from "./pages/timesheets/TimesheetsPage";
 import { RotasPage } from "./pages/rotas/RotasPage";
-import { ExpensesPage } from "./pages/expenses/ExpensesPage";
-import { PerformancePage } from "./pages/performance/PerformancePage";
+import { ExpensesPage } from "./pages/me/expenses/ExpensesPage";
+import { PerformancePage } from "./pages/me/performance/PerformancePage";
 import { AttendanceSettingsPage } from "./pages/settings/attendance/AttendanceSettingsPage";
 import { LeaveSettingsPage } from "./pages/settings/leave/LeaveSettingsPage";
 import { LocationsPage } from "./pages/settings/locations/LocationsPage";
