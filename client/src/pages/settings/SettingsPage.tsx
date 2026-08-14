@@ -15,7 +15,7 @@ import {
   type NavCardGroupItem,
 } from "../../components/ui/NavCardGroup";
 import { PageContainer } from "../../components/ui/PageContainer";
-import { PageHeader } from "../../components/ui/PageHeader";
+import { PageHeader } from "../../components/layout/PageHeader";
 import { useAuth } from "../../contexts/AuthContext";
 import type { UserRole } from "../../types";
 

@@ -2,7 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { FormEvent, useCallback, useEffect, useMemo, useState } from 'react';
 import { Navigate } from 'react-router-dom';
 import { PageContainer } from '../../../components/ui/PageContainer';
-import { PageHeader } from '../../../components/ui/PageHeader';
+import { PageHeader } from '../../../components/layout/PageHeader';
 import { useSiteConfig } from '../../../contexts/SiteConfigContext';
 import { useAuth } from '../../../contexts/AuthContext';
 import { ApiError, fetchPlatformSiteSettings, updatePlatformSiteSettings } from '../../../lib/api';

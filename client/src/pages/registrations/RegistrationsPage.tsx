@@ -4,7 +4,7 @@ import { Navigate } from 'react-router-dom';
 import { HiPlus } from 'react-icons/hi2';
 import { Button } from '../../components/ui/Button';
 import { PageContainer } from '../../components/ui/PageContainer';
-import { PageHeader } from '../../components/ui/PageHeader';
+import { PageHeader } from '../../components/layout/PageHeader';
 import { TabGroup } from '../../components/ui/TabGroup';
 import { useTabUrlState } from '../../hooks/useTabUrlState';
 import {

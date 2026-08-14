@@ -7,7 +7,7 @@ import { Button } from "../../../components/ui/Button";
 import { FormField } from "../../../components/ui/FormField";
 import { Input } from "../../../components/ui/Input";
 import { PageContainer } from "../../../components/ui/PageContainer";
-import { PageHeader } from "../../../components/ui/PageHeader";
+import { PageHeader } from "../../../components/layout/PageHeader";
 import { Tabs } from "../../../components/ui/Tabs";
 import { useAuth } from "../../../contexts/AuthContext";
 import {

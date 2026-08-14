@@ -5,7 +5,7 @@ import { HiPlus } from 'react-icons/hi2';
 import { toast } from 'react-toastify';
 import { Button } from '../../components/ui/Button';
 import { PageContainer } from '../../components/ui/PageContainer';
-import { PageHeader } from '../../components/ui/PageHeader';
+import { PageHeader } from '../../components/layout/PageHeader';
 import { useAuth } from '../../contexts/AuthContext';
 import {
   ApiError,

@@ -4,7 +4,7 @@ import { Navigate, useNavigate } from 'react-router-dom';
 import { HiArrowUpTray, HiPlus } from 'react-icons/hi2';
 import { Button } from '../../components/ui/Button';
 import { PageContainer } from '../../components/ui/PageContainer';
-import { PageHeader } from '../../components/ui/PageHeader';
+import { PageHeader } from '../../components/layout/PageHeader';
 import { TabGroup } from '../../components/ui/TabGroup';
 import type { TableSortState } from '../../components/ui/Table';
 import { useTabUrlState } from '../../hooks/useTabUrlState';

@@ -1,5 +1,5 @@
 import { PageContainer } from "../../../components/ui/PageContainer";
-import { PageHeader } from "../../../components/ui/PageHeader";
+import { PageHeader } from "../../../components/layout/PageHeader";
 import { MeTabs } from "../components/MeTabs";
 
 export const PerformancePage = () => {

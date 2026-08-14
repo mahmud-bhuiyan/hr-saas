@@ -11,7 +11,7 @@ import {
   YAxis,
 } from 'recharts';
 import { PageContainer } from '../../components/ui/PageContainer';
-import { PageHeader } from '../../components/ui/PageHeader';
+import { PageHeader } from '../../components/layout/PageHeader';
 import { Table } from '../../components/ui/Table';
 import { useAuth } from '../../contexts/AuthContext';
 import { fetchHeadcountReport } from '../../lib/api';
