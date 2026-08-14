@@ -17,6 +17,7 @@ import {
 } from '../../../lib/api';
 import type { WorkLocation } from '../../../types';
 import { areRequiredFieldsFilled } from '../../../utils/form';
+import { isQueryInitialLoad } from '../../../utils/query';
 import { hasPermission } from '../../../utils/permissions';
 import { LocationFormModal } from './components/LocationFormModal';
 import { LocationsTable } from './components/LocationsTable';
@@ -141,7 +142,7 @@ export const LocationsPage = () => {
   const archivedLocations = allLocations.filter((loc) => loc.isArchived);
 
   const tableProps = {
-    loading: locationsQuery.isLoading,
+    loading: isQueryInitialLoad(locationsQuery),
     onEdit: (location: WorkLocation) => {
       setEditTarget(location);
       setEditForm({

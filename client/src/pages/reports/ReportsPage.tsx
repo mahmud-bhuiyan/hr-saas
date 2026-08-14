@@ -1,7 +1,7 @@
 import { Link, Navigate } from 'react-router-dom';
 import { HiChartBarSquare, HiUserGroup } from 'react-icons/hi2';
 import { PageContainer } from '../../components/ui/PageContainer';
-import { PageHeader } from '../../components/ui/PageHeader';
+import { PageHeader } from '../../components/layout/PageHeader';
 import { useAuth } from '../../contexts/AuthContext';
 import { hasPermission } from '../../utils/permissions';
 

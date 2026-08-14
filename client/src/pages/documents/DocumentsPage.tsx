@@ -6,7 +6,7 @@ import { toast } from 'react-toastify';
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
 import { PageContainer } from '../../components/ui/PageContainer';
-import { PageHeader } from '../../components/ui/PageHeader';
+import { PageHeader } from '../../components/layout/PageHeader';
 import { Select } from '../../components/ui/Select';
 import { Tabs } from '../../components/ui/Tabs';
 import { useAuth } from '../../contexts/AuthContext';
@@ -23,6 +23,7 @@ import {
 } from '../../lib/api';
 import type { DocumentCategory } from '../../types';
 import { areRequiredFieldsFilled } from '../../utils/form';
+import { isQueryInitialLoad } from '../../utils/query';
 import { hasPermission } from '../../utils/permissions';
 import { DocumentsTable } from './components/DocumentsTable';
 import {
@@ -255,7 +256,9 @@ export const DocumentsPage = () => {
       <DocumentsTable
         documents={filteredDocuments}
         loading={
-          effectiveTab === 'expiring' ? expiringQuery.isLoading : documentsQuery.isLoading
+          effectiveTab === 'expiring'
+            ? isQueryInitialLoad(expiringQuery)
+            : isQueryInitialLoad(documentsQuery)
         }
         emptyMessage={
           effectiveTab === 'expiring'

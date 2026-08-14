@@ -5,7 +5,7 @@ import { HiCalendarDays, HiChevronLeft, HiChevronRight } from 'react-icons/hi2';
 import { toast } from 'react-toastify';
 import { Button } from '../../components/ui/Button';
 import { PageContainer } from '../../components/ui/PageContainer';
-import { PageHeader } from '../../components/ui/PageHeader';
+import { PageHeader } from '../../components/layout/PageHeader';
 import { Tabs } from '../../components/ui/Tabs';
 import { useAuth } from '../../contexts/AuthContext';
 import {
@@ -20,6 +20,7 @@ import {
 } from '../../lib/api';
 import type { TimesheetEntry } from '../../types';
 import { hasPermission } from '../../utils/permissions';
+import { isQueryInitialLoad } from '../../utils/query';
 import { TimesheetApprovalQueue } from './components/TimesheetApprovalQueue';
 import { TimesheetWeekGrid } from './components/TimesheetWeekGrid';
 import { formatWeekRange, getMondayOfWeek, formatWeekOf, shiftWeek, type TimesheetTab } from './utils';
@@ -210,7 +211,7 @@ export const TimesheetsPage = () => {
               <TimesheetWeekGrid
                 weekOf={weekOf}
                 timesheet={timesheet}
-                loading={timesheetQuery.isLoading}
+                loading={isQueryInitialLoad(timesheetQuery)}
                 generating={generateMutation.isPending}
                 saving={saveMutation.isPending}
                 submitting={submitMutation.isPending}
@@ -235,7 +236,7 @@ export const TimesheetsPage = () => {
       {activeTab === 'approval-queue' && canApprove && (
         <TimesheetApprovalQueue
           timesheets={approvalQuery.data?.timesheets ?? []}
-          loading={approvalQuery.isLoading}
+          loading={isQueryInitialLoad(approvalQuery)}
           actionLoadingId={actionLoadingId}
           onApprove={(sheet) => {
             setActionLoadingId(sheet.id);

@@ -15,6 +15,7 @@ import {
 } from '../../../lib/api';
 import type { CompanyProfile, PatchCompanyProfileInput, PatchTenantBrandingInput } from '../../../types';
 import { hasFormChanges, pickChangedFields } from '../../../utils/form';
+import { isAnyQueryInitialLoad } from '../../../utils/query';
 import { CompanySettingsTabs } from './components/CompanySettingsTabs';
 import type { CompanyProfileFormValues } from './components/CompanyProfileForm';
 import type { TenantBrandingFormValues } from './components/TenantBrandingForm';
@@ -188,7 +189,8 @@ export const CompanySettingsPage = () => {
     return <Navigate to="/dashboard/settings" replace />;
   }
 
-  const isLoading = profileQuery.isLoading || brandingQuery.isLoading || !profileValues || !brandingValues;
+  const isLoading =
+    isAnyQueryInitialLoad(profileQuery, brandingQuery) || !profileValues || !brandingValues;
   const isError = profileQuery.isError || brandingQuery.isError;
 
   if (isLoading) {

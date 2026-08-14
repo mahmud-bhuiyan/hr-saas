@@ -1,8 +1,12 @@
 import type { Employee } from '../../types';
 
-export type EmployeesTab = 'active' | 'inactive';
+export const EMPLOYEES_BASE_PATH = '/employees';
+export const EMPLOYEES_ACTIVE_PATH = '/employees/active';
+export const EMPLOYEES_INACTIVE_PATH = '/employees/inactive';
 
-export const EMPLOYEES_TAB_IDS = ['active', 'inactive'] as const satisfies readonly EmployeesTab[];
+export const employeeViewPath = (id: string): string => `${EMPLOYEES_BASE_PATH}/${id}`;
+
+export const employeeEditPath = (id: string): string => `${EMPLOYEES_BASE_PATH}/${id}/edit`;
 
 export const isActiveEmployee = (employee: Employee): boolean => employee.status !== 'terminated';
 

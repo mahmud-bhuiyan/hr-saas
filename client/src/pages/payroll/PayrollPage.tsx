@@ -5,7 +5,7 @@ import { HiPlus } from 'react-icons/hi2';
 import { toast } from 'react-toastify';
 import { Button } from '../../components/ui/Button';
 import { PageContainer } from '../../components/ui/PageContainer';
-import { PageHeader } from '../../components/ui/PageHeader';
+import { PageHeader } from '../../components/layout/PageHeader';
 import { useAuth } from '../../contexts/AuthContext';
 import {
   ApiError,
@@ -21,6 +21,7 @@ import {
 import type { PayrollPeriod } from '../../types';
 import { areRequiredFieldsFilled } from '../../utils/form';
 import { hasPermission } from '../../utils/permissions';
+import { isQueryInitialLoad } from '../../utils/query';
 import {
   CreatePayrollPeriodModal,
   type CreatePayrollPeriodForm,
@@ -214,7 +215,7 @@ export const PayrollPage = () => {
       <div className="mb-8">
         <PayrollPeriodsTable
           periods={periodsQuery.data ?? []}
-          loading={periodsQuery.isLoading}
+          loading={isQueryInitialLoad(periodsQuery)}
           selectedPeriodId={selectedPeriodId}
           actionLoadingId={actionLoadingId}
           canGenerate={Boolean(canGenerate)}
@@ -245,7 +246,7 @@ export const PayrollPage = () => {
 
           <PayrollPreviewTable
             summaries={previewSummaries}
-            loading={selectedPeriodQuery.isLoading}
+            loading={isQueryInitialLoad(selectedPeriodQuery)}
           />
         </div>
       )}

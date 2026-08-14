@@ -144,7 +144,7 @@ Before building custom markup, search `client/src/components/ui/` (current kit) 
 | `Tabs` | `Tabs.tsx` | Tab bar for switching related list views |
 | `Dropdown` | `Dropdown.tsx` | Menus (user menu, action menus) |
 | `PageContainer` | `PageContainer.tsx` | Page wrapper with consistent spacing |
-| `PageHeader` | `PageHeader.tsx` | Label, title, description, optional action |
+| `PageHeader` | `layout/PageHeader.tsx` | Label, title, description, optional action |
 
 Feature-specific composites compose the UI kit and live in the feature folder (new: `features/<feature>/components/`; existing: `pages/<feature>/components/` or `client/src/components/` until migrated).
 

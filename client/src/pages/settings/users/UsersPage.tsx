@@ -8,6 +8,7 @@ import { useAuth } from '../../../contexts/AuthContext';
 import { ApiError, fetchTenantUsers, updateTenantUser } from '../../../lib/api';
 import type { TenantUser, UserRole } from '../../../types';
 import { hasFormChanges } from '../../../utils/form';
+import { isQueryInitialLoad } from '../../../utils/query';
 import { EditUserModal } from './components/EditUserModal';
 import { UsersTable } from './components/UsersTable';
 
@@ -87,7 +88,7 @@ export const UsersPage = () => {
 
       <UsersTable
         users={usersQuery.data ?? []}
-        loading={usersQuery.isLoading}
+        loading={isQueryInitialLoad(usersQuery)}
         currentUserId={user.id}
         onEdit={setEditTarget}
       />

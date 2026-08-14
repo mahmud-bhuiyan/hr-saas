@@ -44,12 +44,12 @@ export const TablePageSizeControl = ({
   return (
     <div className={`flex items-center justify-end ${className}`}>
       <label className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
-        <span>Rows per page</span>
+        <span>Per page</span>
         <Select
           value={String(pageSize)}
           onChange={(event) => onPageSizeChange(Number(event.target.value))}
           className="w-20 py-1.5"
-          aria-label="Rows per page"
+          aria-label="Per page"
         >
           {pageSizeOptions.map((option) => (
             <option key={option} value={option}>

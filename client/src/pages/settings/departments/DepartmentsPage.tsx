@@ -17,6 +17,7 @@ import {
 } from '../../../lib/api';
 import type { Department } from '../../../types';
 import { areRequiredFieldsFilled } from '../../../utils/form';
+import { isQueryInitialLoad } from '../../../utils/query';
 import { DepartmentFormModal } from './components/DepartmentFormModal';
 import { DepartmentsTable } from './components/DepartmentsTable';
 
@@ -117,7 +118,7 @@ export const DepartmentsPage = () => {
   const archivedDepartments = allDepartments.filter((dept) => dept.isArchived);
 
   const tableProps = {
-    loading: departmentsQuery.isLoading,
+    loading: isQueryInitialLoad(departmentsQuery),
     onEdit: (dept: Department) => {
       setEditTarget(dept);
       setEditName(dept.name);

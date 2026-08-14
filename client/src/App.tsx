@@ -7,7 +7,7 @@ import { ProtectedRoute } from "./components/ProtectedRoute";
 import { DashboardPage } from "./pages/dashboard/DashboardPage";
 import { EmployeeEditPage } from "./pages/employees/EmployeeEditPage";
 import { EmployeeViewPage } from "./pages/employees/EmployeeViewPage";
-import { EmployeesPage } from "./pages/employees/EmployeesPage";
+import { EmployeesIndexRedirect, EmployeesPage } from "./pages/employees/EmployeesPage";
 import { LoginPage } from "./pages/login/LoginPage";
 import { ForgotPasswordPage } from "./pages/login/ForgotPasswordPage";
 import { ResetPasswordPage } from "./pages/login/ResetPasswordPage";
@@ -20,13 +20,13 @@ import { CompanySettingsPage } from "./pages/settings/company/CompanySettingsPag
 import { DepartmentsPage } from "./pages/settings/departments/DepartmentsPage";
 import { UsersPage } from "./pages/settings/users/UsersPage";
 import { AuditLogPage } from "./pages/settings/audit-log/AuditLogPage";
-import { LeavePage } from "./pages/leave/LeavePage";
+import { LeavePage } from "./pages/me/leave/LeavePage";
 import { DocumentsPage } from "./pages/documents/DocumentsPage";
-import { AttendancePage } from "./pages/attendance/AttendancePage";
+import { AttendancePage } from "./pages/me/attendance/AttendancePage";
 import { TimesheetsPage } from "./pages/timesheets/TimesheetsPage";
 import { RotasPage } from "./pages/rotas/RotasPage";
-import { ExpensesPage } from "./pages/expenses/ExpensesPage";
-import { PerformancePage } from "./pages/performance/PerformancePage";
+import { ExpensesPage } from "./pages/me/expenses/ExpensesPage";
+import { PerformancePage } from "./pages/me/performance/PerformancePage";
 import { AttendanceSettingsPage } from "./pages/settings/attendance/AttendanceSettingsPage";
 import { LeaveSettingsPage } from "./pages/settings/leave/LeaveSettingsPage";
 import { LocationsPage } from "./pages/settings/locations/LocationsPage";
@@ -60,15 +60,19 @@ const App = () => {
             element={<RegistrationsPage />}
           />
           <Route
-            path="/dashboard/employees"
+            path="/employees"
             element={
               <ModuleRoute module="employees">
                 <EmployeesPage />
               </ModuleRoute>
             }
-          />
+          >
+            <Route index element={<EmployeesIndexRedirect />} />
+            <Route path="active" />
+            <Route path="inactive" />
+          </Route>
           <Route
-            path="/dashboard/employees/:id/edit"
+            path="/employees/:id/edit"
             element={
               <ModuleRoute module="employees">
                 <EmployeeEditPage />
@@ -76,7 +80,7 @@ const App = () => {
             }
           />
           <Route
-            path="/dashboard/employees/:id"
+            path="/employees/:id"
             element={
               <ModuleRoute module="employees">
                 <EmployeeViewPage />

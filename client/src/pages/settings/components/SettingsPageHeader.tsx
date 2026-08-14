@@ -1,5 +1,5 @@
 import type { ComponentProps, ReactNode } from 'react';
-import { PageHeader } from '../../../components/ui/PageHeader';
+import { PageHeader } from '../../../components/layout/PageHeader';
 
 type PageHeaderActionAlign = NonNullable<ComponentProps<typeof PageHeader>['actionAlign']>;
 

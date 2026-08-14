@@ -6,6 +6,7 @@ import { Table } from '../../../components/ui/Table';
 import { useAuth } from '../../../contexts/AuthContext';
 import { fetchAuditLogs } from '../../../lib/api';
 import { hasPermission } from '../../../utils/permissions';
+import { isQueryInitialLoad } from '../../../utils/query';
 import type { AuditLogEntry } from '../../../types';
 
 export const AuditLogPage = () => {
@@ -31,7 +32,7 @@ export const AuditLogPage = () => {
       />
 
       <Table<AuditLogEntry>
-        loading={auditQuery.isLoading}
+        loading={isQueryInitialLoad(auditQuery)}
         emptyMessage="No audit entries yet"
         columns={[
           {

@@ -5,7 +5,7 @@ import { Link, Navigate, useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { Button } from '../../components/ui/Button';
 import { PageContainer } from '../../components/ui/PageContainer';
-import { PageHeader } from '../../components/ui/PageHeader';
+import { PageHeader } from '../../components/layout/PageHeader';
 import { Spinner } from '../../components/ui/Spinner';
 import { useAuth } from '../../contexts/AuthContext';
 import {
@@ -18,6 +18,7 @@ import {
 } from '../../lib/api';
 import { hasFormChanges, pickChangedFields } from '../../utils/form';
 import { hasPermission } from '../../utils/permissions';
+import { isQueryInitialLoad } from '../../utils/query';
 import {
   EmployeeEditFields,
   EmployeePayFields,
@@ -25,7 +26,7 @@ import {
   type EmployeeFormValues,
 } from './components/EmployeeEditForm';
 import { EmployeeStatusBadge } from './components/EmployeeStatusBadge';
-import { employeeName } from './utils';
+import { employeeName, employeeViewPath, EMPLOYEES_ACTIVE_PATH } from './utils';
 
 const FORM_ID = 'employee-edit-page-form';
 
@@ -121,7 +122,7 @@ export const EmployeeEditPage = () => {
       setForm(toEmployeeFormValues(updated));
       void queryClient.invalidateQueries({ queryKey: ['employees'] });
       void queryClient.invalidateQueries({ queryKey: ['employees', id] });
-      navigate(`/dashboard/employees/${id}`);
+      navigate(employeeViewPath(id!));
     },
     onError: (err) => {
       toast.error(err instanceof ApiError ? err.message : 'Failed to update employee');
@@ -129,11 +130,11 @@ export const EmployeeEditPage = () => {
   });
 
   if (!canUpdate) {
-    return <Navigate to="/dashboard/employees" replace />;
+    return <Navigate to={EMPLOYEES_ACTIVE_PATH} replace />;
   }
 
   if (!id) {
-    return <Navigate to="/dashboard/employees" replace />;
+    return <Navigate to={EMPLOYEES_ACTIVE_PATH} replace />;
   }
 
   const updateField = <K extends keyof EmployeeFormValues,>(
@@ -199,7 +200,7 @@ export const EmployeeEditPage = () => {
 
   const handleCancel = () => {
     if (!updateMutation.isPending) {
-      navigate(`/dashboard/employees/${id}`);
+      navigate(employeeViewPath(id!));
     }
   };
 
@@ -214,7 +215,7 @@ export const EmployeeEditPage = () => {
     <PageContainer className="space-y-6">
       <div>
         <Link
-          to={`/dashboard/employees/${id}`}
+          to={employeeViewPath(id!)}
           className="inline-flex items-center gap-1.5 text-sm font-medium text-brand-700 hover:text-brand-800"
         >
           <HiArrowLeft className="h-4 w-4" />
@@ -222,7 +223,7 @@ export const EmployeeEditPage = () => {
         </Link>
       </div>
 
-      {employeeQuery.isLoading && (
+      {isQueryInitialLoad(employeeQuery) && (
         <div className="flex justify-center py-12">
           <Spinner className="h-6 w-6 text-brand-600" />
         </div>
