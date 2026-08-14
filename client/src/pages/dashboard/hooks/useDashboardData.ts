@@ -11,6 +11,7 @@ import {
   fetchProfile,
 } from '../../../lib/api';
 import { hasPermission } from '../../../utils/permissions';
+import { isAnyQueryInitialLoad } from '../../../utils/query';
 import type { DashboardCard, DashboardLink } from '../utils';
 import {
   dashboardDescription,
@@ -160,12 +161,13 @@ export const useDashboardData = (): {
     return [];
   }, [role, isSuperAdmin, canReadAllEmployees, canCreateEmployee, isManager, isEmployee, user]);
 
-  const loading =
-    (isSuperAdmin && (pendingQuery.isLoading || approvedQuery.isLoading)) ||
-    (canReadEmployees && !isSuperAdmin && employeesQuery.isLoading) ||
-    (canReadAllEmployees && !isSuperAdmin && departmentsQuery.isLoading) ||
-    (canApproveLeave && !isSuperAdmin && pendingLeaveQuery.isLoading) ||
-    (isEmployee && (profileQuery.isLoading || leaveBalanceQuery.isLoading));
+  const loading = isAnyQueryInitialLoad(
+    ...(isSuperAdmin ? [pendingQuery, approvedQuery] : []),
+    ...(canReadEmployees && !isSuperAdmin ? [employeesQuery] : []),
+    ...(canReadAllEmployees && !isSuperAdmin ? [departmentsQuery] : []),
+    ...(canApproveLeave && !isSuperAdmin ? [pendingLeaveQuery] : []),
+    ...(isEmployee ? [profileQuery, leaveBalanceQuery] : [])
+  );
 
   const description = role ? dashboardDescription(role) : 'Your HR workspace is ready.';
 

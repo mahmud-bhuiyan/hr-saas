@@ -18,6 +18,7 @@ import {
   toTabPatchInput,
   type SiteSettingsTab,
 } from './utils';
+import { isQueryInitialLoad } from '../../../utils/query';
 
 const toFormValues = (settings: PlatformSiteSettings): SiteSettingsFormValues => ({
   siteName: settings.siteName,
@@ -115,7 +116,7 @@ export const PlatformSiteSettingsPage = () => {
     return <Navigate to="/dashboard" replace />;
   }
 
-  if (settingsQuery.isLoading || !values || !original) {
+  if (isQueryInitialLoad(settingsQuery) || !values || !original) {
     return (
       <PageContainer>
         <p className="text-sm text-slate-500">Loading site settings…</p>

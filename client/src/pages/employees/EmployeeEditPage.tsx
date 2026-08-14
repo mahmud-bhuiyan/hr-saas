@@ -18,6 +18,7 @@ import {
 } from '../../lib/api';
 import { hasFormChanges, pickChangedFields } from '../../utils/form';
 import { hasPermission } from '../../utils/permissions';
+import { isQueryInitialLoad } from '../../utils/query';
 import {
   EmployeeEditFields,
   EmployeePayFields,
@@ -222,7 +223,7 @@ export const EmployeeEditPage = () => {
         </Link>
       </div>
 
-      {employeeQuery.isLoading && (
+      {isQueryInitialLoad(employeeQuery) && (
         <div className="flex justify-center py-12">
           <Spinner className="h-6 w-6 text-brand-600" />
         </div>

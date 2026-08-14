@@ -6,6 +6,7 @@ import { Input } from '../../../../components/ui/Input';
 import { Select } from '../../../../components/ui/Select';
 import { fetchEmployeeAttendance, fetchEmployees } from '../../../../lib/api';
 import type { AttendanceLog } from '../../../../types';
+import { isQueryInitialLoad } from '../../../../utils/query';
 import { AttendanceHistoryTable } from './AttendanceHistoryTable';
 
 interface AttendanceEmployeeCorrectionsProps {
@@ -77,7 +78,7 @@ export const AttendanceEmployeeCorrections = ({ onCorrect }: AttendanceEmployeeC
           </h2>
           <AttendanceHistoryTable
             logs={historyQuery.data?.logs ?? []}
-            loading={historyQuery.isLoading}
+            loading={isQueryInitialLoad(historyQuery)}
             canCorrect
             onCorrect={onCorrect}
           />

@@ -12,6 +12,7 @@ import { APP_NAME } from '../constants/app';
 import { DEFAULT_FAVICON_DISPLAY, DEFAULT_LOGO_DISPLAY, DEFAULT_SIDEBAR_DISPLAY } from '../constants/branding';
 import { fetchEffectiveBranding, fetchSiteConfig } from '../lib/api';
 import { applyDocumentBranding } from '../utils/theme';
+import { isAnyQueryInitialLoad } from '../utils/query';
 import type { SiteConfig } from '../types';
 import { useAuth } from './AuthContext';
 
@@ -72,7 +73,10 @@ export const SiteConfigProvider = ({ children }: { children: ReactNode }) => {
     await queryClient.invalidateQueries({ queryKey: ['settings', 'branding'] });
   }, [queryClient]);
 
-  const isLoading = publicQuery.isLoading || (isAuthenticated && effectiveQuery.isLoading);
+  const isLoading = isAnyQueryInitialLoad(
+    publicQuery,
+    ...(isAuthenticated ? [effectiveQuery] : [])
+  );
 
   const value = useMemo(
     () => ({

@@ -16,6 +16,7 @@ import { Table } from '../../components/ui/Table';
 import { useAuth } from '../../contexts/AuthContext';
 import { fetchHeadcountReport } from '../../lib/api';
 import { hasPermission } from '../../utils/permissions';
+import { isQueryInitialLoad } from '../../utils/query';
 import type { HeadcountDepartmentBreakdown } from '../../types';
 
 export const HeadcountReportPage = () => {
@@ -110,7 +111,7 @@ export const HeadcountReportPage = () => {
         <h2 className="mb-4 text-sm font-medium text-slate-900 dark:text-slate-100">
           Headcount by department
         </h2>
-        {reportQuery.isLoading ? (
+        {isQueryInitialLoad(reportQuery) ? (
           <div className="flex h-72 items-center justify-center text-sm text-slate-500">Loading chart…</div>
         ) : chartData.length === 0 ? (
           <div className="flex h-72 items-center justify-center text-sm text-slate-500">
@@ -143,7 +144,7 @@ export const HeadcountReportPage = () => {
         columns={columns}
         data={report?.byDepartment ?? []}
         getRowKey={(row) => row.department}
-        loading={reportQuery.isLoading}
+        loading={isQueryInitialLoad(reportQuery)}
         emptyMessage="No department data available."
       />
     </PageContainer>

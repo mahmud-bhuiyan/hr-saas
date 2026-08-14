@@ -9,6 +9,7 @@ import { Spinner } from '../../components/ui/Spinner';
 import { useAuth } from '../../contexts/AuthContext';
 import { ApiError, fetchEmployee, fetchEmployeeReports, inviteEmployee } from '../../lib/api';
 import { hasPermission } from '../../utils/permissions';
+import { isQueryInitialLoad } from '../../utils/query';
 import { DirectReportsTable } from './components/DirectReportsTable';
 import { EmployeeProfileSummary } from './components/EmployeeProfileSummary';
 import { EmployeeStatusBadge } from './components/EmployeeStatusBadge';
@@ -71,7 +72,7 @@ export const EmployeeViewPage = () => {
         </Link>
       </div>
 
-      {employeeQuery.isLoading && (
+      {isQueryInitialLoad(employeeQuery) && (
         <div className="flex justify-center py-12">
           <Spinner className="h-6 w-6 text-brand-600" />
         </div>
@@ -129,7 +130,7 @@ export const EmployeeViewPage = () => {
                 <HiUserGroup className="h-4 w-4 text-brand-600" />
                 <h2 className="text-sm font-semibold text-slate-900 dark:text-slate-100">Direct reports</h2>
               </div>
-              {!reportsQuery.isLoading && (
+              {!isQueryInitialLoad(reportsQuery) && (
                 <span className="rounded-full bg-white px-2.5 py-0.5 text-xs font-medium text-slate-600 ring-1 ring-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:ring-slate-700">
                   {reportCount}
                 </span>
@@ -137,7 +138,7 @@ export const EmployeeViewPage = () => {
             </div>
             <DirectReportsTable
               reports={reportsQuery.data ?? []}
-              loading={reportsQuery.isLoading}
+              loading={isQueryInitialLoad(reportsQuery)}
               onViewEmployee={(employeeId) => navigate(employeeViewPath(employeeId))}
               embedded
             />

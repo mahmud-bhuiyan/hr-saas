@@ -20,6 +20,7 @@ import { Table } from '../../components/ui/Table';
 import { useAuth } from '../../contexts/AuthContext';
 import { fetchAbsenceSummaryReport } from '../../lib/api';
 import { hasPermission } from '../../utils/permissions';
+import { isQueryInitialLoad } from '../../utils/query';
 import type { AbsenceDepartmentBreakdown } from '../../types';
 
 const currentYear = new Date().getFullYear();
@@ -123,7 +124,7 @@ export const AbsenceReportPage = () => {
         <h2 className="mb-4 text-sm font-medium text-slate-900 dark:text-slate-100">
           Absence days by department
         </h2>
-        {reportQuery.isLoading ? (
+        {isQueryInitialLoad(reportQuery) ? (
           <div className="flex h-72 items-center justify-center text-sm text-slate-500">Loading chart…</div>
         ) : chartData.length === 0 ? (
           <div className="flex h-72 items-center justify-center text-sm text-slate-500">
@@ -154,7 +155,7 @@ export const AbsenceReportPage = () => {
         columns={columns}
         data={reportQuery.data?.byDepartment ?? []}
         getRowKey={(row) => row.department}
-        loading={reportQuery.isLoading}
+        loading={isQueryInitialLoad(reportQuery)}
         emptyMessage="No absence data for this period."
       />
     </PageContainer>

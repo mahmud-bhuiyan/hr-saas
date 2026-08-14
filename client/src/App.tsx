@@ -7,8 +7,7 @@ import { ProtectedRoute } from "./components/ProtectedRoute";
 import { DashboardPage } from "./pages/dashboard/DashboardPage";
 import { EmployeeEditPage } from "./pages/employees/EmployeeEditPage";
 import { EmployeeViewPage } from "./pages/employees/EmployeeViewPage";
-import { ActiveEmployeesPage } from "./pages/employees/ActiveEmployeesPage";
-import { InactiveEmployeesPage } from "./pages/employees/InactiveEmployeesPage";
+import { EmployeesIndexRedirect, EmployeesPage } from "./pages/employees/EmployeesPage";
 import { LoginPage } from "./pages/login/LoginPage";
 import { ForgotPasswordPage } from "./pages/login/ForgotPasswordPage";
 import { ResetPasswordPage } from "./pages/login/ResetPasswordPage";
@@ -39,7 +38,6 @@ import { HeadcountReportPage } from "./pages/reports/HeadcountReportPage";
 import { AbsenceReportPage } from "./pages/reports/AbsenceReportPage";
 import { TermsOfUsePage } from "./pages/legal/TermsOfUsePage";
 import { PrivacyPolicyPage } from "./pages/legal/PrivacyPolicyPage";
-import { EMPLOYEES_ACTIVE_PATH } from "./pages/employees/utils";
 
 const App = () => {
   return (
@@ -63,24 +61,16 @@ const App = () => {
           />
           <Route
             path="/employees"
-            element={<Navigate to={EMPLOYEES_ACTIVE_PATH} replace />}
-          />
-          <Route
-            path="/employees/active"
             element={
               <ModuleRoute module="employees">
-                <ActiveEmployeesPage />
+                <EmployeesPage />
               </ModuleRoute>
             }
-          />
-          <Route
-            path="/employees/inactive"
-            element={
-              <ModuleRoute module="employees">
-                <InactiveEmployeesPage />
-              </ModuleRoute>
-            }
-          />
+          >
+            <Route index element={<EmployeesIndexRedirect />} />
+            <Route path="active" />
+            <Route path="inactive" />
+          </Route>
           <Route
             path="/employees/:id/edit"
             element={

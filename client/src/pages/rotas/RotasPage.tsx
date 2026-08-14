@@ -23,6 +23,7 @@ import {
 import type { Shift } from '../../types';
 import { pickChangedFields } from '../../utils/form';
 import { hasPermission } from '../../utils/permissions';
+import { isQueryInitialLoad } from '../../utils/query';
 import { MyShiftsTable } from './components/MyShiftsTable';
 import { OpenShiftsTable } from './components/OpenShiftsTable';
 import { PublishRotaModal } from './components/PublishRotaModal';
@@ -236,7 +237,7 @@ export const RotasPage = () => {
 
   const locations = locationsQuery.data ?? [];
   const employees = employeesQuery.data ?? [];
-  const noLocations = canManage && !locationsQuery.isLoading && locations.length === 0;
+  const noLocations = canManage && !isQueryInitialLoad(locationsQuery) && locations.length === 0;
 
   return (
     <PageContainer>
@@ -305,7 +306,7 @@ export const RotasPage = () => {
           <RotaWeekGrid
             weekOf={weekOf}
             shifts={shifts}
-            loading={rotaQuery.isLoading}
+            loading={isQueryInitialLoad(rotaQuery)}
             actionLoadingId={actionLoadingId}
             canManage={canManage}
             onAddShift={(date) => {
@@ -331,13 +332,13 @@ export const RotasPage = () => {
         )}
 
         {activeTab === 'my-shifts' && canReadOwn && (
-          <MyShiftsTable shifts={myShifts} loading={rotaQuery.isLoading} />
+          <MyShiftsTable shifts={myShifts} loading={isQueryInitialLoad(rotaQuery)} />
         )}
 
         {activeTab === 'open-shifts' && canClaim && (
           <OpenShiftsTable
             shifts={openShifts}
-            loading={rotaQuery.isLoading}
+            loading={isQueryInitialLoad(rotaQuery)}
             claimLoadingId={claimLoadingId}
             onClaim={(shift) => {
               setClaimLoadingId(shift.id);

@@ -8,6 +8,7 @@ import {
   markNotificationRead,
 } from '../lib/api';
 import { useAuth } from '../contexts/AuthContext';
+import { isQueryInitialLoad } from '../utils/query';
 import { Spinner } from './ui/Spinner';
 
 export const NotificationBell = () => {
@@ -83,13 +84,13 @@ export const NotificationBell = () => {
             </div>
 
             <div className="max-h-80 overflow-y-auto">
-              {listQuery.isLoading && (
+              {isQueryInitialLoad(listQuery) && (
                 <div className="flex justify-center py-8">
                   <Spinner className="h-5 w-5 text-brand-600" />
                 </div>
               )}
 
-              {!listQuery.isLoading && (listQuery.data?.length ?? 0) === 0 && (
+              {!isQueryInitialLoad(listQuery) && (listQuery.data?.length ?? 0) === 0 && (
                 <p className="px-4 py-8 text-center text-sm text-slate-500 dark:text-slate-400">No notifications yet</p>
               )}
 

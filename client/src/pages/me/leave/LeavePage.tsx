@@ -22,6 +22,7 @@ import {
 import type { CreateLeaveRequestInput } from "../../../types";
 import { areRequiredFieldsFilled } from "../../../utils/form";
 import { hasPermission } from "../../../utils/permissions";
+import { isQueryInitialLoad } from "../../../utils/query";
 import { LeaveApprovalQueue } from "./components/LeaveApprovalQueue";
 import { EmployeeLeaveList } from "./components/EmployeeLeaveList";
 import { LeaveBalanceSummary } from "./components/LeaveBalanceSummary";
@@ -271,7 +272,7 @@ export const LeavePage = () => {
         <div className="space-y-6">
           <LeaveBalanceSummary
             balance={balanceQuery.data}
-            loading={balanceQuery.isLoading}
+            loading={isQueryInitialLoad(balanceQuery)}
             missingEmployeeLink={missingEmployeeLink}
           />
           <div>
@@ -280,7 +281,7 @@ export const LeavePage = () => {
             </h2>
             <LeaveRequestsTable
               requests={myRequestsQuery.data ?? []}
-              loading={myRequestsQuery.isLoading}
+              loading={isQueryInitialLoad(myRequestsQuery)}
               onCancel={(request) => {
                 setActionLoadingId(request.id);
                 cancelMutation.mutate(request.id);
@@ -296,7 +297,7 @@ export const LeavePage = () => {
       {effectiveTab === "employee-leave" && canApprove && (
         <EmployeeLeaveList
           requests={employeeLeaveQuery.data ?? []}
-          loading={employeeLeaveQuery.isLoading}
+          loading={isQueryInitialLoad(employeeLeaveQuery)}
           title={canApproveAll ? "Employee leave" : "Team leave"}
           description={
             canApproveAll
@@ -309,7 +310,7 @@ export const LeavePage = () => {
       {effectiveTab === "approvals" && canApprove && (
         <LeaveApprovalQueue
           requests={pendingQuery.data ?? []}
-          loading={pendingQuery.isLoading}
+          loading={isQueryInitialLoad(pendingQuery)}
           multiStepApprovalEnabled={
             leaveSettingsQuery.data?.multiStepApprovalEnabled ?? false
           }
@@ -330,7 +331,7 @@ export const LeavePage = () => {
           year={calendarYear}
           month={calendarMonth}
           entries={calendarQuery.data ?? []}
-          loading={calendarQuery.isLoading}
+          loading={isQueryInitialLoad(calendarQuery)}
           onMonthChange={(year, month) => {
             setCalendarYear(year);
             setCalendarMonth(month);

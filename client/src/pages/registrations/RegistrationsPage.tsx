@@ -27,6 +27,7 @@ import {
 } from '../../types/modules';
 import type { CreateCompanyInput, RegistrationRequest, UpdateCompanyInput } from '../../types';
 import { areRequiredFieldsFilled, hasFormChanges, pickChangedFields } from '../../utils/form';
+import { isQueryInitialLoad } from '../../utils/query';
 import {
   ApproveRegistrationModal,
   CompanyDetailsModal,
@@ -352,7 +353,7 @@ export const RegistrationsPage = () => {
             content: (
               <RegisteredCompaniesTable
                 registered={registered}
-                loading={approvedQuery.isLoading}
+                loading={isQueryInitialLoad(approvedQuery)}
                 isError={approvedQuery.isError}
                 onViewDetails={setDetailsTarget}
                 onEdit={openEditModal}
@@ -370,7 +371,7 @@ export const RegistrationsPage = () => {
             content: (
               <PendingRegistrationsTable
                 pending={pending}
-                loading={pendingQuery.isLoading}
+                loading={isQueryInitialLoad(pendingQuery)}
                 isError={pendingQuery.isError}
                 onViewDetails={setDetailsTarget}
                 onApprove={(row) => setApproveTarget(row)}

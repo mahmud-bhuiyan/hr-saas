@@ -24,6 +24,7 @@ import {
 } from "../../../lib/api";
 import { areRequiredFieldsFilled } from "../../../utils/form";
 import { hasPermission } from "../../../utils/permissions";
+import { isQueryInitialLoad } from "../../../utils/query";
 import { ExpenseApprovalQueue } from "./components/ExpenseApprovalQueue";
 import { MyExpensesTable } from "./components/MyExpensesTable";
 import {
@@ -326,7 +327,7 @@ export const ExpensesPage = () => {
           ) : (
             <MyExpensesTable
               expenses={myExpensesQuery.data?.expenses ?? []}
-              loading={myExpensesQuery.isLoading}
+              loading={isQueryInitialLoad(myExpensesQuery)}
               receiptLoadingId={receiptLoadingId}
               onViewReceipt={(expense) => void handleViewReceipt(expense.id)}
             />
@@ -337,7 +338,7 @@ export const ExpensesPage = () => {
       {activeTab === "approval-queue" && canApprove && (
         <ExpenseApprovalQueue
           expenses={approvalQuery.data?.expenses ?? []}
-          loading={approvalQuery.isLoading}
+          loading={isQueryInitialLoad(approvalQuery)}
           actionLoadingId={actionLoadingId}
           receiptLoadingId={receiptLoadingId}
           onApprove={(expense) => {

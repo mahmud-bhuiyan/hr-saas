@@ -20,6 +20,7 @@ import {
 } from "../../../lib/api";
 import type { AttendanceLog, PatchAttendanceInput } from "../../../types";
 import { hasPermission } from "../../../utils/permissions";
+import { isQueryInitialLoad } from "../../../utils/query";
 import "./attendance-keka.css";
 import { AttendanceActionsCard } from "./components/AttendanceActionsCard";
 import { AttendanceEmployeeCorrections } from "./components/AttendanceEmployeeCorrections";
@@ -131,8 +132,8 @@ export const AttendancePage = () => {
     ? calendarQuery.data
     : currentMonthCalendarQuery.data;
   const statsLoading = viewingCurrentMonth
-    ? calendarQuery.isLoading
-    : currentMonthCalendarQuery.isLoading;
+    ? isQueryInitialLoad(calendarQuery)
+    : isQueryInitialLoad(currentMonthCalendarQuery);
 
   const sessionCalendarDays = useMemo(
     () => statsCalendar?.days ?? calendarQuery.data?.days ?? [],
@@ -307,12 +308,12 @@ export const AttendancePage = () => {
             calendarYear={calendarYear}
             calendarMonth={calendarMonth}
             calendarDays={calendarQuery.data?.days ?? []}
-            calendarLoading={calendarQuery.isLoading}
+            calendarLoading={isQueryInitialLoad(calendarQuery)}
             selectedDate={selectedDate}
             onMonthSelect={handleMonthSelect}
             onDaySelect={setSelectedDate}
             historyLogs={historyQuery.data?.logs ?? []}
-            historyLoading={historyQuery.isLoading}
+            historyLoading={isQueryInitialLoad(historyQuery)}
             historyPage={historyPage}
             historyTotal={historyQuery.data?.total ?? 0}
             historyLimit={historyQuery.data?.limit ?? 20}
@@ -342,7 +343,7 @@ export const AttendancePage = () => {
       content: (
         <AttendanceTeamBoard
           logs={teamLiveQuery.data ?? []}
-          loading={teamLiveQuery.isLoading}
+          loading={isQueryInitialLoad(teamLiveQuery)}
         />
       ),
     });

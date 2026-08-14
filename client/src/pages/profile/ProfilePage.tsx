@@ -15,6 +15,7 @@ import {
 import { toast } from 'react-toastify';
 import { hasFormChanges, pickChangedFields } from '../../utils/form';
 import { hasPermission } from '../../utils/permissions';
+import { isQueryInitialLoad } from '../../utils/query';
 import { ProfileEditForm } from './components/ProfileEditForm';
 import { ProfileHeaderBanner } from './components/ProfileHeaderBanner';
 import { ProfileSecuritySection } from './components/ProfileSecuritySection';
@@ -162,7 +163,7 @@ export const ProfilePage = () => {
     );
   };
 
-  if (profileQuery.isLoading) {
+  if (isQueryInitialLoad(profileQuery)) {
     return (
       <PageContainer>
         <p className="text-sm text-slate-500">Loading profile…</p>

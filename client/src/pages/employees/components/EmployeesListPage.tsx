@@ -18,6 +18,7 @@ import {
 import { toast } from 'react-toastify';
 import type { CreateEmployeeInput, Employee, EmployeeSortField } from '../../../types';
 import { areRequiredFieldsFilled } from '../../../utils/form';
+import { isQueryInitialLoad } from '../../../utils/query';
 import { hasPermission } from '../../../utils/permissions';
 import { usePagination } from '../../../hooks/usePagination';
 import { CreateEmployeeModal } from './CreateEmployeeModal';
@@ -291,7 +292,7 @@ export const EmployeesListPage = ({ variant }: EmployeesListPageProps) => {
 
       <EmployeesTable
         employees={paginatedItems}
-        loading={employeesQuery.isLoading}
+        loading={isQueryInitialLoad(employeesQuery)}
         sort={sort}
         onSortChange={setSort}
         pagination={{
