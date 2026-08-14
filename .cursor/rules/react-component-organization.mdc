@@ -1,0 +1,235 @@
+---
+description: Rules for creating, naming, organizing and reusing React components in the client application
+globs: ["client/src/**/*.tsx", "client/src/**/*.ts"]
+alwaysApply: true
+---
+
+# React Component Organization Rules
+
+Applies to **new** client components only. Do **not** move, rename, or reorganize existing files unless the user explicitly asks.
+
+Existing code still lives under `client/src/components/ui/`, `client/src/pages/`, and `client/src/components/`. Reuse those files. Do not duplicate them into the new folders.
+
+---
+
+## Core Principle
+
+Before creating a new component, determine whether it is:
+
+1. A primitive UI component
+2. A form component
+3. A layout component
+4. A navigation component
+5. A shared application component
+6. A feature-specific component
+7. A route component
+
+Do not put all components into one folder.
+
+---
+
+## 1. Primitive UI Components
+
+Low-level reusable UI components belong in:
+
+```text
+client/src/components/ui/primitives/
+```
+
+Examples: `Button`, `Input`, `Checkbox`, `RadioGroup`, `Dropdown`, `Modal`, `Calendar`, `FileInput`.
+
+These must be generic and reusable. They must not contain business-specific logic.
+
+Use PascalCase file names: `Button.tsx`, `Input.tsx`, `Modal.tsx`.
+
+Do not use: `button.tsx`, `commonButton.tsx`, `ReusableButton.tsx`, `CustomButton.tsx`.
+
+Reuse existing kit files in `client/src/components/ui/` (e.g. `Button.tsx`) until they are migrated. Do not create a second copy under `primitives/`.
+
+---
+
+## 2. Form Components
+
+Components that combine inputs with labels, validation, errors, helper text, or form-specific behavior belong in:
+
+```text
+client/src/components/ui/forms/
+```
+
+Examples: `FormField`, `InputField`, `PasswordField`, `CheckboxField`, `RadioField`, `FileField`, `FormActions`, `FormModal`.
+
+Naming:
+
+```text
+Input           = low-level input
+InputField      = input + label + error/helper content
+PasswordInput   = password-specific input behavior
+PasswordField   = password input + label + validation/helper content
+```
+
+Only create both versions when they have clearly different responsibilities. Do not create duplicates that provide the same functionality.
+
+---
+
+## 3. Layout Components
+
+Application layout components belong in:
+
+```text
+client/src/components/layout/
+```
+
+Examples: `AppShell`, `AuthLayout`, `PageContainer`, `PageHeader`, `Navbar`, `Sidebar`, `Footer`.
+
+Do not place these in `components/ui/primitives`.
+
+---
+
+## 4. Navigation Components
+
+Reusable navigation components belong in:
+
+```text
+client/src/components/ui/navigation/
+```
+
+Examples: `NavCard`, `NavCardGroup`, `NavigationMenu`, `Breadcrumbs`.
+
+If a navigation component is specific to one feature, place it inside that feature instead (e.g. `features/settings/components/SettingsNavCard.tsx`).
+
+---
+
+## 5. Feature-Specific Components
+
+Components with business-specific behavior belong in the feature:
+
+```text
+client/src/features/<feature>/components/
+```
+
+Example:
+
+```text
+client/src/features/users/components/
+├── UserCard.tsx
+├── UserTable.tsx
+├── UserForm.tsx
+└── CreateUserModal.tsx
+```
+
+Do not put these in generic UI folders.
+
+Until an existing feature is migrated out of `client/src/pages/<feature>/`, add new files for that feature next to its current code. Do not split one feature across `pages/` and `features/`.
+
+New features (no existing `pages/` folder) use `client/src/features/<feature>/`.
+
+---
+
+## 6. Route Components
+
+Route protection and route handling belong under:
+
+```text
+client/src/routes/
+```
+
+Examples: `ProtectedRoute`, `GuestRoute`, `ModuleRoute`.
+
+Do not place route components inside `components/ui/`.
+
+---
+
+## 7. Naming Rules
+
+React components must use PascalCase.
+
+Correct: `Button.tsx`, `InputField.tsx`, `PasswordInput.tsx`, `PageHeader.tsx`, `UserAvatar.tsx`.
+
+Incorrect: `button.tsx`, `input-field.tsx`, `user_avatar.tsx`, `useravatar.tsx`.
+
+Avoid prefixes such as `Common`, `Reusable`, `Custom`, `Generic`, `Shared`. Prefer `Button` with a `variant` prop instead of `PrimaryButton` / `SecondaryButton` / `DangerButton`.
+
+---
+
+## 8. Component Creation Process
+
+Before creating a component:
+
+1. Search the existing codebase for a component with the same or similar purpose.
+2. Check `components/ui/` (current kit) and `components/ui/primitives/`.
+3. Check `components/ui/forms/`.
+4. Check `components/ui/navigation/`.
+5. Check `components/layout/`.
+6. Check the relevant feature folder (`features/<feature>/` or existing `pages/<feature>/`).
+7. Reuse or extend an existing component if appropriate.
+8. Create a new component only when an existing component cannot reasonably support the requirement.
+
+Never create a duplicate because a new screen has slightly different styling.
+
+---
+
+## 9. Generic vs Feature-Specific
+
+```text
+Is the component reusable without knowing the application's business domain?
+        |
+        YES → components/ui/ (primitives / forms / navigation as appropriate)
+        NO
+        ↓
+Is it specific to a feature?
+        |
+        YES → features/<feature>/components/ (or existing pages/<feature>/ until migrated)
+```
+
+Examples: `Card` → primitives; `UserCard` → feature. `Input` → primitives; `UserForm` → feature. `Modal` → primitives; `CreateUserModal` → feature.
+
+---
+
+## 10. Avoid Generic Dumping Folders
+
+Do not create or use `components/common/`, `components/shared/`, `components/reusable/`, `components/misc/`, `components/other/`, or `components/custom/` unless there is a clear architectural reason.
+
+Do not use `common` or `shared` as a dumping ground.
+
+---
+
+## 11. Do Not Over-Componentize
+
+Create a component when it is reused, has meaningful behavior or styling, represents a clear UI concept, or makes the parent easier to understand.
+
+Avoid components that only wrap one simple HTML element without adding value.
+
+---
+
+## 12. Tailwind CSS
+
+Use Tailwind CSS for component styling. Do not create separate CSS files for simple component styles.
+
+Extract repeated UI into components instead of copying large Tailwind class strings. Use variants and props for different visual states.
+
+---
+
+## 13. Existing Components
+
+Do not reorganize existing components unless:
+
+- The user explicitly asks
+- The current location clearly violates the architecture **and** the work is a dedicated refactor
+- Files are being moved as part of a larger component cleanup
+
+Do not move unrelated files during normal feature development.
+
+---
+
+## 14. Final Placement Decision (new files)
+
+```text
+Generic low-level UI?              → components/ui/primitives/
+Form-related reusable component?   → components/ui/forms/
+Navigation-related reusable?       → components/ui/navigation/
+Application layout?                → components/layout/
+Feature-specific?                  → features/<feature>/components/
+Routing-related?                   → routes/
+```
+
+Always determine the category before creating the file.

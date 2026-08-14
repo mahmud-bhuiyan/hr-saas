@@ -13,17 +13,19 @@ Use arrow functions for components and helpers — `export const MyPage = () => 
 
 ## Reuse before creating
 
-Check `client/src/components/ui/` first. Reuse `Button`, `Input`, `PasswordInput`, `Select`, `Textarea`, `FormField`, `FormActions`, `Modal`, `FormModal`, `Table`, `Tabs`, `PageContainer`, `PageHeader`, `Dropdown`, and `Spinner`. Create a new file in that folder only when no existing component fits.
+Search existing components first (`client/src/components/ui/` and related folders). Reuse `Button`, `Input`, `PasswordInput`, `Select`, `Textarea`, `FormField`, `FormActions`, `Modal`, `FormModal`, `Table`, `Tabs`, `PageContainer`, `PageHeader`, `Dropdown`, and `Spinner`. Create a new file only when no existing component fits.
+
+**New** files: primitives → `components/ui/primitives/`; form composites → `components/ui/forms/`; navigation → `components/ui/navigation/`; layout → `components/layout/`; route guards → `routes/`. Do not move existing files. Do not duplicate a component that already exists in `components/ui/`.
 
 ## Page file organization
 
-Keep page entry files thin. Structure:
+Keep page entry files thin. Do not migrate existing `pages/` files unless asked.
 
-- `client/src/pages/<feature>/<Feature>Page.tsx` — route entry: guards, queries/mutations, state, composition
-- `client/src/pages/<feature>/components/` — tables, filters, forms, modals, sections for that page
-- `client/src/pages/<feature>/utils.ts` — optional page-local pure helpers
+- **Existing:** `client/src/pages/<feature>/<Feature>Page.tsx` + `components/` + optional `utils.ts`
+- **New features:** `client/src/features/<feature>/` with the same split (route entry, `components/`, optional `utils.ts`)
+- Adding to an existing `pages/` feature: colocate there until that feature is migrated
 
-Extract UI into `components/` as the page grows. Reuse across features → `client/src/components/`. See `employees/EmployeesPage` and `registrations/RegistrationsPage` for reference.
+See `employees/EmployeesPage` and `registrations/RegistrationsPage` for page layout reference.
 
 ## Page layout
 

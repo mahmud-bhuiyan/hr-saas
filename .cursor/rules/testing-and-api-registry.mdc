@@ -14,9 +14,9 @@ Read `AGENTS.md` for full instructions.
 - **No root node_modules**
 
 ## Client UI
-- Reuse components in `client/src/components/ui/` (Button, FormModal, Table, Tabs, PageHeader, PasswordInput, etc.)
-- **Page components:** `client/src/pages/<feature>/components/` — extract tables, forms, modals from page entry files
-- New pages: folder per feature (`pages/<feature>/<Feature>Page.tsx` + `components/`); keep entry file thin
+- Reuse existing components (Button, FormModal, Table, Tabs, PageHeader, PasswordInput, etc.) — do not duplicate or move them
+- **New** component placement: primitives → `components/ui/primitives/`; forms → `components/ui/forms/`; navigation → `components/ui/navigation/`; layout → `components/layout/`; features → `features/<feature>/components/`; routes → `routes/`
+- **Existing** screens stay in `pages/<feature>/`; new features use `features/<feature>/`; keep entry files thin
 - New pages layout: `PageContainer` + `PageHeader` + `Table` / `Tabs` + `FormModal` (match `employees/EmployeesPage`, `registrations/RegistrationsPage`)
 - Tables: center-aligned by default; use `Table` `align` prop or per-column `align` — never hardcode `text-left`/`text-right` on columns for alignment
 - Form inputs: pass `icon` on every `Input` / `PasswordInput` / `Select` / `Textarea` — all existing and new forms (see `login/LoginForm`, `register/RegisterForm`, `employees/CreateEmployeeModal`)

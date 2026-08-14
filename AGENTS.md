@@ -106,14 +106,27 @@ Do not duplicate detailed API or plan docs — link to `docs/openapi.yaml`, `doc
 
 - `client/src/lib/api.ts` — API client (uses `VITE_API_URL`)
 - Build output: `client/dist/` → static hosting
-- **UI kit:** `client/src/components/ui/` — reusable primitives (see below)
-- **Page components:** `client/src/pages/<feature>/components/` — feature-specific UI extracted from page files (see below)
 - **Form helpers:** `client/src/utils/form.ts` — change detection and required-field checks
 - **Icons:** [`react-icons`](https://react-icons.github.io/react-icons/) — use colorful icons where they aid UX
 
+### Component organization (new files)
+
+Do **not** move existing files. Reuse what already exists. New components follow this layout (see `.cursor/rules/react-component-organization.mdc`):
+
+| Category | New files go in |
+|----------|-----------------|
+| Primitive UI (`Button`, `Input`, `Modal`, …) | `client/src/components/ui/primitives/` |
+| Form composites (`FormField`, `FormModal`, …) | `client/src/components/ui/forms/` |
+| Navigation (`NavCard`, `Breadcrumbs`, …) | `client/src/components/ui/navigation/` |
+| Layout (`AppShell`, `PageContainer`, `Navbar`, …) | `client/src/components/layout/` |
+| Feature-specific | `client/src/features/<feature>/components/` |
+| Route guards (`ProtectedRoute`, `GuestRoute`) | `client/src/routes/` |
+
+Existing kit still lives in `client/src/components/ui/` and existing screens in `client/src/pages/`. Reuse those files. Do not duplicate them into the new folders. When adding to a feature that still lives under `pages/`, colocate there until that feature is migrated.
+
 ### Reusable UI components (required)
 
-Before building custom markup, check `client/src/components/ui/`. **Reuse existing components; create a new one in that folder only if none fits.**
+Before building custom markup, search `client/src/components/ui/` (current kit) and the folders above. **Reuse existing components; create a new one only if none fits.**
 
 | Component | File | Use for |
 |-----------|------|---------|
@@ -133,11 +146,13 @@ Before building custom markup, check `client/src/components/ui/`. **Reuse existi
 | `PageContainer` | `PageContainer.tsx` | Page wrapper with consistent spacing |
 | `PageHeader` | `PageHeader.tsx` | Label, title, description, optional action |
 
-Feature-specific composites (e.g. `ChangePasswordModal`) live in `client/src/components/` and compose the UI kit.
+Feature-specific composites compose the UI kit and live in the feature folder (new: `features/<feature>/components/`; existing: `pages/<feature>/components/` or `client/src/components/` until migrated).
 
 ### Page file organization (required)
 
-Keep page entry files thin. Each screen lives in its own folder under `client/src/pages/`:
+Keep page entry files thin. **Existing** screens live under `client/src/pages/` — do not move them unless asked. **New** features use `client/src/features/<feature>/`.
+
+Current layout (do not reorganize):
 
 ```
 client/src/pages/
@@ -159,13 +174,11 @@ client/src/pages/
 
 **Page entry file** (`*Page.tsx`): routing guard, queries/mutations, local state, and composing child components. Target ~150 lines or less when possible.
 
-**Page components** (`pages/<feature>/components/`): tables, filters, forms, modals, and sections used by that page only. Pass data and callbacks via props — do not duplicate fetch logic in child components unless shared across multiple pages.
+**Page components** (`pages/<feature>/components/` or `features/<feature>/components/`): tables, filters, forms, modals, and sections used by that page only. Pass data and callbacks via props — do not duplicate fetch logic in child components unless shared across multiple pages.
 
-**Page utils** (`pages/<feature>/utils.ts`): small pure helpers shared within that feature (formatters, mappers). Do not put these in `components/ui/`.
+**Page utils** (`utils.ts` next to the feature): small pure helpers shared within that feature (formatters, mappers). Do not put these in `components/ui/`.
 
-**Shared across features:** if a component is reused by multiple page folders, move it to `client/src/components/` (e.g. `ChangePasswordModal`).
-
-When adding a new screen, create the folder and `components/` subfolder from the start — do not grow monolithic page files.
+When adding a new screen, create the feature folder and `components/` subfolder from the start — do not grow monolithic page files.
 
 ### Page layout (required for new screens)
 
