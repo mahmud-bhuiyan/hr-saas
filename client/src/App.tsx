@@ -7,7 +7,8 @@ import { ProtectedRoute } from "./components/ProtectedRoute";
 import { DashboardPage } from "./pages/dashboard/DashboardPage";
 import { EmployeeEditPage } from "./pages/employees/EmployeeEditPage";
 import { EmployeeViewPage } from "./pages/employees/EmployeeViewPage";
-import { EmployeesPage } from "./pages/employees/EmployeesPage";
+import { ActiveEmployeesPage } from "./pages/employees/ActiveEmployeesPage";
+import { InactiveEmployeesPage } from "./pages/employees/InactiveEmployeesPage";
 import { LoginPage } from "./pages/login/LoginPage";
 import { ForgotPasswordPage } from "./pages/login/ForgotPasswordPage";
 import { ResetPasswordPage } from "./pages/login/ResetPasswordPage";
@@ -38,6 +39,7 @@ import { HeadcountReportPage } from "./pages/reports/HeadcountReportPage";
 import { AbsenceReportPage } from "./pages/reports/AbsenceReportPage";
 import { TermsOfUsePage } from "./pages/legal/TermsOfUsePage";
 import { PrivacyPolicyPage } from "./pages/legal/PrivacyPolicyPage";
+import { EMPLOYEES_ACTIVE_PATH } from "./pages/employees/utils";
 
 const App = () => {
   return (
@@ -60,15 +62,27 @@ const App = () => {
             element={<RegistrationsPage />}
           />
           <Route
-            path="/dashboard/employees"
+            path="/employees"
+            element={<Navigate to={EMPLOYEES_ACTIVE_PATH} replace />}
+          />
+          <Route
+            path="/employees/active"
             element={
               <ModuleRoute module="employees">
-                <EmployeesPage />
+                <ActiveEmployeesPage />
               </ModuleRoute>
             }
           />
           <Route
-            path="/dashboard/employees/:id/edit"
+            path="/employees/inactive"
+            element={
+              <ModuleRoute module="employees">
+                <InactiveEmployeesPage />
+              </ModuleRoute>
+            }
+          />
+          <Route
+            path="/employees/:id/edit"
             element={
               <ModuleRoute module="employees">
                 <EmployeeEditPage />
@@ -76,7 +90,7 @@ const App = () => {
             }
           />
           <Route
-            path="/dashboard/employees/:id"
+            path="/employees/:id"
             element={
               <ModuleRoute module="employees">
                 <EmployeeViewPage />

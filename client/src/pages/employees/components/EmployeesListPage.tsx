@@ -2,30 +2,29 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { FormEvent, useMemo, useState } from 'react';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { HiArrowUpTray, HiPlus } from 'react-icons/hi2';
-import { Button } from '../../components/ui/Button';
-import { PageContainer } from '../../components/ui/PageContainer';
-import { PageHeader } from '../../components/layout/PageHeader';
-import { TabGroup } from '../../components/ui/TabGroup';
-import type { TableSortState } from '../../components/ui/Table';
-import { useTabUrlState } from '../../hooks/useTabUrlState';
-import { useAuth } from '../../contexts/AuthContext';
+import { Button } from '../../../components/ui/Button';
+import { PageContainer } from '../../../components/ui/PageContainer';
+import { PageHeader } from '../../../components/layout/PageHeader';
+import type { TableSortState } from '../../../components/ui/Table';
+import { useAuth } from '../../../contexts/AuthContext';
 import {
   ApiError,
   createEmployee,
   fetchEmployeeDepartments,
   fetchEmployees,
   updateEmployee,
-} from '../../lib/api';
+} from '../../../lib/api';
 import { toast } from 'react-toastify';
-import type { CreateEmployeeInput, Employee, EmployeeSortField } from '../../types';
-import { areRequiredFieldsFilled } from '../../utils/form';
-import { hasPermission } from '../../utils/permissions';
-import { usePagination } from '../../hooks/usePagination';
-import { CreateEmployeeModal } from './components/CreateEmployeeModal';
-import { EmployeeImportModal } from './components/EmployeeImportModal';
-import { EmployeeFilters } from './components/EmployeeFilters';
-import { EmployeesTable } from './components/EmployeesTable';
-import { employeeName, EMPLOYEES_TAB_IDS, isActiveEmployee, type EmployeesTab } from './utils';
+import type { CreateEmployeeInput, Employee, EmployeeSortField } from '../../../types';
+import { areRequiredFieldsFilled } from '../../../utils/form';
+import { hasPermission } from '../../../utils/permissions';
+import { usePagination } from '../../../hooks/usePagination';
+import { CreateEmployeeModal } from './CreateEmployeeModal';
+import { EmployeeImportModal } from './EmployeeImportModal';
+import { EmployeeFilters } from './EmployeeFilters';
+import { EmployeesTable } from './EmployeesTable';
+import { EmployeesTabs } from './EmployeesTabs';
+import { employeeName, employeeEditPath, employeeViewPath, isActiveEmployee } from '../utils';
 
 const emptyCreateForm: CreateEmployeeInput = {
   firstName: '',
@@ -37,14 +36,19 @@ const emptyCreateForm: CreateEmployeeInput = {
   startDate: '',
 };
 
-export const EmployeesPage = () => {
+export type EmployeesListVariant = 'active' | 'inactive';
+
+interface EmployeesListPageProps {
+  variant: EmployeesListVariant;
+}
+
+export const EmployeesListPage = ({ variant }: EmployeesListPageProps) => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
   const [search, setSearch] = useState('');
   const [department, setDepartment] = useState('');
-  const { activeTab, setActiveTab } = useTabUrlState(EMPLOYEES_TAB_IDS, { defaultTab: 'active' });
   const [createOpen, setCreateOpen] = useState(false);
   const [importOpen, setImportOpen] = useState(false);
   const [createForm, setCreateForm] = useState<CreateEmployeeInput>(emptyCreateForm);
@@ -143,15 +147,14 @@ export const EmployeesPage = () => {
   );
 
   const allEmployees = employeesQuery.data ?? [];
-  const activeEmployees = useMemo(
-    () => allEmployees.filter(isActiveEmployee),
-    [allEmployees]
+  const filteredEmployees = useMemo(
+    () =>
+      allEmployees.filter((employee) =>
+        variant === 'active' ? isActiveEmployee(employee) : !isActiveEmployee(employee)
+      ),
+    [allEmployees, variant]
   );
-  const inactiveEmployees = useMemo(
-    () => allEmployees.filter((employee) => !isActiveEmployee(employee)),
-    [allEmployees]
-  );
-  const tabEmployees = activeTab === 'active' ? activeEmployees : inactiveEmployees;
+
   const {
     paginatedItems,
     page,
@@ -163,8 +166,8 @@ export const EmployeesPage = () => {
     rangeStart,
     rangeEnd,
     pageSizeOptions,
-  } = usePagination(tabEmployees, {
-    resetKey: `${activeTab}-${search}-${department}-${sortBy}-${sortOrder}`,
+  } = usePagination(filteredEmployees, {
+    resetKey: `${variant}-${search}-${department}-${sortBy}-${sortOrder}`,
   });
 
   if (!canRead) {
@@ -174,13 +177,13 @@ export const EmployeesPage = () => {
   const openCreateModal = () => {
     setCreateForm(emptyCreateForm);
     setCreateOpen(true);
-  }
+  };
 
   const closeCreateModal = () => {
     if (!createMutation.isPending) {
       setCreateOpen(false);
     }
-  }
+  };
 
   const handleCreateSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -198,7 +201,7 @@ export const EmployeesPage = () => {
       startDate: createForm.startDate || undefined,
       managerId: createForm.managerId || undefined,
     });
-  }
+  };
 
   const handleDeactivate = (employee: Employee) => {
     const name = employeeName(employee);
@@ -207,7 +210,7 @@ export const EmployeesPage = () => {
     }
 
     deactivateMutation.mutate(employee.id);
-  }
+  };
 
   const handleActivate = (employee: Employee) => {
     const name = employeeName(employee);
@@ -216,42 +219,24 @@ export const EmployeesPage = () => {
     }
 
     activateMutation.mutate(employee.id);
-  }
-
-  const tableBaseProps = {
-    employees: paginatedItems,
-    loading: employeesQuery.isLoading,
-    sort,
-    onSortChange: setSort,
-    pagination: {
-      page,
-      pageSize,
-      total,
-      totalPages,
-      rangeStart,
-      rangeEnd,
-      onPageChange: setPage,
-      onPageSizeChange: setPageSize,
-      pageSizeOptions,
-    },
-    canUpdate: Boolean(canUpdate),
-    onView: (employee: Employee) => navigate(`/dashboard/employees/${employee.id}`),
-    onEdit: canUpdate
-      ? (employee: Employee) => navigate(`/dashboard/employees/${employee.id}/edit`)
-      : undefined,
-    deactivateLoadingId,
-    activateLoadingId,
   };
+
+  const isActiveList = variant === 'active';
 
   return (
     <PageContainer>
+      <EmployeesTabs />
       <PageHeader
         label="People"
-        title="Employees"
-        description="Browse, search, and manage employee records for your company."
+        title={isActiveList ? 'Active employees' : 'Inactive employees'}
+        description={
+          isActiveList
+            ? 'Browse, search, and manage active employee records for your company.'
+            : 'Browse and manage employees who are no longer active.'
+        }
         actionAlign="end"
         action={
-          canCreate ? (
+          canCreate && isActiveList ? (
             <div className="flex flex-wrap items-center justify-end gap-2">
               <Button
                 variant="secondary"
@@ -282,37 +267,39 @@ export const EmployeesPage = () => {
         pageSizeOptions={pageSizeOptions}
       />
 
-      <TabGroup<EmployeesTab>
-        activeId={activeTab}
-        onChange={setActiveTab}
-        className="space-y-4"
-        tabs={[
-          {
-            id: 'active',
-            label: 'Active employees',
-            count: activeEmployees.length,
-            content: (
-              <EmployeesTable
-                {...tableBaseProps}
-                emptyMessage="No active employees match your filters."
-                onDeactivate={canUpdate ? handleDeactivate : undefined}
-              />
-            ),
-          },
-          {
-            id: 'inactive',
-            label: 'Inactive employees',
-            count: inactiveEmployees.length,
-            content: (
-              <EmployeesTable
-                {...tableBaseProps}
-                emptyMessage="No inactive employees match your filters."
-                showStatus
-                onActivate={canUpdate ? handleActivate : undefined}
-              />
-            ),
-          },
-        ]}
+      <EmployeesTable
+        employees={paginatedItems}
+        loading={employeesQuery.isLoading}
+        sort={sort}
+        onSortChange={setSort}
+        pagination={{
+          page,
+          pageSize,
+          total,
+          totalPages,
+          rangeStart,
+          rangeEnd,
+          onPageChange: setPage,
+          onPageSizeChange: setPageSize,
+          pageSizeOptions,
+        }}
+        canUpdate={Boolean(canUpdate)}
+        onView={(employee) => navigate(employeeViewPath(employee.id))}
+        onEdit={
+          canUpdate
+            ? (employee) => navigate(employeeEditPath(employee.id))
+            : undefined
+        }
+        deactivateLoadingId={deactivateLoadingId}
+        activateLoadingId={activateLoadingId}
+        emptyMessage={
+          isActiveList
+            ? 'No active employees match your filters.'
+            : 'No inactive employees match your filters.'
+        }
+        showStatus={!isActiveList}
+        onDeactivate={canUpdate && isActiveList ? handleDeactivate : undefined}
+        onActivate={canUpdate && !isActiveList ? handleActivate : undefined}
       />
 
       <CreateEmployeeModal
@@ -334,7 +321,6 @@ export const EmployeesPage = () => {
           void queryClient.invalidateQueries({ queryKey: ['employees'] });
         }}
       />
-
     </PageContainer>
   );
-}
+};

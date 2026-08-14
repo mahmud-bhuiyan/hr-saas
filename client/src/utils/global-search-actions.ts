@@ -1,5 +1,6 @@
 import type { AuthUser, UserRole } from '../types';
 import type { TenantModuleId } from '../types/modules';
+import { EMPLOYEES_ACTIVE_PATH } from '../pages/employees/utils';
 import { isModuleEnabledForUser } from './modules';
 
 export type GlobalSearchActionDef = {
@@ -67,7 +68,7 @@ export const GLOBAL_SEARCH_ACTIONS: GlobalSearchActionDef[] = [
     id: 'employees',
     label: 'Employees',
     subtitle: 'Employee directory',
-    route: '/dashboard/employees',
+    route: EMPLOYEES_ACTIVE_PATH,
     roles: ['company_admin', 'hr_manager', 'manager'],
     module: 'employees',
     keywords: ['employees', 'directory', 'staff', 'team', 'people'],

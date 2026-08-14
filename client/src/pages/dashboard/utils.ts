@@ -1,4 +1,5 @@
 import { isModuleEnabledForUser } from '../../utils/modules';
+import { EMPLOYEES_ACTIVE_PATH } from '../employees/utils';
 import type { AuthUser, Employee, LeaveBalance, RegistrationRequest, UserRole } from '../../types';
 import type { TenantModuleId } from '../../types/modules';
 
@@ -57,8 +58,8 @@ export const tenantAdminCards = (
 export const tenantAdminLinks = (canCreate: boolean, user?: AuthUser | null): DashboardLink[] =>
   filterDashboardLinks(
     [
-      ...(canCreate ? [{ label: 'Add employee', to: '/dashboard/employees', module: 'employees' as const }] : []),
-      { label: 'View employees', to: '/dashboard/employees', module: 'employees' },
+      ...(canCreate ? [{ label: 'Add employee', to: EMPLOYEES_ACTIVE_PATH, module: 'employees' as const }] : []),
+      { label: 'View employees', to: EMPLOYEES_ACTIVE_PATH, module: 'employees' },
       { label: 'Review leave requests', to: '/me/leave', module: 'leave' },
       { label: 'Company settings', to: '/dashboard/settings', module: 'settings' },
       { label: 'Upload document', to: '/dashboard/documents', module: 'documents' },
@@ -69,7 +70,7 @@ export const tenantAdminLinks = (canCreate: boolean, user?: AuthUser | null): Da
 export const managerLinks = (user?: AuthUser | null): DashboardLink[] =>
   filterDashboardLinks(
     [
-      { label: 'View team', to: '/dashboard/employees', module: 'employees' },
+      { label: 'View team', to: EMPLOYEES_ACTIVE_PATH, module: 'employees' },
       { label: 'Review leave requests', to: '/me/leave', module: 'leave' },
       { label: 'Request leave', to: '/me/leave', module: 'leave' },
     ],

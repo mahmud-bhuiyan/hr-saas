@@ -86,11 +86,12 @@ const navItems: Array<{
   },
 
   {
-    to: "/dashboard/employees",
+    to: "/employees/active",
     label: "My Team",
     icon: HiUserGroup,
     roles: ["company_admin", "hr_manager", "manager"],
     module: "employees",
+    activePrefix: "/employees",
   },
 
   {

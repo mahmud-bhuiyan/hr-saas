@@ -12,7 +12,7 @@ import { hasPermission } from '../../utils/permissions';
 import { DirectReportsTable } from './components/DirectReportsTable';
 import { EmployeeProfileSummary } from './components/EmployeeProfileSummary';
 import { EmployeeStatusBadge } from './components/EmployeeStatusBadge';
-import { employeeName } from './utils';
+import { employeeName, employeeEditPath, employeeViewPath, EMPLOYEES_ACTIVE_PATH } from './utils';
 
 export const EmployeeViewPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -53,7 +53,7 @@ export const EmployeeViewPage = () => {
   }
 
   if (!id) {
-    return <Navigate to="/dashboard/employees" replace />;
+    return <Navigate to={EMPLOYEES_ACTIVE_PATH} replace />;
   }
 
   const employee = employeeQuery.data;
@@ -63,7 +63,7 @@ export const EmployeeViewPage = () => {
     <PageContainer className="space-y-6">
       <div>
         <Link
-          to="/dashboard/employees"
+          to={EMPLOYEES_ACTIVE_PATH}
           className="inline-flex items-center gap-1.5 text-sm font-medium text-brand-700 hover:text-brand-800"
         >
           <HiArrowLeft className="h-4 w-4" />
@@ -111,7 +111,7 @@ export const EmployeeViewPage = () => {
                     <Button
                       variant="secondary"
                       icon={<HiPencilSquare className="h-4 w-4 text-brand-600" />}
-                      onClick={() => navigate(`/dashboard/employees/${id}/edit`)}
+                      onClick={() => navigate(employeeEditPath(id!))}
                     >
                       Edit employee
                     </Button>
@@ -138,7 +138,7 @@ export const EmployeeViewPage = () => {
             <DirectReportsTable
               reports={reportsQuery.data ?? []}
               loading={reportsQuery.isLoading}
-              onViewEmployee={(employeeId) => navigate(`/dashboard/employees/${employeeId}`)}
+              onViewEmployee={(employeeId) => navigate(employeeViewPath(employeeId))}
               embedded
             />
           </section>

@@ -30,7 +30,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useDebouncedValue } from '../hooks/useDebouncedValue';
 import { fetchEmployees } from '../lib/api';
 import type { Employee } from '../types';
-import { employeeName, employeeMatchesSearch } from '../pages/employees/utils';
+import { employeeName, employeeMatchesSearch, employeeViewPath } from '../pages/employees/utils';
 import {
   filterGlobalSearchActions,
   type GlobalSearchActionDef,
@@ -139,7 +139,7 @@ export const GlobalSearch = () => {
       if (result.type === 'action') {
         navigate(result.action.route);
       } else {
-        navigate(`/dashboard/employees/${result.employee.id}`);
+        navigate(employeeViewPath(result.employee.id));
       }
 
       setQuery('');
