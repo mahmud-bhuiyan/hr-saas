@@ -73,10 +73,11 @@ export const TablePagination = ({
   const pageItems = getPaginationItems(totalPages);
   const navButtonClass = "px-3 py-1.5 text-xs";
   const pageButtonClass = "min-w-[2.25rem] px-2.5 py-1.5 text-xs";
+  const showPageNav = totalPages > 1;
 
   return (
     <div
-      className={`flex flex-col gap-3 border-t px-4 py-3 lg:flex-row lg:items-center lg:justify-between ${footerClassName}`}
+      className={`flex flex-col gap-3 border-t px-4 py-3 lg:flex-row lg:items-center ${showPageNav ? "lg:justify-between" : ""} ${footerClassName}`}
     >
       <p className="text-sm text-slate-600 dark:text-slate-400">
         {total === 0
@@ -84,71 +85,73 @@ export const TablePagination = ({
           : `Showing ${rangeStart}–${rangeEnd} of ${total}`}
       </p>
 
-      <nav
-        className="flex flex-wrap items-center justify-center gap-1.5"
-        aria-label="Table pagination"
-      >
-        <Button
-          type="button"
-          variant="secondary"
-          className={navButtonClass}
-          disabled={page <= 1}
-          onClick={() => onPageChange(1)}
+      {showPageNav && (
+        <nav
+          className="flex flex-wrap items-center justify-center gap-1.5"
+          aria-label="Table pagination"
         >
-          First
-        </Button>
-        <Button
-          type="button"
-          variant="secondary"
-          className={navButtonClass}
-          disabled={page <= 1}
-          onClick={() => onPageChange(page - 1)}
-        >
-          Prev
-        </Button>
+          <Button
+            type="button"
+            variant="secondary"
+            className={navButtonClass}
+            disabled={page <= 1}
+            onClick={() => onPageChange(1)}
+          >
+            First
+          </Button>
+          <Button
+            type="button"
+            variant="secondary"
+            className={navButtonClass}
+            disabled={page <= 1}
+            onClick={() => onPageChange(page - 1)}
+          >
+            Prev
+          </Button>
 
-        {pageItems.map((item, index) =>
-          item === "ellipsis" ? (
-            <span
-              key={`ellipsis-${index}`}
-              className={`inline-flex items-center justify-center text-slate-400 ${pageButtonClass}`}
-              aria-hidden
-            >
-              . .
-            </span>
-          ) : (
-            <Button
-              key={item}
-              type="button"
-              variant={item === page ? "primary" : "secondary"}
-              className={pageButtonClass}
-              aria-current={item === page ? "page" : undefined}
-              onClick={() => onPageChange(item)}
-            >
-              {item}
-            </Button>
-          ),
-        )}
+          {pageItems.map((item, index) =>
+            item === "ellipsis" ? (
+              <span
+                key={`ellipsis-${index}`}
+                className={`inline-flex items-center justify-center text-slate-400 ${pageButtonClass}`}
+                aria-hidden
+              >
+                . .
+              </span>
+            ) : (
+              <Button
+                key={item}
+                type="button"
+                variant={item === page ? "primary" : "secondary"}
+                className={pageButtonClass}
+                aria-current={item === page ? "page" : undefined}
+                onClick={() => onPageChange(item)}
+              >
+                {item}
+              </Button>
+            ),
+          )}
 
-        <Button
-          type="button"
-          variant="secondary"
-          className={navButtonClass}
-          disabled={page >= totalPages}
-          onClick={() => onPageChange(page + 1)}
-        >
-          Next
-        </Button>
-        <Button
-          type="button"
-          variant="secondary"
-          className={navButtonClass}
-          disabled={page >= totalPages}
-          onClick={() => onPageChange(totalPages)}
-        >
-          Last
-        </Button>
-      </nav>
+          <Button
+            type="button"
+            variant="secondary"
+            className={navButtonClass}
+            disabled={page >= totalPages}
+            onClick={() => onPageChange(page + 1)}
+          >
+            Next
+          </Button>
+          <Button
+            type="button"
+            variant="secondary"
+            className={navButtonClass}
+            disabled={page >= totalPages}
+            onClick={() => onPageChange(totalPages)}
+          >
+            Last
+          </Button>
+        </nav>
+      )}
     </div>
   );
 };

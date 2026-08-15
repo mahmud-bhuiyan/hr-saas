@@ -85,10 +85,11 @@ const navItems: Array<{
   },
 
   {
-    to: "/dashboard/platform/country-codes",
+    to: "/country-codes/active",
     label: "Country codes",
     icon: HiPhone,
     roles: ["super_admin"],
+    activePrefix: "/country-codes",
   },
 
   {

@@ -71,7 +71,7 @@ export const superAdminLinks = (): DashboardLink[] => [
   { label: "View registered companies", to: "/companies/registered" },
   { label: "Review pending sign-ups", to: "/companies/pending" },
   { label: "Platform site settings", to: "/dashboard/platform/site-settings" },
-  { label: "Country codes", to: "/dashboard/platform/country-codes" },
+  { label: "Country codes", to: "/country-codes/active" },
 ];
 
 export const tenantAdminCards = (

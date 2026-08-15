@@ -1,17 +1,17 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { FormEvent, useState } from "react";
-import { Navigate } from "react-router-dom";
+import { Navigate, useLocation } from "react-router-dom";
 import { HiPlus } from "react-icons/hi2";
 import { toast } from "react-toastify";
 import { Button } from "../../../components/ui/Button";
+import { ConfirmModal } from "../../../components/ui/forms/ConfirmModal";
 import { PageContainer } from "../../../components/ui/PageContainer";
 import { PageHeader } from "../../../components/layout/PageHeader";
-import { TabGroup } from "../../../components/ui/TabGroup";
-import { useTabUrlState } from "../../../hooks/useTabUrlState";
 import { useAuth } from "../../../contexts/AuthContext";
 import {
   ApiError,
   createCountryDialCode,
+  deleteCountryDialCode,
   fetchManagedCountryDialCodes,
   updateCountryDialCode,
 } from "../../../lib/api";
@@ -20,19 +20,24 @@ import type {
   PatchCountryDialCodeInput,
 } from "../../../types";
 import { isQueryInitialLoad } from "../../../utils/query";
+import { CountryCodesTabs } from "./components/CountryCodesTabs";
 import {
   CountryDialCodeFormModal,
   defaultCountryDialCodeFormValues,
   type CountryDialCodeFormValues,
 } from "./components/CountryDialCodeFormModal";
-import { CountryDialCodesTable } from "./components/CountryDialCodesTable";
+import { ActiveCountryDialCodesTable } from "./components/ActiveCountryDialCodesTable";
+import { ArchivedCountryDialCodesTable } from "./components/ArchivedCountryDialCodesTable";
+import {
+  COUNTRY_CODES_ARCHIVED_PATH,
+  type CountryCodesListVariant,
+} from "./utils";
 
-type CountryCodesTab = "active" | "archived";
-
-const COUNTRY_CODES_TAB_IDS = [
-  "active",
-  "archived",
-] as const satisfies readonly CountryCodesTab[];
+const countryCodesListVariant = (pathname: string): CountryCodesListVariant => {
+  return pathname.startsWith(COUNTRY_CODES_ARCHIVED_PATH)
+    ? "archived"
+    : "active";
+};
 
 const parseNationalLength = (value: string): number | null => {
   const parsed = Number.parseInt(value, 10);
@@ -66,11 +71,12 @@ const isFormComplete = (form: CountryDialCodeFormValues): boolean => {
 };
 
 export const PlatformCountryCodesPage = () => {
+  const { pathname } = useLocation();
+  const variant = countryCodesListVariant(pathname);
+  const isArchivedList = variant === "archived";
+
   const { user } = useAuth();
   const queryClient = useQueryClient();
-  const { activeTab, setActiveTab } = useTabUrlState(COUNTRY_CODES_TAB_IDS, {
-    defaultTab: "active",
-  });
   const [createOpen, setCreateOpen] = useState(false);
   const [createForm, setCreateForm] = useState<CountryDialCodeFormValues>(
     defaultCountryDialCodeFormValues(),
@@ -83,6 +89,9 @@ export const PlatformCountryCodesPage = () => {
   );
   const [archiveLoadingId, setArchiveLoadingId] = useState<string | null>(null);
   const [restoreLoadingId, setRestoreLoadingId] = useState<string | null>(null);
+  const [deleteLoadingId, setDeleteLoadingId] = useState<string | null>(null);
+  const [deleteTarget, setDeleteTarget] =
+    useState<CountryDialCodeRecord | null>(null);
 
   const countryDialCodesQuery = useQuery({
     queryKey: ["platform", "country-dial-codes", "all"],
@@ -152,6 +161,24 @@ export const PlatformCountryCodesPage = () => {
     },
   });
 
+  const deleteMutation = useMutation({
+    mutationFn: deleteCountryDialCode,
+    onSuccess: () => {
+      toast.success("Country code permanently deleted.");
+      setDeleteTarget(null);
+      setDeleteLoadingId(null);
+      invalidateCountryDialCodes();
+    },
+    onError: (err) => {
+      toast.error(
+        err instanceof ApiError
+          ? err.message
+          : "Failed to delete country code permanently",
+      );
+      setDeleteLoadingId(null);
+    },
+  });
+
   const handleCreateSubmit = (e: FormEvent) => {
     e.preventDefault();
     const minNationalLength = parseNationalLength(createForm.minNationalLength);
@@ -216,68 +243,82 @@ export const PlatformCountryCodesPage = () => {
     updateMutation.mutate({ id: country.id, input: { isArchived: false } });
   };
 
+  const handleDelete = (country: CountryDialCodeRecord) => {
+    setDeleteTarget(country);
+  };
+
+  const handleDeleteConfirm = () => {
+    if (!deleteTarget) {
+      return;
+    }
+    setDeleteLoadingId(deleteTarget.id);
+    deleteMutation.mutate(deleteTarget.id);
+  };
+
   if (user?.role !== "super_admin") {
     return <Navigate to="/dashboard" replace />;
   }
 
-  const tableProps = {
-    loading: isQueryInitialLoad(countryDialCodesQuery),
-    onEdit: (country: CountryDialCodeRecord) => {
-      setEditTarget(country);
-      setEditForm(toFormValues(country));
-    },
-    onArchive: handleArchive,
-    onRestore: handleRestore,
-    archiveLoadingId,
-    restoreLoadingId,
-  };
+  const tableActionPending =
+    createMutation.isPending ||
+    updateMutation.isPending ||
+    deleteMutation.isPending ||
+    archiveLoadingId !== null ||
+    restoreLoadingId !== null ||
+    deleteLoadingId !== null;
 
   return (
-    <PageContainer className="space-y-6">
+    <PageContainer flushTop>
+      <CountryCodesTabs />
       <PageHeader
-        back={{ to: "/dashboard", label: "Back to dashboard" }}
-        label="Platform"
-        title="Country codes"
-        description="Manage the global dial code list and national number length rules for all companies."
+        label="Super admin"
+        title={
+          isArchivedList ? "Archived country codes" : "Active country codes"
+        }
+        description={
+          isArchivedList
+            ? "View and restore country codes that are no longer available for phone inputs."
+            : "Browse and manage international dialing codes available to all companies."
+        }
+        actionAlign="end"
         action={
-          <Button
-            type="button"
-            icon={<HiPlus className="h-4 w-4 text-white" />}
-            onClick={() => setCreateOpen(true)}
-          >
-            Add country code
-          </Button>
+          !isArchivedList ? (
+            <Button
+              type="button"
+              icon={<HiPlus className="h-4 w-4 text-white" />}
+              onClick={() => setCreateOpen(true)}
+            >
+              Add country code
+            </Button>
+          ) : undefined
         }
       />
 
-      <TabGroup<CountryCodesTab>
-        activeId={activeTab}
-        onChange={setActiveTab}
-        tabs={[
-          {
-            id: "active",
-            label: "Active",
-            count: activeCountryDialCodes.length,
-            content: (
-              <CountryDialCodesTable
-                countryDialCodes={activeCountryDialCodes}
-                {...tableProps}
-              />
-            ),
-          },
-          {
-            id: "archived",
-            label: "Archived",
-            count: archivedCountryDialCodes.length,
-            content: (
-              <CountryDialCodesTable
-                countryDialCodes={archivedCountryDialCodes}
-                {...tableProps}
-              />
-            ),
-          },
-        ]}
-      />
+      {isArchivedList ? (
+        <ArchivedCountryDialCodesTable
+          countryDialCodes={archivedCountryDialCodes}
+          loading={isQueryInitialLoad(countryDialCodesQuery)}
+          isError={countryDialCodesQuery.isError}
+          onRestore={handleRestore}
+          onDelete={handleDelete}
+          restoreLoadingId={restoreLoadingId}
+          deleteLoadingId={deleteLoadingId}
+          actionPending={tableActionPending}
+        />
+      ) : (
+        <ActiveCountryDialCodesTable
+          countryDialCodes={activeCountryDialCodes}
+          loading={isQueryInitialLoad(countryDialCodesQuery)}
+          isError={countryDialCodesQuery.isError}
+          onEdit={(country) => {
+            setEditTarget(country);
+            setEditForm(toFormValues(country));
+          }}
+          onArchive={handleArchive}
+          archiveLoadingId={archiveLoadingId}
+          actionPending={tableActionPending}
+        />
+      )}
 
       <CountryDialCodeFormModal
         open={createOpen}
@@ -324,6 +365,30 @@ export const PlatformCountryCodesPage = () => {
               editTarget.maxNationalLength)
         }
       />
+
+      <ConfirmModal
+        open={Boolean(deleteTarget)}
+        onClose={() => {
+          if (!deleteMutation.isPending) {
+            setDeleteTarget(null);
+          }
+        }}
+        onConfirm={handleDeleteConfirm}
+        title="Delete country code permanently"
+        description={
+          deleteTarget
+            ? `Permanently delete ${deleteTarget.name} (+${deleteTarget.dialCode})? This cannot be undone.`
+            : undefined
+        }
+        confirmLabel="Delete permanently"
+        confirmVariant="danger"
+        loading={deleteMutation.isPending}
+        loadingText="Deleting…"
+      />
     </PageContainer>
   );
+};
+
+export const CountryCodesIndexRedirect = () => {
+  return <Navigate to="active" replace />;
 };

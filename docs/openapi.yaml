@@ -3529,6 +3529,51 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
+    delete:
+      tags: [Platform]
+      summary: Permanently delete archived country dial code
+      description: Super admin only. Permanently removes an archived country dial code. Fails if companies still use it as their default dial code.
+      operationId: deletePlatformCountryDialCode
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Country dial code deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, data]
+                properties:
+                  status:
+                    type: string
+                    enum: [ok]
+                  data:
+                    type: object
+                    required: [deleted]
+                    properties:
+                      deleted:
+                        type: boolean
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          description: Country dial code is in use
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
 
   /api/v1/settings/branding:
     get:
@@ -3970,6 +4015,51 @@ paths:
           $ref: "#/components/responses/NotFound"
         "409":
           description: Location name already exists
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    delete:
+      tags: [Locations]
+      summary: Permanently delete archived work location
+      description: HR manager or company admin. Permanently removes an archived location. Fails if shifts or rota templates still reference it.
+      operationId: deleteWorkLocation
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Work location deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, data]
+                properties:
+                  status:
+                    type: string
+                    enum: [ok]
+                  data:
+                    type: object
+                    required: [deleted]
+                    properties:
+                      deleted:
+                        type: boolean
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          description: Location is still in use
           content:
             application/json:
               schema:
@@ -4787,6 +4877,51 @@ paths:
           $ref: "#/components/responses/NotFound"
         "409":
           description: Department name already exists
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    delete:
+      tags: [Settings]
+      summary: Permanently delete archived department
+      description: Company admin or HR manager. Permanently removes an archived department. Fails if active employees are still assigned to it.
+      operationId: deleteSettingsDepartment
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Department deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, data]
+                properties:
+                  status:
+                    type: string
+                    enum: [ok]
+                  data:
+                    type: object
+                    required: [deleted]
+                    properties:
+                      deleted:
+                        type: boolean
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          description: Department still has assigned employees
           content:
             application/json:
               schema:

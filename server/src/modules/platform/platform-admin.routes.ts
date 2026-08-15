@@ -3,6 +3,7 @@ import type { ServerEnv } from "../../config/env.js";
 import { authenticate, authorize } from "../../middleware/auth.js";
 import {
   createCountryDialCodeHandler,
+  deleteCountryDialCodeHandler,
   listManagedCountryDialCodesHandler,
   patchCountryDialCodeHandler,
 } from "../settings/country-dial-code.controller.js";
@@ -39,6 +40,10 @@ export const createPlatformAdminRoutes = (env: ServerEnv): Router => {
 
   router.patch("/country-dial-codes/:id", (req, res) => {
     void patchCountryDialCodeHandler(req, res);
+  });
+
+  router.delete("/country-dial-codes/:id", (req, res) => {
+    void deleteCountryDialCodeHandler(req, res);
   });
 
   return router;

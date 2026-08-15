@@ -147,7 +147,7 @@ export const GLOBAL_SEARCH_ACTIONS: GlobalSearchActionDef[] = [
     id: "country-codes",
     label: "Country codes",
     subtitle: "Manage global phone dial codes",
-    route: "/dashboard/platform/country-codes",
+    route: "/country-codes/active",
     roles: ["super_admin"],
     keywords: ["country", "dial", "phone", "codes"],
   },

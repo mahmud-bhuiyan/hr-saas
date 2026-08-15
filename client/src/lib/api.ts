@@ -662,6 +662,15 @@ export const updateDepartment = async (
   return json.data;
 };
 
+export const deleteDepartment = async (departmentId: string): Promise<void> => {
+  await apiFetch<ApiSuccessResponse<{ deleted: true }>>(
+    `/api/v1/settings/departments/${departmentId}`,
+    {
+      method: "DELETE",
+    },
+  );
+};
+
 export const fetchCountryDialCodes =
   async (): Promise<CountryDialCodesBundle> => {
     const json = await apiFetch<ApiSuccessResponse<CountryDialCodesBundle>>(
@@ -707,6 +716,17 @@ export const updateCountryDialCode = async (
   return json.data;
 };
 
+export const deleteCountryDialCode = async (
+  countryDialCodeId: string,
+): Promise<void> => {
+  await apiFetch<ApiSuccessResponse<{ deleted: true }>>(
+    `/api/v1/admin/platform/country-dial-codes/${countryDialCodeId}`,
+    {
+      method: "DELETE",
+    },
+  );
+};
+
 export const fetchWorkLocations = async (
   includeArchived = false,
 ): Promise<WorkLocation[]> => {
@@ -742,6 +762,15 @@ export const updateWorkLocation = async (
     },
   );
   return json.data;
+};
+
+export const deleteWorkLocation = async (locationId: string): Promise<void> => {
+  await apiFetch<ApiSuccessResponse<{ deleted: true }>>(
+    `/api/v1/locations/${locationId}`,
+    {
+      method: "DELETE",
+    },
+  );
 };
 
 export const fetchRotaWeek = async (weekOf: string): Promise<WeekRota> => {

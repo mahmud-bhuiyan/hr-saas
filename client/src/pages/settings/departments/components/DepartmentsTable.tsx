@@ -1,4 +1,9 @@
-import { HiArchiveBox, HiPencilSquare } from "react-icons/hi2";
+import {
+  HiArchiveBox,
+  HiArrowUturnLeft,
+  HiPencilSquare,
+  HiTrash,
+} from "react-icons/hi2";
 import { Button } from "../../../../components/ui/Button";
 import type { TableColumn } from "../../../../components/ui/primitives/Table";
 import { Table } from "../../../../components/ui/primitives/Table";
@@ -10,8 +15,11 @@ interface DepartmentsTableProps {
   onEdit: (department: Department) => void;
   onArchive: (department: Department) => void;
   onRestore: (department: Department) => void;
+  onDelete?: (department: Department) => void;
   archiveLoadingId: string | null;
   restoreLoadingId: string | null;
+  deleteLoadingId?: string | null;
+  actionPending?: boolean;
 }
 
 export const DepartmentsTable = ({
@@ -20,8 +28,11 @@ export const DepartmentsTable = ({
   onEdit,
   onArchive,
   onRestore,
+  onDelete,
   archiveLoadingId,
   restoreLoadingId,
+  deleteLoadingId = null,
+  actionPending = false,
 }: DepartmentsTableProps) => {
   const columns: TableColumn<Department>[] = [
     {
@@ -87,15 +98,32 @@ export const DepartmentsTable = ({
               </Button>
             </>
           ) : (
-            <Button
-              type="button"
-              variant="ghost"
-              loading={restoreLoadingId === dept.id}
-              loadingText="Restoring…"
-              onClick={() => onRestore(dept)}
-            >
-              Restore
-            </Button>
+            <>
+              <Button
+                type="button"
+                variant="ghost"
+                loading={restoreLoadingId === dept.id}
+                loadingText="Restoring…"
+                disabled={actionPending}
+                icon={<HiArrowUturnLeft className="h-4 w-4 text-brand-600" />}
+                onClick={() => onRestore(dept)}
+              >
+                Restore
+              </Button>
+              {onDelete && (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  loading={deleteLoadingId === dept.id}
+                  loadingText="Deleting…"
+                  disabled={actionPending}
+                  icon={<HiTrash className="h-4 w-4 text-red-500" />}
+                  onClick={() => onDelete(dept)}
+                >
+                  Delete permanently
+                </Button>
+              )}
+            </>
           )}
         </div>
       ),

@@ -3,6 +3,7 @@ import type { AuthenticatedRequest } from "../../middleware/auth.js";
 import {
   CountryDialCodeServiceError,
   createCountryDialCode,
+  deleteCountryDialCode,
   getCountryDialCodesBundle,
   listCountryDialCodes,
   patchCountryDialCode,
@@ -123,6 +124,31 @@ export const patchCountryDialCodeHandler = async (
       req.user.sub,
     );
     res.json({ status: "ok", data: countryDialCode });
+  } catch (error) {
+    if (error instanceof CountryDialCodeServiceError) {
+      res
+        .status(error.statusCode)
+        .json({ status: "error", message: error.message });
+      return;
+    }
+    res.status(500).json({ status: "error", message: "Internal server error" });
+  }
+};
+
+export const deleteCountryDialCodeHandler = async (
+  req: AuthenticatedRequest,
+  res: Response,
+): Promise<void> => {
+  try {
+    if (!req.user) {
+      res
+        .status(403)
+        .json({ status: "error", message: "Authentication required" });
+      return;
+    }
+
+    await deleteCountryDialCode(req.params.id);
+    res.json({ status: "ok", data: { deleted: true } });
   } catch (error) {
     if (error instanceof CountryDialCodeServiceError) {
       res

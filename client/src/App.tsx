@@ -21,7 +21,10 @@ import {
   RegistrationsIndexRedirect,
 } from "./pages/registrations/RegistrationsPage";
 import { PlatformSiteSettingsPage } from "./pages/platform/site-settings/PlatformSiteSettingsPage";
-import { PlatformCountryCodesPage } from "./pages/platform/country-codes/PlatformCountryCodesPage";
+import {
+  CountryCodesIndexRedirect,
+  PlatformCountryCodesPage,
+} from "./pages/platform/country-codes/PlatformCountryCodesPage";
 import { SettingsPage } from "./pages/settings/SettingsPage";
 import { CompanySettingsPage } from "./pages/settings/company/CompanySettingsPage";
 import { DepartmentsPage } from "./pages/settings/departments/DepartmentsPage";
@@ -66,6 +69,11 @@ const App = () => {
               <Route index element={<RegistrationsIndexRedirect />} />
               <Route path="registered" />
               <Route path="pending" />
+            </Route>
+            <Route path="/country-codes" element={<PlatformCountryCodesPage />}>
+              <Route index element={<CountryCodesIndexRedirect />} />
+              <Route path="active" />
+              <Route path="archived" />
             </Route>
             <Route
               path="/employees"
@@ -181,10 +189,6 @@ const App = () => {
               element={<PlatformSiteSettingsPage />}
             />
             <Route
-              path="/dashboard/platform/country-codes"
-              element={<PlatformCountryCodesPage />}
-            />
-            <Route
               path="/dashboard/settings"
               element={
                 <ModuleRoute module="settings">
@@ -207,12 +211,6 @@ const App = () => {
                   to="/dashboard/settings/company?tab=branding"
                   replace
                 />
-              }
-            />
-            <Route
-              path="/dashboard/settings/country-codes"
-              element={
-                <Navigate to="/dashboard/platform/country-codes" replace />
               }
             />
             <Route

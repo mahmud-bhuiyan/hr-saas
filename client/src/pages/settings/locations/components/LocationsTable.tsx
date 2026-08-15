@@ -1,4 +1,9 @@
-import { HiArchiveBox, HiPencilSquare } from "react-icons/hi2";
+import {
+  HiArchiveBox,
+  HiArrowUturnLeft,
+  HiPencilSquare,
+  HiTrash,
+} from "react-icons/hi2";
 import { Button } from "../../../../components/ui/Button";
 import type { TableColumn } from "../../../../components/ui/primitives/Table";
 import { Table } from "../../../../components/ui/primitives/Table";
@@ -10,8 +15,11 @@ interface LocationsTableProps {
   onEdit: (location: WorkLocation) => void;
   onArchive: (location: WorkLocation) => void;
   onRestore: (location: WorkLocation) => void;
+  onDelete?: (location: WorkLocation) => void;
   archiveLoadingId: string | null;
   restoreLoadingId: string | null;
+  deleteLoadingId?: string | null;
+  actionPending?: boolean;
 }
 
 export const LocationsTable = ({
@@ -20,8 +28,11 @@ export const LocationsTable = ({
   onEdit,
   onArchive,
   onRestore,
+  onDelete,
   archiveLoadingId,
   restoreLoadingId,
+  deleteLoadingId = null,
+  actionPending = false,
 }: LocationsTableProps) => {
   const columns: TableColumn<WorkLocation>[] = [
     {
@@ -93,15 +104,32 @@ export const LocationsTable = ({
               </Button>
             </>
           ) : (
-            <Button
-              type="button"
-              variant="ghost"
-              loading={restoreLoadingId === location.id}
-              loadingText="Restoring…"
-              onClick={() => onRestore(location)}
-            >
-              Restore
-            </Button>
+            <>
+              <Button
+                type="button"
+                variant="ghost"
+                loading={restoreLoadingId === location.id}
+                loadingText="Restoring…"
+                disabled={actionPending}
+                icon={<HiArrowUturnLeft className="h-4 w-4 text-brand-600" />}
+                onClick={() => onRestore(location)}
+              >
+                Restore
+              </Button>
+              {onDelete && (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  loading={deleteLoadingId === location.id}
+                  loadingText="Deleting…"
+                  disabled={actionPending}
+                  icon={<HiTrash className="h-4 w-4 text-red-500" />}
+                  onClick={() => onDelete(location)}
+                >
+                  Delete permanently
+                </Button>
+              )}
+            </>
           )}
         </div>
       ),

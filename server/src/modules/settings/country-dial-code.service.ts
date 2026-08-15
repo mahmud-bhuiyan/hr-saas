@@ -258,3 +258,33 @@ export const patchCountryDialCode = async (
 
   return toCountryDialCodePublic(countryDialCode);
 };
+
+export const deleteCountryDialCode = async (
+  countryDialCodeId: string,
+): Promise<void> => {
+  const countryDialCode = await CountryDialCode.findById(countryDialCodeId);
+
+  if (!countryDialCode) {
+    throw new CountryDialCodeServiceError("Country dial code not found", 404);
+  }
+
+  if (!countryDialCode.isArchived) {
+    throw new CountryDialCodeServiceError(
+      "Only archived country codes can be permanently deleted",
+      400,
+    );
+  }
+
+  const tenantsUsingDialCode = await Tenant.countDocuments({
+    defaultPhoneDialCode: countryDialCode.dialCode,
+  });
+
+  if (tenantsUsingDialCode > 0) {
+    throw new CountryDialCodeServiceError(
+      "Cannot delete this dial code while companies use it as their default",
+      409,
+    );
+  }
+
+  await countryDialCode.deleteOne();
+};

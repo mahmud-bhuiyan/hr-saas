@@ -2374,6 +2374,26 @@
             "description": "Super admin only. Update fields or set isArchived."
           },
           "response": []
+        },
+        {
+          "name": "Delete Platform Country Dial Code",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/admin/platform/country-dial-codes/{{countryDialCodeId}}",
+            "description": "Super admin only. Permanently delete an archived country dial code."
+          },
+          "response": []
         }
       ]
     },
@@ -2646,6 +2666,26 @@
           "response": []
         },
         {
+          "name": "Delete Department",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/settings/departments/{{departmentId}}",
+            "description": "Company admin or HR manager. Permanently delete an archived department."
+          },
+          "response": []
+        },
+        {
           "name": "Get Payroll Settings",
           "request": {
             "auth": {
@@ -2769,6 +2809,26 @@
             },
             "url": "{{baseUrl}}/api/v1/locations/{{locationId}}",
             "description": "HR manager or company admin. Rename, update address/timezone, or archive."
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Work Location",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/locations/{{locationId}}",
+            "description": "HR manager or company admin. Permanently delete an archived work location."
           },
           "response": []
         },
