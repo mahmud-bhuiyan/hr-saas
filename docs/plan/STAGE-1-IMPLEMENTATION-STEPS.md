@@ -26,7 +26,7 @@ Features added during implementation that extend the original step list. Keep th
 | Super admin add company | 2 | `POST /api/v1/admin/registrations` — create approved company + admin in one step |
 | User profile & password | 2–3 | `GET/PATCH /api/v1/auth/me`, profile page, change-password modal |
 | UI component kit | 3 | Reusable primitives in `client/src/components/ui/` (Button, Table, Modal, FormModal, etc.) |
-| Companies page (super admin) | 3 | `/companies` — pending queue + add company |
+| Companies page (super admin) | 3 | `/super-admin/companies` — pending queue + add company |
 | Manager team-scoped employee read | 4 | Managers see direct reports only (`employee:read:team`) |
 | Direct reports org view | 4 | `GET /api/v1/employees/:id/reports` + profile section |
 | Platform site customization | 7 | Super admin: global site name, theme color, logo, favicon |
@@ -82,7 +82,7 @@ Features added during implementation that extend the original step list. Keep th
 - [x] App shell with sidebar nav and role-based menu items
 - [x] Reusable UI component kit (`client/src/components/ui/`)
 - [x] User profile page (`/dashboard/profile`) with change password
-- [x] Companies page for super admin (`/companies`)
+- [x] Companies page for super admin (`/super-admin/companies`)
 - [x] User light/dark theme toggle in app shell header (`ThemeContext` + localStorage; synced to DB via `PATCH /api/v1/auth/me`)
 
 **Review:** Confirm UI shell and auth UX before Step 4.
@@ -141,8 +141,8 @@ Features added during implementation that extend the original step list. Keep th
 - [x] Public `GET /api/v1/platform/site-config` + super_admin PATCH endpoints
 - [x] Tenant branding overrides (company admin): logo URL + primary color
 - [x] Client: dynamic theme, title, favicon from site config
-- [x] Super admin screen: `/dashboard/platform/site-settings`
-- [x] Company admin screen: `/dashboard/settings/branding`
+- [x] Super admin screen: `/super-admin/site/*`
+- [x] Company admin screen: `/dashboard/settings/company` (branding tab)
 - [x] Dashboard summary cards wired to real counts (role-based: super admin, tenant admin, manager, employee)
 - [x] `docs/openapi.yaml` and Postman collection updated (platform + branding endpoints)
 

@@ -1,22 +1,28 @@
-import { FormEvent, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
-import { useAuth } from '../../contexts/AuthContext';
-import { ApiError, login } from '../../lib/api';
+import { FormEvent, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import { useAuth } from "../../contexts/AuthContext";
+import { ApiError, login } from "../../lib/api";
+import { homePathForRole, TENANT_DASHBOARD_PATH } from "../../utils/routes";
 import {
   clearSavedCredentials,
   loadSavedCredentials,
   saveSavedCredentials,
-} from '../../lib/saved-credentials-storage';
-import { LoginForm } from './components/LoginForm';
+} from "../../lib/saved-credentials-storage";
+import { LoginForm } from "./components/LoginForm";
 
-const mapLoginApiError = (message: string): { passwordError?: string; formError?: string } => {
+const mapLoginApiError = (
+  message: string,
+): { passwordError?: string; formError?: string } => {
   const lower = message.toLowerCase();
 
-  if (lower.includes('invalid email') || lower === 'invalid email or password') {
+  if (
+    lower.includes("invalid email") ||
+    lower === "invalid email or password"
+  ) {
     return { passwordError: message };
   }
 
-  if (lower.includes('email')) {
+  if (lower.includes("email")) {
     return { formError: message };
   }
 
@@ -36,8 +42,8 @@ const getInitialLoginState = () => {
   }
 
   return {
-    email: '',
-    password: '',
+    email: "",
+    password: "",
     saveForLater: false,
     initialStep: 1 as const,
   };
@@ -57,7 +63,8 @@ export const LoginPage = () => {
   const [passwordError, setPasswordError] = useState<string | null>(null);
   const [formError, setFormError] = useState<string | null>(null);
 
-  const from = (location.state as { from?: string } | null)?.from ?? '/dashboard';
+  const from =
+    (location.state as { from?: string } | null)?.from ?? TENANT_DASHBOARD_PATH;
 
   const handleEmailChange = (value: string) => {
     setEmail(value);
@@ -97,9 +104,11 @@ export const LoginPage = () => {
       }
 
       setAuth(data.user, data.accessToken);
-      navigate(from, { replace: true });
+      const destination =
+        from === TENANT_DASHBOARD_PATH ? homePathForRole(data.user.role) : from;
+      navigate(destination, { replace: true });
     } catch (err) {
-      const message = err instanceof ApiError ? err.message : 'Login failed';
+      const message = err instanceof ApiError ? err.message : "Login failed";
       const mapped = mapLoginApiError(message);
       setPasswordError(mapped.passwordError ?? null);
       setFormError(mapped.formError ?? null);

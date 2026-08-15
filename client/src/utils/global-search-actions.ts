@@ -1,7 +1,11 @@
 import type { AuthUser, UserRole } from "../types";
 import type { TenantModuleId } from "../types/modules";
 import { EMPLOYEES_ACTIVE_PATH } from "../pages/employees/utils";
+import { REGISTERED_COMPANIES_PATH } from "../pages/super-admin/companies/utils";
+import { COUNTRY_CODES_ACTIVE_PATH } from "../pages/super-admin/country-codes/utils";
+import { SITE_SETTINGS_GENERAL_PATH } from "../pages/super-admin/site/utils";
 import { isModuleEnabledForUser } from "./modules";
+import { SUPER_ADMIN_DASHBOARD_PATH, TENANT_DASHBOARD_PATH } from "./routes";
 
 export type GlobalSearchActionDef = {
   id: string;
@@ -18,8 +22,17 @@ export const GLOBAL_SEARCH_ACTIONS: GlobalSearchActionDef[] = [
     id: "dashboard",
     label: "Dashboard",
     subtitle: "Home overview",
-    route: "/dashboard",
+    route: TENANT_DASHBOARD_PATH,
+    roles: ["company_admin", "hr_manager", "manager", "employee"],
     keywords: ["home", "overview"],
+  },
+  {
+    id: "super-admin-dashboard",
+    label: "Dashboard",
+    subtitle: "Platform overview",
+    route: SUPER_ADMIN_DASHBOARD_PATH,
+    roles: ["super_admin"],
+    keywords: ["home", "overview", "platform"],
   },
   {
     id: "profile",
@@ -131,23 +144,23 @@ export const GLOBAL_SEARCH_ACTIONS: GlobalSearchActionDef[] = [
     id: "registrations",
     label: "Companies",
     subtitle: "Pending and registered tenants",
-    route: "/companies/registered",
+    route: REGISTERED_COMPANIES_PATH,
     roles: ["super_admin"],
     keywords: ["companies", "registrations", "tenants", "approve"],
   },
   {
     id: "site-settings",
-    label: "Platform site settings",
+    label: "Site settings",
     subtitle: "Global branding and theme",
-    route: "/dashboard/platform/site-settings",
+    route: SITE_SETTINGS_GENERAL_PATH,
     roles: ["super_admin"],
-    keywords: ["platform", "site", "branding", "logo", "favicon"],
+    keywords: ["site", "branding", "logo", "favicon"],
   },
   {
     id: "country-codes",
     label: "Country codes",
     subtitle: "Manage global phone dial codes",
-    route: "/country-codes/active",
+    route: COUNTRY_CODES_ACTIVE_PATH,
     roles: ["super_admin"],
     keywords: ["country", "dial", "phone", "codes"],
   },

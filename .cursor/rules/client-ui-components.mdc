@@ -21,15 +21,31 @@ Search existing components first (`client/src/components/ui/` and related folder
 
 Keep page entry files thin. Do not migrate existing `pages/` files unless asked.
 
-- **Existing:** `client/src/pages/<feature>/<Feature>Page.tsx` + `components/` + optional `utils.ts`
-- **New features:** `client/src/features/<feature>/` with the same split (route entry, `components/`, optional `utils.ts`)
-- Adding to an existing `pages/` feature: colocate there until that feature is migrated
+### Folder naming
 
-See `employees/EmployeesPage` and `registrations/RegistrationsPage` for page layout reference.
+- **Folders:** lowercase; **kebab-case** for multiple words (`super-admin`, `country-codes`, `audit-log`)
+- **Files:** PascalCase page/components (`EmployeesPage.tsx`, `SiteSettingsPage.tsx`)
+- Do not use camelCase, PascalCase, or snake_case for page folders
+
+### Where pages go
+
+| Audience | Folder | Examples |
+|----------|--------|----------|
+| **Super admin** | `client/src/pages/super-admin/<feature>/` | `dashboard/`, `companies/`, `site/`, `country-codes/` |
+| **Tenant users** | `client/src/pages/<feature>/` or `pages/settings/<feature>/` | `employees/`, `settings/company/` |
+| **New features** (greenfield) | `client/src/features/<feature>/` | same split: route entry, `components/`, optional `utils.ts` |
+
+Add super-admin screens only under `pages/super-admin/`. Do not put them in `pages/settings/`.
+
+Each feature: `<Feature>Page.tsx` + `components/` + optional `utils.ts` (path constants, formatters).
+
+**Route-based tabs:** separate URLs per section → `NavTabBar` with `to` links (`super-admin/site/components/SiteSettingsTabs.tsx`). Use `PageContainer flushTop` when the tab bar bleeds under the header.
+
+See `employees/EmployeesPage` and `super-admin/companies/RegistrationsPage` for page layout reference.
 
 ## Page layout
 
-New dashboard pages must match existing screens (`employees/EmployeesPage`, `registrations/RegistrationsPage`):
+New dashboard pages must match existing screens (`employees/EmployeesPage`, `super-admin/companies/RegistrationsPage`):
 
 - `PageContainer` → `PageHeader` (label, title, description, action button) → content
 - Data lists: `Table` with `loading` / `emptyMessage` (center-aligned by default; use `align` prop to override)

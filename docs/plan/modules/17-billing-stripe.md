@@ -96,7 +96,7 @@ On employee activate/deactivate (status change), call Stripe API to update subsc
 - **States:** no subscription, active, past_due, canceled, exempt
 
 ### Screen: Super admin companies
-- **Route:** `/companies` (enhancement)
+- **Route:** `/super-admin/companies` (enhancement)
 - **Elements:** subscription status column per tenant
 
 ### User flow
