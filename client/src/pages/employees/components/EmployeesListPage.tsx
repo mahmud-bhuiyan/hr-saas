@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import { Navigate, useSearchParams } from "react-router-dom";
+import { homePathForRole } from "../../../utils/routes";
 import { HiArrowUpTray, HiPlus, HiRectangleGroup } from "react-icons/hi2";
 import { Button } from "../../../components/ui/Button";
 import { ConfirmModal } from "../../../components/ui/forms/ConfirmModal";
@@ -351,7 +352,7 @@ export const EmployeesListPage = ({ variant }: EmployeesListPageProps) => {
   });
 
   if (!canRead) {
-    return <Navigate to="/dashboard" replace />;
+    return <Navigate to={homePathForRole(user?.role)} replace />;
   }
 
   const openCreateModal = () => {

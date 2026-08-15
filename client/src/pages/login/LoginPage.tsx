@@ -2,7 +2,8 @@ import { FormEvent, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 import { ApiError, login } from "../../lib/api";
-import { homePathForRole, TENANT_DASHBOARD_PATH } from "../../utils/routes";
+import { homePathForRole } from "../../utils/routes";
+import { ADMIN_DASHBOARD_PATH } from "../../pages/admin/utils";
 import {
   clearSavedCredentials,
   loadSavedCredentials,
@@ -64,7 +65,7 @@ export const LoginPage = () => {
   const [formError, setFormError] = useState<string | null>(null);
 
   const from =
-    (location.state as { from?: string } | null)?.from ?? TENANT_DASHBOARD_PATH;
+    (location.state as { from?: string } | null)?.from ?? ADMIN_DASHBOARD_PATH;
 
   const handleEmailChange = (value: string) => {
     setEmail(value);
@@ -105,7 +106,7 @@ export const LoginPage = () => {
 
       setAuth(data.user, data.accessToken);
       const destination =
-        from === TENANT_DASHBOARD_PATH ? homePathForRole(data.user.role) : from;
+        from === ADMIN_DASHBOARD_PATH ? homePathForRole(data.user.role) : from;
       navigate(destination, { replace: true });
     } catch (err) {
       const message = err instanceof ApiError ? err.message : "Login failed";
