@@ -3403,6 +3403,133 @@ paths:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
 
+  /api/v1/admin/platform/country-dial-codes:
+    get:
+      tags: [Platform]
+      summary: List managed country dial codes
+      description: Super admin only. Lists platform country dial codes, optionally including archived entries.
+      operationId: listPlatformCountryDialCodes
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: includeArchived
+          in: query
+          schema:
+            type: boolean
+            default: false
+      responses:
+        "200":
+          description: Country dial code list
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, data]
+                properties:
+                  status:
+                    type: string
+                    enum: [ok]
+                  data:
+                    $ref: "#/components/schemas/ManagedCountryDialCodesList"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+    post:
+      tags: [Platform]
+      summary: Create country dial code
+      description: Super admin only. Adds a country dial code to the platform list.
+      operationId: createPlatformCountryDialCode
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateCountryDialCodeRequest"
+            example:
+              code: NG
+              name: Nigeria
+              dialCode: "234"
+      responses:
+        "201":
+          description: Created country dial code
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, data]
+                properties:
+                  status:
+                    type: string
+                    enum: [ok]
+                  data:
+                    $ref: "#/components/schemas/CountryDialCode"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "409":
+          description: Country code already exists
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /api/v1/admin/platform/country-dial-codes/{id}:
+    patch:
+      tags: [Platform]
+      summary: Update country dial code
+      description: Super admin only. Update or archive a platform country dial code.
+      operationId: patchPlatformCountryDialCode
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PatchCountryDialCodeRequest"
+            example:
+              name: United Kingdom
+      responses:
+        "200":
+          description: Updated country dial code
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, data]
+                properties:
+                  status:
+                    type: string
+                    enum: [ok]
+                  data:
+                    $ref: "#/components/schemas/CountryDialCode"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          description: Country code already exists
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
   /api/v1/settings/branding:
     get:
       tags: [Settings]
@@ -4665,6 +4792,33 @@ paths:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
 
+  /api/v1/country-dial-codes:
+    get:
+      tags: [Settings]
+      summary: List country dial codes for tenant
+      description: Any authenticated tenant user. Returns active platform country dial codes and the tenant default dial code.
+      operationId: listCountryDialCodes
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Country dial codes bundle
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, data]
+                properties:
+                  status:
+                    type: string
+                    enum: [ok]
+                  data:
+                    $ref: "#/components/schemas/CountryDialCodesBundle"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+
   /api/v1/settings/users:
     get:
       tags: [Settings]
@@ -5623,7 +5777,7 @@ components:
 
     CreateEmployeeRequest:
       type: object
-      required: [firstName, lastName]
+      required: [firstName, lastName, email, phone, jobTitle, startDate]
       properties:
         firstName:
           type: string
@@ -5634,10 +5788,13 @@ components:
         email:
           type: string
           format: email
+          minLength: 1
         phone:
           type: string
+          minLength: 1
         jobTitle:
           type: string
+          minLength: 1
         department:
           type: string
         startDate:
@@ -6049,7 +6206,7 @@ components:
 
     CompanyProfile:
       type: object
-      required: [name, address, logoUrl, updatedAt]
+      required: [name, address, logoUrl, defaultPhoneDialCode, updatedAt]
       properties:
         name:
           type: string
@@ -6060,6 +6217,9 @@ components:
           type: string
           nullable: true
           format: uri
+        defaultPhoneDialCode:
+          type: string
+          description: Tenant default dial code digits (without plus)
         updatedAt:
           type: string
           format: date-time
@@ -6079,6 +6239,11 @@ components:
           type: string
           nullable: true
           format: uri
+        defaultPhoneDialCode:
+          type: string
+          minLength: 1
+          maxLength: 4
+          pattern: "^\\d+$"
 
     LeaveSettings:
       type: object
@@ -6149,6 +6314,129 @@ components:
           type: string
           minLength: 1
           maxLength: 100
+        isArchived:
+          type: boolean
+
+    CountryDialCode:
+      type: object
+      required:
+        [
+          id,
+          code,
+          name,
+          dialCode,
+          minNationalLength,
+          maxNationalLength,
+          isArchived,
+          createdAt,
+          updatedAt,
+        ]
+      properties:
+        id:
+          type: string
+        code:
+          type: string
+          minLength: 2
+          maxLength: 2
+          description: ISO 3166-1 alpha-2 country code
+        name:
+          type: string
+        dialCode:
+          type: string
+          description: Digits only, without leading plus
+        minNationalLength:
+          type: integer
+          minimum: 1
+          maximum: 15
+          description: Minimum digits allowed after the country code
+        maxNationalLength:
+          type: integer
+          minimum: 1
+          maximum: 15
+          description: Maximum digits allowed after the country code
+        isArchived:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    CountryDialCodesBundle:
+      type: object
+      required: [countryDialCodes, defaultPhoneDialCode]
+      properties:
+        countryDialCodes:
+          type: array
+          items:
+            $ref: "#/components/schemas/CountryDialCode"
+        defaultPhoneDialCode:
+          type: string
+          description: Tenant default dial code digits (without plus)
+
+    ManagedCountryDialCodesList:
+      type: object
+      required: [countryDialCodes]
+      properties:
+        countryDialCodes:
+          type: array
+          items:
+            $ref: "#/components/schemas/CountryDialCode"
+
+    CreateCountryDialCodeRequest:
+      type: object
+      required: [code, name, dialCode]
+      properties:
+        code:
+          type: string
+          minLength: 2
+          maxLength: 2
+        name:
+          type: string
+          minLength: 1
+          maxLength: 100
+        dialCode:
+          type: string
+          minLength: 1
+          maxLength: 4
+          pattern: "^\\d+$"
+        minNationalLength:
+          type: integer
+          minimum: 1
+          maximum: 15
+          default: 7
+        maxNationalLength:
+          type: integer
+          minimum: 1
+          maximum: 15
+          default: 11
+
+    PatchCountryDialCodeRequest:
+      type: object
+      minProperties: 1
+      properties:
+        code:
+          type: string
+          minLength: 2
+          maxLength: 2
+        name:
+          type: string
+          minLength: 1
+          maxLength: 100
+        dialCode:
+          type: string
+          minLength: 1
+          maxLength: 4
+          pattern: "^\\d+$"
+        minNationalLength:
+          type: integer
+          minimum: 1
+          maximum: 15
+        maxNationalLength:
+          type: integer
+          minimum: 1
+          maximum: 15
         isArchived:
           type: boolean
 

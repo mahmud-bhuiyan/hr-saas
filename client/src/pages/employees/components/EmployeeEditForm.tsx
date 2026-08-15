@@ -12,6 +12,7 @@ import {
 } from "react-icons/hi2";
 import { FormField } from "../../../components/ui/FormField";
 import { Input } from "../../../components/ui/Input";
+import { PhoneInput } from "../../../components/ui/PhoneInput";
 import { Select } from "../../../components/ui/Select";
 import type {
   Employee,
@@ -65,7 +66,7 @@ export const EmployeeEditFields = ({
   return (
     <>
       <div className="grid gap-4 sm:grid-cols-2">
-        <FormField label="First name" htmlFor={`${idPrefix}firstName`}>
+        <FormField label="First name" htmlFor={`${idPrefix}firstName`} required>
           <Input
             id={`${idPrefix}firstName`}
             value={form.firstName}
@@ -74,7 +75,7 @@ export const EmployeeEditFields = ({
             icon={<HiUser className="h-4 w-4 text-brand-600" />}
           />
         </FormField>
-        <FormField label="Last name" htmlFor={`${idPrefix}lastName`}>
+        <FormField label="Last name" htmlFor={`${idPrefix}lastName`} required>
           <Input
             id={`${idPrefix}lastName`}
             value={form.lastName}
@@ -86,31 +87,34 @@ export const EmployeeEditFields = ({
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2">
-        <FormField label="Email" htmlFor={`${idPrefix}email`}>
+        <FormField label="Email" htmlFor={`${idPrefix}email`} required>
           <Input
             id={`${idPrefix}email`}
             type="email"
             value={form.email}
             onChange={(e) => onFieldChange("email", e.target.value)}
+            required
             icon={<HiEnvelope className="h-4 w-4 text-brand-600" />}
           />
         </FormField>
-        <FormField label="Phone" htmlFor={`${idPrefix}phone`}>
-          <Input
+        <FormField label="Phone" htmlFor={`${idPrefix}phone`} required>
+          <PhoneInput
             id={`${idPrefix}phone`}
             value={form.phone}
-            onChange={(e) => onFieldChange("phone", e.target.value)}
+            onChange={(phone) => onFieldChange("phone", phone)}
+            required
             icon={<HiPhone className="h-4 w-4 text-brand-600" />}
           />
         </FormField>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2">
-        <FormField label="Job title" htmlFor={`${idPrefix}jobTitle`}>
+        <FormField label="Job title" htmlFor={`${idPrefix}jobTitle`} required>
           <Input
             id={`${idPrefix}jobTitle`}
             value={form.jobTitle}
             onChange={(e) => onFieldChange("jobTitle", e.target.value)}
+            required
             icon={<HiBriefcase className="h-4 w-4 text-brand-600" />}
           />
         </FormField>
@@ -132,12 +136,13 @@ export const EmployeeEditFields = ({
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2">
-        <FormField label="Start date" htmlFor={`${idPrefix}startDate`}>
+        <FormField label="Start date" htmlFor={`${idPrefix}startDate`} required>
           <Input
             id={`${idPrefix}startDate`}
             type="date"
             value={form.startDate}
             onChange={(e) => onFieldChange("startDate", e.target.value)}
+            required
             icon={<HiCalendarDays className="h-4 w-4 text-brand-600" />}
           />
         </FormField>

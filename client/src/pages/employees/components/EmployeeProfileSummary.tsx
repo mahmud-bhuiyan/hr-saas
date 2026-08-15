@@ -7,43 +7,53 @@ import {
   HiRectangleGroup,
   HiUser,
   HiUserGroup,
-} from 'react-icons/hi2';
-import type { Employee } from '../../../types';
-import { employeeName, formatDateTime } from '../utils';
-import { SummaryItem } from './SummaryItem';
+} from "react-icons/hi2";
+import type { Employee } from "../../../types";
+import { useCountryDialCodes } from "../../../hooks/useCountryDialCodes";
+import { formatPhone } from "../../../utils/phone";
+import { employeeName, formatDateTime } from "../utils";
+import { SummaryItem } from "./SummaryItem";
 
 interface EmployeeProfileSummaryProps {
   employee: Employee;
   showMetadata?: boolean;
 }
 
-const iconClass = 'h-4 w-4';
+const iconClass = "h-4 w-4";
 
-export const EmployeeProfileSummary = ({ employee, showMetadata = false }: EmployeeProfileSummaryProps) => {
+export const EmployeeProfileSummary = ({
+  employee,
+  showMetadata = false,
+}: EmployeeProfileSummaryProps) => {
+  const { dialCodeOptions, defaultDialCode } = useCountryDialCodes();
   const managerName = employee.manager
     ? `${employee.manager.firstName} ${employee.manager.lastName}`
-    : '—';
+    : "—";
 
   const contactFields = (
     <>
       <SummaryItem
         label="Email"
-        value={employee.email ?? '—'}
+        value={employee.email ?? "—"}
         icon={<HiEnvelope className={iconClass} />}
       />
       <SummaryItem
         label="Phone"
-        value={employee.phone ?? '—'}
+        value={
+          employee.phone
+            ? formatPhone(employee.phone, dialCodeOptions, defaultDialCode)
+            : "—"
+        }
         icon={<HiPhone className={iconClass} />}
       />
       <SummaryItem
         label="Job title"
-        value={employee.jobTitle ?? '—'}
+        value={employee.jobTitle ?? "—"}
         icon={<HiBriefcase className={iconClass} />}
       />
       <SummaryItem
         label="Department"
-        value={employee.department ?? '—'}
+        value={employee.department ?? "—"}
         icon={<HiRectangleGroup className={iconClass} />}
       />
       <SummaryItem
@@ -53,7 +63,11 @@ export const EmployeeProfileSummary = ({ employee, showMetadata = false }: Emplo
       />
       <SummaryItem
         label="Start date"
-        value={employee.startDate ? new Date(employee.startDate).toLocaleDateString() : '—'}
+        value={
+          employee.startDate
+            ? new Date(employee.startDate).toLocaleDateString()
+            : "—"
+        }
         icon={<HiCalendarDays className={iconClass} />}
       />
     </>
@@ -85,10 +99,22 @@ export const EmployeeProfileSummary = ({ employee, showMetadata = false }: Emplo
 
       <div className="border-t border-slate-100 bg-slate-50 px-5 py-4 dark:border-slate-800 dark:bg-slate-800/50">
         <dl className="grid gap-3 sm:grid-cols-2">
-          <SummaryItem label="Created by" value={employee.createdByName ?? '—'} />
-          <SummaryItem label="Created at" value={formatDateTime(employee.createdAt)} />
-          <SummaryItem label="Updated by" value={employee.updatedByName ?? '—'} />
-          <SummaryItem label="Updated at" value={formatDateTime(employee.updatedAt)} />
+          <SummaryItem
+            label="Created by"
+            value={employee.createdByName ?? "—"}
+          />
+          <SummaryItem
+            label="Created at"
+            value={formatDateTime(employee.createdAt)}
+          />
+          <SummaryItem
+            label="Updated by"
+            value={employee.updatedByName ?? "—"}
+          />
+          <SummaryItem
+            label="Updated at"
+            value={formatDateTime(employee.updatedAt)}
+          />
         </dl>
       </div>
     </section>

@@ -736,7 +736,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"firstName\": \"Alex\",\n  \"lastName\": \"Morgan\",\n  \"email\": \"alex.morgan@acme.com\",\n  \"jobTitle\": \"Software Engineer\",\n  \"department\": \"Engineering\",\n  \"startDate\": \"2024-03-01\"\n}"
+              "raw": "{\n  \"firstName\": \"Alex\",\n  \"lastName\": \"Morgan\",\n  \"email\": \"alex.morgan@acme.com\",\n  \"phone\": \"+12025550100\",\n  \"jobTitle\": \"Software Engineer\",\n  \"department\": \"Engineering\",\n  \"startDate\": \"2024-03-01\"\n}"
             },
             "url": "{{baseUrl}}/api/v1/employees",
             "description": "Requires company_admin or hr_manager (employee:create). Saves employeeId from response."
@@ -817,7 +817,9 @@
           "request": {
             "auth": {
               "type": "bearer",
-              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+              "bearer": [
+                { "key": "token", "value": "{{accessToken}}", "type": "string" }
+              ]
             },
             "method": "POST",
             "header": [
@@ -840,7 +842,9 @@
           "request": {
             "auth": {
               "type": "bearer",
-              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+              "bearer": [
+                { "key": "token", "value": "{{accessToken}}", "type": "string" }
+              ]
             },
             "method": "POST",
             "header": [{ "key": "Content-Type", "value": "application/json" }],
@@ -858,7 +862,9 @@
           "request": {
             "auth": {
               "type": "bearer",
-              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+              "bearer": [
+                { "key": "token", "value": "{{accessToken}}", "type": "string" }
+              ]
             },
             "method": "POST",
             "header": [{ "key": "Content-Type", "value": "application/json" }],
@@ -881,7 +887,9 @@
           "request": {
             "auth": {
               "type": "bearer",
-              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+              "bearer": [
+                { "key": "token", "value": "{{accessToken}}", "type": "string" }
+              ]
             },
             "method": "GET",
             "header": [],
@@ -914,7 +922,9 @@
           "request": {
             "auth": {
               "type": "bearer",
-              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+              "bearer": [
+                { "key": "token", "value": "{{accessToken}}", "type": "string" }
+              ]
             },
             "method": "POST",
             "header": [{ "key": "Content-Type", "value": "application/json" }],
@@ -932,7 +942,9 @@
           "request": {
             "auth": {
               "type": "bearer",
-              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+              "bearer": [
+                { "key": "token", "value": "{{accessToken}}", "type": "string" }
+              ]
             },
             "method": "GET",
             "header": [],
@@ -946,7 +958,9 @@
           "request": {
             "auth": {
               "type": "bearer",
-              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+              "bearer": [
+                { "key": "token", "value": "{{accessToken}}", "type": "string" }
+              ]
             },
             "method": "POST",
             "header": [],
@@ -960,7 +974,9 @@
           "request": {
             "auth": {
               "type": "bearer",
-              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+              "bearer": [
+                { "key": "token", "value": "{{accessToken}}", "type": "string" }
+              ]
             },
             "method": "POST",
             "header": [{ "key": "Content-Type", "value": "application/json" }],
@@ -978,7 +994,9 @@
           "request": {
             "auth": {
               "type": "bearer",
-              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+              "bearer": [
+                { "key": "token", "value": "{{accessToken}}", "type": "string" }
+              ]
             },
             "method": "POST",
             "header": [],
@@ -992,7 +1010,9 @@
           "request": {
             "auth": {
               "type": "bearer",
-              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+              "bearer": [
+                { "key": "token", "value": "{{accessToken}}", "type": "string" }
+              ]
             },
             "method": "GET",
             "header": [],
@@ -1014,7 +1034,9 @@
           "request": {
             "auth": {
               "type": "bearer",
-              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+              "bearer": [
+                { "key": "token", "value": "{{accessToken}}", "type": "string" }
+              ]
             },
             "method": "GET",
             "header": [],
@@ -1033,7 +1055,9 @@
           "request": {
             "auth": {
               "type": "bearer",
-              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+              "bearer": [
+                { "key": "token", "value": "{{accessToken}}", "type": "string" }
+              ]
             },
             "method": "GET",
             "header": [],
@@ -1047,7 +1071,9 @@
           "request": {
             "auth": {
               "type": "bearer",
-              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+              "bearer": [
+                { "key": "token", "value": "{{accessToken}}", "type": "string" }
+              ]
             },
             "method": "PATCH",
             "header": [{ "key": "Content-Type", "value": "application/json" }],
@@ -1079,7 +1105,9 @@
           "request": {
             "auth": {
               "type": "bearer",
-              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+              "bearer": [
+                { "key": "token", "value": "{{accessToken}}", "type": "string" }
+              ]
             },
             "method": "POST",
             "header": [{ "key": "Content-Type", "value": "application/json" }],
@@ -1097,7 +1125,9 @@
           "request": {
             "auth": {
               "type": "bearer",
-              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+              "bearer": [
+                { "key": "token", "value": "{{accessToken}}", "type": "string" }
+              ]
             },
             "method": "POST",
             "header": [],
@@ -1111,7 +1141,9 @@
           "request": {
             "auth": {
               "type": "bearer",
-              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+              "bearer": [
+                { "key": "token", "value": "{{accessToken}}", "type": "string" }
+              ]
             },
             "method": "GET",
             "header": [],
@@ -1125,7 +1157,9 @@
           "request": {
             "auth": {
               "type": "bearer",
-              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+              "bearer": [
+                { "key": "token", "value": "{{accessToken}}", "type": "string" }
+              ]
             },
             "method": "GET",
             "header": [],
@@ -1147,7 +1181,9 @@
           "request": {
             "auth": {
               "type": "bearer",
-              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+              "bearer": [
+                { "key": "token", "value": "{{accessToken}}", "type": "string" }
+              ]
             },
             "method": "GET",
             "header": [],
@@ -1169,7 +1205,9 @@
           "request": {
             "auth": {
               "type": "bearer",
-              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+              "bearer": [
+                { "key": "token", "value": "{{accessToken}}", "type": "string" }
+              ]
             },
             "method": "GET",
             "header": [],
@@ -1191,7 +1229,9 @@
           "request": {
             "auth": {
               "type": "bearer",
-              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+              "bearer": [
+                { "key": "token", "value": "{{accessToken}}", "type": "string" }
+              ]
             },
             "method": "GET",
             "header": [],
@@ -1205,7 +1245,9 @@
           "request": {
             "auth": {
               "type": "bearer",
-              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+              "bearer": [
+                { "key": "token", "value": "{{accessToken}}", "type": "string" }
+              ]
             },
             "method": "PATCH",
             "header": [{ "key": "Content-Type", "value": "application/json" }],
@@ -1242,7 +1284,9 @@
           "request": {
             "auth": {
               "type": "bearer",
-              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+              "bearer": [
+                { "key": "token", "value": "{{accessToken}}", "type": "string" }
+              ]
             },
             "method": "POST",
             "header": [{ "key": "Content-Type", "value": "application/json" }],
@@ -1260,7 +1304,9 @@
           "request": {
             "auth": {
               "type": "bearer",
-              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+              "bearer": [
+                { "key": "token", "value": "{{accessToken}}", "type": "string" }
+              ]
             },
             "method": "GET",
             "header": [],
@@ -1282,7 +1328,9 @@
           "request": {
             "auth": {
               "type": "bearer",
-              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+              "bearer": [
+                { "key": "token", "value": "{{accessToken}}", "type": "string" }
+              ]
             },
             "method": "GET",
             "header": [],
@@ -1296,7 +1344,9 @@
           "request": {
             "auth": {
               "type": "bearer",
-              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+              "bearer": [
+                { "key": "token", "value": "{{accessToken}}", "type": "string" }
+              ]
             },
             "method": "GET",
             "header": [],
@@ -1319,7 +1369,9 @@
           "request": {
             "auth": {
               "type": "bearer",
-              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+              "bearer": [
+                { "key": "token", "value": "{{accessToken}}", "type": "string" }
+              ]
             },
             "method": "PATCH",
             "header": [{ "key": "Content-Type", "value": "application/json" }],
@@ -1337,7 +1389,9 @@
           "request": {
             "auth": {
               "type": "bearer",
-              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+              "bearer": [
+                { "key": "token", "value": "{{accessToken}}", "type": "string" }
+              ]
             },
             "method": "POST",
             "header": [],
@@ -1351,7 +1405,9 @@
           "request": {
             "auth": {
               "type": "bearer",
-              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+              "bearer": [
+                { "key": "token", "value": "{{accessToken}}", "type": "string" }
+              ]
             },
             "method": "POST",
             "header": [],
@@ -1365,7 +1421,9 @@
           "request": {
             "auth": {
               "type": "bearer",
-              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+              "bearer": [
+                { "key": "token", "value": "{{accessToken}}", "type": "string" }
+              ]
             },
             "method": "POST",
             "header": [{ "key": "Content-Type", "value": "application/json" }],
@@ -1388,7 +1446,9 @@
           "request": {
             "auth": {
               "type": "bearer",
-              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+              "bearer": [
+                { "key": "token", "value": "{{accessToken}}", "type": "string" }
+              ]
             },
             "method": "POST",
             "header": [{ "key": "Content-Type", "value": "application/json" }],
@@ -1420,7 +1480,9 @@
           "request": {
             "auth": {
               "type": "bearer",
-              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+              "bearer": [
+                { "key": "token", "value": "{{accessToken}}", "type": "string" }
+              ]
             },
             "method": "POST",
             "header": [{ "key": "Content-Type", "value": "application/json" }],
@@ -1438,7 +1500,9 @@
           "request": {
             "auth": {
               "type": "bearer",
-              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+              "bearer": [
+                { "key": "token", "value": "{{accessToken}}", "type": "string" }
+              ]
             },
             "method": "GET",
             "header": [],
@@ -1461,7 +1525,9 @@
           "request": {
             "auth": {
               "type": "bearer",
-              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+              "bearer": [
+                { "key": "token", "value": "{{accessToken}}", "type": "string" }
+              ]
             },
             "method": "GET",
             "header": [],
@@ -1485,7 +1551,9 @@
           "request": {
             "auth": {
               "type": "bearer",
-              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+              "bearer": [
+                { "key": "token", "value": "{{accessToken}}", "type": "string" }
+              ]
             },
             "method": "GET",
             "header": [],
@@ -1499,7 +1567,9 @@
           "request": {
             "auth": {
               "type": "bearer",
-              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+              "bearer": [
+                { "key": "token", "value": "{{accessToken}}", "type": "string" }
+              ]
             },
             "method": "GET",
             "header": [],
@@ -1513,7 +1583,9 @@
           "request": {
             "auth": {
               "type": "bearer",
-              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+              "bearer": [
+                { "key": "token", "value": "{{accessToken}}", "type": "string" }
+              ]
             },
             "method": "POST",
             "header": [],
@@ -1527,7 +1599,9 @@
           "request": {
             "auth": {
               "type": "bearer",
-              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+              "bearer": [
+                { "key": "token", "value": "{{accessToken}}", "type": "string" }
+              ]
             },
             "method": "POST",
             "header": [{ "key": "Content-Type", "value": "application/json" }],
@@ -1545,7 +1619,9 @@
           "request": {
             "auth": {
               "type": "bearer",
-              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+              "bearer": [
+                { "key": "token", "value": "{{accessToken}}", "type": "string" }
+              ]
             },
             "method": "GET",
             "header": [],
@@ -1569,7 +1645,9 @@
           "request": {
             "auth": {
               "type": "bearer",
-              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+              "bearer": [
+                { "key": "token", "value": "{{accessToken}}", "type": "string" }
+              ]
             },
             "method": "GET",
             "header": [],
@@ -1583,7 +1661,9 @@
           "request": {
             "auth": {
               "type": "bearer",
-              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+              "bearer": [
+                { "key": "token", "value": "{{accessToken}}", "type": "string" }
+              ]
             },
             "method": "GET",
             "header": [],
@@ -1610,7 +1690,9 @@
           "request": {
             "auth": {
               "type": "bearer",
-              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+              "bearer": [
+                { "key": "token", "value": "{{accessToken}}", "type": "string" }
+              ]
             },
             "method": "GET",
             "header": [],
@@ -1640,7 +1722,9 @@
           "request": {
             "auth": {
               "type": "bearer",
-              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+              "bearer": [
+                { "key": "token", "value": "{{accessToken}}", "type": "string" }
+              ]
             },
             "method": "POST",
             "header": [{ "key": "Content-Type", "value": "application/json" }],
@@ -1658,7 +1742,9 @@
           "request": {
             "auth": {
               "type": "bearer",
-              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+              "bearer": [
+                { "key": "token", "value": "{{accessToken}}", "type": "string" }
+              ]
             },
             "method": "PATCH",
             "header": [{ "key": "Content-Type", "value": "application/json" }],
@@ -1676,7 +1762,9 @@
           "request": {
             "auth": {
               "type": "bearer",
-              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+              "bearer": [
+                { "key": "token", "value": "{{accessToken}}", "type": "string" }
+              ]
             },
             "method": "DELETE",
             "header": [],
@@ -1690,7 +1778,9 @@
           "request": {
             "auth": {
               "type": "bearer",
-              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+              "bearer": [
+                { "key": "token", "value": "{{accessToken}}", "type": "string" }
+              ]
             },
             "method": "POST",
             "header": [{ "key": "Content-Type", "value": "application/json" }],
@@ -1708,7 +1798,9 @@
           "request": {
             "auth": {
               "type": "bearer",
-              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+              "bearer": [
+                { "key": "token", "value": "{{accessToken}}", "type": "string" }
+              ]
             },
             "method": "POST",
             "header": [{ "key": "Content-Type", "value": "application/json" }],
@@ -1726,7 +1818,9 @@
           "request": {
             "auth": {
               "type": "bearer",
-              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+              "bearer": [
+                { "key": "token", "value": "{{accessToken}}", "type": "string" }
+              ]
             },
             "method": "POST",
             "header": [],
@@ -1745,7 +1839,9 @@
           "request": {
             "auth": {
               "type": "bearer",
-              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+              "bearer": [
+                { "key": "token", "value": "{{accessToken}}", "type": "string" }
+              ]
             },
             "method": "GET",
             "header": [],
@@ -1775,7 +1871,9 @@
           "request": {
             "auth": {
               "type": "bearer",
-              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+              "bearer": [
+                { "key": "token", "value": "{{accessToken}}", "type": "string" }
+              ]
             },
             "method": "POST",
             "header": [{ "key": "Content-Type", "value": "application/json" }],
@@ -1793,7 +1891,9 @@
           "request": {
             "auth": {
               "type": "bearer",
-              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+              "bearer": [
+                { "key": "token", "value": "{{accessToken}}", "type": "string" }
+              ]
             },
             "method": "GET",
             "header": [],
@@ -1807,7 +1907,9 @@
           "request": {
             "auth": {
               "type": "bearer",
-              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+              "bearer": [
+                { "key": "token", "value": "{{accessToken}}", "type": "string" }
+              ]
             },
             "method": "POST",
             "header": [],
@@ -1821,7 +1923,9 @@
           "request": {
             "auth": {
               "type": "bearer",
-              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+              "bearer": [
+                { "key": "token", "value": "{{accessToken}}", "type": "string" }
+              ]
             },
             "method": "GET",
             "header": [],
@@ -1835,7 +1939,9 @@
           "request": {
             "auth": {
               "type": "bearer",
-              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+              "bearer": [
+                { "key": "token", "value": "{{accessToken}}", "type": "string" }
+              ]
             },
             "method": "POST",
             "header": [],
@@ -1849,7 +1955,9 @@
           "request": {
             "auth": {
               "type": "bearer",
-              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+              "bearer": [
+                { "key": "token", "value": "{{accessToken}}", "type": "string" }
+              ]
             },
             "method": "GET",
             "header": [],
@@ -1863,7 +1971,9 @@
           "request": {
             "auth": {
               "type": "bearer",
-              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+              "bearer": [
+                { "key": "token", "value": "{{accessToken}}", "type": "string" }
+              ]
             },
             "method": "GET",
             "header": [],
@@ -1877,7 +1987,9 @@
           "request": {
             "auth": {
               "type": "bearer",
-              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+              "bearer": [
+                { "key": "token", "value": "{{accessToken}}", "type": "string" }
+              ]
             },
             "method": "DELETE",
             "header": [],
@@ -1896,7 +2008,9 @@
           "request": {
             "auth": {
               "type": "bearer",
-              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+              "bearer": [
+                { "key": "token", "value": "{{accessToken}}", "type": "string" }
+              ]
             },
             "method": "GET",
             "header": [],
@@ -1910,7 +2024,9 @@
           "request": {
             "auth": {
               "type": "bearer",
-              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+              "bearer": [
+                { "key": "token", "value": "{{accessToken}}", "type": "string" }
+              ]
             },
             "method": "POST",
             "header": [{ "key": "Content-Type", "value": "application/json" }],
@@ -1928,7 +2044,9 @@
           "request": {
             "auth": {
               "type": "bearer",
-              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+              "bearer": [
+                { "key": "token", "value": "{{accessToken}}", "type": "string" }
+              ]
             },
             "method": "POST",
             "header": [{ "key": "Content-Type", "value": "application/json" }],
@@ -1968,7 +2086,9 @@
           "request": {
             "auth": {
               "type": "bearer",
-              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+              "bearer": [
+                { "key": "token", "value": "{{accessToken}}", "type": "string" }
+              ]
             },
             "method": "GET",
             "header": [],
@@ -1982,7 +2102,9 @@
           "request": {
             "auth": {
               "type": "bearer",
-              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+              "bearer": [
+                { "key": "token", "value": "{{accessToken}}", "type": "string" }
+              ]
             },
             "method": "POST",
             "header": [{ "key": "Content-Type", "value": "application/json" }],
@@ -2014,7 +2136,9 @@
           "request": {
             "auth": {
               "type": "bearer",
-              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+              "bearer": [
+                { "key": "token", "value": "{{accessToken}}", "type": "string" }
+              ]
             },
             "method": "POST",
             "header": [{ "key": "Content-Type", "value": "application/json" }],
@@ -2032,7 +2156,9 @@
           "request": {
             "auth": {
               "type": "bearer",
-              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+              "bearer": [
+                { "key": "token", "value": "{{accessToken}}", "type": "string" }
+              ]
             },
             "method": "GET",
             "header": [],
@@ -2046,7 +2172,9 @@
           "request": {
             "auth": {
               "type": "bearer",
-              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+              "bearer": [
+                { "key": "token", "value": "{{accessToken}}", "type": "string" }
+              ]
             },
             "method": "GET",
             "header": [],
@@ -2065,7 +2193,9 @@
           "request": {
             "auth": {
               "type": "bearer",
-              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+              "bearer": [
+                { "key": "token", "value": "{{accessToken}}", "type": "string" }
+              ]
             },
             "method": "DELETE",
             "header": [],
@@ -2164,6 +2294,84 @@
             },
             "url": "{{baseUrl}}/api/v1/admin/platform/site-settings/upload",
             "description": "Super admin only. Uploads logo or favicon to ImgBB; returns URL (does not auto-save settings)."
+          },
+          "response": []
+        },
+        {
+          "name": "List Platform Country Dial Codes",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/admin/platform/country-dial-codes?includeArchived=true",
+            "description": "Super admin only."
+          },
+          "response": []
+        },
+        {
+          "name": "Create Platform Country Dial Code",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"code\": \"NG\",\n  \"name\": \"Nigeria\",\n  \"dialCode\": \"234\",\n  \"minNationalLength\": 7,\n  \"maxNationalLength\": 10\n}"
+            },
+            "url": "{{baseUrl}}/api/v1/admin/platform/country-dial-codes",
+            "description": "Super admin only."
+          },
+          "response": []
+        },
+        {
+          "name": "Update Platform Country Dial Code",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Nigeria\",\n  \"maxNationalLength\": 11\n}"
+            },
+            "url": "{{baseUrl}}/api/v1/admin/platform/country-dial-codes/{{countryDialCodeId}}",
+            "description": "Super admin only. Update fields or set isArchived."
           },
           "response": []
         }
@@ -2283,10 +2491,30 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"name\": \"Acme Ltd\",\n  \"address\": \"123 Main Street, London, UK\",\n  \"logoUrl\": \"https://example.com/acme-logo.png\"\n}"
+              "raw": "{\n  \"name\": \"Acme Ltd\",\n  \"address\": \"123 Main Street, London, UK\",\n  \"logoUrl\": \"https://example.com/acme-logo.png\",\n  \"defaultPhoneDialCode\": \"44\"\n}"
             },
             "url": "{{baseUrl}}/api/v1/settings/company",
             "description": "Company admin only. Partial update."
+          },
+          "response": []
+        },
+        {
+          "name": "List Country Dial Codes",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/country-dial-codes",
+            "description": "Any authenticated tenant user. Returns active platform dial codes and tenant default."
           },
           "response": []
         },
@@ -2603,7 +2831,9 @@
           "request": {
             "auth": {
               "type": "bearer",
-              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+              "bearer": [
+                { "key": "token", "value": "{{accessToken}}", "type": "string" }
+              ]
             },
             "method": "GET",
             "header": [],
@@ -2627,7 +2857,9 @@
           "request": {
             "auth": {
               "type": "bearer",
-              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+              "bearer": [
+                { "key": "token", "value": "{{accessToken}}", "type": "string" }
+              ]
             },
             "method": "GET",
             "header": [],
@@ -2641,7 +2873,9 @@
           "request": {
             "auth": {
               "type": "bearer",
-              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+              "bearer": [
+                { "key": "token", "value": "{{accessToken}}", "type": "string" }
+              ]
             },
             "method": "GET",
             "header": [],
@@ -2655,7 +2889,9 @@
           "request": {
             "auth": {
               "type": "bearer",
-              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+              "bearer": [
+                { "key": "token", "value": "{{accessToken}}", "type": "string" }
+              ]
             },
             "method": "PATCH",
             "header": [],
@@ -2669,7 +2905,9 @@
           "request": {
             "auth": {
               "type": "bearer",
-              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+              "bearer": [
+                { "key": "token", "value": "{{accessToken}}", "type": "string" }
+              ]
             },
             "method": "POST",
             "header": [],

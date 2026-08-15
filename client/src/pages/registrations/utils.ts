@@ -1,25 +1,50 @@
-import type { RegistrationRequest } from '../../types';
+import type { RegistrationRequest } from "../../types";
 
-export const adminDisplayName = (firstName?: string, lastName?: string): string => {
+export const adminDisplayName = (
+  firstName?: string,
+  lastName?: string,
+): string => {
   if (firstName || lastName) {
-    return [firstName, lastName].filter(Boolean).join(' ');
+    return [firstName, lastName].filter(Boolean).join(" ");
   }
-  return '—';
-}
+  return "—";
+};
 
 export const formatDate = (iso: string): string => {
   return new Date(iso).toLocaleString();
-}
+};
 
 export const toEditForm = (row: RegistrationRequest): EditCompanyForm => {
   return {
     companyName: row.companyName,
     adminEmail: row.adminEmail,
-    adminFirstName: row.adminFirstName ?? '',
-    adminLastName: row.adminLastName ?? '',
+    adminFirstName: row.adminFirstName ?? "",
+    adminLastName: row.adminLastName ?? "",
     isActive: row.isActive,
   };
-}
+};
+
+export const matchesCompanySearch = (
+  row: RegistrationRequest,
+  query: string,
+): boolean => {
+  const normalized = query.trim().toLowerCase();
+  if (!normalized) {
+    return true;
+  }
+
+  const haystack = [
+    row.companyName,
+    row.adminEmail,
+    row.adminFirstName,
+    row.adminLastName,
+    adminDisplayName(row.adminFirstName, row.adminLastName),
+  ]
+    .join(" ")
+    .toLowerCase();
+
+  return haystack.includes(normalized);
+};
 
 export type EditCompanyForm = {
   companyName: string;
@@ -30,21 +55,23 @@ export type EditCompanyForm = {
 };
 
 export const editFormKeys: Array<keyof EditCompanyForm> = [
-  'companyName',
-  'adminEmail',
-  'adminFirstName',
-  'adminLastName',
-  'isActive',
+  "companyName",
+  "adminEmail",
+  "adminFirstName",
+  "adminLastName",
+  "isActive",
 ];
 
-export type CompaniesTab = 'pending' | 'registered';
+export const COMPANIES_BASE_PATH = "/companies";
+export const REGISTERED_COMPANIES_PATH = "/companies/registered";
+export const PENDING_COMPANIES_PATH = "/companies/pending";
 
-export const COMPANIES_TAB_IDS = ['registered', 'pending'] as const satisfies readonly CompaniesTab[];
+export type CompaniesListVariant = "registered" | "pending";
 
 export const emptyCreateForm = {
-  companyName: '',
-  email: '',
-  password: '',
-  firstName: '',
-  lastName: '',
+  companyName: "",
+  email: "",
+  password: "",
+  firstName: "",
+  lastName: "",
 };

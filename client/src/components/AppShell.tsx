@@ -13,6 +13,7 @@ import {
   HiCurrencyDollar,
   HiDocumentText,
   HiHome,
+  HiPhone,
   HiTableCells,
   HiUserGroup,
 } from "react-icons/hi2";
@@ -66,10 +67,11 @@ const navItems: Array<{
   { to: "/dashboard", label: "Home", icon: HiHome, end: true },
 
   {
-    to: "/dashboard/registrations",
+    to: "/companies/registered",
     label: "Companies",
     icon: HiBuildingOffice2,
     roles: ["super_admin"],
+    activePrefix: "/companies",
   },
 
   {
@@ -79,6 +81,13 @@ const navItems: Array<{
 
     icon: HiCog6Tooth,
 
+    roles: ["super_admin"],
+  },
+
+  {
+    to: "/dashboard/platform/country-codes",
+    label: "Country codes",
+    icon: HiPhone,
     roles: ["super_admin"],
   },
 
@@ -398,7 +407,7 @@ export const AppShell = () => {
 
       <main
         id="app-main"
-        className="thin-scrollbar fixed bottom-0 left-0 right-0 top-14 overflow-y-auto px-3 py-6 transition-[left] duration-200 md:px-4"
+        className="thin-scrollbar fixed bottom-0 left-0 right-0 top-14 overflow-y-auto px-3 pb-6 pt-0 transition-[left] duration-200 md:px-4"
         style={mainOffsetStyle}
       >
         <Outlet />

@@ -24,6 +24,8 @@ export interface NavTabBarProps {
   onChange?: (id: string) => void;
   /** Pull the bar edge-to-edge inside padded main content. */
   bleed?: boolean;
+  /** Keep the bar visible while the page scrolls. Defaults to true when `bleed` is set. */
+  sticky?: boolean;
   /** Tailwind classes for bar and tab states. Omitted keys use the dark nav defaults. */
   colors?: NavTabBarColors;
   className?: string;
@@ -58,6 +60,7 @@ export const NavTabBar = ({
   activeId,
   onChange,
   bleed = false,
+  sticky,
   colors,
   className = "",
   "aria-label": ariaLabel = "Section navigation",
@@ -67,11 +70,13 @@ export const NavTabBar = ({
   }
 
   const resolvedColors = { ...defaultNavTabBarColors, ...colors };
-  const bleedClassName = bleed ? "-mx-3 -mt-6 mb-6 md:-mx-4" : "";
+  const bleedClassName = bleed ? "-mx-3 mb-6 md:-mx-4" : "";
+  const isSticky = sticky ?? bleed;
+  const stickyClassName = isSticky ? "sticky top-0 z-10" : "";
 
   return (
     <div
-      className={`flex h-14 items-center px-3 md:px-4 ${resolvedColors.bar} ${bleedClassName} ${className}`.trim()}
+      className={`flex h-14 items-center px-3 md:px-4 ${resolvedColors.bar} ${bleedClassName} ${stickyClassName} ${className}`.trim()}
     >
       <nav className="flex h-full gap-6" aria-label={ariaLabel}>
         {tabs.map((tab) => {

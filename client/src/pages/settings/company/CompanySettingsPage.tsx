@@ -1,47 +1,63 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { FormEvent, useEffect, useMemo, useState } from 'react';
-import { Navigate } from 'react-router-dom';
-import { toast } from 'react-toastify';
-import { PageContainer } from '../../../components/ui/PageContainer';
-import { SettingsPageHeader } from '../components/SettingsPageHeader';
-import { useAuth } from '../../../contexts/AuthContext';
-import { useSiteConfig } from '../../../contexts/SiteConfigContext';
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { FormEvent, useEffect, useMemo, useState } from "react";
+import { Navigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import { PageContainer } from "../../../components/ui/PageContainer";
+import { SettingsPageHeader } from "../components/SettingsPageHeader";
+import { useAuth } from "../../../contexts/AuthContext";
+import { useSiteConfig } from "../../../contexts/SiteConfigContext";
 import {
   ApiError,
   fetchCompanyProfile,
+  fetchCountryDialCodes,
   fetchTenantBrandingOverrides,
   updateCompanyProfile,
   updateTenantBranding,
-} from '../../../lib/api';
-import type { CompanyProfile, PatchCompanyProfileInput, PatchTenantBrandingInput } from '../../../types';
-import { hasFormChanges, pickChangedFields } from '../../../utils/form';
-import { isAnyQueryInitialLoad } from '../../../utils/query';
-import { CompanySettingsTabs } from './components/CompanySettingsTabs';
-import type { CompanyProfileFormValues } from './components/CompanyProfileForm';
-import type { TenantBrandingFormValues } from './components/TenantBrandingForm';
-import type { CompanySettingsTab } from './utils';
+} from "../../../lib/api";
+import type {
+  CompanyProfile,
+  PatchCompanyProfileInput,
+  PatchTenantBrandingInput,
+} from "../../../types";
+import { hasFormChanges, pickChangedFields } from "../../../utils/form";
+import { getUniqueDialCodes } from "../../../utils/phone";
+import { isAnyQueryInitialLoad } from "../../../utils/query";
+import { CompanySettingsTabs } from "./components/CompanySettingsTabs";
+import type { CompanyProfileFormValues } from "./components/CompanyProfileForm";
+import type { TenantBrandingFormValues } from "./components/TenantBrandingForm";
+import type { CompanySettingsTab } from "./utils";
 
-const profileFormKeys = ['name', 'address', 'logoUrl'] as const;
-const brandingFormKeys = ['logoUrl'] as const;
+const profileFormKeys = [
+  "name",
+  "address",
+  "logoUrl",
+  "defaultPhoneDialCode",
+] as const;
+const brandingFormKeys = ["logoUrl"] as const;
 
-const toProfileFormValues = (profile: CompanyProfile): CompanyProfileFormValues => ({
+const toProfileFormValues = (
+  profile: CompanyProfile,
+): CompanyProfileFormValues => ({
   name: profile.name,
-  address: profile.address ?? '',
-  logoUrl: profile.logoUrl ?? '',
+  address: profile.address ?? "",
+  logoUrl: profile.logoUrl ?? "",
+  defaultPhoneDialCode: profile.defaultPhoneDialCode,
 });
 
-const toBrandingFormValues = (overrides: { logoUrl: string | null }): TenantBrandingFormValues => ({
-  logoUrl: overrides.logoUrl ?? '',
+const toBrandingFormValues = (overrides: {
+  logoUrl: string | null;
+}): TenantBrandingFormValues => ({
+  logoUrl: overrides.logoUrl ?? "",
 });
 
 const toProfilePatchInput = (
   values: CompanyProfileFormValues,
-  original: CompanyProfileFormValues
+  original: CompanyProfileFormValues,
 ): PatchCompanyProfileInput => {
   const changed = pickChangedFields(
     values as unknown as Record<string, unknown>,
     original as unknown as Record<string, unknown>,
-    [...profileFormKeys]
+    [...profileFormKeys],
   );
   const input: PatchCompanyProfileInput = {};
 
@@ -54,13 +70,16 @@ const toProfilePatchInput = (
   if (changed.logoUrl !== undefined) {
     input.logoUrl = String(changed.logoUrl) || null;
   }
+  if (changed.defaultPhoneDialCode !== undefined) {
+    input.defaultPhoneDialCode = String(changed.defaultPhoneDialCode);
+  }
 
   return input;
 };
 
 const toBrandingPatchInput = (
   values: TenantBrandingFormValues,
-  original: TenantBrandingFormValues
+  original: TenantBrandingFormValues,
 ): PatchTenantBrandingInput => {
   const changed = pickChangedFields(values, original, [...brandingFormKeys]);
   const input: PatchTenantBrandingInput = {};
@@ -76,23 +95,43 @@ export const CompanySettingsPage = () => {
   const { user } = useAuth();
   const { displayName, refresh } = useSiteConfig();
   const queryClient = useQueryClient();
-  const [profileValues, setProfileValues] = useState<CompanyProfileFormValues | null>(null);
-  const [profileOriginal, setProfileOriginal] = useState<CompanyProfileFormValues | null>(null);
-  const [brandingValues, setBrandingValues] = useState<TenantBrandingFormValues | null>(null);
-  const [brandingOriginal, setBrandingOriginal] = useState<TenantBrandingFormValues | null>(null);
+  const [profileValues, setProfileValues] =
+    useState<CompanyProfileFormValues | null>(null);
+  const [profileOriginal, setProfileOriginal] =
+    useState<CompanyProfileFormValues | null>(null);
+  const [brandingValues, setBrandingValues] =
+    useState<TenantBrandingFormValues | null>(null);
+  const [brandingOriginal, setBrandingOriginal] =
+    useState<TenantBrandingFormValues | null>(null);
   const [savingTab, setSavingTab] = useState<CompanySettingsTab | null>(null);
 
   const profileQuery = useQuery({
-    queryKey: ['settings', 'company'],
+    queryKey: ["settings", "company"],
     queryFn: fetchCompanyProfile,
-    enabled: user?.role === 'company_admin',
+    enabled: user?.role === "company_admin",
   });
 
   const brandingQuery = useQuery({
-    queryKey: ['settings', 'branding', 'overrides'],
+    queryKey: ["settings", "branding", "overrides"],
     queryFn: fetchTenantBrandingOverrides,
-    enabled: user?.role === 'company_admin',
+    enabled: user?.role === "company_admin",
   });
+
+  const countryDialCodesQuery = useQuery({
+    queryKey: ["country-dial-codes"],
+    queryFn: fetchCountryDialCodes,
+    enabled: user?.role === "company_admin",
+  });
+
+  const dialCodeOptions = getUniqueDialCodes(
+    countryDialCodesQuery.data?.countryDialCodes.map((country) => ({
+      code: country.code,
+      name: country.name,
+      dialCode: country.dialCode,
+      minNationalLength: country.minNationalLength,
+      maxNationalLength: country.maxNationalLength,
+    })) ?? [],
+  );
 
   useEffect(() => {
     if (profileQuery.data) {
@@ -117,7 +156,7 @@ export const CompanySettingsPage = () => {
     return hasFormChanges(
       profileValues as unknown as Record<string, unknown>,
       profileOriginal as unknown as Record<string, unknown>,
-      [...profileFormKeys]
+      [...profileFormKeys],
     );
   }, [profileValues, profileOriginal]);
 
@@ -125,14 +164,17 @@ export const CompanySettingsPage = () => {
     if (!brandingValues || !brandingOriginal) {
       return false;
     }
-    return hasFormChanges(brandingValues, brandingOriginal, [...brandingFormKeys]);
+    return hasFormChanges(brandingValues, brandingOriginal, [
+      ...brandingFormKeys,
+    ]);
   }, [brandingValues, brandingOriginal]);
 
   const profileMutation = useMutation({
     mutationFn: updateCompanyProfile,
     onSuccess: async (profile) => {
-      toast.success('Company profile updated.');
-      void queryClient.invalidateQueries({ queryKey: ['settings', 'company'] });
+      toast.success("Company profile updated.");
+      void queryClient.invalidateQueries({ queryKey: ["settings", "company"] });
+      void queryClient.invalidateQueries({ queryKey: ["country-dial-codes"] });
       await refresh();
       const formValues = toProfileFormValues(profile);
       setProfileValues(formValues);
@@ -141,15 +183,21 @@ export const CompanySettingsPage = () => {
     },
     onError: (err) => {
       setSavingTab(null);
-      toast.error(err instanceof ApiError ? err.message : 'Failed to update company profile');
+      toast.error(
+        err instanceof ApiError
+          ? err.message
+          : "Failed to update company profile",
+      );
     },
   });
 
   const brandingMutation = useMutation({
     mutationFn: updateTenantBranding,
     onSuccess: async () => {
-      toast.success('Company branding updated.');
-      void queryClient.invalidateQueries({ queryKey: ['settings', 'branding'] });
+      toast.success("Company branding updated.");
+      void queryClient.invalidateQueries({
+        queryKey: ["settings", "branding"],
+      });
       await refresh();
       const refreshed = await fetchTenantBrandingOverrides();
       const formValues = toBrandingFormValues(refreshed);
@@ -159,7 +207,11 @@ export const CompanySettingsPage = () => {
     },
     onError: (err) => {
       setSavingTab(null);
-      toast.error(err instanceof ApiError ? err.message : 'Failed to update company branding');
+      toast.error(
+        err instanceof ApiError
+          ? err.message
+          : "Failed to update company branding",
+      );
     },
   });
 
@@ -168,7 +220,7 @@ export const CompanySettingsPage = () => {
     if (!profileValues || !profileOriginal || !profileHasChanges) {
       return;
     }
-    setSavingTab('profile');
+    setSavingTab("profile");
     profileMutation.mutate(toProfilePatchInput(profileValues, profileOriginal));
   };
 
@@ -177,21 +229,28 @@ export const CompanySettingsPage = () => {
     if (!brandingValues || !brandingOriginal || !brandingHasChanges) {
       return;
     }
-    setSavingTab('branding');
-    brandingMutation.mutate(toBrandingPatchInput(brandingValues, brandingOriginal));
+    setSavingTab("branding");
+    brandingMutation.mutate(
+      toBrandingPatchInput(brandingValues, brandingOriginal),
+    );
   };
 
   const handleClearBrandingField = (field: keyof TenantBrandingFormValues) => {
-    setBrandingValues((prev) => (prev ? { ...prev, [field]: '' } : prev));
+    setBrandingValues((prev) => (prev ? { ...prev, [field]: "" } : prev));
   };
 
-  if (user?.role !== 'company_admin') {
+  if (user?.role !== "company_admin") {
     return <Navigate to="/dashboard/settings" replace />;
   }
 
   const isLoading =
-    isAnyQueryInitialLoad(profileQuery, brandingQuery) || !profileValues || !brandingValues;
-  const isError = profileQuery.isError || brandingQuery.isError;
+    isAnyQueryInitialLoad(profileQuery, brandingQuery, countryDialCodesQuery) ||
+    !profileValues ||
+    !brandingValues;
+  const isError =
+    profileQuery.isError ||
+    brandingQuery.isError ||
+    countryDialCodesQuery.isError;
 
   if (isLoading) {
     return (
@@ -217,22 +276,27 @@ export const CompanySettingsPage = () => {
       />
 
       <CompanySettingsTabs
+        dialCodeOptions={dialCodeOptions}
         profile={{
           values: profileValues,
           onChange: (field, value) =>
-            setProfileValues((prev) => (prev ? { ...prev, [field]: value } : prev)),
+            setProfileValues((prev) =>
+              prev ? { ...prev, [field]: value } : prev,
+            ),
           onSubmit: handleProfileSubmit,
-          loading: profileMutation.isPending && savingTab === 'profile',
+          loading: profileMutation.isPending && savingTab === "profile",
           hasChanges: profileHasChanges,
         }}
         branding={{
           values: brandingValues,
           displayName,
           onChange: (field, value) =>
-            setBrandingValues((prev) => (prev ? { ...prev, [field]: value } : prev)),
+            setBrandingValues((prev) =>
+              prev ? { ...prev, [field]: value } : prev,
+            ),
           onClearField: handleClearBrandingField,
           onSubmit: handleBrandingSubmit,
-          loading: brandingMutation.isPending && savingTab === 'branding',
+          loading: brandingMutation.isPending && savingTab === "branding",
           hasChanges: brandingHasChanges,
         }}
       />

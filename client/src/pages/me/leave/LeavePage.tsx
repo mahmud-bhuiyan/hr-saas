@@ -240,7 +240,7 @@ export const LeavePage = () => {
     : tabs[0].id;
 
   return (
-    <PageContainer>
+    <PageContainer flushTop>
       <MeTabs />
       <PageHeader
         label="Leave"

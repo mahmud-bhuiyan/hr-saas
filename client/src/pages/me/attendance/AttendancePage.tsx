@@ -35,7 +35,11 @@ import type {
   AttendanceLogsTab,
   AttendanceTab,
 } from "./utils";
-import { ATTENDANCE_24H_KEY, ATTENDANCE_TAB_IDS, todayDateString } from "./utils";
+import {
+  ATTENDANCE_24H_KEY,
+  ATTENDANCE_TAB_IDS,
+  todayDateString,
+} from "./utils";
 
 const TENANT_ATTENDANCE_ROLES = [
   "company_admin",
@@ -264,10 +268,13 @@ export const AttendancePage = () => {
     <div className="keka-attendance space-y-5">
       {missingEmployeeLink ? (
         <div className="rounded-lg border border-amber-300/60 bg-amber-50 px-4 py-3 text-sm text-amber-900 dark:border-amber-500/40 dark:bg-amber-500/10 dark:text-amber-200">
-          <p className="font-medium">No employee profile linked to your account</p>
+          <p className="font-medium">
+            No employee profile linked to your account
+          </p>
           <p className="mt-1 keka-muted">
-            Attendance is recorded against employee records. Your user account is not linked to one,
-            so personal clock-in and history are unavailable.
+            Attendance is recorded against employee records. Your user account
+            is not linked to one, so personal clock-in and history are
+            unavailable.
             {canReadTeam
               ? " Switch to the Team live board tab to see who is working, or link your user to an employee in Employees."
               : " Contact your administrator to link your user to an employee record."}
@@ -358,7 +365,7 @@ export const AttendancePage = () => {
   }
 
   return (
-    <PageContainer>
+    <PageContainer flushTop>
       <MeTabs />
       <PageHeader
         label="Operations"

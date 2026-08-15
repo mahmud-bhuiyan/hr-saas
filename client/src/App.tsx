@@ -16,8 +16,12 @@ import { ForgotPasswordPage } from "./pages/login/ForgotPasswordPage";
 import { ResetPasswordPage } from "./pages/login/ResetPasswordPage";
 import { ProfilePage } from "./pages/profile/ProfilePage";
 import { RegisterPage } from "./pages/register/RegisterPage";
-import { RegistrationsPage } from "./pages/registrations/RegistrationsPage";
+import {
+  RegistrationsPage,
+  RegistrationsIndexRedirect,
+} from "./pages/registrations/RegistrationsPage";
 import { PlatformSiteSettingsPage } from "./pages/platform/site-settings/PlatformSiteSettingsPage";
+import { PlatformCountryCodesPage } from "./pages/platform/country-codes/PlatformCountryCodesPage";
 import { SettingsPage } from "./pages/settings/SettingsPage";
 import { CompanySettingsPage } from "./pages/settings/company/CompanySettingsPage";
 import { DepartmentsPage } from "./pages/settings/departments/DepartmentsPage";
@@ -47,227 +51,243 @@ const App = () => {
     <>
       <ScrollToTop />
       <Routes>
-      <Route element={<GuestRoute />}>
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/register" element={<RegisterPage />} />
-        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-        <Route path="/reset-password" element={<ResetPasswordPage />} />
-      </Route>
-
-      <Route element={<ProtectedRoute />}>
-        <Route element={<AppShell />}>
-          <Route path="/dashboard" element={<DashboardPage />} />
-          <Route path="/dashboard/profile" element={<ProfilePage />} />
-          <Route
-            path="/dashboard/registrations"
-            element={<RegistrationsPage />}
-          />
-          <Route
-            path="/employees"
-            element={
-              <ModuleRoute module="employees">
-                <EmployeesPage />
-              </ModuleRoute>
-            }
-          >
-            <Route index element={<EmployeesIndexRedirect />} />
-            <Route path="active" />
-            <Route path="inactive" />
-          </Route>
-          <Route
-            path="/employees/:id/edit"
-            element={
-              <ModuleRoute module="employees">
-                <EmployeeEditRedirect />
-              </ModuleRoute>
-            }
-          />
-          <Route
-            path="/employees/:id"
-            element={
-              <ModuleRoute module="employees">
-                <EmployeeViewRedirect />
-              </ModuleRoute>
-            }
-          />
-          <Route
-            path="/me/leave"
-            element={
-              <ModuleRoute module="leave">
-                <LeavePage />
-              </ModuleRoute>
-            }
-          />
-          <Route
-            path="/me/attendance"
-            element={
-              <ModuleRoute module="attendance">
-                <AttendancePage />
-              </ModuleRoute>
-            }
-          />
-          <Route
-            path="/dashboard/timesheets"
-            element={
-              <ModuleRoute module="timesheets">
-                <TimesheetsPage />
-              </ModuleRoute>
-            }
-          />
-          <Route
-            path="/dashboard/rotas"
-            element={
-              <ModuleRoute module="rotas">
-                <RotasPage />
-              </ModuleRoute>
-            }
-          />
-          <Route
-            path="/me/expenses"
-            element={
-              <ModuleRoute module="expenses">
-                <ExpensesPage />
-              </ModuleRoute>
-            }
-          />
-          <Route path="/me/performance" element={<PerformancePage />} />
-          <Route
-            path="/dashboard/payroll"
-            element={
-              <ModuleRoute module="payroll">
-                <PayrollPage />
-              </ModuleRoute>
-            }
-          />
-          <Route
-            path="/dashboard/reports"
-            element={
-              <ModuleRoute module="reports">
-                <ReportsPage />
-              </ModuleRoute>
-            }
-          />
-          <Route
-            path="/dashboard/reports/headcount"
-            element={
-              <ModuleRoute module="reports">
-                <HeadcountReportPage />
-              </ModuleRoute>
-            }
-          />
-          <Route
-            path="/dashboard/reports/absence"
-            element={
-              <ModuleRoute module="reports">
-                <AbsenceReportPage />
-              </ModuleRoute>
-            }
-          />
-          <Route
-            path="/dashboard/documents"
-            element={
-              <ModuleRoute module="documents">
-                <DocumentsPage />
-              </ModuleRoute>
-            }
-          />
-          <Route
-            path="/dashboard/platform/site-settings"
-            element={<PlatformSiteSettingsPage />}
-          />
-          <Route
-            path="/dashboard/settings"
-            element={
-              <ModuleRoute module="settings">
-                <SettingsPage />
-              </ModuleRoute>
-            }
-          />
-          <Route
-            path="/dashboard/settings/company"
-            element={
-              <ModuleRoute module="settings">
-                <CompanySettingsPage />
-              </ModuleRoute>
-            }
-          />
-          <Route
-            path="/dashboard/settings/branding"
-            element={<Navigate to="/dashboard/settings/company?tab=branding" replace />}
-          />
-          <Route
-            path="/dashboard/settings/departments"
-            element={
-              <ModuleRoute module="settings">
-                <DepartmentsPage />
-              </ModuleRoute>
-            }
-          />
-          <Route
-            path="/dashboard/settings/locations"
-            element={
-              <ModuleRoute module="settings">
-                <LocationsPage />
-              </ModuleRoute>
-            }
-          />
-          <Route
-            path="/dashboard/settings/payroll"
-            element={
-              <ModuleRoute module="settings">
-                <PayrollSettingsPage />
-              </ModuleRoute>
-            }
-          />
-          <Route
-            path="/dashboard/settings/users"
-            element={
-              <ModuleRoute module="settings">
-                <UsersPage />
-              </ModuleRoute>
-            }
-          />
-          <Route
-            path="/dashboard/settings/attendance"
-            element={
-              <ModuleRoute module="settings">
-                <AttendanceSettingsPage />
-              </ModuleRoute>
-            }
-          />
-          <Route
-            path="/dashboard/settings/leave"
-            element={
-              <ModuleRoute module="settings">
-                <LeaveSettingsPage />
-              </ModuleRoute>
-            }
-          />
-          <Route
-            path="/dashboard/settings/billing"
-            element={
-              <ModuleRoute module="settings">
-                <BillingPage />
-              </ModuleRoute>
-            }
-          />
-          <Route
-            path="/dashboard/settings/audit-log"
-            element={
-              <ModuleRoute module="settings">
-                <AuditLogPage />
-              </ModuleRoute>
-            }
-          />
+        <Route element={<GuestRoute />}>
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
+          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+          <Route path="/reset-password" element={<ResetPasswordPage />} />
         </Route>
-      </Route>
 
-      <Route path="/terms" element={<TermsOfUsePage />} />
-      <Route path="/privacy" element={<PrivacyPolicyPage />} />
+        <Route element={<ProtectedRoute />}>
+          <Route element={<AppShell />}>
+            <Route path="/dashboard" element={<DashboardPage />} />
+            <Route path="/dashboard/profile" element={<ProfilePage />} />
+            <Route path="/companies" element={<RegistrationsPage />}>
+              <Route index element={<RegistrationsIndexRedirect />} />
+              <Route path="registered" />
+              <Route path="pending" />
+            </Route>
+            <Route
+              path="/employees"
+              element={
+                <ModuleRoute module="employees">
+                  <EmployeesPage />
+                </ModuleRoute>
+              }
+            >
+              <Route index element={<EmployeesIndexRedirect />} />
+              <Route path="active" />
+              <Route path="inactive" />
+            </Route>
+            <Route
+              path="/employees/:id/edit"
+              element={
+                <ModuleRoute module="employees">
+                  <EmployeeEditRedirect />
+                </ModuleRoute>
+              }
+            />
+            <Route
+              path="/employees/:id"
+              element={
+                <ModuleRoute module="employees">
+                  <EmployeeViewRedirect />
+                </ModuleRoute>
+              }
+            />
+            <Route
+              path="/me/leave"
+              element={
+                <ModuleRoute module="leave">
+                  <LeavePage />
+                </ModuleRoute>
+              }
+            />
+            <Route
+              path="/me/attendance"
+              element={
+                <ModuleRoute module="attendance">
+                  <AttendancePage />
+                </ModuleRoute>
+              }
+            />
+            <Route
+              path="/dashboard/timesheets"
+              element={
+                <ModuleRoute module="timesheets">
+                  <TimesheetsPage />
+                </ModuleRoute>
+              }
+            />
+            <Route
+              path="/dashboard/rotas"
+              element={
+                <ModuleRoute module="rotas">
+                  <RotasPage />
+                </ModuleRoute>
+              }
+            />
+            <Route
+              path="/me/expenses"
+              element={
+                <ModuleRoute module="expenses">
+                  <ExpensesPage />
+                </ModuleRoute>
+              }
+            />
+            <Route path="/me/performance" element={<PerformancePage />} />
+            <Route
+              path="/dashboard/payroll"
+              element={
+                <ModuleRoute module="payroll">
+                  <PayrollPage />
+                </ModuleRoute>
+              }
+            />
+            <Route
+              path="/dashboard/reports"
+              element={
+                <ModuleRoute module="reports">
+                  <ReportsPage />
+                </ModuleRoute>
+              }
+            />
+            <Route
+              path="/dashboard/reports/headcount"
+              element={
+                <ModuleRoute module="reports">
+                  <HeadcountReportPage />
+                </ModuleRoute>
+              }
+            />
+            <Route
+              path="/dashboard/reports/absence"
+              element={
+                <ModuleRoute module="reports">
+                  <AbsenceReportPage />
+                </ModuleRoute>
+              }
+            />
+            <Route
+              path="/dashboard/documents"
+              element={
+                <ModuleRoute module="documents">
+                  <DocumentsPage />
+                </ModuleRoute>
+              }
+            />
+            <Route
+              path="/dashboard/platform/site-settings"
+              element={<PlatformSiteSettingsPage />}
+            />
+            <Route
+              path="/dashboard/platform/country-codes"
+              element={<PlatformCountryCodesPage />}
+            />
+            <Route
+              path="/dashboard/settings"
+              element={
+                <ModuleRoute module="settings">
+                  <SettingsPage />
+                </ModuleRoute>
+              }
+            />
+            <Route
+              path="/dashboard/settings/company"
+              element={
+                <ModuleRoute module="settings">
+                  <CompanySettingsPage />
+                </ModuleRoute>
+              }
+            />
+            <Route
+              path="/dashboard/settings/branding"
+              element={
+                <Navigate
+                  to="/dashboard/settings/company?tab=branding"
+                  replace
+                />
+              }
+            />
+            <Route
+              path="/dashboard/settings/country-codes"
+              element={
+                <Navigate to="/dashboard/platform/country-codes" replace />
+              }
+            />
+            <Route
+              path="/dashboard/settings/departments"
+              element={
+                <ModuleRoute module="settings">
+                  <DepartmentsPage />
+                </ModuleRoute>
+              }
+            />
+            <Route
+              path="/dashboard/settings/locations"
+              element={
+                <ModuleRoute module="settings">
+                  <LocationsPage />
+                </ModuleRoute>
+              }
+            />
+            <Route
+              path="/dashboard/settings/payroll"
+              element={
+                <ModuleRoute module="settings">
+                  <PayrollSettingsPage />
+                </ModuleRoute>
+              }
+            />
+            <Route
+              path="/dashboard/settings/users"
+              element={
+                <ModuleRoute module="settings">
+                  <UsersPage />
+                </ModuleRoute>
+              }
+            />
+            <Route
+              path="/dashboard/settings/attendance"
+              element={
+                <ModuleRoute module="settings">
+                  <AttendanceSettingsPage />
+                </ModuleRoute>
+              }
+            />
+            <Route
+              path="/dashboard/settings/leave"
+              element={
+                <ModuleRoute module="settings">
+                  <LeaveSettingsPage />
+                </ModuleRoute>
+              }
+            />
+            <Route
+              path="/dashboard/settings/billing"
+              element={
+                <ModuleRoute module="settings">
+                  <BillingPage />
+                </ModuleRoute>
+              }
+            />
+            <Route
+              path="/dashboard/settings/audit-log"
+              element={
+                <ModuleRoute module="settings">
+                  <AuditLogPage />
+                </ModuleRoute>
+              }
+            />
+          </Route>
+        </Route>
 
-      <Route path="/" element={<Navigate to="/dashboard" replace />} />
-      <Route path="*" element={<Navigate to="/dashboard" replace />} />
-    </Routes>
+        <Route path="/terms" element={<TermsOfUsePage />} />
+        <Route path="/privacy" element={<PrivacyPolicyPage />} />
+
+        <Route path="/" element={<Navigate to="/dashboard" replace />} />
+        <Route path="*" element={<Navigate to="/dashboard" replace />} />
+      </Routes>
     </>
   );
 };

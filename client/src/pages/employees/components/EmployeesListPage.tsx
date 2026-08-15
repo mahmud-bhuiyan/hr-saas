@@ -42,7 +42,11 @@ import { EmployeeImportModal } from "./EmployeeImportModal";
 import { EmployeesTable } from "./EmployeesTable";
 import { EmployeesTabs } from "./EmployeesTabs";
 import { ViewEmployeeModal } from "./ViewEmployeeModal";
-import { employeeName, isActiveEmployee } from "../utils";
+import {
+  employeeName,
+  EMPLOYEE_REQUIRED_FIELD_KEYS,
+  isActiveEmployee,
+} from "../utils";
 
 const baseEditableKeys = [
   "firstName",
@@ -282,10 +286,10 @@ export const EmployeesListPage = ({ variant }: EmployeesListPageProps) => {
     },
   });
 
-  const createRequiredKeys = ["firstName", "lastName"] as const;
+  const createRequiredKeys = [...EMPLOYEE_REQUIRED_FIELD_KEYS];
   const canSubmitCreate = areRequiredFieldsFilled(
     createForm as unknown as Record<string, unknown>,
-    [...createRequiredKeys],
+    createRequiredKeys,
   );
 
   const managerOptions = useMemo(
@@ -302,6 +306,12 @@ export const EmployeesListPage = ({ variant }: EmployeesListPageProps) => {
       ),
     [managerOptions, editEmployee?.id],
   );
+
+  const hasEditRequiredFields =
+    editForm != null &&
+    areRequiredFieldsFilled(editForm as unknown as Record<string, unknown>, [
+      ...EMPLOYEE_REQUIRED_FIELD_KEYS,
+    ]);
 
   const hasEditChanges =
     editForm && editOriginalValues
@@ -423,7 +433,8 @@ export const EmployeesListPage = ({ variant }: EmployeesListPageProps) => {
       !editForm ||
       !editOriginalValues ||
       !editEmployeeId ||
-      !hasEditChanges
+      !hasEditChanges ||
+      !hasEditRequiredFields
     ) {
       return;
     }
@@ -473,11 +484,11 @@ export const EmployeesListPage = ({ variant }: EmployeesListPageProps) => {
     createMutation.mutate({
       firstName: createForm.firstName.trim(),
       lastName: createForm.lastName.trim(),
-      email: createForm.email?.trim() || undefined,
-      phone: createForm.phone?.trim() || undefined,
-      jobTitle: createForm.jobTitle?.trim() || undefined,
+      email: createForm.email.trim(),
+      phone: createForm.phone.trim(),
+      jobTitle: createForm.jobTitle.trim(),
       department: createForm.department?.trim() || undefined,
-      startDate: createForm.startDate || undefined,
+      startDate: createForm.startDate,
       managerId: createForm.managerId || undefined,
     });
   };
@@ -510,7 +521,7 @@ export const EmployeesListPage = ({ variant }: EmployeesListPageProps) => {
   const showSearchToolbar = hasEmployeeFilters || filteredEmployees.length > 0;
 
   return (
-    <PageContainer>
+    <PageContainer flushTop>
       <EmployeesTabs />
       <PageHeader
         label="People"
@@ -645,7 +656,7 @@ export const EmployeesListPage = ({ variant }: EmployeesListPageProps) => {
         showPayFields={Boolean(canEditPay)}
         loading={editLoading}
         loadingEmployee={editEmployeeQuery.isLoading}
-        submitDisabled={!hasEditChanges}
+        submitDisabled={!hasEditChanges || !hasEditRequiredFields}
       />
 
       <EmployeeImportModal

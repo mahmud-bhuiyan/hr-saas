@@ -1,12 +1,10 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { FormEvent, useState } from 'react';
-import { Navigate } from 'react-router-dom';
-import { HiPlus } from 'react-icons/hi2';
-import { Button } from '../../components/ui/Button';
-import { PageContainer } from '../../components/ui/PageContainer';
-import { PageHeader } from '../../components/layout/PageHeader';
-import { TabGroup } from '../../components/ui/TabGroup';
-import { useTabUrlState } from '../../hooks/useTabUrlState';
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { FormEvent, useState } from "react";
+import { Navigate, useLocation, useNavigate } from "react-router-dom";
+import { HiPlus } from "react-icons/hi2";
+import { Button } from "../../components/ui/Button";
+import { PageContainer } from "../../components/ui/PageContainer";
+import { PageHeader } from "../../components/layout/PageHeader";
 import {
   ApiError,
   approveRegistration,
@@ -17,82 +15,110 @@ import {
   rejectRegistration,
   updateCompany,
   updateCompanyModules,
-} from '../../lib/api';
-import { toast } from 'react-toastify';
-import { useAuth } from '../../contexts/AuthContext';
+} from "../../lib/api";
+import { toast } from "react-toastify";
+import { useAuth } from "../../contexts/AuthContext";
 import {
   ALL_TENANT_MODULE_IDS,
   resolveEnabledModules,
   type TenantModuleId,
-} from '../../types/modules';
-import type { CreateCompanyInput, RegistrationRequest, UpdateCompanyInput } from '../../types';
-import { areRequiredFieldsFilled, hasFormChanges, pickChangedFields } from '../../utils/form';
-import { isQueryInitialLoad } from '../../utils/query';
+} from "../../types/modules";
+import type {
+  CreateCompanyInput,
+  RegistrationRequest,
+  UpdateCompanyInput,
+} from "../../types";
+import {
+  areRequiredFieldsFilled,
+  hasFormChanges,
+  pickChangedFields,
+} from "../../utils/form";
+import { isQueryInitialLoad } from "../../utils/query";
+import { CompaniesTabs } from "./components/CompaniesTabs";
 import {
   ApproveRegistrationModal,
   CompanyDetailsModal,
   CreateCompanyModal,
   EditCompanyModal,
   RejectRegistrationModal,
-} from './components/RegistrationsModals';
-import { ManageCompanyModulesModal } from './components/ManageCompanyModulesModal';
+} from "./components/RegistrationsModals";
+import { ManageCompanyModulesModal } from "./components/ManageCompanyModulesModal";
+import { PendingRegistrationsTable } from "./components/PendingRegistrationsTable";
+import { RegisteredCompaniesTable } from "./components/RegisteredCompaniesTable";
 import {
-  PendingRegistrationsTable,
-  RegisteredCompaniesTable,
-} from './components/RegistrationsTables';
-import {
-  COMPANIES_TAB_IDS,
-  type CompaniesTab,
+  type CompaniesListVariant,
   type EditCompanyForm,
   editFormKeys,
   emptyCreateForm,
+  PENDING_COMPANIES_PATH,
+  REGISTERED_COMPANIES_PATH,
   toEditForm,
-} from './utils';
+} from "./utils";
+
+const companiesListVariant = (pathname: string): CompaniesListVariant => {
+  return pathname.startsWith(PENDING_COMPANIES_PATH) ? "pending" : "registered";
+};
 
 export const RegistrationsPage = () => {
+  const { pathname } = useLocation();
+  const variant = companiesListVariant(pathname);
+  const isRegisteredList = variant === "registered";
+
   const { user } = useAuth();
   const queryClient = useQueryClient();
-  const { activeTab, setActiveTab } = useTabUrlState(COMPANIES_TAB_IDS, {
-    defaultTab: 'registered',
-  });
+  const navigate = useNavigate();
   const [createOpen, setCreateOpen] = useState(false);
-  const [createForm, setCreateForm] = useState<CreateCompanyInput>(emptyCreateForm);
-  const [approveTarget, setApproveTarget] = useState<RegistrationRequest | null>(null);
-  const [rejectTarget, setRejectTarget] = useState<RegistrationRequest | null>(null);
-  const [rejectReason, setRejectReason] = useState('');
-  const [editTarget, setEditTarget] = useState<RegistrationRequest | null>(null);
+  const [createForm, setCreateForm] =
+    useState<CreateCompanyInput>(emptyCreateForm);
+  const [approveTarget, setApproveTarget] =
+    useState<RegistrationRequest | null>(null);
+  const [rejectTarget, setRejectTarget] = useState<RegistrationRequest | null>(
+    null,
+  );
+  const [rejectReason, setRejectReason] = useState("");
+  const [editTarget, setEditTarget] = useState<RegistrationRequest | null>(
+    null,
+  );
   const [editForm, setEditForm] = useState<EditCompanyForm | null>(null);
-  const [editOriginal, setEditOriginal] = useState<EditCompanyForm | null>(null);
-  const [detailsTarget, setDetailsTarget] = useState<RegistrationRequest | null>(null);
-  const [modulesTarget, setModulesTarget] = useState<RegistrationRequest | null>(null);
-  const [modulesSelection, setModulesSelection] = useState<TenantModuleId[]>([]);
+  const [editOriginal, setEditOriginal] = useState<EditCompanyForm | null>(
+    null,
+  );
+  const [detailsTarget, setDetailsTarget] =
+    useState<RegistrationRequest | null>(null);
+  const [modulesTarget, setModulesTarget] =
+    useState<RegistrationRequest | null>(null);
+  const [modulesSelection, setModulesSelection] = useState<TenantModuleId[]>(
+    [],
+  );
   const [modulesOriginal, setModulesOriginal] = useState<TenantModuleId[]>([]);
 
   const pendingQuery = useQuery({
-    queryKey: ['registrations', 'pending'],
+    queryKey: ["registrations", "pending"],
     queryFn: fetchPendingRegistrations,
-    enabled: user?.role === 'super_admin',
+    enabled: user?.role === "super_admin",
   });
 
   const approvedQuery = useQuery({
-    queryKey: ['registrations', 'approved'],
+    queryKey: ["registrations", "approved"],
     queryFn: fetchApprovedCompanies,
-    enabled: user?.role === 'super_admin',
+    enabled: user?.role === "super_admin",
   });
 
   const invalidateRegistrations = () => {
-    void queryClient.invalidateQueries({ queryKey: ['registrations'] });
-  }
+    void queryClient.invalidateQueries({ queryKey: ["registrations"] });
+  };
 
   const approveMutation = useMutation({
     mutationFn: approveRegistration,
     onSuccess: (company) => {
       setApproveTarget(null);
-      toast.success(`${company.companyName} was approved. The company admin can sign in.`);
+      toast.success(
+        `${company.companyName} was approved. The company admin can sign in.`,
+      );
       invalidateRegistrations();
     },
     onError: (err) => {
-      toast.error(err instanceof ApiError ? err.message : 'Approval failed');
+      toast.error(err instanceof ApiError ? err.message : "Approval failed");
       setApproveTarget(null);
     },
   });
@@ -103,13 +129,15 @@ export const RegistrationsPage = () => {
       setCreateOpen(false);
       setCreateForm(emptyCreateForm);
       toast.success(
-        `${company.companyName} was created. The company admin can sign in immediately.`
+        `${company.companyName} was created. The company admin can sign in immediately.`,
       );
-      setActiveTab('registered');
+      navigate(REGISTERED_COMPANIES_PATH);
       invalidateRegistrations();
     },
     onError: (err) => {
-      toast.error(err instanceof ApiError ? err.message : 'Failed to create company');
+      toast.error(
+        err instanceof ApiError ? err.message : "Failed to create company",
+      );
     },
   });
 
@@ -118,18 +146,23 @@ export const RegistrationsPage = () => {
       rejectRegistration(tenantId, reason),
     onSuccess: () => {
       setRejectTarget(null);
-      setRejectReason('');
-      toast.success('Registration rejected.');
+      setRejectReason("");
+      toast.success("Registration rejected.");
       invalidateRegistrations();
     },
     onError: (err) => {
-      toast.error(err instanceof ApiError ? err.message : 'Rejection failed');
+      toast.error(err instanceof ApiError ? err.message : "Rejection failed");
     },
   });
 
   const updateMutation = useMutation({
-    mutationFn: ({ tenantId, input }: { tenantId: string; input: UpdateCompanyInput }) =>
-      updateCompany(tenantId, input),
+    mutationFn: ({
+      tenantId,
+      input,
+    }: {
+      tenantId: string;
+      input: UpdateCompanyInput;
+    }) => updateCompany(tenantId, input),
     onSuccess: (company) => {
       setEditTarget(null);
       setEditForm(null);
@@ -138,7 +171,7 @@ export const RegistrationsPage = () => {
       invalidateRegistrations();
     },
     onError: (err) => {
-      toast.error(err instanceof ApiError ? err.message : 'Update failed');
+      toast.error(err instanceof ApiError ? err.message : "Update failed");
     },
   });
 
@@ -155,17 +188,19 @@ export const RegistrationsPage = () => {
       setModulesSelection([]);
       setModulesOriginal([]);
       invalidateRegistrations();
-      toast.success('Company modules updated.');
+      toast.success("Company modules updated.");
     },
     onError: (err) => {
-      toast.error(err instanceof ApiError ? err.message : 'Failed to update modules');
+      toast.error(
+        err instanceof ApiError ? err.message : "Failed to update modules",
+      );
     },
   });
 
-  const createRequiredKeys = ['companyName', 'email', 'password'] as const;
+  const createRequiredKeys = ["companyName", "email", "password"] as const;
   const canSubmitCreate = areRequiredFieldsFilled(
     createForm as unknown as Record<string, unknown>,
-    [...createRequiredKeys]
+    [...createRequiredKeys],
   );
 
   const canSubmitEdit =
@@ -176,10 +211,10 @@ export const RegistrationsPage = () => {
     hasFormChanges(
       editForm as unknown as Record<string, unknown>,
       editOriginal as unknown as Record<string, unknown>,
-      editFormKeys
+      editFormKeys,
     );
 
-  if (user?.role !== 'super_admin') {
+  if (user?.role !== "super_admin") {
     return <Navigate to="/dashboard" replace />;
   }
 
@@ -189,13 +224,13 @@ export const RegistrationsPage = () => {
   const openCreateModal = () => {
     setCreateForm(emptyCreateForm);
     setCreateOpen(true);
-  }
+  };
 
   const closeCreateModal = () => {
     if (!createMutation.isPending) {
       setCreateOpen(false);
     }
-  }
+  };
 
   const handleCreateSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -210,19 +245,19 @@ export const RegistrationsPage = () => {
       firstName: createForm.firstName?.trim() || undefined,
       lastName: createForm.lastName?.trim() || undefined,
     });
-  }
+  };
 
   const openRejectModal = (item: RegistrationRequest) => {
     setRejectTarget(item);
-    setRejectReason('');
-  }
+    setRejectReason("");
+  };
 
   const closeRejectModal = () => {
     if (!rejectMutation.isPending) {
       setRejectTarget(null);
-      setRejectReason('');
+      setRejectReason("");
     }
-  }
+  };
 
   const handleRejectSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -233,14 +268,14 @@ export const RegistrationsPage = () => {
       tenantId: rejectTarget.tenantId,
       reason: rejectReason || undefined,
     });
-  }
+  };
 
   const openEditModal = (item: RegistrationRequest) => {
     const form = toEditForm(item);
     setEditTarget(item);
     setEditForm(form);
     setEditOriginal(form);
-  }
+  };
 
   const closeEditModal = () => {
     if (!updateMutation.isPending) {
@@ -248,7 +283,7 @@ export const RegistrationsPage = () => {
       setEditForm(null);
       setEditOriginal(null);
     }
-  }
+  };
 
   const handleEditSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -267,11 +302,11 @@ export const RegistrationsPage = () => {
     const changes = pickChangedFields(
       trimmed as unknown as Record<string, unknown>,
       editOriginal as unknown as Record<string, unknown>,
-      editFormKeys
+      editFormKeys,
     ) as UpdateCompanyInput;
 
     updateMutation.mutate({ tenantId: editTarget.tenantId, input: changes });
-  }
+  };
 
   const openModulesModal = async (item: RegistrationRequest) => {
     setModulesTarget(item);
@@ -287,7 +322,7 @@ export const RegistrationsPage = () => {
         toast.error(error.message);
       }
     }
-  }
+  };
 
   const closeModulesModal = () => {
     if (!updateModulesMutation.isPending) {
@@ -295,15 +330,15 @@ export const RegistrationsPage = () => {
       setModulesSelection([]);
       setModulesOriginal([]);
     }
-  }
+  };
 
   const toggleModuleSelection = (moduleId: TenantModuleId) => {
     setModulesSelection((current) =>
       current.includes(moduleId)
         ? current.filter((id) => id !== moduleId)
-        : [...current, moduleId]
+        : [...current, moduleId],
     );
-  }
+  };
 
   const handleModulesSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -315,7 +350,7 @@ export const RegistrationsPage = () => {
       tenantId: modulesTarget.tenantId,
       enabledModules: modulesSelection,
     });
-  }
+  };
 
   const modulesChanged =
     JSON.stringify([...modulesSelection].sort()) !==
@@ -325,64 +360,53 @@ export const RegistrationsPage = () => {
     updateMutation.isPending || updateModulesMutation.isPending;
 
   return (
-    <PageContainer>
+    <PageContainer flushTop>
+      <CompaniesTabs />
       <PageHeader
         label="Super admin"
-        title="Companies"
-        description="Add a company directly or review self-registration requests before they can sign in."
+        title={isRegisteredList ? "Registered companies" : "Pending sign-ups"}
+        description={
+          isRegisteredList
+            ? "Browse and manage companies that are approved and can sign in."
+            : "Review self-registration requests before companies can sign in."
+        }
         actionAlign="end"
         action={
-          <Button
-            icon={<HiPlus className="h-4 w-4 text-white" />}
-            onClick={openCreateModal}
-          >
-            Add company
-          </Button>
+          isRegisteredList ? (
+            <Button
+              icon={<HiPlus className="h-4 w-4 text-white" />}
+              onClick={openCreateModal}
+            >
+              Add company
+            </Button>
+          ) : undefined
         }
       />
 
-      <TabGroup<CompaniesTab>
-        activeId={activeTab}
-        onChange={setActiveTab}
-        className="space-y-4"
-        tabs={[
-          {
-            id: 'registered',
-            label: 'Registered companies',
-            count: registered.length,
-            content: (
-              <RegisteredCompaniesTable
-                registered={registered}
-                loading={isQueryInitialLoad(approvedQuery)}
-                isError={approvedQuery.isError}
-                onViewDetails={setDetailsTarget}
-                onEdit={openEditModal}
-                onManageModules={(row) => {
-                  void openModulesModal(row);
-                }}
-                companyActionPending={companyActionPending}
-              />
-            ),
-          },
-          {
-            id: 'pending',
-            label: 'Pending registrations',
-            count: pending.length,
-            content: (
-              <PendingRegistrationsTable
-                pending={pending}
-                loading={isQueryInitialLoad(pendingQuery)}
-                isError={pendingQuery.isError}
-                onViewDetails={setDetailsTarget}
-                onApprove={(row) => setApproveTarget(row)}
-                onReject={openRejectModal}
-                approvePending={approveMutation.isPending}
-                rejectPending={rejectMutation.isPending}
-              />
-            ),
-          },
-        ]}
-      />
+      {isRegisteredList ? (
+        <RegisteredCompaniesTable
+          registered={registered}
+          loading={isQueryInitialLoad(approvedQuery)}
+          isError={approvedQuery.isError}
+          onViewDetails={setDetailsTarget}
+          onEdit={openEditModal}
+          onManageModules={(row) => {
+            void openModulesModal(row);
+          }}
+          companyActionPending={companyActionPending}
+        />
+      ) : (
+        <PendingRegistrationsTable
+          pending={pending}
+          loading={isQueryInitialLoad(pendingQuery)}
+          isError={pendingQuery.isError}
+          onViewDetails={setDetailsTarget}
+          onApprove={(row) => setApproveTarget(row)}
+          onReject={openRejectModal}
+          approvePending={approveMutation.isPending}
+          rejectPending={rejectMutation.isPending}
+        />
+      )}
 
       <CreateCompanyModal
         open={createOpen}
@@ -418,7 +442,10 @@ export const RegistrationsPage = () => {
         loading={rejectMutation.isPending}
       />
 
-      <CompanyDetailsModal target={detailsTarget} onClose={() => setDetailsTarget(null)} />
+      <CompanyDetailsModal
+        target={detailsTarget}
+        onClose={() => setDetailsTarget(null)}
+      />
 
       <EditCompanyModal
         target={editTarget}
@@ -434,7 +461,7 @@ export const RegistrationsPage = () => {
         open={!!modulesTarget}
         onClose={closeModulesModal}
         onSubmit={handleModulesSubmit}
-        companyName={modulesTarget?.companyName ?? ''}
+        companyName={modulesTarget?.companyName ?? ""}
         selectedModules={modulesSelection}
         onToggleModule={toggleModuleSelection}
         onSelectAll={() => setModulesSelection([...ALL_TENANT_MODULE_IDS])}
@@ -444,4 +471,8 @@ export const RegistrationsPage = () => {
       />
     </PageContainer>
   );
-}
+};
+
+export const RegistrationsIndexRedirect = () => {
+  return <Navigate to="registered" replace />;
+};

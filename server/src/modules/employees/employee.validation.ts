@@ -1,19 +1,26 @@
-import { z } from 'zod';
+import { z } from "zod";
 
-const employeeStatusSchema = z.enum(['active', 'on_leave', 'terminated']);
-const payRateTypeSchema = z.enum(['hourly', 'salary']);
+const employeeStatusSchema = z.enum(["active", "on_leave", "terminated"]);
+const payRateTypeSchema = z.enum(["hourly", "salary"]);
 
 export const createEmployeeSchema = z.object({
-  firstName: z.string().trim().min(1, 'First name is required').max(100),
-  lastName: z.string().trim().min(1, 'Last name is required').max(100),
-  email: z.string().email('Invalid email').transform((v) => v.toLowerCase().trim()).optional(),
-  phone: z.string().trim().max(30).optional(),
-  jobTitle: z.string().trim().max(100).optional(),
+  firstName: z.string().trim().min(1, "First name is required").max(100),
+  lastName: z.string().trim().min(1, "Last name is required").max(100),
+  email: z
+    .string()
+    .trim()
+    .min(1, "Email is required")
+    .email("Invalid email")
+    .transform((v) => v.toLowerCase().trim()),
+  phone: z.string().trim().min(1, "Phone is required").max(16),
+  jobTitle: z.string().trim().min(1, "Job title is required").max(100),
   department: z.string().trim().max(100).optional(),
   startDate: z
     .string()
-    .regex(/^\d{4}-\d{2}-\d{2}$/, 'Start date must be YYYY-MM-DD')
-    .optional(),
+    .regex(
+      /^\d{4}-\d{2}-\d{2}$/,
+      "Start date is required and must be YYYY-MM-DD",
+    ),
   managerId: z.string().min(1).optional(),
   employeeNumber: z.string().trim().max(50).optional(),
   status: employeeStatusSchema.optional(),
@@ -25,39 +32,44 @@ export const updateEmployeeSchema = z
     lastName: z.string().trim().min(1).max(100).optional(),
     email: z
       .string()
-      .email('Invalid email')
+      .trim()
+      .min(1, "Email is required")
+      .email("Invalid email")
       .transform((v) => v.toLowerCase().trim())
-      .optional()
-      .or(z.literal('')),
-    phone: z.string().trim().max(30).optional().or(z.literal('')),
-    jobTitle: z.string().trim().max(100).optional().or(z.literal('')),
-    department: z.string().trim().max(100).optional().or(z.literal('')),
+      .optional(),
+    phone: z.string().trim().min(1, "Phone is required").max(16).optional(),
+    jobTitle: z
+      .string()
+      .trim()
+      .min(1, "Job title is required")
+      .max(100)
+      .optional(),
+    department: z.string().trim().max(100).optional().or(z.literal("")),
     startDate: z
       .string()
-      .regex(/^\d{4}-\d{2}-\d{2}$/, 'Start date must be YYYY-MM-DD')
-      .optional()
-      .or(z.literal('')),
+      .regex(/^\d{4}-\d{2}-\d{2}$/, "Start date must be YYYY-MM-DD")
+      .optional(),
     managerId: z.string().min(1).optional().nullable(),
     status: employeeStatusSchema.optional(),
     payRate: z.number().min(0).optional().nullable(),
     payRateType: payRateTypeSchema.optional().nullable(),
-    payCurrency: z.string().trim().length(3).optional().or(z.literal('')),
+    payCurrency: z.string().trim().length(3).optional().or(z.literal("")),
     fteFactor: z.number().min(0).max(1).optional(),
     defaultLocationId: z.string().min(1).optional().nullable(),
   })
   .refine((data) => Object.keys(data).length > 0, {
-    message: 'At least one field is required',
+    message: "At least one field is required",
   });
 
 const employeeSortFieldSchema = z.enum([
-  'name',
-  'employeeNumber',
-  'jobTitle',
-  'department',
-  'manager',
+  "name",
+  "employeeNumber",
+  "jobTitle",
+  "department",
+  "manager",
 ]);
 
-const sortOrderSchema = z.enum(['asc', 'desc']);
+const sortOrderSchema = z.enum(["asc", "desc"]);
 
 export const listEmployeesQuerySchema = z.object({
   search: z.string().trim().optional(),
@@ -68,7 +80,10 @@ export const listEmployeesQuerySchema = z.object({
 });
 
 export const inviteEmployeeSchema = z.object({
-  role: z.enum(['employee', 'manager', 'hr_manager']).optional().default('employee'),
+  role: z
+    .enum(["employee", "manager", "hr_manager"])
+    .optional()
+    .default("employee"),
 });
 
 export type CreateEmployeeInput = z.infer<typeof createEmployeeSchema>;
@@ -77,28 +92,38 @@ export type ListEmployeesQuery = z.infer<typeof listEmployeesQuerySchema>;
 export type InviteEmployeeInput = z.infer<typeof inviteEmployeeSchema>;
 
 export const employeeImportCsvSchema = z.object({
-  csv: z.string().trim().min(1, 'CSV content is required'),
+  csv: z.string().trim().min(1, "CSV content is required"),
 });
 
 const employeeImportRowSchema = z.object({
   firstName: z.string().trim().min(1).max(100),
   lastName: z.string().trim().min(1).max(100),
-  email: z.string().email().transform((value) => value.toLowerCase().trim()),
+  email: z
+    .string()
+    .email()
+    .transform((value) => value.toLowerCase().trim()),
   jobTitle: z.string().trim().min(1).max(100),
   department: z.string().trim().min(1).max(100),
-  startDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Start date must be YYYY-MM-DD'),
+  startDate: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/, "Start date must be YYYY-MM-DD"),
   managerEmail: z
     .string()
     .email()
     .transform((value) => value.toLowerCase().trim())
     .optional(),
-  phone: z.string().trim().max(30).optional(),
+  phone: z.string().trim().max(16).optional(),
 });
 
 export const employeeImportCommitSchema = z.object({
-  rows: z.array(employeeImportRowSchema).min(1, 'At least one row is required').max(500),
+  rows: z
+    .array(employeeImportRowSchema)
+    .min(1, "At least one row is required")
+    .max(500),
 });
 
 export type EmployeeImportCsvInput = z.infer<typeof employeeImportCsvSchema>;
 export type EmployeeImportRowInput = z.infer<typeof employeeImportRowSchema>;
-export type EmployeeImportCommitInput = z.infer<typeof employeeImportCommitSchema>;
+export type EmployeeImportCommitInput = z.infer<
+  typeof employeeImportCommitSchema
+>;

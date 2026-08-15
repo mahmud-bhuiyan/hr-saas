@@ -1,14 +1,15 @@
-import mongoose from 'mongoose';
-import { Tenant } from '../auth/tenant.model.js';
-import type { PatchCompanyProfileInput } from './company.validation.js';
+import mongoose from "mongoose";
+import { Tenant } from "../auth/tenant.model.js";
+import { assertActiveDialCodeExists } from "./country-dial-code.service.js";
+import type { PatchCompanyProfileInput } from "./company.validation.js";
 
 export class CompanySettingsServiceError extends Error {
   constructor(
     message: string,
-    public statusCode: number
+    public statusCode: number,
   ) {
     super(message);
-    this.name = 'CompanySettingsServiceError';
+    this.name = "CompanySettingsServiceError";
   }
 }
 
@@ -16,11 +17,12 @@ export interface CompanyProfile {
   name: string;
   address: string | null;
   logoUrl: string | null;
+  defaultPhoneDialCode: string;
   updatedAt: string;
 }
 
 const normalizeUrl = (value: string | null | undefined): string | null => {
-  if (value === null || value === '' || value === undefined) {
+  if (value === null || value === "" || value === undefined) {
     return null;
   }
   return value;
@@ -30,18 +32,22 @@ const toCompanyProfile = (tenant: {
   name: string;
   address?: string;
   logoUrl?: string | null;
+  defaultPhoneDialCode?: string;
   updatedAt: Date;
 }): CompanyProfile => ({
   name: tenant.name,
   address: tenant.address?.trim() || null,
   logoUrl: tenant.logoUrl ?? null,
+  defaultPhoneDialCode: tenant.defaultPhoneDialCode ?? "1",
   updatedAt: tenant.updatedAt.toISOString(),
 });
 
-export const getCompanyProfile = async (tenantId: string): Promise<CompanyProfile> => {
+export const getCompanyProfile = async (
+  tenantId: string,
+): Promise<CompanyProfile> => {
   const tenant = await Tenant.findById(tenantId);
   if (!tenant) {
-    throw new CompanySettingsServiceError('Tenant not found', 404);
+    throw new CompanySettingsServiceError("Tenant not found", 404);
   }
   return toCompanyProfile(tenant);
 };
@@ -49,11 +55,11 @@ export const getCompanyProfile = async (tenantId: string): Promise<CompanyProfil
 export const patchCompanyProfile = async (
   tenantId: string,
   input: PatchCompanyProfileInput,
-  userId: string
+  userId: string,
 ): Promise<CompanyProfile> => {
   const tenant = await Tenant.findById(tenantId);
   if (!tenant) {
-    throw new CompanySettingsServiceError('Tenant not found', 404);
+    throw new CompanySettingsServiceError("Tenant not found", 404);
   }
 
   if (input.name !== undefined) {
@@ -64,6 +70,10 @@ export const patchCompanyProfile = async (
   }
   if (input.logoUrl !== undefined) {
     tenant.logoUrl = normalizeUrl(input.logoUrl);
+  }
+  if (input.defaultPhoneDialCode !== undefined) {
+    await assertActiveDialCodeExists(input.defaultPhoneDialCode);
+    tenant.defaultPhoneDialCode = input.defaultPhoneDialCode;
   }
 
   tenant.updatedBy = new mongoose.Types.ObjectId(userId);

@@ -1,24 +1,30 @@
-import { parse } from 'csv-parse/sync';
-import mongoose from 'mongoose';
-import { writeAuditLog, type AuditContext } from '../audit/audit.service.js';
-import { syncSeatCount } from '../billing/billing.service.js';
-import { assertActiveDepartmentName, DepartmentServiceError } from '../settings/department.service.js';
-import { Employee } from './employee.model.js';
-import { EmployeeServiceError } from './employee.service.js';
-import type { EmployeeImportRowInput } from './employee.validation.js';
+import { parse } from "csv-parse/sync";
+import mongoose from "mongoose";
+import { writeAuditLog, type AuditContext } from "../audit/audit.service.js";
+import { syncSeatCount } from "../billing/billing.service.js";
+import {
+  assertActiveDepartmentName,
+  DepartmentServiceError,
+} from "../settings/department.service.js";
+import { listCountryDialCodes } from "../settings/country-dial-code.service.js";
+import { Tenant } from "../auth/tenant.model.js";
+import { validatePhoneNationalLength } from "../../utils/phone.js";
+import { Employee } from "./employee.model.js";
+import { EmployeeServiceError } from "./employee.service.js";
+import type { EmployeeImportRowInput } from "./employee.validation.js";
 
 const MAX_IMPORT_ROWS = 500;
 
 const REQUIRED_COLUMNS = [
-  'firstName',
-  'lastName',
-  'email',
-  'jobTitle',
-  'department',
-  'startDate',
+  "firstName",
+  "lastName",
+  "email",
+  "jobTitle",
+  "department",
+  "startDate",
 ] as const;
 
-const OPTIONAL_COLUMNS = ['managerEmail', 'phone'] as const;
+const OPTIONAL_COLUMNS = ["managerEmail", "phone"] as const;
 
 const ALL_COLUMNS = [...REQUIRED_COLUMNS, ...OPTIONAL_COLUMNS];
 
@@ -51,16 +57,18 @@ export interface EmployeeImportCommitResult {
   errors: EmployeeImportError[];
 }
 
-const normalizeHeader = (header: string): string => header.trim().replace(/^\uFEFF/, '');
+const normalizeHeader = (header: string): string =>
+  header.trim().replace(/^\uFEFF/, "");
 
-const isValidEmail = (email: string): boolean => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+const isValidEmail = (email: string): boolean =>
+  /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
 const isValidStartDate = (value: string): boolean => {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) {
     return false;
   }
 
-  const [year, month, day] = value.split('-').map(Number);
+  const [year, month, day] = value.split("-").map(Number);
   const date = new Date(Date.UTC(year, month - 1, day));
   return (
     date.getUTCFullYear() === year &&
@@ -72,7 +80,7 @@ const isValidStartDate = (value: string): boolean => {
 const parseCsvRows = (csvContent: string): Record<string, string>[] => {
   const trimmed = csvContent.trim();
   if (!trimmed) {
-    throw new EmployeeServiceError('CSV file is empty', 400);
+    throw new EmployeeServiceError("CSV file is empty", 400);
   }
 
   let records: Record<string, string>[];
@@ -85,35 +93,40 @@ const parseCsvRows = (csvContent: string): Record<string, string>[] => {
       relax_column_count: true,
     }) as Record<string, string>[];
   } catch {
-    throw new EmployeeServiceError('Unable to parse CSV file', 400);
+    throw new EmployeeServiceError("Unable to parse CSV file", 400);
   }
 
   if (records.length === 0) {
-    throw new EmployeeServiceError('CSV file contains no data rows', 400);
+    throw new EmployeeServiceError("CSV file contains no data rows", 400);
   }
 
   if (records.length > MAX_IMPORT_ROWS) {
-    throw new EmployeeServiceError(`CSV exceeds maximum of ${MAX_IMPORT_ROWS} rows`, 400);
+    throw new EmployeeServiceError(
+      `CSV exceeds maximum of ${MAX_IMPORT_ROWS} rows`,
+      400,
+    );
   }
 
   const headers = Object.keys(records[0] ?? {});
-  const missingColumns = REQUIRED_COLUMNS.filter((column) => !headers.includes(column));
+  const missingColumns = REQUIRED_COLUMNS.filter(
+    (column) => !headers.includes(column),
+  );
 
   if (missingColumns.length > 0) {
     throw new EmployeeServiceError(
-      `Missing required columns: ${missingColumns.join(', ')}`,
-      400
+      `Missing required columns: ${missingColumns.join(", ")}`,
+      400,
     );
   }
 
   const unknownColumns = headers.filter(
-    (header) => !ALL_COLUMNS.includes(header as (typeof ALL_COLUMNS)[number])
+    (header) => !ALL_COLUMNS.includes(header as (typeof ALL_COLUMNS)[number]),
   );
 
   if (unknownColumns.length > 0) {
     throw new EmployeeServiceError(
-      `Unknown columns: ${unknownColumns.join(', ')}. Expected: ${ALL_COLUMNS.join(', ')}`,
-      400
+      `Unknown columns: ${unknownColumns.join(", ")}. Expected: ${ALL_COLUMNS.join(", ")}`,
+      400,
     );
   }
 
@@ -122,7 +135,7 @@ const parseCsvRows = (csvContent: string): Record<string, string>[] => {
 
 const validateDepartmentName = async (
   tenantId: string,
-  department: string
+  department: string,
 ): Promise<string | undefined> => {
   try {
     await assertActiveDepartmentName(tenantId, department);
@@ -137,19 +150,22 @@ const validateDepartmentName = async (
 
 export const validateEmployeeImport = async (
   tenantId: string,
-  csvContent: string
+  csvContent: string,
 ): Promise<EmployeeImportValidateResult> => {
   const records = parseCsvRows(csvContent);
   const tenantObjectId = new mongoose.Types.ObjectId(tenantId);
 
   const existingEmployees = await Employee.find({ tenantId: tenantObjectId })
-    .select('email')
+    .select("email")
     .lean();
   const existingEmails = new Set(
     existingEmployees
       .map((employee) => employee.email?.toLowerCase())
-      .filter((email): email is string => Boolean(email))
+      .filter((email): email is string => Boolean(email)),
   );
+  const countryDialCodes = await listCountryDialCodes(false);
+  const tenant = await Tenant.findById(tenantId).select("defaultPhoneDialCode");
+  const fallbackDialCode = tenant?.defaultPhoneDialCode ?? "1";
 
   const csvEmails = new Map<string, number>();
   const valid: EmployeeImportValidRow[] = [];
@@ -160,33 +176,49 @@ export const validateEmployeeImport = async (
     const record = records[index];
     const rowErrors: EmployeeImportError[] = [];
 
-    const firstName = record.firstName?.trim() ?? '';
-    const lastName = record.lastName?.trim() ?? '';
-    const email = record.email?.trim().toLowerCase() ?? '';
-    const jobTitle = record.jobTitle?.trim() ?? '';
-    const department = record.department?.trim() ?? '';
-    const startDate = record.startDate?.trim() ?? '';
+    const firstName = record.firstName?.trim() ?? "";
+    const lastName = record.lastName?.trim() ?? "";
+    const email = record.email?.trim().toLowerCase() ?? "";
+    const jobTitle = record.jobTitle?.trim() ?? "";
+    const department = record.department?.trim() ?? "";
+    const startDate = record.startDate?.trim() ?? "";
     const managerEmail = record.managerEmail?.trim().toLowerCase() || undefined;
     const phone = record.phone?.trim() || undefined;
 
     if (!firstName) {
-      rowErrors.push({ row: rowNumber, field: 'firstName', message: 'First name is required' });
+      rowErrors.push({
+        row: rowNumber,
+        field: "firstName",
+        message: "First name is required",
+      });
     }
 
     if (!lastName) {
-      rowErrors.push({ row: rowNumber, field: 'lastName', message: 'Last name is required' });
+      rowErrors.push({
+        row: rowNumber,
+        field: "lastName",
+        message: "Last name is required",
+      });
     }
 
     if (!email) {
-      rowErrors.push({ row: rowNumber, field: 'email', message: 'Email is required' });
+      rowErrors.push({
+        row: rowNumber,
+        field: "email",
+        message: "Email is required",
+      });
     } else if (!isValidEmail(email)) {
-      rowErrors.push({ row: rowNumber, field: 'email', message: 'Invalid email address' });
+      rowErrors.push({
+        row: rowNumber,
+        field: "email",
+        message: "Invalid email address",
+      });
     } else {
       if (existingEmails.has(email)) {
         rowErrors.push({
           row: rowNumber,
-          field: 'email',
-          message: 'Email already exists for an employee',
+          field: "email",
+          message: "Email already exists for an employee",
         });
       }
 
@@ -194,7 +226,7 @@ export const validateEmployeeImport = async (
       if (firstSeenRow !== undefined) {
         rowErrors.push({
           row: rowNumber,
-          field: 'email',
+          field: "email",
           message: `Duplicate email in CSV (also on row ${firstSeenRow})`,
         });
       } else {
@@ -203,40 +235,70 @@ export const validateEmployeeImport = async (
     }
 
     if (!jobTitle) {
-      rowErrors.push({ row: rowNumber, field: 'jobTitle', message: 'Job title is required' });
+      rowErrors.push({
+        row: rowNumber,
+        field: "jobTitle",
+        message: "Job title is required",
+      });
     }
 
     if (!department) {
-      rowErrors.push({ row: rowNumber, field: 'department', message: 'Department is required' });
+      rowErrors.push({
+        row: rowNumber,
+        field: "department",
+        message: "Department is required",
+      });
     } else {
-      const departmentError = await validateDepartmentName(tenantId, department);
+      const departmentError = await validateDepartmentName(
+        tenantId,
+        department,
+      );
       if (departmentError) {
-        rowErrors.push({ row: rowNumber, field: 'department', message: departmentError });
+        rowErrors.push({
+          row: rowNumber,
+          field: "department",
+          message: departmentError,
+        });
       }
     }
 
     if (!startDate) {
-      rowErrors.push({ row: rowNumber, field: 'startDate', message: 'Start date is required' });
+      rowErrors.push({
+        row: rowNumber,
+        field: "startDate",
+        message: "Start date is required",
+      });
     } else if (!isValidStartDate(startDate)) {
       rowErrors.push({
         row: rowNumber,
-        field: 'startDate',
-        message: 'Start date must be YYYY-MM-DD',
+        field: "startDate",
+        message: "Start date must be YYYY-MM-DD",
       });
     }
 
     if (managerEmail && !isValidEmail(managerEmail)) {
       rowErrors.push({
         row: rowNumber,
-        field: 'managerEmail',
-        message: 'Invalid manager email address',
+        field: "managerEmail",
+        message: "Invalid manager email address",
       });
     } else if (managerEmail && managerEmail === email) {
       rowErrors.push({
         row: rowNumber,
-        field: 'managerEmail',
-        message: 'Employee cannot be their own manager',
+        field: "managerEmail",
+        message: "Employee cannot be their own manager",
       });
+    }
+
+    if (phone) {
+      const phoneError = validatePhoneNationalLength(
+        phone,
+        countryDialCodes,
+        fallbackDialCode,
+      );
+      if (phoneError) {
+        rowErrors.push({ row: rowNumber, field: "phone", message: phoneError });
+      }
     }
 
     if (rowErrors.length > 0) {
@@ -259,20 +321,26 @@ export const validateEmployeeImport = async (
 
   if (valid.length > 0) {
     const managerEmails = [
-      ...new Set(valid.map((row) => row.managerEmail).filter((email): email is string => Boolean(email))),
+      ...new Set(
+        valid
+          .map((row) => row.managerEmail)
+          .filter((email): email is string => Boolean(email)),
+      ),
     ];
 
     if (managerEmails.length > 0) {
       const managersInDb = await Employee.find({
         tenantId: tenantObjectId,
         email: { $in: managerEmails },
-        status: { $ne: 'terminated' },
+        status: { $ne: "terminated" },
       })
-        .select('email')
+        .select("email")
         .lean();
 
       const managerEmailSet = new Set(
-        managersInDb.map((manager) => manager.email?.toLowerCase()).filter(Boolean)
+        managersInDb
+          .map((manager) => manager.email?.toLowerCase())
+          .filter(Boolean),
       );
       const csvEmailSet = new Set(valid.map((row) => row.email));
 
@@ -281,11 +349,15 @@ export const validateEmployeeImport = async (
           continue;
         }
 
-        if (!managerEmailSet.has(row.managerEmail) && !csvEmailSet.has(row.managerEmail)) {
+        if (
+          !managerEmailSet.has(row.managerEmail) &&
+          !csvEmailSet.has(row.managerEmail)
+        ) {
           errors.push({
             row: row.row,
-            field: 'managerEmail',
-            message: 'Manager email not found among employees or in this import',
+            field: "managerEmail",
+            message:
+              "Manager email not found among employees or in this import",
           });
         }
       }
@@ -294,8 +366,8 @@ export const validateEmployeeImport = async (
         (row) =>
           !row.managerEmail ||
           !errors.some(
-            (error) => error.row === row.row && error.field === 'managerEmail'
-          )
+            (error) => error.row === row.row && error.field === "managerEmail",
+          ),
       );
 
       return {
@@ -313,29 +385,35 @@ export const validateEmployeeImport = async (
   };
 };
 
-const generateEmployeeNumber = async (tenantId: string, offset: number): Promise<string> => {
+const generateEmployeeNumber = async (
+  tenantId: string,
+  offset: number,
+): Promise<string> => {
   const count = await Employee.countDocuments({
     tenantId: new mongoose.Types.ObjectId(tenantId),
   });
-  return `EMP-${String(count + 1 + offset).padStart(4, '0')}`;
+  return `EMP-${String(count + 1 + offset).padStart(4, "0")}`;
 };
 
 export const commitEmployeeImport = async (
   tenantId: string,
   rows: EmployeeImportRowInput[],
   createdByUserId: string,
-  audit?: AuditContext
+  audit?: AuditContext,
 ): Promise<EmployeeImportCommitResult> => {
   if (rows.length === 0) {
-    throw new EmployeeServiceError('No rows to import', 400);
+    throw new EmployeeServiceError("No rows to import", 400);
   }
 
   if (rows.length > MAX_IMPORT_ROWS) {
-    throw new EmployeeServiceError(`Import exceeds maximum of ${MAX_IMPORT_ROWS} rows`, 400);
+    throw new EmployeeServiceError(
+      `Import exceeds maximum of ${MAX_IMPORT_ROWS} rows`,
+      400,
+    );
   }
 
   const csvContent = [
-    [...REQUIRED_COLUMNS, ...OPTIONAL_COLUMNS].join(','),
+    [...REQUIRED_COLUMNS, ...OPTIONAL_COLUMNS].join(","),
     ...rows.map((row) =>
       [
         row.firstName,
@@ -344,13 +422,13 @@ export const commitEmployeeImport = async (
         row.jobTitle,
         row.department,
         row.startDate,
-        row.managerEmail ?? '',
-        row.phone ?? '',
+        row.managerEmail ?? "",
+        row.phone ?? "",
       ]
         .map((value) => `"${value.replace(/"/g, '""')}"`)
-        .join(',')
+        .join(","),
     ),
-  ].join('\n');
+  ].join("\n");
 
   const validation = await validateEmployeeImport(tenantId, csvContent);
 
@@ -362,7 +440,7 @@ export const commitEmployeeImport = async (
   }
 
   if (validation.valid.length !== rows.length) {
-    throw new EmployeeServiceError('Import rows failed validation', 400);
+    throw new EmployeeServiceError("Import rows failed validation", 400);
   }
 
   const tenantObjectId = new mongoose.Types.ObjectId(tenantId);
@@ -372,14 +450,17 @@ export const commitEmployeeImport = async (
 
   const existingManagers = await Employee.find({
     tenantId: tenantObjectId,
-    status: { $ne: 'terminated' },
+    status: { $ne: "terminated" },
   })
-    .select('_id email')
+    .select("_id email")
     .lean();
 
   for (const manager of existingManagers) {
     if (manager.email) {
-      emailToEmployeeId.set(manager.email.toLowerCase(), manager._id.toString());
+      emailToEmployeeId.set(
+        manager.email.toLowerCase(),
+        manager._id.toString(),
+      );
     }
   }
 
@@ -399,7 +480,7 @@ export const commitEmployeeImport = async (
       jobTitle: row.jobTitle,
       department: row.department,
       startDate: new Date(row.startDate),
-      status: 'active',
+      status: "active",
       createdBy: actorId,
       updatedBy: actorId,
     });
@@ -421,16 +502,19 @@ export const commitEmployeeImport = async (
     }
 
     await Employee.updateOne(
-      { _id: new mongoose.Types.ObjectId(employeeId), tenantId: tenantObjectId },
-      { managerId: new mongoose.Types.ObjectId(managerId), updatedBy: actorId }
+      {
+        _id: new mongoose.Types.ObjectId(employeeId),
+        tenantId: tenantObjectId,
+      },
+      { managerId: new mongoose.Types.ObjectId(managerId), updatedBy: actorId },
     );
   }
 
   void writeAuditLog({
     tenantId,
     userId: createdByUserId,
-    action: 'create',
-    entityType: 'Employee',
+    action: "create",
+    entityType: "Employee",
     entityId: batchId.toString(),
     after: {
       importBatch: true,

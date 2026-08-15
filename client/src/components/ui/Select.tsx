@@ -13,7 +13,8 @@ import {
   type ReactNode,
   type SelectHTMLAttributes,
 } from "react";
-import { HiChevronDown } from "react-icons/hi2";
+import { HiChevronDown, HiMagnifyingGlass } from "react-icons/hi2";
+import { Input } from "./Input";
 
 interface SelectOption {
   value: string;
@@ -23,13 +24,26 @@ interface SelectOption {
 
 interface SelectProps extends Omit<
   SelectHTMLAttributes<HTMLSelectElement>,
-  "onChange"
+  "onChange" | "size"
 > {
   error?: string;
   icon?: ReactNode;
   wrapperClassName?: string;
+  searchable?: boolean;
+  searchPlaceholder?: string;
+  size?: "default" | "sm";
   onChange?: (event: ChangeEvent<HTMLSelectElement>) => void;
 }
+
+const triggerSizeClasses = {
+  default: "px-3 py-2.5",
+  sm: "px-2.5 py-1.5 text-sm",
+} as const;
+
+const chevronSizeClasses = {
+  default: "h-4 w-4",
+  sm: "h-3.5 w-3.5",
+} as const;
 
 const parseOptions = (children: ReactNode): SelectOption[] => {
   const options: SelectOption[] = [];
@@ -70,6 +84,9 @@ export const Select = ({
   icon,
   children,
   wrapperClassName = "",
+  searchable = false,
+  searchPlaceholder = "Search…",
+  size = "default",
   value,
   defaultValue,
   disabled,
@@ -83,10 +100,24 @@ export const Select = ({
   const fieldId = id ?? generatedId;
   const containerRef = useRef<HTMLDivElement>(null);
   const listRef = useRef<HTMLUListElement>(null);
+  const searchInputRef = useRef<HTMLInputElement>(null);
   const [open, setOpen] = useState(false);
   const [activeIndex, setActiveIndex] = useState(-1);
+  const [searchQuery, setSearchQuery] = useState("");
 
   const options = useMemo(() => parseOptions(children), [children]);
+  const normalizedSearch = searchQuery.trim().toLowerCase();
+  const visibleOptions = useMemo(() => {
+    if (!searchable || !normalizedSearch) {
+      return options;
+    }
+
+    return options.filter(
+      (option) =>
+        option.label.toLowerCase().includes(normalizedSearch) ||
+        option.value.toLowerCase().includes(normalizedSearch),
+    );
+  }, [normalizedSearch, options, searchable]);
   const selectedValue =
     value !== undefined
       ? String(value)
@@ -105,6 +136,7 @@ export const Select = ({
   const closeMenu = () => {
     setOpen(false);
     setActiveIndex(-1);
+    setSearchQuery("");
   };
 
   const selectOption = (option: SelectOption) => {
@@ -116,7 +148,7 @@ export const Select = ({
     closeMenu();
   };
 
-  const enabledOptions = options.filter((option) => !option.disabled);
+  const enabledOptions = visibleOptions.filter((option) => !option.disabled);
 
   const moveActiveIndex = (direction: 1 | -1) => {
     if (enabledOptions.length === 0) {
@@ -168,6 +200,20 @@ export const Select = ({
       document.removeEventListener("keydown", handleEscape);
     };
   }, [open]);
+
+  useEffect(() => {
+    if (!open || !searchable) {
+      return;
+    }
+
+    const frame = window.requestAnimationFrame(() => {
+      searchInputRef.current?.focus();
+    });
+
+    return () => {
+      window.cancelAnimationFrame(frame);
+    };
+  }, [open, searchable]);
 
   useEffect(() => {
     if (!open || activeIndex < 0 || !listRef.current) {
@@ -248,7 +294,7 @@ export const Select = ({
             setOpen((prev) => !prev);
           }}
           onKeyDown={handleTriggerKeyDown}
-          className="flex w-full items-center gap-2 px-3 py-2.5 text-left disabled:cursor-not-allowed disabled:opacity-50"
+          className={`flex w-full items-center gap-2 text-left disabled:cursor-not-allowed disabled:opacity-50 ${triggerSizeClasses[size]}`}
         >
           {icon && (
             <span
@@ -262,54 +308,96 @@ export const Select = ({
             {selectedLabel}
           </span>
           <HiChevronDown
-            className={`h-4 w-4 shrink-0 text-slate-400 transition-transform ${open ? "rotate-180" : ""}`}
+            className={`${chevronSizeClasses[size]} shrink-0 text-slate-400 transition-transform ${open ? "rotate-180" : ""}`}
             aria-hidden
           />
         </button>
 
         {open && (
-          <ul
-            ref={listRef}
-            role="listbox"
-            aria-labelledby={fieldId}
-            tabIndex={-1}
-            onKeyDown={handleListKeyDown}
-            className="absolute inset-x-0 top-full z-50 mt-1 max-h-60 overflow-auto rounded-lg border border-slate-200 bg-white py-1 shadow-lg dark:border-slate-700 dark:bg-slate-900"
-          >
-            {options.map((option) => {
-              const enabledIndex = enabledOptions.findIndex(
-                (item) => item.value === option.value,
-              );
-              const isSelected = option.value === selectedValue;
-              const isActive = enabledIndex === activeIndex;
-
-              return (
-                <li key={option.value} role="presentation">
-                  <button
-                    type="button"
-                    role="option"
-                    aria-selected={isSelected}
-                    disabled={option.disabled}
-                    onMouseEnter={() => {
-                      if (enabledIndex >= 0) {
-                        setActiveIndex(enabledIndex);
-                      }
-                    }}
-                    onClick={() => selectOption(option)}
-                    className={`flex w-full items-center px-3 py-2.5 text-left text-sm transition disabled:cursor-not-allowed disabled:opacity-50 ${
-                      isSelected
-                        ? "bg-brand-600 text-white"
-                        : isActive
-                          ? "bg-brand-50 text-brand-700 dark:bg-brand-950/40 dark:text-brand-200"
-                          : "text-slate-700 hover:bg-slate-50 dark:text-slate-200 dark:hover:bg-slate-800"
-                    }`}
-                  >
-                    {option.label}
-                  </button>
+          <div className="absolute inset-x-0 top-full z-50 mt-1 overflow-hidden rounded-lg border border-slate-200 bg-white shadow-lg dark:border-slate-700 dark:bg-slate-900">
+            {searchable && (
+              <div className="border-b border-slate-100 p-2 dark:border-slate-800">
+                <Input
+                  ref={searchInputRef}
+                  value={searchQuery}
+                  onChange={(event) => {
+                    setSearchQuery(event.target.value);
+                    setActiveIndex(0);
+                  }}
+                  placeholder={searchPlaceholder}
+                  icon={
+                    <HiMagnifyingGlass className="h-4 w-4 text-brand-600" />
+                  }
+                  onKeyDown={(event) => {
+                    if (event.key === "ArrowDown") {
+                      event.preventDefault();
+                      moveActiveIndex(1);
+                    }
+                    if (event.key === "ArrowUp") {
+                      event.preventDefault();
+                      moveActiveIndex(-1);
+                    }
+                    if (event.key === "Enter" && enabledOptions[activeIndex]) {
+                      event.preventDefault();
+                      selectOption(enabledOptions[activeIndex]);
+                    }
+                    if (event.key === "Escape") {
+                      event.preventDefault();
+                      closeMenu();
+                    }
+                  }}
+                />
+              </div>
+            )}
+            <ul
+              ref={listRef}
+              role="listbox"
+              aria-labelledby={fieldId}
+              tabIndex={-1}
+              onKeyDown={handleListKeyDown}
+              className="max-h-60 overflow-auto py-1"
+            >
+              {visibleOptions.length === 0 ? (
+                <li className="px-3 py-2.5 text-sm text-slate-500 dark:text-slate-400">
+                  No matches found
                 </li>
-              );
-            })}
-          </ul>
+              ) : (
+                visibleOptions.map((option) => {
+                  const enabledIndex = enabledOptions.findIndex(
+                    (item) => item.value === option.value,
+                  );
+                  const isSelected = option.value === selectedValue;
+                  const isActive = enabledIndex === activeIndex;
+
+                  return (
+                    <li key={option.value} role="presentation">
+                      <button
+                        type="button"
+                        role="option"
+                        aria-selected={isSelected}
+                        disabled={option.disabled}
+                        onMouseEnter={() => {
+                          if (enabledIndex >= 0) {
+                            setActiveIndex(enabledIndex);
+                          }
+                        }}
+                        onClick={() => selectOption(option)}
+                        className={`flex w-full items-center px-3 py-2.5 text-left text-sm transition disabled:cursor-not-allowed disabled:opacity-50 ${
+                          isSelected
+                            ? "bg-brand-600 text-white"
+                            : isActive
+                              ? "bg-brand-50 text-brand-700 dark:bg-brand-950/40 dark:text-brand-200"
+                              : "text-slate-700 hover:bg-slate-50 dark:text-slate-200 dark:hover:bg-slate-800"
+                        }`}
+                      >
+                        {option.label}
+                      </button>
+                    </li>
+                  );
+                })
+              )}
+            </ul>
+          </div>
         )}
       </div>
       {error && <p className="mt-1 text-sm text-red-600">{error}</p>}
