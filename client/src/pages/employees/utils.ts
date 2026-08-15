@@ -26,6 +26,9 @@ export const employeeEditPath = (
 export const isActiveEmployee = (employee: Employee): boolean =>
   employee.status !== "terminated";
 
+export const isCompanyAdminEmployee = (employee: Employee): boolean =>
+  Boolean(employee.isCompanyAdminAccount);
+
 export const personName = (person: {
   firstName: string;
   lastName: string;

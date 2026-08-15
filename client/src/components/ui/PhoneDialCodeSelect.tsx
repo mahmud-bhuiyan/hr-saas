@@ -206,7 +206,7 @@ export const PhoneDialCodeSelect = ({
           }
         }}
         onKeyDown={handleTriggerKeyDown}
-        className="flex min-w-[4.25rem] items-center gap-0.5 border-0 bg-transparent py-0 pl-0 pr-1 text-sm font-medium text-slate-700 focus:outline-none focus:ring-0 disabled:cursor-not-allowed disabled:opacity-50 dark:text-slate-200"
+        className="flex shrink-0 items-center gap-0.5 border-0 bg-transparent py-0 pl-0 pr-0.5 text-sm font-medium text-slate-700 focus:outline-none focus:ring-0 disabled:cursor-not-allowed disabled:opacity-50 dark:text-slate-200"
       >
         <span>+{value}</span>
         <HiChevronDown

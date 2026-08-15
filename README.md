@@ -100,11 +100,11 @@ npm run seed:superadmin   # once — platform super admin (superadmin@hr.com / U
 
 Demo/staging company data is created manually via the app or super-admin registration flows.
 
-For **local API testing**, seed Acme Ltd plus sample employees (all passwords `User@123`):
+For **local API testing**, seed Marvel Construct plus 10 sample employees (all passwords `User@123`):
 
 ```bash
 cd server
-npm run seed:test-data   # superadmin@hr.com, admin@acme.com, alex.morgan@acme.com, …
+npm run seed:test-data   # superadmin@hr.com, info@marvelconstruct.co.uk, employee@one.com, …
 ```
 
 Use **Auth → Login (Employee)** in [docs/postman/hr-saas.postman_collection.json](./docs/postman/hr-saas.postman_collection.json) with `employeeEmail` + `testPassword`.

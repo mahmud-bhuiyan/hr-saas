@@ -54,6 +54,7 @@ interface EmployeeEditFieldsProps {
   managerOptions: Employee[];
   departmentOptions: string[];
   idPrefix?: string;
+  protectStatusChange?: boolean;
 }
 
 export const EmployeeEditFields = ({
@@ -62,7 +63,12 @@ export const EmployeeEditFields = ({
   managerOptions,
   departmentOptions,
   idPrefix = "",
+  protectStatusChange = false,
 }: EmployeeEditFieldsProps) => {
+  const statusOptions = protectStatusChange
+    ? STATUS_OPTIONS.filter((option) => option.value !== "terminated")
+    : STATUS_OPTIONS;
+
   return (
     <>
       <div className="grid gap-4 sm:grid-cols-2">
@@ -173,7 +179,7 @@ export const EmployeeEditFields = ({
             }
             icon={<HiSignal className="h-4 w-4 text-brand-600" />}
           >
-            {STATUS_OPTIONS.map((option) => (
+            {statusOptions.map((option) => (
               <option key={option.value} value={option.value}>
                 {option.label}
               </option>

@@ -185,6 +185,8 @@ export interface Employee {
   updatedByName?: string;
   createdAt: string;
   updatedAt: string;
+  /** True when this record is linked to the tenant company admin login. */
+  isCompanyAdminAccount?: boolean;
 }
 
 export interface MyEmployeeProfile {

@@ -68,6 +68,8 @@ export interface EmployeePublic {
   updatedByName?: string;
   createdAt: string;
   updatedAt: string;
+  /** True when this record is linked to the tenant's company_admin login. */
+  isCompanyAdminAccount?: boolean;
 }
 
 export interface MyEmployeeProfile {
@@ -145,11 +147,18 @@ const loadAuditUsers = async (
 const canViewPayFields = (role: UserRole): boolean =>
   hasPermission(role, "payroll:read");
 
+const COMPANY_ADMIN_EMAIL_CONFLICT_MESSAGE =
+  "This email belongs to the company administrator and cannot be used for an employee record.";
+
+const COMPANY_ADMIN_DEACTIVATE_MESSAGE =
+  "Company admin accounts cannot be deactivated from the employee list.";
+
 const toEmployeePublic = (
   employee: IEmployeeDocument,
   manager?: EmployeeManagerSummary | null,
   auditUsers?: Map<string, AuditUserSummary>,
   includePayFields = false,
+  isCompanyAdminAccount = false,
 ): EmployeePublic => {
   const createdBy = employee.createdBy
     ? auditUsers?.get(employee.createdBy.toString())
@@ -185,6 +194,7 @@ const toEmployeePublic = (
     updatedByName: auditUserDisplayName(updatedBy),
     createdAt: employee.createdAt.toISOString(),
     updatedAt: employee.updatedAt.toISOString(),
+    isCompanyAdminAccount: isCompanyAdminAccount || undefined,
   };
 };
 
@@ -204,6 +214,104 @@ const findEmployeeRecordForUser = async (
     tenantId: new mongoose.Types.ObjectId(tenantId),
     userId: new mongoose.Types.ObjectId(userId),
   });
+};
+
+/** Employee IDs whose linked login (or email) belongs to a company_admin user. */
+const loadCompanyAdminEmployeeIdSet = async (
+  tenantId: string,
+  employees: IEmployeeDocument[],
+): Promise<Set<string>> => {
+  if (employees.length === 0) {
+    return new Set();
+  }
+
+  const tenantObjectId = new mongoose.Types.ObjectId(tenantId);
+  const userIds = [
+    ...new Set(
+      employees
+        .map((employee) => employee.userId?.toString())
+        .filter((id): id is string => Boolean(id)),
+    ),
+  ];
+  const emails = [
+    ...new Set(
+      employees
+        .map((employee) => employee.email?.toLowerCase().trim())
+        .filter((email): email is string => Boolean(email)),
+    ),
+  ];
+
+  const orFilters: Record<string, unknown>[] = [];
+  if (userIds.length > 0) {
+    orFilters.push({
+      _id: { $in: userIds.map((id) => new mongoose.Types.ObjectId(id)) },
+    });
+  }
+  if (emails.length > 0) {
+    orFilters.push({ email: { $in: emails } });
+  }
+
+  if (orFilters.length === 0) {
+    return new Set();
+  }
+
+  const users = await User.find({
+    tenantId: tenantObjectId,
+    role: "company_admin",
+    $or: orFilters,
+  })
+    .select("email")
+    .lean();
+
+  if (users.length === 0) {
+    return new Set();
+  }
+
+  const adminUserIds = new Set(users.map((user) => user._id.toString()));
+  const adminEmails = new Set(
+    users.map((user) => user.email.toLowerCase().trim()),
+  );
+  const protectedIds = new Set<string>();
+
+  for (const employee of employees) {
+    const linkedUserId = employee.userId?.toString();
+    const email = employee.email?.toLowerCase().trim();
+
+    if (
+      (linkedUserId && adminUserIds.has(linkedUserId)) ||
+      (email && adminEmails.has(email))
+    ) {
+      protectedIds.add(employee._id.toString());
+    }
+  }
+
+  return protectedIds;
+};
+
+const isCompanyAdminEmployeeRecord = async (
+  tenantId: string,
+  employee: IEmployeeDocument,
+): Promise<boolean> => {
+  const protectedIds = await loadCompanyAdminEmployeeIdSet(tenantId, [
+    employee,
+  ]);
+  return protectedIds.has(employee._id.toString());
+};
+
+export const assertEmployeeEmailNotCompanyAdmin = async (
+  tenantId: string,
+  email: string,
+): Promise<void> => {
+  const normalizedEmail = email.toLowerCase().trim();
+  const companyAdmin = await User.findOne({
+    tenantId: new mongoose.Types.ObjectId(tenantId),
+    email: normalizedEmail,
+    role: "company_admin",
+  }).select("_id");
+
+  if (companyAdmin) {
+    throw new EmployeeServiceError(COMPANY_ADMIN_EMAIL_CONFLICT_MESSAGE, 409);
+  }
 };
 
 export interface EnsureEmployeeForUserInput {
@@ -250,6 +358,15 @@ export const ensureEmployeeRecordForUser = async (
 ): Promise<IEmployeeDocument> => {
   const tenantObjectId = new mongoose.Types.ObjectId(tenantId);
   const userObjectId = new mongoose.Types.ObjectId(user.userId);
+
+  const loginUser = await User.findOne({
+    _id: userObjectId,
+    tenantId: tenantObjectId,
+  }).select("role");
+
+  if (loginUser?.role === "company_admin") {
+    throw new EmployeeServiceError(COMPANY_ADMIN_EMAIL_CONFLICT_MESSAGE, 409);
+  }
 
   const linked = await Employee.findOne({
     tenantId: tenantObjectId,
@@ -341,11 +458,17 @@ const loadManagerSummaries = async (
 };
 
 const toPublicList = async (
+  tenantId: string,
   employees: IEmployeeDocument[],
   includePayFields = false,
 ): Promise<EmployeePublic[]> => {
   const managerMap = await loadManagerSummaries(employees);
   const auditUsers = await loadAuditUsers(employees);
+  const companyAdminIds = await loadCompanyAdminEmployeeIdSet(
+    tenantId,
+    employees,
+  );
+
   return employees.map((employee) =>
     toEmployeePublic(
       employee,
@@ -354,6 +477,7 @@ const toPublicList = async (
         : undefined,
       auditUsers,
       includePayFields,
+      companyAdminIds.has(employee._id.toString()),
     ),
   );
 };
@@ -568,8 +692,17 @@ export const listEmployees = async (
       : buildMongoSort(sortBy, sortOrder),
   );
 
-  const publicEmployees = await toPublicList(
+  const companyAdminIds = await loadCompanyAdminEmployeeIdSet(
+    tenantId,
     employees,
+  );
+  const visibleEmployees = employees.filter(
+    (employee) => !companyAdminIds.has(employee._id.toString()),
+  );
+
+  const publicEmployees = await toPublicList(
+    tenantId,
+    visibleEmployees,
     canViewPayFields(access.role),
   );
 
@@ -676,11 +809,17 @@ export const getEmployeeById = async (
     }
   }
 
+  const isCompanyAdminAccount = await isCompanyAdminEmployeeRecord(
+    tenantId,
+    employee,
+  );
+
   return toEmployeePublic(
     employee,
     manager,
     await loadAuditUsers([employee]),
     canViewPayFields(access.role),
+    isCompanyAdminAccount,
   );
 };
 
@@ -705,7 +844,7 @@ export const listDirectReports = async (
     managerId: employee._id,
   }).sort({ lastName: 1, firstName: 1 });
 
-  return toPublicList(reports, canViewPayFields(access.role));
+  return toPublicList(tenantId, reports, canViewPayFields(access.role));
 };
 
 const assertEmployeePhone = async (
@@ -744,6 +883,8 @@ export const createEmployee = async (
   }
 
   if (input.email) {
+    await assertEmployeeEmailNotCompanyAdmin(tenantId, input.email);
+
     const existingEmail = await Employee.findOne({
       tenantId: new mongoose.Types.ObjectId(tenantId),
       email: input.email,
@@ -835,6 +976,8 @@ export const updateEmployee = async (
   if (input.email !== undefined) {
     const email = input.email || undefined;
     if (email) {
+      await assertEmployeeEmailNotCompanyAdmin(tenantId, email);
+
       const existingEmail = await Employee.findOne({
         tenantId: new mongoose.Types.ObjectId(tenantId),
         email,
@@ -874,6 +1017,16 @@ export const updateEmployee = async (
   }
 
   if (input.status !== undefined) {
+    if (input.status === "terminated") {
+      const isProtected = await isCompanyAdminEmployeeRecord(
+        tenantId,
+        employee,
+      );
+      if (isProtected) {
+        throw new EmployeeServiceError(COMPANY_ADMIN_DEACTIVATE_MESSAGE, 403);
+      }
+    }
+
     employee.status = input.status;
   }
 
