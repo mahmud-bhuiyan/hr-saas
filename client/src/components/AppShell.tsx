@@ -21,6 +21,8 @@ import type { IconType } from "react-icons";
 
 import { useAuth } from "../contexts/AuthContext";
 
+import { useHasLinkedEmployee } from "../hooks/useLinkedEmployee";
+
 import { useSiteConfig } from "../contexts/SiteConfigContext";
 
 import {
@@ -165,6 +167,7 @@ const isNavItemActive = (
 
 export const AppShell = () => {
   const { user } = useAuth();
+  const hasLinkedEmployee = useHasLinkedEmployee();
   const { config } = useSiteConfig();
   const location = useLocation();
 
@@ -284,6 +287,14 @@ export const AppShell = () => {
               if (
                 item.activePrefix === "/me/" &&
                 !hasAnyMeModuleEnabled(user)
+              ) {
+                return false;
+              }
+
+              if (
+                item.activePrefix === "/me/" &&
+                user?.role === "company_admin" &&
+                hasLinkedEmployee !== true
               ) {
                 return false;
               }

@@ -1,52 +1,53 @@
-import mongoose from 'mongoose';
-import type { ServerEnv } from '../../config/env.js';
-import type { UserRole } from '../../types/index.js';
-import { hasPermission } from '../../utils/permissions.js';
+import mongoose from "mongoose";
+import type { ServerEnv } from "../../config/env.js";
+import type { UserRole } from "../../types/index.js";
+import { hasPermission } from "../../utils/permissions.js";
+import { leaveRequestAuditSnapshot } from "../../utils/audit-snapshot.js";
+import { writeAuditLog, type AuditContext } from "../audit/audit.service.js";
 import {
-  leaveRequestAuditSnapshot,
-} from '../../utils/audit-snapshot.js';
-import { writeAuditLog, type AuditContext } from '../audit/audit.service.js';
-import { Employee, type IEmployeeDocument } from '../employees/employee.model.js';
-import { ensureEmployeeRecordForUser } from '../employees/employee.service.js';
-import { User } from '../admin/user.model.js';
+  Employee,
+  type IEmployeeDocument,
+} from "../employees/employee.model.js";
+import { ensureEmployeeRecordForUser } from "../employees/employee.service.js";
+import { User } from "../admin/user.model.js";
 import {
   sendLeaveApprovedEmail,
   sendLeaveDeclinedEmail,
   sendLeaveSubmittedEmail,
-} from '../notifications/email.service.js';
+} from "../notifications/email.service.js";
 import {
   LeaveBalance,
   LeaveRequest,
   type ILeaveRequestDocument,
   type LeaveRequestStatus,
   type LeaveType,
-} from './leave.model.js';
+} from "./leave.model.js";
 import type {
   CreateLeaveRequestInput,
   LeaveCalendarQuery,
   ListLeaveRequestsQuery,
-} from './leave.validation.js';
+} from "./leave.validation.js";
 import {
   calculateLeaveDays,
   dateRangesOverlap,
   formatDateString,
   parseDateString,
-} from './leave.utils.js';
+} from "./leave.utils.js";
 import {
   ensureLeaveBalanceForYear,
   getTenantLeaveSettings,
-} from './leave-settings.service.js';
-import { Shift } from '../rotas/shift.model.js';
-import { WorkLocation } from '../locations/location.model.js';
-import type { ShiftStatus } from '../rotas/shift.model.js';
+} from "./leave-settings.service.js";
+import { Shift } from "../rotas/shift.model.js";
+import { WorkLocation } from "../locations/location.model.js";
+import type { ShiftStatus } from "../rotas/shift.model.js";
 
 export class LeaveServiceError extends Error {
   constructor(
     message: string,
-    public statusCode: number
+    public statusCode: number,
   ) {
     super(message);
-    this.name = 'LeaveServiceError';
+    this.name = "LeaveServiceError";
   }
 }
 
@@ -125,16 +126,19 @@ export interface LeaveCalendarEntry {
   status: LeaveRequestStatus;
 }
 
-const canApproveAll = (role: UserRole): boolean => hasPermission(role, 'leave:approve');
+const canApproveAll = (role: UserRole): boolean =>
+  hasPermission(role, "leave:approve");
 
-const canApproveTeam = (role: UserRole): boolean => hasPermission(role, 'leave:approve:team');
+const canApproveTeam = (role: UserRole): boolean =>
+  hasPermission(role, "leave:approve:team");
 
-const canReadOwn = (role: UserRole): boolean => hasPermission(role, 'leave:read:own');
+const canReadOwn = (role: UserRole): boolean =>
+  hasPermission(role, "leave:read:own");
 
 export const resolveEmployeeForUser = async (
   tenantId: string,
   userId: string,
-  userEmail: string
+  userEmail: string,
 ): Promise<IEmployeeDocument> => {
   const tenantObjectId = new mongoose.Types.ObjectId(tenantId);
 
@@ -159,7 +163,7 @@ export const resolveEmployeeForUser = async (
     tenantId: tenantObjectId,
   });
 
-  if (user && user.role !== 'super_admin') {
+  if (user && user.role !== "super_admin" && user.role !== "company_admin") {
     return ensureEmployeeRecordForUser(tenantId, {
       userId: user._id.toString(),
       email: user.email,
@@ -169,12 +173,14 @@ export const resolveEmployeeForUser = async (
   }
 
   throw new LeaveServiceError(
-    'No employee record linked to your account. Contact your administrator.',
-    403
+    "No employee record linked to your account. Contact your administrator.",
+    403,
   );
 };
 
-const toEmployeeSummary = (employee: IEmployeeDocument): LeaveEmployeeSummary => ({
+const toEmployeeSummary = (
+  employee: IEmployeeDocument,
+): LeaveEmployeeSummary => ({
   id: employee._id.toString(),
   firstName: employee.firstName,
   lastName: employee.lastName,
@@ -182,11 +188,11 @@ const toEmployeeSummary = (employee: IEmployeeDocument): LeaveEmployeeSummary =>
 });
 
 const toLeaveRequestPublic = async (
-  request: ILeaveRequestDocument
+  request: ILeaveRequestDocument,
 ): Promise<LeaveRequestPublic> => {
   const employee = await Employee.findById(request.employeeId);
   if (!employee) {
-    throw new LeaveServiceError('Employee not found for leave request', 500);
+    throw new LeaveServiceError("Employee not found for leave request", 500);
   }
 
   return {
@@ -197,7 +203,11 @@ const toLeaveRequestPublic = async (
     startDate: formatDateString(request.startDate),
     endDate: formatDateString(request.endDate),
     halfDay: request.halfDay,
-    days: calculateLeaveDays(request.startDate, request.endDate, request.halfDay),
+    days: calculateLeaveDays(
+      request.startDate,
+      request.endDate,
+      request.halfDay,
+    ),
     reason: request.reason,
     status: request.status,
     approverId: request.approverId?.toString(),
@@ -213,7 +223,7 @@ const toLeaveRequestPublic = async (
 
 const loadShiftConflictMap = async (
   tenantId: string,
-  requests: ILeaveRequestDocument[]
+  requests: ILeaveRequestDocument[],
 ): Promise<Map<string, LeaveShiftConflictSummary[]>> => {
   const conflictMap = new Map<string, LeaveShiftConflictSummary[]>();
 
@@ -221,30 +231,40 @@ const loadShiftConflictMap = async (
     return conflictMap;
   }
 
-  const employeeIds = [...new Set(requests.map((request) => request.employeeId.toString()))];
+  const employeeIds = [
+    ...new Set(requests.map((request) => request.employeeId.toString())),
+  ];
   const minDate = formatDateString(
     requests.reduce(
-      (earliest, request) => (request.startDate < earliest ? request.startDate : earliest),
-      requests[0].startDate
-    )
+      (earliest, request) =>
+        request.startDate < earliest ? request.startDate : earliest,
+      requests[0].startDate,
+    ),
   );
   const maxDate = formatDateString(
     requests.reduce(
-      (latest, request) => (request.endDate > latest ? request.endDate : latest),
-      requests[0].endDate
-    )
+      (latest, request) =>
+        request.endDate > latest ? request.endDate : latest,
+      requests[0].endDate,
+    ),
   );
 
   const shifts = await Shift.find({
     tenantId: new mongoose.Types.ObjectId(tenantId),
-    employeeId: { $in: employeeIds.map((id) => new mongoose.Types.ObjectId(id)) },
+    employeeId: {
+      $in: employeeIds.map((id) => new mongoose.Types.ObjectId(id)),
+    },
     date: { $gte: minDate, $lte: maxDate },
   });
 
-  const locationIds = [...new Set(shifts.map((shift) => shift.locationId.toString()))];
-  const locations = await WorkLocation.find({ _id: { $in: locationIds } }).select('_id name');
+  const locationIds = [
+    ...new Set(shifts.map((shift) => shift.locationId.toString())),
+  ];
+  const locations = await WorkLocation.find({
+    _id: { $in: locationIds },
+  }).select("_id name");
   const locationMap = new Map(
-    locations.map((location) => [location._id.toString(), location.name])
+    locations.map((location) => [location._id.toString(), location.name]),
   );
 
   for (const request of requests) {
@@ -257,7 +277,7 @@ const loadShiftConflictMap = async (
         (shift) =>
           shift.employeeId?.toString() === employeeId &&
           shift.date >= requestStart &&
-          shift.date <= requestEnd
+          shift.date <= requestEnd,
       )
       .map((shift) => ({
         id: shift._id.toString(),
@@ -265,7 +285,8 @@ const loadShiftConflictMap = async (
         startTime: shift.startTime,
         endTime: shift.endTime,
         status: shift.status,
-        locationName: locationMap.get(shift.locationId.toString()) ?? 'Unknown location',
+        locationName:
+          locationMap.get(shift.locationId.toString()) ?? "Unknown location",
       }));
 
     conflictMap.set(request._id.toString(), conflicts);
@@ -276,11 +297,11 @@ const loadShiftConflictMap = async (
 
 const loadOverlapPool = async (
   tenantId: string,
-  access: AccessContext
+  access: AccessContext,
 ): Promise<ILeaveRequestDocument[]> => {
   const filter: Record<string, unknown> = {
     tenantId: new mongoose.Types.ObjectId(tenantId),
-    status: { $in: ['pending', 'approved'] },
+    status: { $in: ["pending", "approved"] },
   };
 
   if (canApproveAll(access.role)) {
@@ -288,10 +309,19 @@ const loadOverlapPool = async (
   }
 
   if (canApproveTeam(access.role)) {
-    const selfRecord = await resolveEmployeeForUser(tenantId, access.userId, access.userEmail);
-    const teamIds = await getTeamEmployeeIds(tenantId, selfRecord._id.toString());
+    const selfRecord = await resolveEmployeeForUser(
+      tenantId,
+      access.userId,
+      access.userEmail,
+    );
+    const teamIds = await getTeamEmployeeIds(
+      tenantId,
+      selfRecord._id.toString(),
+    );
     filter.employeeId = {
-      $in: [...teamIds, selfRecord._id.toString()].map((id) => new mongoose.Types.ObjectId(id)),
+      $in: [...teamIds, selfRecord._id.toString()].map(
+        (id) => new mongoose.Types.ObjectId(id),
+      ),
     };
     return LeaveRequest.find(filter);
   }
@@ -302,19 +332,25 @@ const loadOverlapPool = async (
 const findOverlapsForRequest = (
   request: ILeaveRequestDocument,
   pool: ILeaveRequestDocument[],
-  employeeNameMap: Map<string, string>
+  employeeNameMap: Map<string, string>,
 ): LeaveOverlapSummary[] =>
   pool
     .filter(
       (other) =>
         other._id.toString() !== request._id.toString() &&
         other.employeeId.toString() !== request.employeeId.toString() &&
-        dateRangesOverlap(request.startDate, request.endDate, other.startDate, other.endDate)
+        dateRangesOverlap(
+          request.startDate,
+          request.endDate,
+          other.startDate,
+          other.endDate,
+        ),
     )
     .map((other) => ({
       id: other._id.toString(),
       employeeId: other.employeeId.toString(),
-      employeeName: employeeNameMap.get(other.employeeId.toString()) ?? 'Unknown',
+      employeeName:
+        employeeNameMap.get(other.employeeId.toString()) ?? "Unknown",
       status: other.status,
       startDate: formatDateString(other.startDate),
       endDate: formatDateString(other.endDate),
@@ -325,18 +361,21 @@ const findOverlapsForRequest = (
 const getOrCreateBalance = async (
   tenantId: string,
   employeeId: string,
-  year: number
+  year: number,
 ): Promise<InstanceType<typeof LeaveBalance>> =>
   ensureLeaveBalanceForYear(tenantId, employeeId, year);
 
-const toBalancePublic = (balance: InstanceType<typeof LeaveBalance>): LeaveBalancePublic => ({
+const toBalancePublic = (
+  balance: InstanceType<typeof LeaveBalance>,
+): LeaveBalancePublic => ({
   employeeId: balance.employeeId.toString(),
   year: balance.year,
   entitlement: balance.entitlement,
   taken: balance.taken,
   pending: balance.pending,
   carriedOver: balance.carriedOver,
-  remaining: balance.entitlement + balance.carriedOver - balance.taken - balance.pending,
+  remaining:
+    balance.entitlement + balance.carriedOver - balance.taken - balance.pending,
 });
 
 const assertNoOverlap = async (
@@ -344,12 +383,12 @@ const assertNoOverlap = async (
   employeeId: string,
   startDate: Date,
   endDate: Date,
-  excludeRequestId?: string
+  excludeRequestId?: string,
 ): Promise<void> => {
   const filter: Record<string, unknown> = {
     tenantId: new mongoose.Types.ObjectId(tenantId),
     employeeId: new mongoose.Types.ObjectId(employeeId),
-    status: { $in: ['pending', 'approved'] },
+    status: { $in: ["pending", "approved"] },
   };
 
   if (excludeRequestId) {
@@ -361,8 +400,8 @@ const assertNoOverlap = async (
   for (const req of existing) {
     if (dateRangesOverlap(startDate, endDate, req.startDate, req.endDate)) {
       throw new LeaveServiceError(
-        'Leave request overlaps with an existing pending or approved request',
-        409
+        "Leave request overlaps with an existing pending or approved request",
+        409,
       );
     }
   }
@@ -370,12 +409,12 @@ const assertNoOverlap = async (
 
 const getTeamEmployeeIds = async (
   tenantId: string,
-  managerEmployeeId: string
+  managerEmployeeId: string,
 ): Promise<string[]> => {
   const reports = await Employee.find({
     tenantId: new mongoose.Types.ObjectId(tenantId),
     managerId: new mongoose.Types.ObjectId(managerEmployeeId),
-  }).select('_id');
+  }).select("_id");
 
   return reports.map((r) => r._id.toString());
 };
@@ -383,7 +422,7 @@ const getTeamEmployeeIds = async (
 const buildListFilter = async (
   tenantId: string,
   query: ListLeaveRequestsQuery,
-  access: AccessContext
+  access: AccessContext,
 ): Promise<Record<string, unknown>> => {
   const filter: Record<string, unknown> = {
     tenantId: new mongoose.Types.ObjectId(tenantId),
@@ -395,7 +434,7 @@ const buildListFilter = async (
     filter.status = query.status;
 
     if (
-      query.status === 'pending' &&
+      query.status === "pending" &&
       settings.multiStepApprovalEnabled &&
       canApproveTeam(access.role) &&
       !canApproveAll(access.role)
@@ -405,19 +444,29 @@ const buildListFilter = async (
   }
 
   if (query.from) {
-    filter.endDate = { ...(filter.endDate as object), $gte: parseDateString(query.from) };
+    filter.endDate = {
+      ...(filter.endDate as object),
+      $gte: parseDateString(query.from),
+    };
   }
 
   if (query.to) {
-    filter.startDate = { ...(filter.startDate as object), $lte: parseDateString(query.to) };
+    filter.startDate = {
+      ...(filter.startDate as object),
+      $lte: parseDateString(query.to),
+    };
   }
 
-  if (query.mine === 'true') {
+  if (query.mine === "true") {
     try {
-      const selfRecord = await resolveEmployeeForUser(tenantId, access.userId, access.userEmail);
+      const selfRecord = await resolveEmployeeForUser(
+        tenantId,
+        access.userId,
+        access.userEmail,
+      );
       filter.employeeId = selfRecord._id;
     } catch {
-      filter._id = new mongoose.Types.ObjectId('000000000000000000000000');
+      filter._id = new mongoose.Types.ObjectId("000000000000000000000000");
     }
     return filter;
   }
@@ -430,43 +479,66 @@ const buildListFilter = async (
   }
 
   if (canApproveTeam(access.role)) {
-    const selfRecord = await resolveEmployeeForUser(tenantId, access.userId, access.userEmail);
-    const teamIds = await getTeamEmployeeIds(tenantId, selfRecord._id.toString());
+    const selfRecord = await resolveEmployeeForUser(
+      tenantId,
+      access.userId,
+      access.userEmail,
+    );
+    const teamIds = await getTeamEmployeeIds(
+      tenantId,
+      selfRecord._id.toString(),
+    );
 
     if (query.employeeId) {
-      if (!teamIds.includes(query.employeeId) && query.employeeId !== selfRecord._id.toString()) {
-        throw new LeaveServiceError('Insufficient permissions', 403);
+      if (
+        !teamIds.includes(query.employeeId) &&
+        query.employeeId !== selfRecord._id.toString()
+      ) {
+        throw new LeaveServiceError("Insufficient permissions", 403);
       }
       filter.employeeId = new mongoose.Types.ObjectId(query.employeeId);
     } else {
       filter.employeeId = {
-        $in: [...teamIds, selfRecord._id.toString()].map((id) => new mongoose.Types.ObjectId(id)),
+        $in: [...teamIds, selfRecord._id.toString()].map(
+          (id) => new mongoose.Types.ObjectId(id),
+        ),
       };
     }
     return filter;
   }
 
   if (canReadOwn(access.role)) {
-    const selfRecord = await resolveEmployeeForUser(tenantId, access.userId, access.userEmail);
+    const selfRecord = await resolveEmployeeForUser(
+      tenantId,
+      access.userId,
+      access.userEmail,
+    );
     filter.employeeId = selfRecord._id;
     return filter;
   }
 
-  throw new LeaveServiceError('Insufficient permissions', 403);
+  throw new LeaveServiceError("Insufficient permissions", 403);
 };
 
 const assertCanAccessRequest = async (
   tenantId: string,
   request: ILeaveRequestDocument,
-  access: AccessContext
+  access: AccessContext,
 ): Promise<void> => {
   if (canApproveAll(access.role)) {
     return;
   }
 
   if (canApproveTeam(access.role)) {
-    const selfRecord = await resolveEmployeeForUser(tenantId, access.userId, access.userEmail);
-    const teamIds = await getTeamEmployeeIds(tenantId, selfRecord._id.toString());
+    const selfRecord = await resolveEmployeeForUser(
+      tenantId,
+      access.userId,
+      access.userEmail,
+    );
+    const teamIds = await getTeamEmployeeIds(
+      tenantId,
+      selfRecord._id.toString(),
+    );
     const requestEmployeeId = request.employeeId.toString();
 
     if (
@@ -476,27 +548,34 @@ const assertCanAccessRequest = async (
       return;
     }
 
-    throw new LeaveServiceError('Insufficient permissions', 403);
+    throw new LeaveServiceError("Insufficient permissions", 403);
   }
 
   if (canReadOwn(access.role)) {
-    const selfRecord = await resolveEmployeeForUser(tenantId, access.userId, access.userEmail);
+    const selfRecord = await resolveEmployeeForUser(
+      tenantId,
+      access.userId,
+      access.userEmail,
+    );
     if (request.employeeId.toString() !== selfRecord._id.toString()) {
-      throw new LeaveServiceError('Insufficient permissions', 403);
+      throw new LeaveServiceError("Insufficient permissions", 403);
     }
     return;
   }
 
-  throw new LeaveServiceError('Insufficient permissions', 403);
+  throw new LeaveServiceError("Insufficient permissions", 403);
 };
 
 const assertCanApproveRequest = async (
   tenantId: string,
   request: ILeaveRequestDocument,
-  access: AccessContext
+  access: AccessContext,
 ): Promise<void> => {
-  if (request.status !== 'pending') {
-    throw new LeaveServiceError('Only pending requests can be approved or declined', 400);
+  if (request.status !== "pending") {
+    throw new LeaveServiceError(
+      "Only pending requests can be approved or declined",
+      400,
+    );
   }
 
   const settings = await getTenantLeaveSettings(tenantId);
@@ -504,21 +583,26 @@ const assertCanApproveRequest = async (
 
   if (settings.multiStepApprovalEnabled && step >= 2) {
     if (!canApproveAll(access.role)) {
-      throw new LeaveServiceError('Insufficient permissions', 403);
+      throw new LeaveServiceError("Insufficient permissions", 403);
     }
     return;
   }
 
   if (settings.multiStepApprovalEnabled && step === 1) {
     if (canApproveTeam(access.role)) {
-      const selfRecord = await resolveEmployeeForUser(tenantId, access.userId, access.userEmail);
+      const selfRecord = await resolveEmployeeForUser(
+        tenantId,
+        access.userId,
+        access.userEmail,
+      );
       const employee = await Employee.findById(request.employeeId);
 
       if (!employee) {
-        throw new LeaveServiceError('Employee not found', 404);
+        throw new LeaveServiceError("Employee not found", 404);
       }
 
-      const isDirectReport = employee.managerId?.toString() === selfRecord._id.toString();
+      const isDirectReport =
+        employee.managerId?.toString() === selfRecord._id.toString();
       if (isDirectReport) {
         return;
       }
@@ -531,7 +615,7 @@ const assertCanApproveRequest = async (
       }
     }
 
-    throw new LeaveServiceError('Insufficient permissions', 403);
+    throw new LeaveServiceError("Insufficient permissions", 403);
   }
 
   if (canApproveAll(access.role)) {
@@ -539,27 +623,34 @@ const assertCanApproveRequest = async (
   }
 
   if (canApproveTeam(access.role)) {
-    const selfRecord = await resolveEmployeeForUser(tenantId, access.userId, access.userEmail);
+    const selfRecord = await resolveEmployeeForUser(
+      tenantId,
+      access.userId,
+      access.userEmail,
+    );
     const employee = await Employee.findById(request.employeeId);
 
     if (!employee) {
-      throw new LeaveServiceError('Employee not found', 404);
+      throw new LeaveServiceError("Employee not found", 404);
     }
 
-    const isDirectReport = employee.managerId?.toString() === selfRecord._id.toString();
+    const isDirectReport =
+      employee.managerId?.toString() === selfRecord._id.toString();
     if (!isDirectReport) {
-      throw new LeaveServiceError('Insufficient permissions', 403);
+      throw new LeaveServiceError("Insufficient permissions", 403);
     }
     return;
   }
 
-  throw new LeaveServiceError('Insufficient permissions', 403);
+  throw new LeaveServiceError("Insufficient permissions", 403);
 };
 
-const findHrRecipientEmail = async (tenantId: string): Promise<string | null> => {
+const findHrRecipientEmail = async (
+  tenantId: string,
+): Promise<string | null> => {
   const hrUser = await User.findOne({
     tenantId: new mongoose.Types.ObjectId(tenantId),
-    role: { $in: ['hr_manager', 'company_admin'] },
+    role: { $in: ["hr_manager", "company_admin"] },
   }).sort({ createdAt: 1 });
 
   return hrUser?.email ?? null;
@@ -567,7 +658,7 @@ const findHrRecipientEmail = async (tenantId: string): Promise<string | null> =>
 
 const findApproverRecipientEmail = async (
   tenantId: string,
-  employee: IEmployeeDocument
+  employee: IEmployeeDocument,
 ): Promise<string | null> => {
   if (employee.managerId) {
     const manager = await Employee.findOne({
@@ -585,14 +676,18 @@ const findApproverRecipientEmail = async (
 export const listLeaveRequests = async (
   tenantId: string,
   query: ListLeaveRequestsQuery,
-  access: AccessContext
+  access: AccessContext,
 ): Promise<LeaveRequestPublic[]> => {
   const filter = await buildListFilter(tenantId, query, access);
 
-  const requests = await LeaveRequest.find(filter).sort({ startDate: -1, createdAt: -1 });
+  const requests = await LeaveRequest.find(filter).sort({
+    startDate: -1,
+    createdAt: -1,
+  });
 
   const includeOverlaps =
-    query.mine !== 'true' && (canApproveAll(access.role) || canApproveTeam(access.role));
+    query.mine !== "true" &&
+    (canApproveAll(access.role) || canApproveTeam(access.role));
 
   let overlapPool: ILeaveRequestDocument[] = [];
   let employeeNameMap = new Map<string, string>();
@@ -601,13 +696,17 @@ export const listLeaveRequests = async (
   if (includeOverlaps && requests.length > 0) {
     overlapPool = await loadOverlapPool(tenantId, access);
     shiftConflictMap = await loadShiftConflictMap(tenantId, requests);
-    const employeeIds = [...new Set(overlapPool.map((entry) => entry.employeeId.toString()))];
-    const employees = await Employee.find({ _id: { $in: employeeIds } }).select('firstName lastName');
+    const employeeIds = [
+      ...new Set(overlapPool.map((entry) => entry.employeeId.toString())),
+    ];
+    const employees = await Employee.find({ _id: { $in: employeeIds } }).select(
+      "firstName lastName",
+    );
     employeeNameMap = new Map(
       employees.map((employee) => [
         employee._id.toString(),
         `${employee.firstName} ${employee.lastName}`,
-      ])
+      ]),
     );
   }
 
@@ -619,20 +718,21 @@ export const listLeaveRequests = async (
         leaveRequest.overlappingRequests = findOverlapsForRequest(
           request,
           overlapPool,
-          employeeNameMap
+          employeeNameMap,
         );
-        leaveRequest.conflictingShifts = shiftConflictMap.get(request._id.toString()) ?? [];
+        leaveRequest.conflictingShifts =
+          shiftConflictMap.get(request._id.toString()) ?? [];
       }
 
       return leaveRequest;
-    })
+    }),
   );
 };
 
 export const getLeaveRequestById = async (
   tenantId: string,
   requestId: string,
-  access: AccessContext
+  access: AccessContext,
 ): Promise<LeaveRequestPublic> => {
   const request = await LeaveRequest.findOne({
     _id: new mongoose.Types.ObjectId(requestId),
@@ -640,7 +740,7 @@ export const getLeaveRequestById = async (
   });
 
   if (!request) {
-    throw new LeaveServiceError('Leave request not found', 404);
+    throw new LeaveServiceError("Leave request not found", 404);
   }
 
   await assertCanAccessRequest(tenantId, request, access);
@@ -653,9 +753,13 @@ export const createLeaveRequest = async (
   input: CreateLeaveRequestInput,
   access: AccessContext,
   env: ServerEnv,
-  audit?: AuditContext
+  audit?: AuditContext,
 ): Promise<LeaveRequestPublic> => {
-  const employee = await resolveEmployeeForUser(tenantId, access.userId, access.userEmail);
+  const employee = await resolveEmployeeForUser(
+    tenantId,
+    access.userId,
+    access.userEmail,
+  );
 
   const startDate = parseDateString(input.startDate);
   const endDate = parseDateString(input.endDate);
@@ -663,15 +767,23 @@ export const createLeaveRequest = async (
 
   await assertNoOverlap(tenantId, employee._id.toString(), startDate, endDate);
 
-  if (input.type === 'annual') {
+  if (input.type === "annual") {
     const year = startDate.getUTCFullYear();
-    const balance = await getOrCreateBalance(tenantId, employee._id.toString(), year);
-    const remaining = balance.entitlement + balance.carriedOver - balance.taken - balance.pending;
+    const balance = await getOrCreateBalance(
+      tenantId,
+      employee._id.toString(),
+      year,
+    );
+    const remaining =
+      balance.entitlement +
+      balance.carriedOver -
+      balance.taken -
+      balance.pending;
 
     if (days > remaining) {
       throw new LeaveServiceError(
         `Insufficient annual leave balance. ${remaining} day(s) remaining.`,
-        400
+        400,
       );
     }
 
@@ -687,7 +799,7 @@ export const createLeaveRequest = async (
     endDate,
     halfDay: input.halfDay ?? false,
     reason: input.reason,
-    status: 'pending',
+    status: "pending",
     approvalStep: 1,
   });
 
@@ -706,8 +818,8 @@ export const createLeaveRequest = async (
   void writeAuditLog({
     tenantId,
     userId: access.userId,
-    action: 'create',
-    entityType: 'LeaveRequest',
+    action: "create",
+    entityType: "LeaveRequest",
     entityId: request._id.toString(),
     after: leaveRequestAuditSnapshot(request),
     context: audit,
@@ -720,7 +832,7 @@ export const cancelLeaveRequest = async (
   tenantId: string,
   requestId: string,
   access: AccessContext,
-  audit?: AuditContext
+  audit?: AuditContext,
 ): Promise<LeaveRequestPublic> => {
   const request = await LeaveRequest.findOne({
     _id: new mongoose.Types.ObjectId(requestId),
@@ -728,37 +840,52 @@ export const cancelLeaveRequest = async (
   });
 
   if (!request) {
-    throw new LeaveServiceError('Leave request not found', 404);
+    throw new LeaveServiceError("Leave request not found", 404);
   }
 
-  const selfRecord = await resolveEmployeeForUser(tenantId, access.userId, access.userEmail);
+  const selfRecord = await resolveEmployeeForUser(
+    tenantId,
+    access.userId,
+    access.userEmail,
+  );
 
   if (request.employeeId.toString() !== selfRecord._id.toString()) {
-    throw new LeaveServiceError('You can only cancel your own leave requests', 403);
+    throw new LeaveServiceError(
+      "You can only cancel your own leave requests",
+      403,
+    );
   }
 
-  if (request.status !== 'pending') {
-    throw new LeaveServiceError('Only pending requests can be cancelled', 400);
+  if (request.status !== "pending") {
+    throw new LeaveServiceError("Only pending requests can be cancelled", 400);
   }
 
   const beforeSnapshot = leaveRequestAuditSnapshot(request);
 
-  if (request.type === 'annual') {
-    const days = calculateLeaveDays(request.startDate, request.endDate, request.halfDay);
+  if (request.type === "annual") {
+    const days = calculateLeaveDays(
+      request.startDate,
+      request.endDate,
+      request.halfDay,
+    );
     const year = request.startDate.getUTCFullYear();
-    const balance = await getOrCreateBalance(tenantId, request.employeeId.toString(), year);
+    const balance = await getOrCreateBalance(
+      tenantId,
+      request.employeeId.toString(),
+      year,
+    );
     balance.pending = Math.max(0, balance.pending - days);
     await balance.save();
   }
 
-  request.status = 'cancelled';
+  request.status = "cancelled";
   await request.save();
 
   void writeAuditLog({
     tenantId,
     userId: access.userId,
-    action: 'update',
-    entityType: 'LeaveRequest',
+    action: "update",
+    entityType: "LeaveRequest",
     entityId: request._id.toString(),
     before: beforeSnapshot,
     after: leaveRequestAuditSnapshot(request),
@@ -773,7 +900,7 @@ export const approveLeaveRequest = async (
   requestId: string,
   access: AccessContext,
   env: ServerEnv,
-  audit?: AuditContext
+  audit?: AuditContext,
 ): Promise<LeaveRequestPublic> => {
   const request = await LeaveRequest.findOne({
     _id: new mongoose.Types.ObjectId(requestId),
@@ -781,7 +908,7 @@ export const approveLeaveRequest = async (
   });
 
   if (!request) {
-    throw new LeaveServiceError('Leave request not found', 404);
+    throw new LeaveServiceError("Leave request not found", 404);
   }
 
   await assertCanApproveRequest(tenantId, request, access);
@@ -807,16 +934,16 @@ export const approveLeaveRequest = async (
         startDate: formatDateString(request.startDate),
         endDate: formatDateString(request.endDate),
         reason: request.reason,
-        subjectPrefix: 'HR approval needed: ',
-        introText: `${approver ? `${approver.firstName ?? ''} ${approver.lastName ?? ''}`.trim() || approver.email : 'Manager'} approved step 1. Final HR approval is required.`,
+        subjectPrefix: "HR approval needed: ",
+        introText: `${approver ? `${approver.firstName ?? ""} ${approver.lastName ?? ""}`.trim() || approver.email : "Manager"} approved step 1. Final HR approval is required.`,
       });
     }
 
     void writeAuditLog({
       tenantId,
       userId: access.userId,
-      action: 'update',
-      entityType: 'LeaveRequest',
+      action: "update",
+      entityType: "LeaveRequest",
       entityId: request._id.toString(),
       before: beforeSnapshot,
       after: leaveRequestAuditSnapshot(request),
@@ -826,16 +953,24 @@ export const approveLeaveRequest = async (
     return toLeaveRequestPublic(request);
   }
 
-  if (request.type === 'annual') {
-    const days = calculateLeaveDays(request.startDate, request.endDate, request.halfDay);
+  if (request.type === "annual") {
+    const days = calculateLeaveDays(
+      request.startDate,
+      request.endDate,
+      request.halfDay,
+    );
     const year = request.startDate.getUTCFullYear();
-    const balance = await getOrCreateBalance(tenantId, request.employeeId.toString(), year);
+    const balance = await getOrCreateBalance(
+      tenantId,
+      request.employeeId.toString(),
+      year,
+    );
     balance.pending = Math.max(0, balance.pending - days);
     balance.taken += days;
     await balance.save();
   }
 
-  request.status = 'approved';
+  request.status = "approved";
   request.approverId = new mongoose.Types.ObjectId(access.userId);
   request.approvedAt = new Date();
   await request.save();
@@ -849,16 +984,17 @@ export const approveLeaveRequest = async (
       startDate: formatDateString(request.startDate),
       endDate: formatDateString(request.endDate),
       approverName: approver
-        ? `${approver.firstName ?? ''} ${approver.lastName ?? ''}`.trim() || approver.email
-        : 'Approver',
+        ? `${approver.firstName ?? ""} ${approver.lastName ?? ""}`.trim() ||
+          approver.email
+        : "Approver",
     });
   }
 
   void writeAuditLog({
     tenantId,
     userId: access.userId,
-    action: 'update',
-    entityType: 'LeaveRequest',
+    action: "update",
+    entityType: "LeaveRequest",
     entityId: request._id.toString(),
     before: beforeSnapshot,
     after: leaveRequestAuditSnapshot(request),
@@ -874,7 +1010,7 @@ export const declineLeaveRequest = async (
   declineReason: string | undefined,
   access: AccessContext,
   env: ServerEnv,
-  audit?: AuditContext
+  audit?: AuditContext,
 ): Promise<LeaveRequestPublic> => {
   const request = await LeaveRequest.findOne({
     _id: new mongoose.Types.ObjectId(requestId),
@@ -882,22 +1018,30 @@ export const declineLeaveRequest = async (
   });
 
   if (!request) {
-    throw new LeaveServiceError('Leave request not found', 404);
+    throw new LeaveServiceError("Leave request not found", 404);
   }
 
   await assertCanApproveRequest(tenantId, request, access);
 
   const beforeSnapshot = leaveRequestAuditSnapshot(request);
 
-  if (request.type === 'annual') {
-    const days = calculateLeaveDays(request.startDate, request.endDate, request.halfDay);
+  if (request.type === "annual") {
+    const days = calculateLeaveDays(
+      request.startDate,
+      request.endDate,
+      request.halfDay,
+    );
     const year = request.startDate.getUTCFullYear();
-    const balance = await getOrCreateBalance(tenantId, request.employeeId.toString(), year);
+    const balance = await getOrCreateBalance(
+      tenantId,
+      request.employeeId.toString(),
+      year,
+    );
     balance.pending = Math.max(0, balance.pending - days);
     await balance.save();
   }
 
-  request.status = 'declined';
+  request.status = "declined";
   request.approverId = new mongoose.Types.ObjectId(access.userId);
   request.approvedAt = new Date();
   request.declineReason = declineReason;
@@ -917,8 +1061,8 @@ export const declineLeaveRequest = async (
   void writeAuditLog({
     tenantId,
     userId: access.userId,
-    action: 'update',
-    entityType: 'LeaveRequest',
+    action: "update",
+    entityType: "LeaveRequest",
     entityId: request._id.toString(),
     before: beforeSnapshot,
     after: leaveRequestAuditSnapshot(request),
@@ -930,17 +1074,25 @@ export const declineLeaveRequest = async (
 
 export const getMyLeaveBalance = async (
   tenantId: string,
-  access: AccessContext
+  access: AccessContext,
 ): Promise<LeaveBalancePublic> => {
-  const employee = await resolveEmployeeForUser(tenantId, access.userId, access.userEmail);
+  const employee = await resolveEmployeeForUser(
+    tenantId,
+    access.userId,
+    access.userEmail,
+  );
   const year = new Date().getUTCFullYear();
-  const balance = await getOrCreateBalance(tenantId, employee._id.toString(), year);
+  const balance = await getOrCreateBalance(
+    tenantId,
+    employee._id.toString(),
+    year,
+  );
   return toBalancePublic(balance);
 };
 
 export const getEmployeeLeaveBalance = async (
   tenantId: string,
-  employeeId: string
+  employeeId: string,
 ): Promise<LeaveBalancePublic> => {
   const employee = await Employee.findOne({
     _id: new mongoose.Types.ObjectId(employeeId),
@@ -948,7 +1100,7 @@ export const getEmployeeLeaveBalance = async (
   });
 
   if (!employee) {
-    throw new LeaveServiceError('Employee not found', 404);
+    throw new LeaveServiceError("Employee not found", 404);
   }
 
   const year = new Date().getUTCFullYear();
@@ -959,14 +1111,14 @@ export const getEmployeeLeaveBalance = async (
 export const getLeaveCalendar = async (
   tenantId: string,
   query: LeaveCalendarQuery,
-  access: AccessContext
+  access: AccessContext,
 ): Promise<LeaveCalendarEntry[]> => {
   const monthStart = new Date(Date.UTC(query.year, query.month - 1, 1));
   const monthEnd = new Date(Date.UTC(query.year, query.month, 0));
 
   const filter: Record<string, unknown> = {
     tenantId: new mongoose.Types.ObjectId(tenantId),
-    status: { $in: ['pending', 'approved'] },
+    status: { $in: ["pending", "approved"] },
     startDate: { $lte: monthEnd },
     endDate: { $gte: monthStart },
   };
@@ -974,13 +1126,22 @@ export const getLeaveCalendar = async (
   if (canApproveAll(access.role)) {
     // all employees
   } else if (canApproveTeam(access.role)) {
-    const selfRecord = await resolveEmployeeForUser(tenantId, access.userId, access.userEmail);
-    const teamIds = await getTeamEmployeeIds(tenantId, selfRecord._id.toString());
+    const selfRecord = await resolveEmployeeForUser(
+      tenantId,
+      access.userId,
+      access.userEmail,
+    );
+    const teamIds = await getTeamEmployeeIds(
+      tenantId,
+      selfRecord._id.toString(),
+    );
     filter.employeeId = {
-      $in: [...teamIds, selfRecord._id.toString()].map((id) => new mongoose.Types.ObjectId(id)),
+      $in: [...teamIds, selfRecord._id.toString()].map(
+        (id) => new mongoose.Types.ObjectId(id),
+      ),
     };
   } else {
-    throw new LeaveServiceError('Insufficient permissions', 403);
+    throw new LeaveServiceError("Insufficient permissions", 403);
   }
 
   const requests = await LeaveRequest.find(filter).sort({ startDate: 1 });
@@ -1008,8 +1169,8 @@ export const getLeaveCalendar = async (
 
 export const countPendingLeaveRequests = async (
   tenantId: string,
-  access: AccessContext
+  access: AccessContext,
 ): Promise<number> => {
-  const filter = await buildListFilter(tenantId, { status: 'pending' }, access);
+  const filter = await buildListFilter(tenantId, { status: "pending" }, access);
   return LeaveRequest.countDocuments(filter);
 };

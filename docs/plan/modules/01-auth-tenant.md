@@ -14,15 +14,15 @@ Authentication, multi-tenant isolation, and company onboarding. Every business r
 
 ## 2. User Roles & Permissions
 
-| Capability | super_admin | company_admin | hr_manager | manager | employee |
-|------------|:-----------:|:-------------:|:----------:|:-------:|:--------:|
-| Platform admin | ✅ | — | — | — | — |
-| Self-register company | — | ✅ (public) | — | — | — |
-| Approve / reject registration | ✅ | — | — | — | — |
-| Create company directly | ✅ | — | — | — | — |
-| Edit platform site settings | ✅ | — | — | — | — |
-| Login / logout / refresh | ✅ | ✅ | ✅ | ✅ | ✅ |
-| View / edit own profile | ✅ | ✅ | ✅ | ✅ | ✅ |
+| Capability                    | super_admin | company_admin | hr_manager | manager | employee |
+| ----------------------------- | :---------: | :-----------: | :--------: | :-----: | :------: |
+| Platform admin                |     ✅      |       —       |     —      |    —    |    —     |
+| Self-register company         |      —      |  ✅ (public)  |     —      |    —    |    —     |
+| Approve / reject registration |     ✅      |       —       |     —      |    —    |    —     |
+| Create company directly       |     ✅      |       —       |     —      |    —    |    —     |
+| Edit platform site settings   |     ✅      |       —       |     —      |    —    |    —     |
+| Login / logout / refresh      |     ✅      |      ✅       |     ✅     |   ✅    |    ✅    |
+| View / edit own profile       |     ✅      |      ✅       |     ✅     |   ✅    |    ✅    |
 
 ---
 
@@ -56,29 +56,29 @@ Authentication, multi-tenant isolation, and company onboarding. Every business r
 
 ## 4. API Endpoints (implemented)
 
-| Method | Path | Access | Description |
-|--------|------|--------|-------------|
-| POST | `/api/v1/auth/register` | Public | Self-register company (pending) |
-| POST | `/api/v1/auth/login` | Public | Login; blocks pending/rejected tenants |
-| POST | `/api/v1/auth/refresh` | Cookie | New access token |
-| POST | `/api/v1/auth/logout` | Public | Clear refresh cookie |
-| GET | `/api/v1/auth/me` | Authenticated | Current user profile (includes `colorScheme`) |
-| PATCH | `/api/v1/auth/me` | Authenticated | Update profile / password / `colorScheme` |
-| POST | `/api/v1/admins` | Bootstrap or super_admin | Create admin user |
-| GET | `/api/v1/admin/registrations` | super_admin | List registrations |
-| POST | `/api/v1/admin/registrations` | super_admin | Create approved company + admin |
-| POST | `/api/v1/admin/registrations/:tenantId/approve` | super_admin | Approve pending registration |
-| POST | `/api/v1/admin/registrations/:tenantId/reject` | super_admin | Reject pending registration |
-| PATCH | `/api/v1/admin/registrations/:tenantId` | super_admin | Update approved company (incl. `isActive`) |
-| GET | `/api/v1/admin/registrations/:tenantId/modules` | super_admin | Read tenant module flags |
-| PATCH | `/api/v1/admin/registrations/:tenantId/modules` | super_admin | Update tenant module flags |
+| Method | Path                                            | Access                   | Description                                   |
+| ------ | ----------------------------------------------- | ------------------------ | --------------------------------------------- |
+| POST   | `/api/v1/auth/register`                         | Public                   | Self-register company (pending)               |
+| POST   | `/api/v1/auth/login`                            | Public                   | Login; blocks pending/rejected tenants        |
+| POST   | `/api/v1/auth/refresh`                          | Cookie                   | New access token                              |
+| POST   | `/api/v1/auth/logout`                           | Public                   | Clear refresh cookie                          |
+| GET    | `/api/v1/auth/me`                               | Authenticated            | Current user profile (includes `colorScheme`) |
+| PATCH  | `/api/v1/auth/me`                               | Authenticated            | Update profile / password / `colorScheme`     |
+| POST   | `/api/v1/admins`                                | Bootstrap or super_admin | Create admin user                             |
+| GET    | `/api/v1/admin/registrations`                   | super_admin              | List registrations                            |
+| POST   | `/api/v1/admin/registrations`                   | super_admin              | Create approved company + admin               |
+| POST   | `/api/v1/admin/registrations/:tenantId/approve` | super_admin              | Approve pending registration                  |
+| POST   | `/api/v1/admin/registrations/:tenantId/reject`  | super_admin              | Reject pending registration                   |
+| PATCH  | `/api/v1/admin/registrations/:tenantId`         | super_admin              | Update approved company (incl. `isActive`)    |
+| GET    | `/api/v1/admin/registrations/:tenantId/modules` | super_admin              | Read tenant module flags                      |
+| PATCH  | `/api/v1/admin/registrations/:tenantId/modules` | super_admin              | Update tenant module flags                    |
 
 ### Stage 2 endpoints (S2-1 — planned)
 
-| Method | Path | Access | Description |
-|--------|------|--------|-------------|
-| POST | `/api/v1/auth/forgot-password` | Public | Send reset email if user exists |
-| POST | `/api/v1/auth/reset-password` | Public | Validate token + set new password |
+| Method | Path                           | Access | Description                       |
+| ------ | ------------------------------ | ------ | --------------------------------- |
+| POST   | `/api/v1/auth/forgot-password` | Public | Send reset email if user exists   |
+| POST   | `/api/v1/auth/reset-password`  | Public | Validate token + set new password |
 
 ---
 
@@ -86,7 +86,7 @@ Authentication, multi-tenant isolation, and company onboarding. Every business r
 
 1. Self-registration creates tenant + company admin with `approvalStatus: pending`; login blocked until approved.
 2. Super admin can create a company in one step — tenant and admin are active immediately.
-3. On company approval or direct company creation, a linked employee record is created for the company admin so they can use leave, attendance, and other self-service features while keeping admin role permissions.
+3. Company admins sign in with a **User** account only — no employee record is created automatically on company approval or direct creation. To use self-service HR (leave, attendance, etc.), create and link an employee record for the admin explicitly.
 4. `tenantId` comes from JWT only; never trust client-supplied tenant id.
 5. Super admin bootstrap: `npm run seed:superadmin` or first `POST /api/v1/admins` when DB has zero users.
 6. User UI theme preference (`colorScheme`) is stored on the User document. Login, refresh, and `GET /auth/me` return it; clients may cache in localStorage for instant paint. `PATCH /auth/me` with `{ colorScheme }` is the source of truth when authenticated.
@@ -95,30 +95,30 @@ Authentication, multi-tenant isolation, and company onboarding. Every business r
 
 ## 6. UI Screens & Flows
 
-| Screen | Route | Status |
-|--------|-------|--------|
-| Login | `/login` | ✅ |
-| Register company | `/register` | ✅ |
-| My profile | `/dashboard/profile` | ✅ |
-| Theme toggle (light/dark) | App shell header | ✅ |
-| Companies (super admin) | `/dashboard/registrations` | ✅ |
-| Platform site settings (super admin) | `/dashboard/platform/site-settings` | ✅ Complete |
-| Manage company modules (super admin) | `/dashboard/registrations` modal | ✅ See [18-module-access-control.md](./18-module-access-control.md) |
-| Forgot password | `/forgot-password` | ✅ |
-| Reset password | `/reset-password` | ✅ |
+| Screen                               | Route                               | Status                                                              |
+| ------------------------------------ | ----------------------------------- | ------------------------------------------------------------------- |
+| Login                                | `/login`                            | ✅                                                                  |
+| Register company                     | `/register`                         | ✅                                                                  |
+| My profile                           | `/dashboard/profile`                | ✅                                                                  |
+| Theme toggle (light/dark)            | App shell header                    | ✅                                                                  |
+| Companies (super admin)              | `/dashboard/registrations`          | ✅                                                                  |
+| Platform site settings (super admin) | `/dashboard/platform/site-settings` | ✅ Complete                                                         |
+| Manage company modules (super admin) | `/dashboard/registrations` modal    | ✅ See [18-module-access-control.md](./18-module-access-control.md) |
+| Forgot password                      | `/forgot-password`                  | ✅                                                                  |
+| Reset password                       | `/reset-password`                   | ✅                                                                  |
 
 ---
 
 ## 7. Stage 1 vs Later
 
-| Feature | Stage 1 | Stage 2 |
-|---------|--------|---------|
-| Register / login / refresh | ✅ | |
-| Registration approval | ✅ | |
-| Super admin add company | ✅ | |
-| Profile + change password | ✅ | |
-| User light/dark theme (DB + localStorage) | ✅ | |
-| Forgot password (email) | — | ✅ S2-1 |
+| Feature                                   | Stage 1 | Stage 2 |
+| ----------------------------------------- | ------- | ------- |
+| Register / login / refresh                | ✅      |         |
+| Registration approval                     | ✅      |         |
+| Super admin add company                   | ✅      |         |
+| Profile + change password                 | ✅      |         |
+| User light/dark theme (DB + localStorage) | ✅      |         |
+| Forgot password (email)                   | —       | ✅ S2-1 |
 
 ---
 
