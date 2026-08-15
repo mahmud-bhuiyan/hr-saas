@@ -1,0 +1,50 @@
+import { useLocation } from "react-router-dom";
+import { NavTabBar } from "../../../components/ui/navigation/NavTabBar";
+import { useAuth } from "../../../contexts/AuthContext";
+import {
+  MY_ATTENDANCE_PATH,
+  MY_EXPENSES_PATH,
+  MY_LEAVE_PATH,
+  MY_PERFORMANCE_PATH,
+} from "../utils";
+import type { TenantModuleId } from "../../../types/modules";
+import { isModuleEnabledForUser } from "../../../utils/modules";
+
+const allTabs: Array<{
+  label: string;
+  path: string;
+  module?: TenantModuleId;
+}> = [
+  { label: "ATTENDANCE", path: MY_ATTENDANCE_PATH, module: "attendance" },
+  { label: "LEAVE", path: MY_LEAVE_PATH, module: "leave" },
+  { label: "PERFORMANCE", path: MY_PERFORMANCE_PATH },
+  { label: "EXPENSES & TRAVEL", path: MY_EXPENSES_PATH, module: "expenses" },
+];
+
+export const MyTabs = () => {
+  const location = useLocation();
+  const { user } = useAuth();
+
+  const tabs = allTabs.filter(
+    (tab) => !tab.module || isModuleEnabledForUser(user, tab.module),
+  );
+
+  if (tabs.length === 0) {
+    return null;
+  }
+
+  const activeId =
+    tabs.find((tab) => location.pathname.startsWith(tab.path))?.path ?? "";
+
+  return (
+    <NavTabBar
+      bleed
+      tabs={tabs.map((tab) => ({
+        id: tab.path,
+        label: tab.label,
+        to: tab.path,
+      }))}
+      activeId={activeId}
+    />
+  );
+};

@@ -1,11 +1,15 @@
 import { Route, Routes } from "react-router-dom";
 import { AppShell } from "./components/AppShell";
 import { ScrollToTop } from "./components/ScrollToTop";
+import { EmployeeRoute } from "./components/EmployeeRoute";
+import { MySelfServiceRoute } from "./components/MySelfServiceRoute";
 import { GuestRoute } from "./components/GuestRoute";
 import { ModuleRoute } from "./components/ModuleRoute";
 import { ProtectedRoute } from "./components/ProtectedRoute";
+import { TenantRoute } from "./components/TenantRoute";
 import { HomeRedirect } from "./routes/HomeRedirect";
-import { TenantDashboardPage } from "./pages/dashboard/TenantDashboardPage";
+import { AdminDashboardPage } from "./pages/admin/dashboard/AdminDashboardPage";
+import { EmployeeDashboardPage } from "./pages/users/dashboard/EmployeeDashboardPage";
 import {
   EmployeesIndexRedirect,
   EmployeesPage,
@@ -28,27 +32,42 @@ import {
   CountryCodesPage,
 } from "./pages/super-admin/country-codes/CountryCodesPage";
 import { SuperAdminDashboardPage } from "./pages/super-admin/dashboard/SuperAdminDashboardPage";
-import { SettingsPage } from "./pages/settings/SettingsPage";
-import { CompanySettingsPage } from "./pages/settings/company/CompanySettingsPage";
-import { DepartmentsPage } from "./pages/settings/departments/DepartmentsPage";
-import { UsersPage } from "./pages/settings/users/UsersPage";
-import { AuditLogPage } from "./pages/settings/audit-log/AuditLogPage";
-import { LeavePage } from "./pages/me/leave/LeavePage";
+import { SettingsPage } from "./pages/admin/settings/SettingsPage";
+import { CompanySettingsPage } from "./pages/admin/settings/company/CompanySettingsPage";
+import { DepartmentsPage } from "./pages/admin/settings/departments/DepartmentsPage";
+import { AuditLogPage } from "./pages/admin/settings/audit-log/AuditLogPage";
+import { LeavePage } from "./pages/users/leave/LeavePage";
 import { DocumentsPage } from "./pages/documents/DocumentsPage";
-import { AttendancePage } from "./pages/me/attendance/AttendancePage";
+import { AttendancePage } from "./pages/users/attendance/AttendancePage";
 import { TimesheetsPage } from "./pages/timesheets/TimesheetsPage";
 import { RotasPage } from "./pages/rotas/RotasPage";
-import { ExpensesPage } from "./pages/me/expenses/ExpensesPage";
-import { PerformancePage } from "./pages/me/performance/PerformancePage";
-import { AttendanceSettingsPage } from "./pages/settings/attendance/AttendanceSettingsPage";
-import { LeaveSettingsPage } from "./pages/settings/leave/LeaveSettingsPage";
-import { LocationsPage } from "./pages/settings/locations/LocationsPage";
-import { PayrollSettingsPage } from "./pages/settings/payroll/PayrollSettingsPage";
-import { PayrollPage } from "./pages/payroll/PayrollPage";
-import { BillingPage } from "./pages/settings/billing/BillingPage";
-import { ReportsPage } from "./pages/reports/ReportsPage";
-import { HeadcountReportPage } from "./pages/reports/HeadcountReportPage";
-import { AbsenceReportPage } from "./pages/reports/AbsenceReportPage";
+import { ExpensesPage } from "./pages/users/expenses/ExpensesPage";
+import { PerformancePage } from "./pages/users/performance/PerformancePage";
+import { AttendanceSettingsPage } from "./pages/admin/settings/attendance/AttendanceSettingsPage";
+import { LeaveSettingsPage } from "./pages/admin/settings/leave/LeaveSettingsPage";
+import { LocationsPage } from "./pages/admin/settings/locations/LocationsPage";
+import { PayrollSettingsPage } from "./pages/admin/settings/payroll/PayrollSettingsPage";
+import { PayrollPage } from "./pages/admin/payroll/PayrollPage";
+import { BillingPage } from "./pages/admin/settings/billing/BillingPage";
+import {
+  ADMIN_DASHBOARD_PATH,
+  ADMIN_PAYROLL_PATH,
+  ADMIN_REPORTS_ABSENCE_PATH,
+  ADMIN_REPORTS_HEADCOUNT_PATH,
+  ADMIN_REPORTS_PATH,
+  ADMIN_SETTINGS_ATTENDANCE_PATH,
+  ADMIN_SETTINGS_AUDIT_LOG_PATH,
+  ADMIN_SETTINGS_BILLING_PATH,
+  ADMIN_SETTINGS_COMPANY_PATH,
+  ADMIN_SETTINGS_DEPARTMENTS_PATH,
+  ADMIN_SETTINGS_LEAVE_PATH,
+  ADMIN_SETTINGS_LOCATIONS_PATH,
+  ADMIN_SETTINGS_PATH,
+  ADMIN_SETTINGS_PAYROLL_PATH,
+} from "./pages/admin/utils";
+import { ReportsPage } from "./pages/admin/reports/ReportsPage";
+import { HeadcountReportPage } from "./pages/admin/reports/HeadcountReportPage";
+import { AbsenceReportPage } from "./pages/admin/reports/AbsenceReportPage";
 import { TermsOfUsePage } from "./pages/legal/TermsOfUsePage";
 import { PrivacyPolicyPage } from "./pages/legal/PrivacyPolicyPage";
 
@@ -66,12 +85,10 @@ const App = () => {
 
         <Route element={<ProtectedRoute />}>
           <Route element={<AppShell />}>
-            <Route path="/dashboard" element={<TenantDashboardPage />} />
             <Route
               path="/super-admin/dashboard"
               element={<SuperAdminDashboardPage />}
             />
-            <Route path="/dashboard/profile" element={<ProfilePage />} />
             <Route
               path="/super-admin/companies"
               element={<RegistrationsPage />}
@@ -88,99 +105,6 @@ const App = () => {
               <Route path="active" />
               <Route path="archived" />
             </Route>
-            <Route
-              path="/employees"
-              element={
-                <ModuleRoute module="employees">
-                  <EmployeesPage />
-                </ModuleRoute>
-              }
-            >
-              <Route index element={<EmployeesIndexRedirect />} />
-              <Route path="active" />
-              <Route path="inactive" />
-            </Route>
-            <Route
-              path="/me/leave"
-              element={
-                <ModuleRoute module="leave">
-                  <LeavePage />
-                </ModuleRoute>
-              }
-            />
-            <Route
-              path="/me/attendance"
-              element={
-                <ModuleRoute module="attendance">
-                  <AttendancePage />
-                </ModuleRoute>
-              }
-            />
-            <Route
-              path="/dashboard/timesheets"
-              element={
-                <ModuleRoute module="timesheets">
-                  <TimesheetsPage />
-                </ModuleRoute>
-              }
-            />
-            <Route
-              path="/dashboard/rotas"
-              element={
-                <ModuleRoute module="rotas">
-                  <RotasPage />
-                </ModuleRoute>
-              }
-            />
-            <Route
-              path="/me/expenses"
-              element={
-                <ModuleRoute module="expenses">
-                  <ExpensesPage />
-                </ModuleRoute>
-              }
-            />
-            <Route path="/me/performance" element={<PerformancePage />} />
-            <Route
-              path="/dashboard/payroll"
-              element={
-                <ModuleRoute module="payroll">
-                  <PayrollPage />
-                </ModuleRoute>
-              }
-            />
-            <Route
-              path="/dashboard/reports"
-              element={
-                <ModuleRoute module="reports">
-                  <ReportsPage />
-                </ModuleRoute>
-              }
-            />
-            <Route
-              path="/dashboard/reports/headcount"
-              element={
-                <ModuleRoute module="reports">
-                  <HeadcountReportPage />
-                </ModuleRoute>
-              }
-            />
-            <Route
-              path="/dashboard/reports/absence"
-              element={
-                <ModuleRoute module="reports">
-                  <AbsenceReportPage />
-                </ModuleRoute>
-              }
-            />
-            <Route
-              path="/dashboard/documents"
-              element={
-                <ModuleRoute module="documents">
-                  <DocumentsPage />
-                </ModuleRoute>
-              }
-            />
             <Route path="/super-admin/site" element={<SiteSettingsPage />}>
               <Route index element={<SiteSettingsIndexRedirect />} />
               <Route path="general" />
@@ -188,86 +112,187 @@ const App = () => {
               <Route path="favicon" />
               <Route path="sidebar" />
             </Route>
-            <Route
-              path="/dashboard/settings"
-              element={
-                <ModuleRoute module="settings">
-                  <SettingsPage />
-                </ModuleRoute>
-              }
-            />
-            <Route
-              path="/dashboard/settings/company"
-              element={
-                <ModuleRoute module="settings">
-                  <CompanySettingsPage />
-                </ModuleRoute>
-              }
-            />
-            <Route
-              path="/dashboard/settings/departments"
-              element={
-                <ModuleRoute module="settings">
-                  <DepartmentsPage />
-                </ModuleRoute>
-              }
-            />
-            <Route
-              path="/dashboard/settings/locations"
-              element={
-                <ModuleRoute module="settings">
-                  <LocationsPage />
-                </ModuleRoute>
-              }
-            />
-            <Route
-              path="/dashboard/settings/payroll"
-              element={
-                <ModuleRoute module="settings">
-                  <PayrollSettingsPage />
-                </ModuleRoute>
-              }
-            />
-            <Route
-              path="/dashboard/settings/users"
-              element={
-                <ModuleRoute module="settings">
-                  <UsersPage />
-                </ModuleRoute>
-              }
-            />
-            <Route
-              path="/dashboard/settings/attendance"
-              element={
-                <ModuleRoute module="settings">
-                  <AttendanceSettingsPage />
-                </ModuleRoute>
-              }
-            />
-            <Route
-              path="/dashboard/settings/leave"
-              element={
-                <ModuleRoute module="settings">
-                  <LeaveSettingsPage />
-                </ModuleRoute>
-              }
-            />
-            <Route
-              path="/dashboard/settings/billing"
-              element={
-                <ModuleRoute module="settings">
-                  <BillingPage />
-                </ModuleRoute>
-              }
-            />
-            <Route
-              path="/dashboard/settings/audit-log"
-              element={
-                <ModuleRoute module="settings">
-                  <AuditLogPage />
-                </ModuleRoute>
-              }
-            />
+
+            <Route path="/my/profile" element={<ProfilePage />} />
+
+            <Route element={<MySelfServiceRoute />}>
+              <Route
+                path="/my/leave"
+                element={
+                  <ModuleRoute module="leave">
+                    <LeavePage />
+                  </ModuleRoute>
+                }
+              />
+              <Route
+                path="/my/attendance"
+                element={
+                  <ModuleRoute module="attendance">
+                    <AttendancePage />
+                  </ModuleRoute>
+                }
+              />
+              <Route
+                path="/my/expenses"
+                element={
+                  <ModuleRoute module="expenses">
+                    <ExpensesPage />
+                  </ModuleRoute>
+                }
+              />
+              <Route path="/my/performance" element={<PerformancePage />} />
+              <Route
+                path="/my/timesheets"
+                element={
+                  <ModuleRoute module="timesheets">
+                    <TimesheetsPage />
+                  </ModuleRoute>
+                }
+              />
+              <Route
+                path="/my/rotas"
+                element={
+                  <ModuleRoute module="rotas">
+                    <RotasPage />
+                  </ModuleRoute>
+                }
+              />
+              <Route
+                path="/my/documents"
+                element={
+                  <ModuleRoute module="documents">
+                    <DocumentsPage />
+                  </ModuleRoute>
+                }
+              />
+            </Route>
+
+            <Route element={<EmployeeRoute />}>
+              <Route path="/my/dashboard" element={<EmployeeDashboardPage />} />
+            </Route>
+
+            <Route element={<TenantRoute />}>
+              <Route
+                path={ADMIN_DASHBOARD_PATH}
+                element={<AdminDashboardPage />}
+              />
+              <Route
+                path="/employees"
+                element={
+                  <ModuleRoute module="employees">
+                    <EmployeesPage />
+                  </ModuleRoute>
+                }
+              >
+                <Route index element={<EmployeesIndexRedirect />} />
+                <Route path="active" />
+                <Route path="inactive" />
+              </Route>
+              <Route
+                path={ADMIN_PAYROLL_PATH}
+                element={
+                  <ModuleRoute module="payroll">
+                    <PayrollPage />
+                  </ModuleRoute>
+                }
+              />
+              <Route
+                path={ADMIN_REPORTS_PATH}
+                element={
+                  <ModuleRoute module="reports">
+                    <ReportsPage />
+                  </ModuleRoute>
+                }
+              />
+              <Route
+                path={ADMIN_REPORTS_HEADCOUNT_PATH}
+                element={
+                  <ModuleRoute module="reports">
+                    <HeadcountReportPage />
+                  </ModuleRoute>
+                }
+              />
+              <Route
+                path={ADMIN_REPORTS_ABSENCE_PATH}
+                element={
+                  <ModuleRoute module="reports">
+                    <AbsenceReportPage />
+                  </ModuleRoute>
+                }
+              />
+              <Route
+                path={ADMIN_SETTINGS_PATH}
+                element={
+                  <ModuleRoute module="settings">
+                    <SettingsPage />
+                  </ModuleRoute>
+                }
+              />
+              <Route
+                path={ADMIN_SETTINGS_COMPANY_PATH}
+                element={
+                  <ModuleRoute module="settings">
+                    <CompanySettingsPage />
+                  </ModuleRoute>
+                }
+              />
+              <Route
+                path={ADMIN_SETTINGS_DEPARTMENTS_PATH}
+                element={
+                  <ModuleRoute module="settings">
+                    <DepartmentsPage />
+                  </ModuleRoute>
+                }
+              />
+              <Route
+                path={ADMIN_SETTINGS_LOCATIONS_PATH}
+                element={
+                  <ModuleRoute module="settings">
+                    <LocationsPage />
+                  </ModuleRoute>
+                }
+              />
+              <Route
+                path={ADMIN_SETTINGS_PAYROLL_PATH}
+                element={
+                  <ModuleRoute module="settings">
+                    <PayrollSettingsPage />
+                  </ModuleRoute>
+                }
+              />
+              <Route
+                path={ADMIN_SETTINGS_ATTENDANCE_PATH}
+                element={
+                  <ModuleRoute module="settings">
+                    <AttendanceSettingsPage />
+                  </ModuleRoute>
+                }
+              />
+              <Route
+                path={ADMIN_SETTINGS_LEAVE_PATH}
+                element={
+                  <ModuleRoute module="settings">
+                    <LeaveSettingsPage />
+                  </ModuleRoute>
+                }
+              />
+              <Route
+                path={ADMIN_SETTINGS_BILLING_PATH}
+                element={
+                  <ModuleRoute module="settings">
+                    <BillingPage />
+                  </ModuleRoute>
+                }
+              />
+              <Route
+                path={ADMIN_SETTINGS_AUDIT_LOG_PATH}
+                element={
+                  <ModuleRoute module="settings">
+                    <AuditLogPage />
+                  </ModuleRoute>
+                }
+              />
+            </Route>
           </Route>
         </Route>
 

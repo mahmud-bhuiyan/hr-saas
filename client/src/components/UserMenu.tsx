@@ -1,5 +1,5 @@
-import { useEffect, useRef, useState, type ReactNode } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useEffect, useRef, useState, type ReactNode } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import {
   HiArrowRightOnRectangle,
   HiChevronRight,
@@ -9,30 +9,32 @@ import {
   HiPaintBrush,
   HiSun,
   HiUser,
-} from 'react-icons/hi2';
-import { ChangePasswordModal } from './ChangePasswordModal';
-import { useAuth } from '../contexts/AuthContext';
-import { useTheme } from '../contexts/ThemeContext';
-import { useMyAttendanceStatus } from '../hooks/useMyAttendanceStatus';
-import { logout } from '../lib/api';
-import type { ColorScheme, ThemeColor } from '../types';
-import { THEME_COLOR_OPTIONS, THEME_COLORS } from '../utils/theme-colors';
-import { UserAvatar } from './UserAvatar';
-import { displayName } from '../utils/user';
+} from "react-icons/hi2";
+import { ChangePasswordModal } from "./ChangePasswordModal";
+import { useAuth } from "../contexts/AuthContext";
+import { useTheme } from "../contexts/ThemeContext";
+import { useMyAttendanceStatus } from "../hooks/useMyAttendanceStatus";
+import { logout } from "../lib/api";
+import { MY_PROFILE_PATH } from "../pages/users/utils";
+import type { ColorScheme, ThemeColor } from "../types";
+import { THEME_COLOR_OPTIONS, THEME_COLORS } from "../utils/theme-colors";
+import { UserAvatar } from "./UserAvatar";
+import { displayName } from "../utils/user";
 
-type SubmenuKey = 'display' | 'theme';
+type SubmenuKey = "display" | "theme";
 
 const menuItemClass =
-  'flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm text-slate-700 transition-colors hover:bg-slate-50 dark:text-slate-200 dark:hover:bg-slate-800/80';
+  "flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm text-slate-700 transition-colors hover:bg-slate-50 dark:text-slate-200 dark:hover:bg-slate-800/80";
 
-const menuIconClass = 'h-5 w-5 shrink-0 text-slate-500 dark:text-slate-300';
+const menuIconClass = "h-5 w-5 shrink-0 text-slate-500 dark:text-slate-300";
 
 const submenuPanelClass =
-  'w-44 rounded-lg border border-slate-700 bg-slate-900 p-1 shadow-xl';
+  "w-44 rounded-lg border border-slate-700 bg-slate-900 p-1 shadow-xl";
 
-const submenuItemClass = 'flex w-full items-center gap-3 rounded-md px-3 py-2 text-left text-sm text-white transition-colors';
+const submenuItemClass =
+  "flex w-full items-center gap-3 rounded-md px-3 py-2 text-left text-sm text-white transition-colors";
 
-const submenuTriggerOpenClass = 'bg-slate-100 dark:bg-white/10';
+const submenuTriggerOpenClass = "bg-slate-100 dark:bg-white/10";
 
 const MenuRow = ({
   icon,
@@ -49,9 +51,16 @@ const MenuRow = ({
 }) => {
   const content = (
     <>
-      <span className="flex h-5 w-5 shrink-0 items-center justify-center">{icon}</span>
+      <span className="flex h-5 w-5 shrink-0 items-center justify-center">
+        {icon}
+      </span>
       <span className="min-w-0 flex-1 truncate leading-5">{label}</span>
-      {chevron && <HiChevronRight className="h-4 w-4 shrink-0 text-slate-400 dark:text-slate-500" aria-hidden />}
+      {chevron && (
+        <HiChevronRight
+          className="h-4 w-4 shrink-0 text-slate-400 dark:text-slate-500"
+          aria-hidden
+        />
+      )}
     </>
   );
 
@@ -64,7 +73,12 @@ const MenuRow = ({
   }
 
   return (
-    <button type="button" role="menuitem" className={menuItemClass} onClick={onClick}>
+    <button
+      type="button"
+      role="menuitem"
+      className={menuItemClass}
+      onClick={onClick}
+    >
       {content}
     </button>
   );
@@ -97,11 +111,16 @@ const HoverSubmenu = ({
     >
       <div
         role="menuitem"
-        className={`${menuItemClass}${isOpen ? ` ${submenuTriggerOpenClass}` : ''}`}
+        className={`${menuItemClass}${isOpen ? ` ${submenuTriggerOpenClass}` : ""}`}
       >
-        <span className="flex h-5 w-5 shrink-0 items-center justify-center">{icon}</span>
+        <span className="flex h-5 w-5 shrink-0 items-center justify-center">
+          {icon}
+        </span>
         <span className="min-w-0 flex-1 truncate leading-5">{label}</span>
-        <HiChevronRight className="h-4 w-4 shrink-0 text-slate-400 dark:text-slate-500" aria-hidden />
+        <HiChevronRight
+          className="h-4 w-4 shrink-0 text-slate-400 dark:text-slate-500"
+          aria-hidden
+        />
       </div>
 
       {isOpen && (
@@ -131,7 +150,7 @@ const ThemeColorOption = ({
       type="button"
       role="menuitem"
       className={`${submenuItemClass} border ${
-        selected ? '' : 'border-transparent hover:border-white/20'
+        selected ? "" : "border-transparent hover:border-white/20"
       }`}
       style={selected ? { borderColor: swatch } : undefined}
       onClick={onSelect}
@@ -161,7 +180,7 @@ const DisplayModeOption = ({
     type="button"
     role="menuitem"
     className={`${submenuItemClass} border ${
-      selected ? 'border-brand-400' : 'border-transparent hover:border-white/20'
+      selected ? "border-brand-400" : "border-transparent hover:border-white/20"
     }`}
     onClick={onSelect}
   >
@@ -195,16 +214,16 @@ export const UserMenu = () => {
     };
 
     const handleEscape = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
+      if (event.key === "Escape") {
         setOpen(false);
       }
     };
 
-    document.addEventListener('mousedown', handleClickOutside);
-    document.addEventListener('keydown', handleEscape);
+    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("keydown", handleEscape);
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-      document.removeEventListener('keydown', handleEscape);
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("keydown", handleEscape);
     };
   }, [open]);
 
@@ -220,7 +239,7 @@ export const UserMenu = () => {
   const handleLogout = async () => {
     closeMenu();
     await logout();
-    navigate('/login', { replace: true });
+    navigate("/login", { replace: true });
   };
 
   const handleDisplayMode = (scheme: ColorScheme) => {
@@ -232,6 +251,8 @@ export const UserMenu = () => {
     setThemeColor(color);
     closeMenu();
   };
+
+  const profilePath = MY_PROFILE_PATH;
 
   return (
     <>
@@ -260,7 +281,7 @@ export const UserMenu = () => {
           >
             <div onClick={closeMenu}>
               <MenuRow
-                to="/dashboard/profile"
+                to={profilePath}
                 label="My profile"
                 icon={<HiUser className={menuIconClass} aria-hidden />}
               />
@@ -276,15 +297,25 @@ export const UserMenu = () => {
             >
               <DisplayModeOption
                 label="Light"
-                icon={<HiSun className="h-5 w-5 shrink-0 text-slate-300" aria-hidden />}
-                selected={colorScheme === 'light'}
-                onSelect={() => handleDisplayMode('light')}
+                icon={
+                  <HiSun
+                    className="h-5 w-5 shrink-0 text-slate-300"
+                    aria-hidden
+                  />
+                }
+                selected={colorScheme === "light"}
+                onSelect={() => handleDisplayMode("light")}
               />
               <DisplayModeOption
                 label="Dark"
-                icon={<HiMoon className="h-5 w-5 shrink-0 text-slate-300" aria-hidden />}
-                selected={colorScheme === 'dark'}
-                onSelect={() => handleDisplayMode('dark')}
+                icon={
+                  <HiMoon
+                    className="h-5 w-5 shrink-0 text-slate-300"
+                    aria-hidden
+                  />
+                }
+                selected={colorScheme === "dark"}
+                onSelect={() => handleDisplayMode("dark")}
               />
             </HoverSubmenu>
 
@@ -316,10 +347,17 @@ export const UserMenu = () => {
               }}
             >
               <HiKey className={menuIconClass} aria-hidden />
-              <span className="min-w-0 flex-1 truncate leading-5">Change password</span>
+              <span className="min-w-0 flex-1 truncate leading-5">
+                Change password
+              </span>
             </button>
 
-            <button type="button" role="menuitem" className={menuItemClass} onClick={() => void handleLogout()}>
+            <button
+              type="button"
+              role="menuitem"
+              className={menuItemClass}
+              onClick={() => void handleLogout()}
+            >
               <HiArrowRightOnRectangle className={menuIconClass} aria-hidden />
               <span className="min-w-0 flex-1 truncate leading-5">Logout</span>
             </button>

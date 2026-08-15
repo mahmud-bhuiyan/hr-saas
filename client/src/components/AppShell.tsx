@@ -42,17 +42,30 @@ import { NotificationBell } from "./NotificationBell";
 import type { UserRole } from "../types";
 import type { TenantModuleId } from "../types/modules";
 import {
-  hasAnyMeModuleEnabled,
+  hasAnyMyModuleEnabled,
   isModuleEnabledForUser,
 } from "../utils/modules";
 import { REGISTERED_COMPANIES_PATH } from "../pages/super-admin/companies/utils";
 import { COUNTRY_CODES_ACTIVE_PATH } from "../pages/super-admin/country-codes/utils";
 import { SITE_SETTINGS_GENERAL_PATH } from "../pages/super-admin/site/utils";
 import {
+  ADMIN_DASHBOARD_PATH,
+  ADMIN_PAYROLL_PATH,
+  ADMIN_REPORTS_PATH,
+  ADMIN_SETTINGS_PATH,
+} from "../pages/admin/utils";
+import {
   SUPER_ADMIN_BASE_PATH,
   SUPER_ADMIN_DASHBOARD_PATH,
-  TENANT_DASHBOARD_PATH,
 } from "../utils/routes";
+import {
+  MY_ATTENDANCE_PATH,
+  MY_DASHBOARD_PATH,
+  MY_DOCUMENTS_PATH,
+  MY_ROTAS_PATH,
+  MY_TIMESHEETS_PATH,
+  isMyPersonalSectionPath,
+} from "../pages/users/utils";
 
 const navItems: Array<{
   to: string;
@@ -63,7 +76,7 @@ const navItems: Array<{
 
   end?: boolean;
 
-  /** Highlight when the current path starts with this prefix (e.g. /me/ sub-tabs). */
+  /** Highlight when the current path starts with this prefix (e.g. /my/ personal tabs). */
   activePrefix?: string;
 
   disabled?: boolean;
@@ -73,11 +86,21 @@ const navItems: Array<{
   module?: TenantModuleId;
 }> = [
   {
-    to: TENANT_DASHBOARD_PATH,
+    to: ADMIN_DASHBOARD_PATH,
     label: "Home",
     icon: HiHome,
     end: true,
-    roles: ["company_admin", "hr_manager", "manager", "employee"],
+    roles: ["company_admin", "hr_manager", "manager"],
+    activePrefix: ADMIN_DASHBOARD_PATH,
+  },
+
+  {
+    to: MY_DASHBOARD_PATH,
+    label: "Home",
+    icon: HiHome,
+    end: true,
+    roles: ["employee"],
+    activePrefix: MY_DASHBOARD_PATH,
   },
 
   {
@@ -114,11 +137,34 @@ const navItems: Array<{
   },
 
   {
-    to: "/me/attendance",
+    to: MY_ATTENDANCE_PATH,
     label: "Me",
     icon: HiUser,
-    activePrefix: "/me/",
     roles: ["company_admin", "hr_manager", "manager", "employee"],
+  },
+
+  {
+    to: MY_TIMESHEETS_PATH,
+    label: "Timesheets",
+    icon: HiTableCells,
+    roles: ["company_admin", "hr_manager", "manager", "employee"],
+    module: "timesheets",
+  },
+
+  {
+    to: MY_ROTAS_PATH,
+    label: "Rotas",
+    icon: HiBriefcase,
+    roles: ["company_admin", "hr_manager", "manager", "employee"],
+    module: "rotas",
+  },
+
+  {
+    to: MY_DOCUMENTS_PATH,
+    label: "Documents",
+    icon: HiDocumentText,
+    roles: ["company_admin", "hr_manager", "employee"],
+    module: "documents",
   },
 
   {
@@ -131,23 +177,7 @@ const navItems: Array<{
   },
 
   {
-    to: "/dashboard/timesheets",
-    label: "Timesheets",
-    icon: HiTableCells,
-    roles: ["company_admin", "hr_manager", "manager", "employee"],
-    module: "timesheets",
-  },
-
-  {
-    to: "/dashboard/rotas",
-    label: "Rotas",
-    icon: HiBriefcase,
-    roles: ["company_admin", "hr_manager", "manager", "employee"],
-    module: "rotas",
-  },
-
-  {
-    to: "/dashboard/payroll",
+    to: ADMIN_PAYROLL_PATH,
     label: "Payroll",
     icon: HiCurrencyDollar,
     roles: ["company_admin", "hr_manager"],
@@ -155,7 +185,7 @@ const navItems: Array<{
   },
 
   {
-    to: "/dashboard/reports",
+    to: ADMIN_REPORTS_PATH,
     label: "Reports",
     icon: HiChartBar,
     roles: ["company_admin", "hr_manager"],
@@ -163,15 +193,7 @@ const navItems: Array<{
   },
 
   {
-    to: "/dashboard/documents",
-    label: "Documents",
-    icon: HiDocumentText,
-    roles: ["company_admin", "hr_manager", "employee"],
-    module: "documents",
-  },
-
-  {
-    to: "/dashboard/settings",
+    to: ADMIN_SETTINGS_PATH,
 
     label: "Settings",
 
@@ -187,6 +209,10 @@ const isNavItemActive = (
   pathname: string,
   item: (typeof navItems)[number],
 ): boolean => {
+  if (item.to === MY_ATTENDANCE_PATH) {
+    return isMyPersonalSectionPath(pathname);
+  }
+
   if (item.activePrefix) {
     return pathname.startsWith(item.activePrefix);
   }
@@ -316,14 +342,14 @@ export const AppShell = () => {
               }
 
               if (
-                item.activePrefix === "/me/" &&
-                !hasAnyMeModuleEnabled(user)
+                item.to === MY_ATTENDANCE_PATH &&
+                !hasAnyMyModuleEnabled(user)
               ) {
                 return false;
               }
 
               if (
-                item.activePrefix === "/me/" &&
+                item.to === MY_ATTENDANCE_PATH &&
                 user?.role === "company_admin" &&
                 hasLinkedEmployee !== true
               ) {

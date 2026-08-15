@@ -1,13 +1,13 @@
-import { FormEvent, useMemo, useState } from 'react';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { Navigate } from 'react-router-dom';
-import { HiArrowPath, HiPlus, HiSignal } from 'react-icons/hi2';
-import { toast } from 'react-toastify';
-import { Button } from '../../components/ui/Button';
-import { PageContainer } from '../../components/ui/PageContainer';
-import { PageHeader } from '../../components/layout/PageHeader';
-import { Tabs } from '../../components/ui/Tabs';
-import { useAuth } from '../../contexts/AuthContext';
+import { FormEvent, useMemo, useState } from "react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { Navigate } from "react-router-dom";
+import { HiArrowPath, HiPlus, HiSignal } from "react-icons/hi2";
+import { toast } from "react-toastify";
+import { Button } from "../../components/ui/Button";
+import { PageContainer } from "../../components/ui/PageContainer";
+import { PageHeader } from "../../components/layout/PageHeader";
+import { Tabs } from "../../components/ui/Tabs";
+import { useAuth } from "../../contexts/AuthContext";
 import {
   ApiError,
   claimShift,
@@ -19,17 +19,18 @@ import {
   fetchWorkLocations,
   patchShift,
   publishRotaWeek,
-} from '../../lib/api';
-import type { Shift } from '../../types';
-import { pickChangedFields } from '../../utils/form';
-import { hasPermission } from '../../utils/permissions';
-import { isQueryInitialLoad } from '../../utils/query';
-import { MyShiftsTable } from './components/MyShiftsTable';
-import { OpenShiftsTable } from './components/OpenShiftsTable';
-import { PublishRotaModal } from './components/PublishRotaModal';
-import { RotaWeekGrid } from './components/RotaWeekGrid';
-import { ShiftFormModal } from './components/ShiftFormModal';
-import { WeekPickerBar } from './components/WeekPickerBar';
+} from "../../lib/api";
+import type { Shift } from "../../types";
+import { pickChangedFields } from "../../utils/form";
+import { hasPermission } from "../../utils/permissions";
+import { homePathForRole } from "../../utils/routes";
+import { isQueryInitialLoad } from "../../utils/query";
+import { MyShiftsTable } from "./components/MyShiftsTable";
+import { OpenShiftsTable } from "./components/OpenShiftsTable";
+import { PublishRotaModal } from "./components/PublishRotaModal";
+import { RotaWeekGrid } from "./components/RotaWeekGrid";
+import { ShiftFormModal } from "./components/ShiftFormModal";
+import { WeekPickerBar } from "./components/WeekPickerBar";
 import {
   emptyShiftForm,
   filterMyShifts,
@@ -38,89 +39,112 @@ import {
   getMondayOfWeek,
   type RotasTab,
   type ShiftFormState,
-} from './utils';
+} from "./utils";
 
-const TENANT_ROTA_ROLES = ['company_admin', 'hr_manager', 'manager', 'employee'] as const;
+const TENANT_ROTA_ROLES = [
+  "company_admin",
+  "hr_manager",
+  "manager",
+  "employee",
+] as const;
 
 export const RotasPage = () => {
   const { user } = useAuth();
   const queryClient = useQueryClient();
 
   const canAccess =
-    user && TENANT_ROTA_ROLES.includes(user.role as (typeof TENANT_ROTA_ROLES)[number]);
-  const canManage = user && hasPermission(user.role, 'rota:manage');
-  const canReadOwn = user && hasPermission(user.role, 'rota:read:own');
-  const canClaim = user && hasPermission(user.role, 'rota:claim:own');
+    user &&
+    TENANT_ROTA_ROLES.includes(user.role as (typeof TENANT_ROTA_ROLES)[number]);
+  const canManage = user && hasPermission(user.role, "rota:manage");
+  const canReadOwn = user && hasPermission(user.role, "rota:read:own");
+  const canClaim = user && hasPermission(user.role, "rota:claim:own");
 
-  const [weekOf, setWeekOf] = useState(() => formatWeekOf(getMondayOfWeek(new Date())));
+  const [weekOf, setWeekOf] = useState(() =>
+    formatWeekOf(getMondayOfWeek(new Date())),
+  );
   const [activeTab, setActiveTab] = useState<RotasTab>(() =>
-    canManage ? 'weekly-rota' : canReadOwn ? 'my-shifts' : 'open-shifts'
+    canManage ? "weekly-rota" : canReadOwn ? "my-shifts" : "open-shifts",
   );
   const [createOpen, setCreateOpen] = useState(false);
   const [editTarget, setEditTarget] = useState<Shift | null>(null);
   const [publishOpen, setPublishOpen] = useState(false);
-  const [createForm, setCreateForm] = useState<ShiftFormState>(() => emptyShiftForm());
-  const [editForm, setEditForm] = useState<ShiftFormState>(() => emptyShiftForm());
+  const [createForm, setCreateForm] = useState<ShiftFormState>(() =>
+    emptyShiftForm(),
+  );
+  const [editForm, setEditForm] = useState<ShiftFormState>(() =>
+    emptyShiftForm(),
+  );
   const [actionLoadingId, setActionLoadingId] = useState<string | null>(null);
   const [claimLoadingId, setClaimLoadingId] = useState<string | null>(null);
 
   const rotaQuery = useQuery({
-    queryKey: ['rotas', weekOf],
+    queryKey: ["rotas", weekOf],
     queryFn: () => fetchRotaWeek(weekOf),
     enabled: Boolean(canAccess),
   });
 
   const locationsQuery = useQuery({
-    queryKey: ['locations', 'active'],
+    queryKey: ["locations", "active"],
     queryFn: () => fetchWorkLocations(false),
     enabled: Boolean(canManage),
   });
 
   const employeesQuery = useQuery({
-    queryKey: ['employees', 'rota'],
-    queryFn: () => fetchEmployees({ status: 'active' }),
+    queryKey: ["employees", "rota"],
+    queryFn: () => fetchEmployees({ status: "active" }),
     enabled: Boolean(canManage),
   });
 
   const invalidateRotas = () => {
-    void queryClient.invalidateQueries({ queryKey: ['rotas'] });
+    void queryClient.invalidateQueries({ queryKey: ["rotas"] });
   };
 
   const createMutation = useMutation({
     mutationFn: createShift,
     onSuccess: () => {
-      toast.success('Shift created.');
+      toast.success("Shift created.");
       setCreateOpen(false);
       setCreateForm(emptyShiftForm());
       invalidateRotas();
     },
     onError: (error: unknown) => {
-      toast.error(error instanceof ApiError ? error.message : 'Failed to create shift');
+      toast.error(
+        error instanceof ApiError ? error.message : "Failed to create shift",
+      );
     },
   });
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, input }: { id: string; input: Record<string, unknown> }) =>
-      patchShift(id, input),
+    mutationFn: ({
+      id,
+      input,
+    }: {
+      id: string;
+      input: Record<string, unknown>;
+    }) => patchShift(id, input),
     onSuccess: () => {
-      toast.success('Shift updated.');
+      toast.success("Shift updated.");
       setEditTarget(null);
       invalidateRotas();
     },
     onError: (error: unknown) => {
-      toast.error(error instanceof ApiError ? error.message : 'Failed to update shift');
+      toast.error(
+        error instanceof ApiError ? error.message : "Failed to update shift",
+      );
     },
   });
 
   const deleteMutation = useMutation({
     mutationFn: deleteShift,
     onSuccess: () => {
-      toast.success('Shift deleted.');
+      toast.success("Shift deleted.");
       setActionLoadingId(null);
       invalidateRotas();
     },
     onError: (error: unknown) => {
-      toast.error(error instanceof ApiError ? error.message : 'Failed to delete shift');
+      toast.error(
+        error instanceof ApiError ? error.message : "Failed to delete shift",
+      );
       setActionLoadingId(null);
     },
   });
@@ -128,35 +152,47 @@ export const RotasPage = () => {
   const publishMutation = useMutation({
     mutationFn: () => publishRotaWeek({ weekOf }),
     onSuccess: (result) => {
-      toast.success(`Published ${result.publishedCount} shift${result.publishedCount === 1 ? '' : 's'}.`);
+      toast.success(
+        `Published ${result.publishedCount} shift${result.publishedCount === 1 ? "" : "s"}.`,
+      );
       setPublishOpen(false);
       invalidateRotas();
     },
     onError: (error: unknown) => {
-      toast.error(error instanceof ApiError ? error.message : 'Failed to publish rota');
+      toast.error(
+        error instanceof ApiError ? error.message : "Failed to publish rota",
+      );
     },
   });
 
   const copyMutation = useMutation({
     mutationFn: () => copyRotaWeek({ weekOf }),
     onSuccess: (result) => {
-      toast.success(`Copied ${result.copiedCount} shift${result.copiedCount === 1 ? '' : 's'} from previous week.`);
+      toast.success(
+        `Copied ${result.copiedCount} shift${result.copiedCount === 1 ? "" : "s"} from previous week.`,
+      );
       invalidateRotas();
     },
     onError: (error: unknown) => {
-      toast.error(error instanceof ApiError ? error.message : 'Failed to copy previous week');
+      toast.error(
+        error instanceof ApiError
+          ? error.message
+          : "Failed to copy previous week",
+      );
     },
   });
 
   const claimMutation = useMutation({
     mutationFn: claimShift,
     onSuccess: () => {
-      toast.success('Shift claimed.');
+      toast.success("Shift claimed.");
       setClaimLoadingId(null);
       invalidateRotas();
     },
     onError: (error: unknown) => {
-      toast.error(error instanceof ApiError ? error.message : 'Failed to claim shift');
+      toast.error(
+        error instanceof ApiError ? error.message : "Failed to claim shift",
+      );
       setClaimLoadingId(null);
     },
   });
@@ -164,13 +200,29 @@ export const RotasPage = () => {
   const shifts = rotaQuery.data?.shifts ?? [];
   const myShifts = useMemo(() => filterMyShifts(shifts), [shifts]);
   const openShifts = useMemo(() => filterOpenShifts(shifts), [shifts]);
-  const draftCount = shifts.filter((shift) => shift.status === 'draft').length;
+  const draftCount = shifts.filter((shift) => shift.status === "draft").length;
 
   const tabs = [
-    ...(canManage ? [{ id: 'weekly-rota' as const, label: 'Weekly rota' }] : []),
-    ...(canReadOwn ? [{ id: 'my-shifts' as const, label: 'My shifts', count: myShifts.length }] : []),
+    ...(canManage
+      ? [{ id: "weekly-rota" as const, label: "Weekly rota" }]
+      : []),
+    ...(canReadOwn
+      ? [
+          {
+            id: "my-shifts" as const,
+            label: "My shifts",
+            count: myShifts.length,
+          },
+        ]
+      : []),
     ...(canClaim
-      ? [{ id: 'open-shifts' as const, label: 'Open shifts', count: openShifts.length }]
+      ? [
+          {
+            id: "open-shifts" as const,
+            label: "Open shifts",
+            count: openShifts.length,
+          },
+        ]
       : []),
   ];
 
@@ -200,7 +252,7 @@ export const RotasPage = () => {
       endTime: editTarget.endTime,
       locationId: editTarget.locationId,
       employeeId: editTarget.employeeId,
-      role: editTarget.role ?? '',
+      role: editTarget.role ?? "",
     };
 
     const next = {
@@ -213,31 +265,32 @@ export const RotasPage = () => {
     };
 
     const changed = pickChangedFields(next, original, [
-      'date',
-      'startTime',
-      'endTime',
-      'locationId',
-      'employeeId',
-      'role',
+      "date",
+      "startTime",
+      "endTime",
+      "locationId",
+      "employeeId",
+      "role",
     ]);
     if (Object.keys(changed).length === 0) {
       return;
     }
 
-    if ('role' in changed && changed.role === '') {
-      changed.role = '';
+    if ("role" in changed && changed.role === "") {
+      changed.role = "";
     }
 
     updateMutation.mutate({ id: editTarget.id, input: changed });
   };
 
   if (!canAccess) {
-    return <Navigate to="/dashboard" replace />;
+    return <Navigate to={homePathForRole(user?.role)} replace />;
   }
 
   const locations = locationsQuery.data ?? [];
   const employees = employeesQuery.data ?? [];
-  const noLocations = canManage && !isQueryInitialLoad(locationsQuery) && locations.length === 0;
+  const noLocations =
+    canManage && !isQueryInitialLoad(locationsQuery) && locations.length === 0;
 
   return (
     <PageContainer>
@@ -246,8 +299,8 @@ export const RotasPage = () => {
         title="Rotas"
         description={
           canManage
-            ? 'Build weekly shift schedules, publish to staff, and manage open shifts.'
-            : 'View your assigned shifts and claim open shifts when available.'
+            ? "Build weekly shift schedules, publish to staff, and manage open shifts."
+            : "View your assigned shifts and claim open shifts when available."
         }
         action={
           canManage ? (
@@ -269,7 +322,7 @@ export const RotasPage = () => {
                 disabled={draftCount === 0}
                 onClick={() => setPublishOpen(true)}
               >
-                Publish week{draftCount > 0 ? ` (${draftCount})` : ''}
+                Publish week{draftCount > 0 ? ` (${draftCount})` : ""}
               </Button>
               <Button
                 type="button"
@@ -302,7 +355,7 @@ export const RotasPage = () => {
       <div className="space-y-6">
         <WeekPickerBar weekOf={weekOf} onWeekChange={setWeekOf} />
 
-        {activeTab === 'weekly-rota' && canManage && (
+        {activeTab === "weekly-rota" && canManage && (
           <RotaWeekGrid
             weekOf={weekOf}
             shifts={shifts}
@@ -320,8 +373,8 @@ export const RotasPage = () => {
                 startTime: shift.startTime,
                 endTime: shift.endTime,
                 locationId: shift.locationId,
-                employeeId: shift.employeeId ?? '',
-                role: shift.role ?? '',
+                employeeId: shift.employeeId ?? "",
+                role: shift.role ?? "",
               });
             }}
             onDeleteShift={(shift) => {
@@ -331,11 +384,14 @@ export const RotasPage = () => {
           />
         )}
 
-        {activeTab === 'my-shifts' && canReadOwn && (
-          <MyShiftsTable shifts={myShifts} loading={isQueryInitialLoad(rotaQuery)} />
+        {activeTab === "my-shifts" && canReadOwn && (
+          <MyShiftsTable
+            shifts={myShifts}
+            loading={isQueryInitialLoad(rotaQuery)}
+          />
         )}
 
-        {activeTab === 'open-shifts' && canClaim && (
+        {activeTab === "open-shifts" && canClaim && (
           <OpenShiftsTable
             shifts={openShifts}
             loading={isQueryInitialLoad(rotaQuery)}

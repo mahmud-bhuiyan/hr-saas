@@ -1,11 +1,27 @@
 import type { AuthUser, UserRole } from "../types";
 import type { TenantModuleId } from "../types/modules";
 import { EMPLOYEES_ACTIVE_PATH } from "../pages/employees/utils";
+import {
+  MY_ATTENDANCE_PATH,
+  MY_DOCUMENTS_PATH,
+  MY_DASHBOARD_PATH,
+  MY_EXPENSES_PATH,
+  MY_LEAVE_PATH,
+  MY_PROFILE_PATH,
+  MY_ROTAS_PATH,
+  MY_TIMESHEETS_PATH,
+} from "../pages/users/utils";
 import { REGISTERED_COMPANIES_PATH } from "../pages/super-admin/companies/utils";
 import { COUNTRY_CODES_ACTIVE_PATH } from "../pages/super-admin/country-codes/utils";
 import { SITE_SETTINGS_GENERAL_PATH } from "../pages/super-admin/site/utils";
 import { isModuleEnabledForUser } from "./modules";
-import { SUPER_ADMIN_DASHBOARD_PATH, TENANT_DASHBOARD_PATH } from "./routes";
+import {
+  ADMIN_DASHBOARD_PATH,
+  ADMIN_PAYROLL_PATH,
+  ADMIN_REPORTS_PATH,
+  ADMIN_SETTINGS_PATH,
+} from "../pages/admin/utils";
+import { SUPER_ADMIN_DASHBOARD_PATH } from "./routes";
 
 export type GlobalSearchActionDef = {
   id: string;
@@ -19,11 +35,19 @@ export type GlobalSearchActionDef = {
 
 export const GLOBAL_SEARCH_ACTIONS: GlobalSearchActionDef[] = [
   {
-    id: "dashboard",
+    id: "admin-dashboard",
     label: "Dashboard",
     subtitle: "Home overview",
-    route: TENANT_DASHBOARD_PATH,
-    roles: ["company_admin", "hr_manager", "manager", "employee"],
+    route: ADMIN_DASHBOARD_PATH,
+    roles: ["company_admin", "hr_manager", "manager"],
+    keywords: ["home", "overview"],
+  },
+  {
+    id: "employee-dashboard",
+    label: "Dashboard",
+    subtitle: "Home overview",
+    route: MY_DASHBOARD_PATH,
+    roles: ["employee"],
     keywords: ["home", "overview"],
   },
   {
@@ -38,14 +62,21 @@ export const GLOBAL_SEARCH_ACTIONS: GlobalSearchActionDef[] = [
     id: "profile",
     label: "My profile",
     subtitle: "View and edit your account",
-    route: "/dashboard/profile",
+    route: MY_PROFILE_PATH,
+    roles: [
+      "company_admin",
+      "hr_manager",
+      "manager",
+      "employee",
+      "super_admin",
+    ],
     keywords: ["profile", "account", "password"],
   },
   {
     id: "leave",
     label: "Leave",
     subtitle: "Leave requests, balances, and time off",
-    route: "/me/leave",
+    route: MY_LEAVE_PATH,
     roles: ["company_admin", "hr_manager", "manager", "employee"],
     module: "leave",
     keywords: [
@@ -63,7 +94,7 @@ export const GLOBAL_SEARCH_ACTIONS: GlobalSearchActionDef[] = [
     id: "attendance",
     label: "Clock in / attendance",
     subtitle: "Clock in, clock out, and history",
-    route: "/me/attendance",
+    route: MY_ATTENDANCE_PATH,
     roles: ["company_admin", "hr_manager", "manager", "employee"],
     module: "attendance",
     keywords: ["clock in", "clock out", "attendance", "punch", "time"],
@@ -72,7 +103,7 @@ export const GLOBAL_SEARCH_ACTIONS: GlobalSearchActionDef[] = [
     id: "timesheets",
     label: "My timesheet",
     subtitle: "Weekly hours and submission",
-    route: "/dashboard/timesheets",
+    route: MY_TIMESHEETS_PATH,
     roles: ["company_admin", "hr_manager", "manager", "employee"],
     module: "timesheets",
     keywords: ["timesheet", "hours", "overtime", "weekly"],
@@ -81,7 +112,7 @@ export const GLOBAL_SEARCH_ACTIONS: GlobalSearchActionDef[] = [
     id: "expenses",
     label: "Submit expense",
     subtitle: "Expense claims and receipts",
-    route: "/me/expenses",
+    route: MY_EXPENSES_PATH,
     roles: ["company_admin", "hr_manager", "manager", "employee"],
     module: "expenses",
     keywords: ["expense", "receipt", "reimbursement", "claim"],
@@ -99,7 +130,7 @@ export const GLOBAL_SEARCH_ACTIONS: GlobalSearchActionDef[] = [
     id: "documents",
     label: "Documents",
     subtitle: "HR documents and files",
-    route: "/dashboard/documents",
+    route: MY_DOCUMENTS_PATH,
     roles: ["company_admin", "hr_manager", "employee"],
     module: "documents",
     keywords: ["documents", "files", "contracts", "upload"],
@@ -108,7 +139,7 @@ export const GLOBAL_SEARCH_ACTIONS: GlobalSearchActionDef[] = [
     id: "rotas",
     label: "Rotas",
     subtitle: "Shift schedule and open shifts",
-    route: "/dashboard/rotas",
+    route: MY_ROTAS_PATH,
     roles: ["company_admin", "hr_manager", "manager", "employee"],
     module: "rotas",
     keywords: ["rota", "rotas", "shift", "schedule", "shifts"],
@@ -117,7 +148,7 @@ export const GLOBAL_SEARCH_ACTIONS: GlobalSearchActionDef[] = [
     id: "payroll",
     label: "Payroll",
     subtitle: "Payroll periods and export",
-    route: "/dashboard/payroll",
+    route: ADMIN_PAYROLL_PATH,
     roles: ["company_admin", "hr_manager"],
     module: "payroll",
     keywords: ["payroll", "pay", "salary", "export"],
@@ -126,7 +157,7 @@ export const GLOBAL_SEARCH_ACTIONS: GlobalSearchActionDef[] = [
     id: "reports",
     label: "Reports",
     subtitle: "Headcount and absence reports",
-    route: "/dashboard/reports",
+    route: ADMIN_REPORTS_PATH,
     roles: ["company_admin", "hr_manager"],
     module: "reports",
     keywords: ["reports", "headcount", "analytics", "absence"],
@@ -135,7 +166,7 @@ export const GLOBAL_SEARCH_ACTIONS: GlobalSearchActionDef[] = [
     id: "settings",
     label: "Settings",
     subtitle: "Company and HR settings",
-    route: "/dashboard/settings",
+    route: ADMIN_SETTINGS_PATH,
     roles: ["company_admin", "hr_manager"],
     module: "settings",
     keywords: ["settings", "company", "departments", "users", "configuration"],
