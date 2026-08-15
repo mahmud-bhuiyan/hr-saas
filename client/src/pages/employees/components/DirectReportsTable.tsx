@@ -1,10 +1,10 @@
-import { HiUserGroup } from 'react-icons/hi2';
-import { Table } from '../../../components/ui/Table';
-import { TablePageSizeControl } from '../../../components/ui/TablePagination';
-import { usePagination } from '../../../hooks/usePagination';
-import type { Employee } from '../../../types';
-import { employeeName } from '../utils';
-import { EmployeeStatusBadge } from './EmployeeStatusBadge';
+import { HiUserGroup } from "react-icons/hi2";
+import { Table } from "../../../components/ui/primitives/Table";
+import { TablePageSizeControl } from "../../../components/ui/primitives/TablePagination";
+import { usePagination } from "../../../hooks/usePagination";
+import type { Employee } from "../../../types";
+import { employeeName } from "../utils";
+import { EmployeeStatusBadge } from "./EmployeeStatusBadge";
 
 interface DirectReportsTableProps {
   reports: Employee[];
@@ -44,8 +44,8 @@ export const DirectReportsTable = ({
       <Table
         columns={[
           {
-            key: 'name',
-            header: 'Name',
+            key: "name",
+            header: "Name",
             render: (row) =>
               onViewEmployee ? (
                 <button
@@ -60,18 +60,18 @@ export const DirectReportsTable = ({
               ),
           },
           {
-            key: 'jobTitle',
-            header: 'Job title',
-            render: (row) => row.jobTitle ?? '—',
+            key: "jobTitle",
+            header: "Job title",
+            render: (row) => row.jobTitle ?? "—",
           },
           {
-            key: 'department',
-            header: 'Department',
-            render: (row) => row.department ?? '—',
+            key: "department",
+            header: "Department",
+            render: (row) => row.department ?? "—",
           },
           {
-            key: 'status',
-            header: 'Status',
+            key: "status",
+            header: "Status",
             render: (row) => <EmployeeStatusBadge status={row.status} />,
           },
         ]}

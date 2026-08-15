@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQuery } from "@tanstack/react-query";
 import {
   useCallback,
   useEffect,
@@ -8,8 +8,8 @@ import {
   useState,
   type KeyboardEvent as ReactKeyboardEvent,
   type ReactNode,
-} from 'react';
-import { useNavigate } from 'react-router-dom';
+} from "react";
+import { useNavigate } from "react-router-dom";
 import {
   HiArrowRightOnRectangle,
   HiBriefcase,
@@ -25,23 +25,27 @@ import {
   HiTableCells,
   HiUser,
   HiUserGroup,
-} from 'react-icons/hi2';
-import { useAuth } from '../contexts/AuthContext';
-import { useDebouncedValue } from '../hooks/useDebouncedValue';
-import { fetchEmployees } from '../lib/api';
-import type { Employee } from '../types';
-import { employeeName, employeeMatchesSearch, employeeViewPath } from '../pages/employees/utils';
+} from "react-icons/hi2";
+import { useAuth } from "../../contexts/AuthContext";
+import { useDebouncedValue } from "../../hooks/useDebouncedValue";
+import { fetchEmployees } from "../../lib/api";
+import type { Employee } from "../../types";
+import {
+  employeeName,
+  employeeMatchesSearch,
+  employeeViewPath,
+} from "../../pages/employees/utils";
 import {
   filterGlobalSearchActions,
   type GlobalSearchActionDef,
-} from '../utils/global-search-actions';
-import { hasPermission } from '../utils/permissions';
-import { isModuleEnabledForUser } from '../utils/modules';
-import { Spinner } from './ui/Spinner';
+} from "../../utils/global-search-actions";
+import { hasPermission } from "../../utils/permissions";
+import { isModuleEnabledForUser } from "../../utils/modules";
+import { Spinner } from "../ui/Spinner";
 
 type SearchResult =
-  | { type: 'action'; action: GlobalSearchActionDef }
-  | { type: 'employee'; employee: Employee };
+  | { type: "action"; action: GlobalSearchActionDef }
+  | { type: "employee"; employee: Employee };
 
 const ACTION_ICONS: Record<string, ReactNode> = {
   dashboard: <HiHome className="h-4 w-4 text-brand-600" aria-hidden />,
@@ -56,21 +60,27 @@ const ACTION_ICONS: Record<string, ReactNode> = {
   payroll: <HiCurrencyDollar className="h-4 w-4 text-green-600" aria-hidden />,
   reports: <HiChartBar className="h-4 w-4 text-indigo-500" aria-hidden />,
   settings: <HiCog6Tooth className="h-4 w-4 text-slate-500" aria-hidden />,
-  registrations: <HiBuildingOffice2 className="h-4 w-4 text-brand-600" aria-hidden />,
-  'site-settings': <HiCog6Tooth className="h-4 w-4 text-brand-600" aria-hidden />,
+  registrations: (
+    <HiBuildingOffice2 className="h-4 w-4 text-brand-600" aria-hidden />
+  ),
+  "site-settings": (
+    <HiCog6Tooth className="h-4 w-4 text-brand-600" aria-hidden />
+  ),
 };
 
 const employeeInitials = (employee: Employee): string => {
-  return `${employee.firstName[0] ?? ''}${employee.lastName[0] ?? ''}`.toUpperCase();
+  return `${employee.firstName[0] ?? ""}${employee.lastName[0] ?? ""}`.toUpperCase();
 };
 
 const searchResultButtonClass = (isActive: boolean): string =>
   isActive
-    ? 'bg-brand-50 text-brand-700 dark:bg-brand-500/15 dark:text-brand-400'
-    : 'text-slate-700 hover:bg-slate-50 dark:text-slate-200 dark:hover:bg-slate-800';
+    ? "bg-brand-50 text-brand-700 dark:bg-brand-500/15 dark:text-brand-400"
+    : "text-slate-700 hover:bg-slate-50 dark:text-slate-200 dark:hover:bg-slate-800";
 
 const searchResultSubtitleClass = (isActive: boolean): string =>
-  isActive ? 'text-brand-600/80 dark:text-brand-300/90' : 'text-slate-500 dark:text-slate-400';
+  isActive
+    ? "text-brand-600/80 dark:text-brand-300/90"
+    : "text-slate-500 dark:text-slate-400";
 
 export const GlobalSearch = () => {
   const listboxId = useId();
@@ -79,7 +89,7 @@ export const GlobalSearch = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
 
-  const [query, setQuery] = useState('');
+  const [query, setQuery] = useState("");
   const [isOpen, setIsOpen] = useState(false);
   const [activeIndex, setActiveIndex] = useState(-1);
 
@@ -88,16 +98,17 @@ export const GlobalSearch = () => {
 
   const actions = useMemo(
     () => (user ? filterGlobalSearchActions(query, user.role, user) : []),
-    [query, user]
+    [query, user],
   );
 
   const canSearchEmployees =
     !!user &&
-    isModuleEnabledForUser(user, 'employees') &&
-    (hasPermission(user.role, 'employee:read') || hasPermission(user.role, 'employee:read:team'));
+    isModuleEnabledForUser(user, "employees") &&
+    (hasPermission(user.role, "employee:read") ||
+      hasPermission(user.role, "employee:read:team"));
 
   const employeesQuery = useQuery({
-    queryKey: ['global-search', 'employees', debouncedQuery],
+    queryKey: ["global-search", "employees", debouncedQuery],
     queryFn: () => fetchEmployees({ search: debouncedQuery }),
     enabled: canSearchEmployees && debouncedQuery.trim().length >= 2,
     staleTime: 30_000,
@@ -115,14 +126,19 @@ export const GlobalSearch = () => {
   }, [debouncedQuery, employeesQuery.data, isQuerySettled]);
 
   const isEmployeesLoading =
-    canSearchEmployees && debouncedQuery.trim().length >= 2 && (!isQuerySettled || employeesQuery.isFetching);
+    canSearchEmployees &&
+    debouncedQuery.trim().length >= 2 &&
+    (!isQuerySettled || employeesQuery.isFetching);
 
   const results = useMemo((): SearchResult[] => {
-    const items: SearchResult[] = actions.map((action) => ({ type: 'action', action }));
+    const items: SearchResult[] = actions.map((action) => ({
+      type: "action",
+      action,
+    }));
 
     if (canSearchEmployees && debouncedQuery.trim().length >= 2) {
       employees.forEach((employee) => {
-        items.push({ type: 'employee', employee });
+        items.push({ type: "employee", employee });
       });
     }
 
@@ -136,41 +152,44 @@ export const GlobalSearch = () => {
 
   const selectResult = useCallback(
     (result: SearchResult) => {
-      if (result.type === 'action') {
+      if (result.type === "action") {
         navigate(result.action.route);
       } else {
         navigate(employeeViewPath(result.employee.id));
       }
 
-      setQuery('');
+      setQuery("");
       closeSearch();
       inputRef.current?.blur();
     },
-    [closeSearch, navigate]
+    [closeSearch, navigate],
   );
 
   useEffect(() => {
     const handleGlobalShortcut = (event: globalThis.KeyboardEvent) => {
-      if (event.altKey && event.key.toLowerCase() === 'k') {
+      if (event.altKey && event.key.toLowerCase() === "k") {
         event.preventDefault();
         inputRef.current?.focus();
         setIsOpen(true);
       }
     };
 
-    window.addEventListener('keydown', handleGlobalShortcut);
-    return () => window.removeEventListener('keydown', handleGlobalShortcut);
+    window.addEventListener("keydown", handleGlobalShortcut);
+    return () => window.removeEventListener("keydown", handleGlobalShortcut);
   }, []);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+      if (
+        containerRef.current &&
+        !containerRef.current.contains(event.target as Node)
+      ) {
         closeSearch();
       }
     };
 
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [closeSearch]);
 
   useEffect(() => {
@@ -178,7 +197,7 @@ export const GlobalSearch = () => {
   }, [results.length, query, debouncedQuery]);
 
   const handleKeyDown = (event: ReactKeyboardEvent<HTMLInputElement>) => {
-    if (event.key === 'Escape') {
+    if (event.key === "Escape") {
       closeSearch();
       inputRef.current?.blur();
       return;
@@ -188,19 +207,21 @@ export const GlobalSearch = () => {
       return;
     }
 
-    if (event.key === 'ArrowDown') {
+    if (event.key === "ArrowDown") {
       event.preventDefault();
       setActiveIndex((current) => (current + 1) % results.length);
       return;
     }
 
-    if (event.key === 'ArrowUp') {
+    if (event.key === "ArrowUp") {
       event.preventDefault();
-      setActiveIndex((current) => (current <= 0 ? results.length - 1 : current - 1));
+      setActiveIndex((current) =>
+        current <= 0 ? results.length - 1 : current - 1,
+      );
       return;
     }
 
-    if (event.key === 'Enter' && activeIndex >= 0 && results[activeIndex]) {
+    if (event.key === "Enter" && activeIndex >= 0 && results[activeIndex]) {
       event.preventDefault();
       selectResult(results[activeIndex]!);
     }
@@ -275,18 +296,25 @@ export const GlobalSearch = () => {
                     role="option"
                     aria-selected={isActive}
                     onMouseEnter={() => setActiveIndex(resultIndex)}
-                    onClick={() => selectResult({ type: 'action', action })}
+                    onClick={() => selectResult({ type: "action", action })}
                     className={`flex w-full items-center gap-3 px-3 py-2.5 text-left text-sm transition ${searchResultButtonClass(isActive)}`}
                   >
                     <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-slate-100 dark:bg-slate-800">
                       {ACTION_ICONS[action.id] ?? (
-                        <HiArrowRightOnRectangle className="h-4 w-4 text-brand-600" aria-hidden />
+                        <HiArrowRightOnRectangle
+                          className="h-4 w-4 text-brand-600"
+                          aria-hidden
+                        />
                       )}
                     </span>
                     <span className="min-w-0 flex-1">
-                      <span className="block truncate font-medium">{action.label}</span>
+                      <span className="block truncate font-medium">
+                        {action.label}
+                      </span>
                       {action.subtitle && (
-                        <span className={`block truncate text-xs ${searchResultSubtitleClass(isActive)}`}>
+                        <span
+                          className={`block truncate text-xs ${searchResultSubtitleClass(isActive)}`}
+                        >
                           {action.subtitle}
                         </span>
                       )}
@@ -298,7 +326,13 @@ export const GlobalSearch = () => {
           )}
 
           {showEmployeeSection && (
-            <div className={actions.length > 0 ? 'mt-1 border-t border-slate-100 pt-1 dark:border-slate-800' : ''}>
+            <div
+              className={
+                actions.length > 0
+                  ? "mt-1 border-t border-slate-100 pt-1 dark:border-slate-800"
+                  : ""
+              }
+            >
               <p className="px-3 py-1.5 text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
                 Employees
               </p>
@@ -320,16 +354,25 @@ export const GlobalSearch = () => {
                       role="option"
                       aria-selected={isActive}
                       onMouseEnter={() => setActiveIndex(resultIndex)}
-                      onClick={() => selectResult({ type: 'employee', employee })}
+                      onClick={() =>
+                        selectResult({ type: "employee", employee })
+                      }
                       className={`flex w-full items-center gap-3 px-3 py-2.5 text-left text-sm transition ${searchResultButtonClass(isActive)}`}
                     >
                       <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-brand-100 text-xs font-semibold text-brand-700 dark:bg-brand-500/20 dark:text-brand-300">
                         {employeeInitials(employee)}
                       </span>
                       <span className="min-w-0 flex-1">
-                        <span className="block truncate font-medium">{employeeName(employee)}</span>
-                        <span className={`block truncate text-xs ${searchResultSubtitleClass(isActive)}`}>
-                          {employee.jobTitle || employee.email || employee.department || 'Employee'}
+                        <span className="block truncate font-medium">
+                          {employeeName(employee)}
+                        </span>
+                        <span
+                          className={`block truncate text-xs ${searchResultSubtitleClass(isActive)}`}
+                        >
+                          {employee.jobTitle ||
+                            employee.email ||
+                            employee.department ||
+                            "Employee"}
                         </span>
                       </span>
                     </button>

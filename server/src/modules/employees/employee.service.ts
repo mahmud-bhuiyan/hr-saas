@@ -1,40 +1,43 @@
-import { randomBytes } from 'node:crypto';
-import mongoose from 'mongoose';
-import type { UserRole } from '../../types/index.js';
-import { hasPermission } from '../../utils/permissions.js';
-import { hashPassword } from '../../utils/password.js';
-import { employeeAuditSnapshot } from '../../utils/audit-snapshot.js';
-import { writeAuditLog, type AuditContext } from '../audit/audit.service.js';
-import { syncSeatCount } from '../billing/billing.service.js';
-import { findUserByEmail } from '../admin/admin.service.js';
-import { User } from '../admin/user.model.js';
-import type { ServerEnv } from '../../config/env.js';
+import { randomBytes } from "node:crypto";
+import mongoose from "mongoose";
+import type { UserRole } from "../../types/index.js";
+import { hasPermission } from "../../utils/permissions.js";
+import { hashPassword } from "../../utils/password.js";
+import { employeeAuditSnapshot } from "../../utils/audit-snapshot.js";
+import { writeAuditLog, type AuditContext } from "../audit/audit.service.js";
+import { syncSeatCount } from "../billing/billing.service.js";
+import { findUserByEmail } from "../admin/admin.service.js";
+import { User } from "../admin/user.model.js";
+import type { ServerEnv } from "../../config/env.js";
 import {
   createPasswordResetTokenForUser,
   sendInviteSetPasswordEmail,
-} from '../auth/password-reset.service.js';
+} from "../auth/password-reset.service.js";
 import {
   assertActiveDepartmentName,
   DepartmentServiceError,
   listActiveDepartmentNames,
-} from '../settings/department.service.js';
+} from "../settings/department.service.js";
 import {
   assertActiveWorkLocation,
   LocationServiceError,
-} from '../locations/location.service.js';
-import { WorkLocation } from '../locations/location.model.js';
-import { refreshBalanceEntitlement } from '../leave/leave-settings.service.js';
+} from "../locations/location.service.js";
+import { WorkLocation } from "../locations/location.model.js";
+import { Tenant } from "../auth/tenant.model.js";
+import { listCountryDialCodes } from "../settings/country-dial-code.service.js";
+import { validatePhoneNationalLength } from "../../utils/phone.js";
+import { refreshBalanceEntitlement } from "../leave/leave-settings.service.js";
 import {
   Employee,
   type EmployeeStatus,
   type IEmployeeDocument,
-} from './employee.model.js';
+} from "./employee.model.js";
 import type {
   CreateEmployeeInput,
   InviteEmployeeInput,
   ListEmployeesQuery,
   UpdateEmployeeInput,
-} from './employee.validation.js';
+} from "./employee.validation.js";
 
 export interface EmployeeManagerSummary {
   id: string;
@@ -57,7 +60,7 @@ export interface EmployeePublic {
   status: EmployeeStatus;
   userId?: string;
   payRate?: number;
-  payRateType?: 'hourly' | 'salary';
+  payRateType?: "hourly" | "salary";
   payCurrency?: string;
   fteFactor?: number;
   defaultLocationId?: string;
@@ -91,20 +94,22 @@ interface AccessContext {
   role: UserRole;
 }
 
-const auditUserDisplayName = (user?: AuditUserSummary | null): string | undefined => {
+const auditUserDisplayName = (
+  user?: AuditUserSummary | null,
+): string | undefined => {
   if (!user) {
     return undefined;
   }
 
   if (user.firstName || user.lastName) {
-    return [user.firstName, user.lastName].filter(Boolean).join(' ');
+    return [user.firstName, user.lastName].filter(Boolean).join(" ");
   }
 
   return user.email;
 };
 
 const loadAuditUsers = async (
-  employees: IEmployeeDocument[]
+  employees: IEmployeeDocument[],
 ): Promise<Map<string, AuditUserSummary>> => {
   const userIds = new Set<string>();
 
@@ -122,7 +127,7 @@ const loadAuditUsers = async (
   }
 
   const users = await User.find({ _id: { $in: [...userIds] } })
-    .select('email firstName lastName')
+    .select("email firstName lastName")
     .lean();
 
   return new Map(
@@ -133,17 +138,18 @@ const loadAuditUsers = async (
         firstName: user.firstName,
         lastName: user.lastName,
       },
-    ])
+    ]),
   );
 };
 
-const canViewPayFields = (role: UserRole): boolean => hasPermission(role, 'payroll:read');
+const canViewPayFields = (role: UserRole): boolean =>
+  hasPermission(role, "payroll:read");
 
 const toEmployeePublic = (
   employee: IEmployeeDocument,
   manager?: EmployeeManagerSummary | null,
   auditUsers?: Map<string, AuditUserSummary>,
-  includePayFields = false
+  includePayFields = false,
 ): EmployeePublic => {
   const createdBy = employee.createdBy
     ? auditUsers?.get(employee.createdBy.toString())
@@ -180,25 +186,25 @@ const toEmployeePublic = (
     createdAt: employee.createdAt.toISOString(),
     updatedAt: employee.updatedAt.toISOString(),
   };
-}
+};
 
 const canReadAllEmployees = (role: UserRole): boolean => {
-  return hasPermission(role, 'employee:read');
-}
+  return hasPermission(role, "employee:read");
+};
 
 const canReadTeamEmployees = (role: UserRole): boolean => {
-  return hasPermission(role, 'employee:read:team');
-}
+  return hasPermission(role, "employee:read:team");
+};
 
 const findEmployeeRecordForUser = async (
   tenantId: string,
-  userId: string
+  userId: string,
 ): Promise<IEmployeeDocument | null> => {
   return Employee.findOne({
     tenantId: new mongoose.Types.ObjectId(tenantId),
     userId: new mongoose.Types.ObjectId(userId),
   });
-}
+};
 
 export interface EnsureEmployeeForUserInput {
   userId: string;
@@ -207,7 +213,9 @@ export interface EnsureEmployeeForUserInput {
   lastName?: string;
 }
 
-const deriveEmployeeNames = (user: EnsureEmployeeForUserInput): { firstName: string; lastName: string } => {
+const deriveEmployeeNames = (
+  user: EnsureEmployeeForUserInput,
+): { firstName: string; lastName: string } => {
   const firstName = user.firstName?.trim();
   const lastName = user.lastName?.trim();
 
@@ -216,29 +224,29 @@ const deriveEmployeeNames = (user: EnsureEmployeeForUserInput): { firstName: str
   }
 
   if (firstName) {
-    return { firstName, lastName: 'User' };
+    return { firstName, lastName: "User" };
   }
 
   if (lastName) {
-    return { firstName: 'User', lastName };
+    return { firstName: "User", lastName };
   }
 
-  const localPart = user.email.split('@')[0] || 'user';
-  return { firstName: localPart, lastName: 'User' };
-}
+  const localPart = user.email.split("@")[0] || "user";
+  return { firstName: localPart, lastName: "User" };
+};
 
 const generateEmployeeNumber = async (tenantId: string): Promise<string> => {
   const count = await Employee.countDocuments({
     tenantId: new mongoose.Types.ObjectId(tenantId),
   });
-  return `EMP-${String(count + 1).padStart(4, '0')}`;
-}
+  return `EMP-${String(count + 1).padStart(4, "0")}`;
+};
 
 /** Ensures a tenant user has a linked employee record (create or link by email). */
 export const ensureEmployeeRecordForUser = async (
   tenantId: string,
   user: EnsureEmployeeForUserInput,
-  options?: { createdByUserId?: string; audit?: AuditContext }
+  options?: { createdByUserId?: string; audit?: AuditContext },
 ): Promise<IEmployeeDocument> => {
   const tenantObjectId = new mongoose.Types.ObjectId(tenantId);
   const userObjectId = new mongoose.Types.ObjectId(user.userId);
@@ -283,7 +291,7 @@ export const ensureEmployeeRecordForUser = async (
     firstName,
     lastName,
     email: normalizedEmail,
-    status: 'active',
+    status: "active",
     createdBy: actorId,
     updatedBy: actorId,
   });
@@ -291,24 +299,24 @@ export const ensureEmployeeRecordForUser = async (
   void writeAuditLog({
     tenantId,
     userId: options?.createdByUserId ?? user.userId,
-    action: 'create',
-    entityType: 'Employee',
+    action: "create",
+    entityType: "Employee",
     entityId: employee._id.toString(),
     after: employeeAuditSnapshot(employee),
     context: options?.audit,
   });
 
   return employee;
-}
+};
 
 const loadManagerSummaries = async (
-  employees: IEmployeeDocument[]
+  employees: IEmployeeDocument[],
 ): Promise<Map<string, EmployeeManagerSummary>> => {
   const managerIds = [
     ...new Set(
       employees
         .map((e) => e.managerId?.toString())
-        .filter((id): id is string => Boolean(id))
+        .filter((id): id is string => Boolean(id)),
     ),
   ];
 
@@ -330,80 +338,84 @@ const loadManagerSummaries = async (
   }
 
   return map;
-}
+};
 
 const toPublicList = async (
   employees: IEmployeeDocument[],
-  includePayFields = false
+  includePayFields = false,
 ): Promise<EmployeePublic[]> => {
   const managerMap = await loadManagerSummaries(employees);
   const auditUsers = await loadAuditUsers(employees);
   return employees.map((employee) =>
     toEmployeePublic(
       employee,
-      employee.managerId ? managerMap.get(employee.managerId.toString()) : undefined,
+      employee.managerId
+        ? managerMap.get(employee.managerId.toString())
+        : undefined,
       auditUsers,
-      includePayFields
-    )
+      includePayFields,
+    ),
   );
-}
+};
 
 const validateManagerId = async (
   tenantId: string,
   managerId: string | null | undefined,
-  employeeId?: string
+  employeeId?: string,
 ): Promise<void> => {
   if (!managerId) {
     return;
   }
 
   if (employeeId && managerId === employeeId) {
-    throw new EmployeeServiceError('Employee cannot be their own manager', 400);
+    throw new EmployeeServiceError("Employee cannot be their own manager", 400);
   }
 
   const manager = await Employee.findOne({
     _id: new mongoose.Types.ObjectId(managerId),
     tenantId: new mongoose.Types.ObjectId(tenantId),
-    status: { $ne: 'terminated' },
+    status: { $ne: "terminated" },
   });
 
   if (!manager) {
-    throw new EmployeeServiceError('Manager not found', 404);
+    throw new EmployeeServiceError("Manager not found", 404);
   }
-}
+};
 
 const assertCanAccessEmployee = async (
   tenantId: string,
   employee: IEmployeeDocument,
-  access: AccessContext
+  access: AccessContext,
 ): Promise<void> => {
   if (canReadAllEmployees(access.role)) {
     return;
   }
 
   if (!canReadTeamEmployees(access.role)) {
-    throw new EmployeeServiceError('Insufficient permissions', 403);
+    throw new EmployeeServiceError("Insufficient permissions", 403);
   }
 
   const selfRecord = await findEmployeeRecordForUser(tenantId, access.userId);
   if (!selfRecord) {
-    throw new EmployeeServiceError('Insufficient permissions', 403);
+    throw new EmployeeServiceError("Insufficient permissions", 403);
   }
 
   const isSelf = employee._id.toString() === selfRecord._id.toString();
-  const isDirectReport = employee.managerId?.toString() === selfRecord._id.toString();
+  const isDirectReport =
+    employee.managerId?.toString() === selfRecord._id.toString();
 
   if (!isSelf && !isDirectReport) {
-    throw new EmployeeServiceError('Insufficient permissions', 403);
+    throw new EmployeeServiceError("Insufficient permissions", 403);
   }
-}
+};
 
-const escapeRegex = (value: string): string => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+const escapeRegex = (value: string): string =>
+  value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
 const buildEmployeeSearchFilter = (search: string): Record<string, unknown> => {
   const trimmed = search.trim();
   const escaped = escapeRegex(trimmed);
-  const regex = new RegExp(escaped, 'i');
+  const regex = new RegExp(escaped, "i");
 
   const fieldMatch = (pattern: RegExp): Record<string, unknown>[] => [
     { firstName: pattern },
@@ -419,29 +431,29 @@ const buildEmployeeSearchFilter = (search: string): Record<string, unknown> => {
     {
       $expr: {
         $regexMatch: {
-          input: { $concat: ['$firstName', ' ', '$lastName'] },
+          input: { $concat: ["$firstName", " ", "$lastName"] },
           regex: escaped,
-          options: 'i',
+          options: "i",
         },
       },
     },
     {
       $expr: {
         $regexMatch: {
-          input: { $concat: ['$lastName', ' ', '$firstName'] },
+          input: { $concat: ["$lastName", " ", "$firstName"] },
           regex: escaped,
-          options: 'i',
+          options: "i",
         },
       },
     },
   ];
 
   const terms = trimmed.split(/\s+/).filter(Boolean);
-  const matchAllTerms = terms.length > 1 && !trimmed.includes('@');
+  const matchAllTerms = terms.length > 1 && !trimmed.includes("@");
 
   if (matchAllTerms) {
     const termFilters = terms.map((term) => ({
-      $or: fieldMatch(new RegExp(escapeRegex(term), 'i')),
+      $or: fieldMatch(new RegExp(escapeRegex(term), "i")),
     }));
 
     return { $and: termFilters };
@@ -455,7 +467,7 @@ const buildEmployeeSearchFilter = (search: string): Record<string, unknown> => {
 const buildListFilter = (
   tenantId: string,
   query: ListEmployeesQuery,
-  teamManagerId?: string
+  teamManagerId?: string,
 ): Record<string, unknown> => {
   const filter: Record<string, unknown> = {
     tenantId: new mongoose.Types.ObjectId(tenantId),
@@ -478,22 +490,22 @@ const buildListFilter = (
   }
 
   return filter;
-}
+};
 
 const buildMongoSort = (
-  sortBy?: ListEmployeesQuery['sortBy'],
-  sortOrder?: ListEmployeesQuery['sortOrder']
+  sortBy?: ListEmployeesQuery["sortBy"],
+  sortOrder?: ListEmployeesQuery["sortOrder"],
 ): Record<string, 1 | -1> => {
-  const dir: 1 | -1 = sortOrder === 'desc' ? -1 : 1;
+  const dir: 1 | -1 = sortOrder === "desc" ? -1 : 1;
 
   switch (sortBy) {
-    case 'employeeNumber':
+    case "employeeNumber":
       return { employeeNumber: dir };
-    case 'jobTitle':
+    case "jobTitle":
       return { jobTitle: dir, lastName: 1, firstName: 1 };
-    case 'department':
+    case "department":
       return { department: dir, lastName: 1, firstName: 1 };
-    case 'name':
+    case "name":
     default:
       return { firstName: dir, lastName: dir };
   }
@@ -501,21 +513,27 @@ const buildMongoSort = (
 
 const sortByManager = (
   employees: EmployeePublic[],
-  sortOrder?: ListEmployeesQuery['sortOrder']
+  sortOrder?: ListEmployeesQuery["sortOrder"],
 ): EmployeePublic[] => {
-  const dir = sortOrder === 'desc' ? -1 : 1;
+  const dir = sortOrder === "desc" ? -1 : 1;
 
   return [...employees].sort((a, b) => {
-    const aName = a.manager ? `${a.manager.firstName} ${a.manager.lastName}` : '';
-    const bName = b.manager ? `${b.manager.firstName} ${b.manager.lastName}` : '';
-    const cmp = aName.localeCompare(bName, undefined, { sensitivity: 'base' });
+    const aName = a.manager
+      ? `${a.manager.firstName} ${a.manager.lastName}`
+      : "";
+    const bName = b.manager
+      ? `${b.manager.firstName} ${b.manager.lastName}`
+      : "";
+    const cmp = aName.localeCompare(bName, undefined, { sensitivity: "base" });
     if (cmp !== 0) {
       return cmp * dir;
     }
 
     const nameCmp =
-      a.firstName.localeCompare(b.firstName, undefined, { sensitivity: 'base' }) ||
-      a.lastName.localeCompare(b.lastName, undefined, { sensitivity: 'base' });
+      a.firstName.localeCompare(b.firstName, undefined, {
+        sensitivity: "base",
+      }) ||
+      a.lastName.localeCompare(b.lastName, undefined, { sensitivity: "base" });
     return nameCmp * dir;
   });
 };
@@ -523,13 +541,13 @@ const sortByManager = (
 export const listEmployees = async (
   tenantId: string,
   query: ListEmployeesQuery,
-  access: AccessContext
+  access: AccessContext,
 ): Promise<EmployeePublic[]> => {
   let teamManagerId: string | undefined;
 
   if (!canReadAllEmployees(access.role)) {
     if (!canReadTeamEmployees(access.role)) {
-      throw new EmployeeServiceError('Insufficient permissions', 403);
+      throw new EmployeeServiceError("Insufficient permissions", 403);
     }
 
     const selfRecord = await findEmployeeRecordForUser(tenantId, access.userId);
@@ -541,23 +559,31 @@ export const listEmployees = async (
   }
 
   const filter = buildListFilter(tenantId, query, teamManagerId);
-  const sortBy = query.sortBy ?? 'name';
-  const sortOrder = query.sortOrder ?? 'asc';
+  const sortBy = query.sortBy ?? "name";
+  const sortOrder = query.sortOrder ?? "asc";
 
   const employees = await Employee.find(filter).sort(
-    sortBy === 'manager' ? { firstName: 1, lastName: 1 } : buildMongoSort(sortBy, sortOrder)
+    sortBy === "manager"
+      ? { firstName: 1, lastName: 1 }
+      : buildMongoSort(sortBy, sortOrder),
   );
 
-  const publicEmployees = await toPublicList(employees, canViewPayFields(access.role));
+  const publicEmployees = await toPublicList(
+    employees,
+    canViewPayFields(access.role),
+  );
 
-  if (sortBy === 'manager') {
+  if (sortBy === "manager") {
     return sortByManager(publicEmployees, sortOrder);
   }
 
   return publicEmployees;
-}
+};
 
-const validateDepartment = async (tenantId: string, department?: string): Promise<void> => {
+const validateDepartment = async (
+  tenantId: string,
+  department?: string,
+): Promise<void> => {
   try {
     await assertActiveDepartmentName(tenantId, department);
   } catch (error) {
@@ -570,7 +596,7 @@ const validateDepartment = async (tenantId: string, department?: string): Promis
 
 const validateDefaultLocation = async (
   tenantId: string,
-  locationId?: string | null
+  locationId?: string | null,
 ): Promise<void> => {
   try {
     await assertActiveWorkLocation(tenantId, locationId ?? undefined);
@@ -584,22 +610,27 @@ const validateDefaultLocation = async (
 
 export const listDepartments = async (tenantId: string): Promise<string[]> => {
   return listActiveDepartmentNames(tenantId);
-}
+};
 
 export const getMyEmployee = async (
   tenantId: string,
-  userId: string
+  userId: string,
 ): Promise<MyEmployeeProfile> => {
   const employee = await findEmployeeRecordForUser(tenantId, userId);
 
   if (!employee) {
-    throw new EmployeeServiceError('No employee record linked to your account', 404);
+    throw new EmployeeServiceError(
+      "No employee record linked to your account",
+      404,
+    );
   }
 
   let defaultLocationName: string | undefined;
 
   if (employee.defaultLocationId) {
-    const location = await WorkLocation.findById(employee.defaultLocationId).select('name');
+    const location = await WorkLocation.findById(
+      employee.defaultLocationId,
+    ).select("name");
     defaultLocationName = location?.name;
   }
 
@@ -615,12 +646,12 @@ export const getMyEmployee = async (
     status: employee.status,
     defaultLocationName,
   };
-}
+};
 
 export const getEmployeeById = async (
   tenantId: string,
   employeeId: string,
-  access: AccessContext
+  access: AccessContext,
 ): Promise<EmployeePublic> => {
   const employee = await Employee.findOne({
     _id: new mongoose.Types.ObjectId(employeeId),
@@ -628,7 +659,7 @@ export const getEmployeeById = async (
   });
 
   if (!employee) {
-    throw new EmployeeServiceError('Employee not found', 404);
+    throw new EmployeeServiceError("Employee not found", 404);
   }
 
   await assertCanAccessEmployee(tenantId, employee, access);
@@ -649,14 +680,14 @@ export const getEmployeeById = async (
     employee,
     manager,
     await loadAuditUsers([employee]),
-    canViewPayFields(access.role)
+    canViewPayFields(access.role),
   );
-}
+};
 
 export const listDirectReports = async (
   tenantId: string,
   employeeId: string,
-  access: AccessContext
+  access: AccessContext,
 ): Promise<EmployeePublic[]> => {
   const employee = await Employee.findOne({
     _id: new mongoose.Types.ObjectId(employeeId),
@@ -664,7 +695,7 @@ export const listDirectReports = async (
   });
 
   if (!employee) {
-    throw new EmployeeServiceError('Employee not found', 404);
+    throw new EmployeeServiceError("Employee not found", 404);
   }
 
   await assertCanAccessEmployee(tenantId, employee, access);
@@ -675,20 +706,33 @@ export const listDirectReports = async (
   }).sort({ lastName: 1, firstName: 1 });
 
   return toPublicList(reports, canViewPayFields(access.role));
-}
+};
+
+const assertEmployeePhone = async (
+  tenantId: string,
+  phone: string,
+): Promise<void> => {
+  const countries = await listCountryDialCodes(false);
+  const tenant = await Tenant.findById(tenantId).select("defaultPhoneDialCode");
+  const fallbackDialCode = tenant?.defaultPhoneDialCode ?? "1";
+  const error = validatePhoneNationalLength(phone, countries, fallbackDialCode);
+
+  if (error) {
+    throw new EmployeeServiceError(error, 400);
+  }
+};
 
 export const createEmployee = async (
   tenantId: string,
   input: CreateEmployeeInput,
   createdByUserId: string,
-  audit?: AuditContext
+  audit?: AuditContext,
 ): Promise<EmployeePublic> => {
   await validateManagerId(tenantId, input.managerId);
   await validateDepartment(tenantId, input.department);
 
   const employeeNumber =
-    input.employeeNumber?.trim() ||
-    (await generateEmployeeNumber(tenantId));
+    input.employeeNumber?.trim() || (await generateEmployeeNumber(tenantId));
 
   const existingNumber = await Employee.findOne({
     tenantId: new mongoose.Types.ObjectId(tenantId),
@@ -696,7 +740,7 @@ export const createEmployee = async (
   });
 
   if (existingNumber) {
-    throw new EmployeeServiceError('Employee number already in use', 409);
+    throw new EmployeeServiceError("Employee number already in use", 409);
   }
 
   if (input.email) {
@@ -706,8 +750,15 @@ export const createEmployee = async (
     });
 
     if (existingEmail) {
-      throw new EmployeeServiceError('Email already in use for an employee', 409);
+      throw new EmployeeServiceError(
+        "Email already in use for an employee",
+        409,
+      );
     }
+  }
+
+  if (input.phone) {
+    await assertEmployeePhone(tenantId, input.phone);
   }
 
   const actorId = new mongoose.Types.ObjectId(createdByUserId);
@@ -722,8 +773,10 @@ export const createEmployee = async (
     jobTitle: input.jobTitle || undefined,
     department: input.department || undefined,
     startDate: input.startDate ? new Date(input.startDate) : undefined,
-    managerId: input.managerId ? new mongoose.Types.ObjectId(input.managerId) : null,
-    status: input.status ?? 'active',
+    managerId: input.managerId
+      ? new mongoose.Types.ObjectId(input.managerId)
+      : null,
+    status: input.status ?? "active",
     createdBy: actorId,
     updatedBy: actorId,
   });
@@ -731,8 +784,8 @@ export const createEmployee = async (
   void writeAuditLog({
     tenantId,
     userId: createdByUserId,
-    action: 'create',
-    entityType: 'Employee',
+    action: "create",
+    entityType: "Employee",
     entityId: employee._id.toString(),
     after: employeeAuditSnapshot(employee),
     context: audit,
@@ -741,17 +794,17 @@ export const createEmployee = async (
   void syncSeatCount(tenantId);
 
   return getEmployeeById(tenantId, employee._id.toString(), {
-    userId: '',
-    role: 'company_admin',
+    userId: "",
+    role: "company_admin",
   });
-}
+};
 
 export const updateEmployee = async (
   tenantId: string,
   employeeId: string,
   input: UpdateEmployeeInput,
   updatedByUserId: string,
-  audit?: AuditContext
+  audit?: AuditContext,
 ): Promise<EmployeePublic> => {
   const employee = await Employee.findOne({
     _id: new mongoose.Types.ObjectId(employeeId),
@@ -759,7 +812,7 @@ export const updateEmployee = async (
   });
 
   if (!employee) {
-    throw new EmployeeServiceError('Employee not found', 404);
+    throw new EmployeeServiceError("Employee not found", 404);
   }
 
   const beforeSnapshot = employeeAuditSnapshot(employee);
@@ -789,13 +842,19 @@ export const updateEmployee = async (
       });
 
       if (existingEmail) {
-        throw new EmployeeServiceError('Email already in use for an employee', 409);
+        throw new EmployeeServiceError(
+          "Email already in use for an employee",
+          409,
+        );
       }
     }
     employee.email = email;
   }
 
   if (input.phone !== undefined) {
+    if (input.phone) {
+      await assertEmployeePhone(tenantId, input.phone);
+    }
     employee.phone = input.phone || undefined;
   }
 
@@ -809,7 +868,9 @@ export const updateEmployee = async (
   }
 
   if (input.startDate !== undefined) {
-    employee.startDate = input.startDate ? new Date(input.startDate) : undefined;
+    employee.startDate = input.startDate
+      ? new Date(input.startDate)
+      : undefined;
   }
 
   if (input.status !== undefined) {
@@ -825,7 +886,9 @@ export const updateEmployee = async (
   }
 
   if (input.payCurrency !== undefined) {
-    employee.payCurrency = input.payCurrency ? input.payCurrency.toUpperCase() : undefined;
+    employee.payCurrency = input.payCurrency
+      ? input.payCurrency.toUpperCase()
+      : undefined;
   }
 
   if (input.fteFactor !== undefined) {
@@ -849,8 +912,8 @@ export const updateEmployee = async (
   void writeAuditLog({
     tenantId,
     userId: updatedByUserId,
-    action: 'update',
-    entityType: 'Employee',
+    action: "update",
+    entityType: "Employee",
     entityId: employee._id.toString(),
     before: beforeSnapshot,
     after: employeeAuditSnapshot(employee),
@@ -870,8 +933,8 @@ export const updateEmployee = async (
   }
 
   return getEmployeeById(tenantId, employeeId, {
-    userId: '',
-    role: 'company_admin',
+    userId: "",
+    role: "company_admin",
   });
 };
 
@@ -881,7 +944,7 @@ export const inviteEmployee = async (
   input: InviteEmployeeInput,
   invitedByUserId: string,
   env: ServerEnv,
-  audit?: AuditContext
+  audit?: AuditContext,
 ): Promise<EmployeePublic> => {
   const employee = await Employee.findOne({
     _id: new mongoose.Types.ObjectId(employeeId),
@@ -889,15 +952,18 @@ export const inviteEmployee = async (
   });
 
   if (!employee) {
-    throw new EmployeeServiceError('Employee not found', 404);
+    throw new EmployeeServiceError("Employee not found", 404);
   }
 
   if (!employee.email) {
-    throw new EmployeeServiceError('Employee must have an email address to invite', 400);
+    throw new EmployeeServiceError(
+      "Employee must have an email address to invite",
+      400,
+    );
   }
 
   if (employee.userId) {
-    throw new EmployeeServiceError('Employee already has a login account', 409);
+    throw new EmployeeServiceError("Employee already has a login account", 409);
   }
 
   const tenantObjectId = new mongoose.Types.ObjectId(tenantId);
@@ -905,7 +971,7 @@ export const inviteEmployee = async (
 
   if (user) {
     if (user.tenantId?.toString() !== tenantId) {
-      throw new EmployeeServiceError('Email already in use', 409);
+      throw new EmployeeServiceError("Email already in use", 409);
     }
 
     const linkedElsewhere = await Employee.findOne({
@@ -915,14 +981,17 @@ export const inviteEmployee = async (
     });
 
     if (linkedElsewhere) {
-      throw new EmployeeServiceError('User is already linked to another employee', 409);
+      throw new EmployeeServiceError(
+        "User is already linked to another employee",
+        409,
+      );
     }
   } else {
-    const passwordHash = await hashPassword(randomBytes(24).toString('hex'));
+    const passwordHash = await hashPassword(randomBytes(24).toString("hex"));
     user = await User.create({
       email: employee.email,
       passwordHash,
-      role: input.role ?? 'employee',
+      role: input.role ?? "employee",
       tenantId: tenantObjectId,
       firstName: employee.firstName,
       lastName: employee.lastName,
@@ -940,8 +1009,8 @@ export const inviteEmployee = async (
   void writeAuditLog({
     tenantId,
     userId: invitedByUserId,
-    action: 'update',
-    entityType: 'Employee',
+    action: "update",
+    entityType: "Employee",
     entityId: employee._id.toString(),
     after: employeeAuditSnapshot(employee),
     context: audit,
@@ -949,16 +1018,16 @@ export const inviteEmployee = async (
 
   return getEmployeeById(tenantId, employeeId, {
     userId: invitedByUserId,
-    role: 'company_admin',
+    role: "company_admin",
   });
 };
 
 export class EmployeeServiceError extends Error {
   constructor(
     message: string,
-    public statusCode: number
+    public statusCode: number,
   ) {
     super(message);
-    this.name = 'EmployeeServiceError';
+    this.name = "EmployeeServiceError";
   }
 }

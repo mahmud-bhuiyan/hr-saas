@@ -236,7 +236,7 @@ export const ExpensesPage = () => {
   ];
 
   return (
-    <PageContainer>
+    <PageContainer flushTop>
       <MeTabs />
       <PageHeader
         label="Operations"

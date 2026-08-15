@@ -1,7 +1,7 @@
-import { type ReactNode, type SelectHTMLAttributes } from 'react';
-import { FormField } from './FormField';
-import { Select } from './Select';
-import type { FormFieldLayoutProps } from './formFieldLayout';
+import { type ReactNode, type SelectHTMLAttributes } from "react";
+import { FormField } from "./FormField";
+import { Select } from "./Select";
+import type { FormFieldLayoutProps } from "./formFieldLayout";
 
 export interface SelectFieldOption {
   value: string;
@@ -10,13 +10,18 @@ export interface SelectFieldOption {
 }
 
 interface SelectFieldProps
-  extends FormFieldLayoutProps,
-    Omit<SelectHTMLAttributes<HTMLSelectElement>, 'className' | 'children'> {
+  extends
+    FormFieldLayoutProps,
+    Omit<
+      SelectHTMLAttributes<HTMLSelectElement>,
+      "className" | "children" | "size"
+    > {
   error?: string;
   icon?: ReactNode;
   options?: SelectFieldOption[];
   children?: ReactNode;
   selectClassName?: string;
+  size?: "default" | "sm";
 }
 
 export const SelectField = ({
@@ -56,7 +61,11 @@ export const SelectField = ({
       >
         {children ??
           options?.map((option) => (
-            <option key={option.value} value={option.value} disabled={option.disabled}>
+            <option
+              key={option.value}
+              value={option.value}
+              disabled={option.disabled}
+            >
               {option.label}
             </option>
           ))}

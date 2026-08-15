@@ -31,10 +31,44 @@ body {
   }
 }
 
-.dark .thin-scrollbar {
-  scrollbar-color: rgb(71 85 105) transparent;
+@layer base {
+  :where(*) {
+    scrollbar-width: thin;
+    scrollbar-color: rgb(203 213 225) transparent;
+  }
+
+  :where(*::-webkit-scrollbar) {
+    width: 6px;
+    height: 6px;
+  }
+
+  :where(*::-webkit-scrollbar-track) {
+    background: transparent;
+  }
+
+  :where(*::-webkit-scrollbar-thumb) {
+    background-color: rgb(203 213 225);
+    border-radius: 9999px;
+  }
+
+  :where(*::-webkit-scrollbar-thumb:hover) {
+    background-color: rgb(148 163 184);
+  }
+
+  .dark :where(*) {
+    scrollbar-color: rgb(71 85 105) transparent;
+  }
+
+  .dark :where(*::-webkit-scrollbar-thumb) {
+    background-color: rgb(71 85 105);
+  }
+
+  .dark :where(*::-webkit-scrollbar-thumb:hover) {
+    background-color: rgb(100 116 139);
+  }
 }
 
+/* Explicit alias — same as global thin scrollbars */
 .thin-scrollbar {
   scrollbar-width: thin;
   scrollbar-color: rgb(203 213 225) transparent;
@@ -56,6 +90,10 @@ body {
 
 .thin-scrollbar::-webkit-scrollbar-thumb:hover {
   background-color: rgb(148 163 184);
+}
+
+.dark .thin-scrollbar {
+  scrollbar-color: rgb(71 85 105) transparent;
 }
 
 .dark .thin-scrollbar::-webkit-scrollbar-thumb {

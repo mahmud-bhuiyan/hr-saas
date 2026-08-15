@@ -1,6 +1,6 @@
 import type { FormEvent, ReactNode } from 'react';
-import { Button } from './Button';
-import { Modal } from './Modal';
+import { Button } from '../Button';
+import { Modal } from '../Modal';
 
 interface FormModalProps {
   open: boolean;
@@ -16,6 +16,7 @@ interface FormModalProps {
   size?: 'sm' | 'md' | 'lg';
   submitVariant?: 'primary' | 'secondary' | 'ghost' | 'danger';
   formId?: string;
+  headerActions?: ReactNode;
 }
 
 export const FormModal = ({
@@ -32,6 +33,7 @@ export const FormModal = ({
   size = 'md',
   submitVariant = 'primary',
   formId = 'form-modal',
+  headerActions,
 }: FormModalProps) => {
   return (
     <Modal
@@ -39,6 +41,7 @@ export const FormModal = ({
       onClose={onClose}
       title={title}
       description={description}
+      headerActions={headerActions}
       size={size}
       footer={
         <div className="flex justify-end gap-2">
@@ -63,4 +66,4 @@ export const FormModal = ({
       </form>
     </Modal>
   );
-}
+};

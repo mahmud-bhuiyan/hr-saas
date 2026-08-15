@@ -1,16 +1,16 @@
-import { useState } from 'react';
-import { HiCheck, HiXMark, HiChatBubbleLeftEllipsis } from 'react-icons/hi2';
-import { Button } from '../../../../components/ui/Button';
-import { FormField } from '../../../../components/ui/FormField';
-import { Modal } from '../../../../components/ui/Modal';
-import { Table } from '../../../../components/ui/Table';
-import { TablePageSizeControl } from '../../../../components/ui/TablePagination';
-import { usePagination } from '../../../../hooks/usePagination';
-import { Textarea } from '../../../../components/ui/Textarea';
-import type { LeaveRequest } from '../../../../types';
-import { formatDateRange, leaveTypeLabel, approvalStepLabel } from '../utils';
-import { LeaveOverlapIndicator } from './LeaveOverlapIndicator';
-import { LeaveShiftConflictIndicator } from './LeaveShiftConflictIndicator';
+import { useState } from "react";
+import { HiCheck, HiXMark, HiChatBubbleLeftEllipsis } from "react-icons/hi2";
+import { Button } from "../../../../components/ui/Button";
+import { FormField } from "../../../../components/ui/FormField";
+import { Modal } from "../../../../components/ui/Modal";
+import { Table } from "../../../../components/ui/primitives/Table";
+import { TablePageSizeControl } from "../../../../components/ui/primitives/TablePagination";
+import { usePagination } from "../../../../hooks/usePagination";
+import { Textarea } from "../../../../components/ui/Textarea";
+import type { LeaveRequest } from "../../../../types";
+import { formatDateRange, leaveTypeLabel, approvalStepLabel } from "../utils";
+import { LeaveOverlapIndicator } from "./LeaveOverlapIndicator";
+import { LeaveShiftConflictIndicator } from "./LeaveShiftConflictIndicator";
 
 interface LeaveApprovalQueueProps {
   requests: LeaveRequest[];
@@ -30,7 +30,7 @@ export const LeaveApprovalQueue = ({
   actionLoadingId,
 }: LeaveApprovalQueueProps) => {
   const [declineTarget, setDeclineTarget] = useState<LeaveRequest | null>(null);
-  const [declineReason, setDeclineReason] = useState('');
+  const [declineReason, setDeclineReason] = useState("");
   const [approveTarget, setApproveTarget] = useState<LeaveRequest | null>(null);
   const {
     paginatedItems,
@@ -49,7 +49,7 @@ export const LeaveApprovalQueue = ({
     if (!declineTarget) return;
     onDecline(declineTarget, declineReason.trim() || undefined);
     setDeclineTarget(null);
-    setDeclineReason('');
+    setDeclineReason("");
   };
 
   const handleApproveClick = (request: LeaveRequest) => {
@@ -84,29 +84,30 @@ export const LeaveApprovalQueue = ({
         getRowKey={(row) => row.id}
         columns={[
           {
-            key: 'employee',
-            header: 'Employee',
+            key: "employee",
+            header: "Employee",
             render: (row: LeaveRequest) =>
               `${row.employee.firstName} ${row.employee.lastName}`,
           },
           {
-            key: 'type',
-            header: 'Type',
+            key: "type",
+            header: "Type",
             render: (row: LeaveRequest) => leaveTypeLabel(row.type),
           },
           {
-            key: 'dates',
-            header: 'Dates',
-            render: (row: LeaveRequest) => formatDateRange(row.startDate, row.endDate, row.halfDay),
+            key: "dates",
+            header: "Dates",
+            render: (row: LeaveRequest) =>
+              formatDateRange(row.startDate, row.endDate, row.halfDay),
           },
           {
-            key: 'days',
-            header: 'Days',
+            key: "days",
+            header: "Days",
             render: (row: LeaveRequest) => row.days,
           },
           {
-            key: 'step',
-            header: 'Approval step',
+            key: "step",
+            header: "Approval step",
             render: (row: LeaveRequest) => {
               const label = approvalStepLabel(row, multiStepApprovalEnabled);
               return label ? (
@@ -114,35 +115,35 @@ export const LeaveApprovalQueue = ({
                   {label}
                 </span>
               ) : (
-                '—'
+                "—"
               );
             },
           },
           {
-            key: 'reason',
-            header: 'Reason',
-            render: (row: LeaveRequest) => row.reason || '—',
+            key: "reason",
+            header: "Reason",
+            render: (row: LeaveRequest) => row.reason || "—",
           },
           {
-            key: 'overlaps',
-            header: 'Same dates',
-            align: 'left',
+            key: "overlaps",
+            header: "Same dates",
+            align: "left",
             render: (row: LeaveRequest) => (
               <LeaveOverlapIndicator overlaps={row.overlappingRequests} />
             ),
           },
           {
-            key: 'shifts',
-            header: 'Rota clash',
-            align: 'left',
+            key: "shifts",
+            header: "Rota clash",
+            align: "left",
             render: (row: LeaveRequest) => (
               <LeaveShiftConflictIndicator conflicts={row.conflictingShifts} />
             ),
           },
           {
-            key: 'actions',
-            header: 'Actions',
-            align: 'right',
+            key: "actions",
+            header: "Actions",
+            align: "right",
             render: (row: LeaveRequest) => (
               <div className="flex justify-end gap-2">
                 <Button
@@ -150,14 +151,16 @@ export const LeaveApprovalQueue = ({
                   className="px-3 py-1.5 text-xs"
                   icon={<HiCheck className="h-4 w-4 text-white" />}
                   loading={actionLoadingId === row.id}
-                  loadingText={row.approvalStep === 2 ? 'Approving…' : 'Approving…'}
+                  loadingText={
+                    row.approvalStep === 2 ? "Approving…" : "Approving…"
+                  }
                   onClick={() => handleApproveClick(row)}
                 >
                   {multiStepApprovalEnabled && row.approvalStep === 2
-                    ? 'Final approve'
+                    ? "Final approve"
                     : multiStepApprovalEnabled && row.approvalStep === 1
-                      ? 'Approve step 1'
-                      : 'Approve'}
+                      ? "Approve step 1"
+                      : "Approve"}
                 </Button>
                 <Button
                   type="button"
@@ -167,7 +170,7 @@ export const LeaveApprovalQueue = ({
                   disabled={actionLoadingId === row.id}
                   onClick={() => {
                     setDeclineTarget(row);
-                    setDeclineReason('');
+                    setDeclineReason("");
                   }}
                 >
                   Decline
@@ -200,14 +203,20 @@ export const LeaveApprovalQueue = ({
         }
         footer={
           <div className="flex justify-end gap-2">
-            <Button type="button" variant="secondary" onClick={() => setDeclineTarget(null)}>
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={() => setDeclineTarget(null)}
+            >
               Cancel
             </Button>
             <Button
               type="button"
               variant="secondary"
               icon={<HiXMark className="h-4 w-4 text-red-500" />}
-              loading={Boolean(declineTarget && actionLoadingId === declineTarget.id)}
+              loading={Boolean(
+                declineTarget && actionLoadingId === declineTarget.id,
+              )}
               loadingText="Declining…"
               onClick={handleDeclineSubmit}
             >
@@ -222,7 +231,9 @@ export const LeaveApprovalQueue = ({
             value={declineReason}
             onChange={(e) => setDeclineReason(e.target.value)}
             rows={3}
-            icon={<HiChatBubbleLeftEllipsis className="h-4 w-4 text-brand-600" />}
+            icon={
+              <HiChatBubbleLeftEllipsis className="h-4 w-4 text-brand-600" />
+            }
           />
         </FormField>
       </Modal>
@@ -238,13 +249,19 @@ export const LeaveApprovalQueue = ({
         }
         footer={
           <div className="flex justify-end gap-2">
-            <Button type="button" variant="secondary" onClick={() => setApproveTarget(null)}>
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={() => setApproveTarget(null)}
+            >
               Cancel
             </Button>
             <Button
               type="button"
               icon={<HiCheck className="h-4 w-4 text-white" />}
-              loading={Boolean(approveTarget && actionLoadingId === approveTarget.id)}
+              loading={Boolean(
+                approveTarget && actionLoadingId === approveTarget.id,
+              )}
               loadingText="Approving…"
               onClick={handleApproveConfirm}
             >
@@ -254,7 +271,9 @@ export const LeaveApprovalQueue = ({
         }
       >
         {approveTarget?.conflictingShifts?.length ? (
-          <LeaveShiftConflictIndicator conflicts={approveTarget.conflictingShifts} />
+          <LeaveShiftConflictIndicator
+            conflicts={approveTarget.conflictingShifts}
+          />
         ) : null}
       </Modal>
     </>

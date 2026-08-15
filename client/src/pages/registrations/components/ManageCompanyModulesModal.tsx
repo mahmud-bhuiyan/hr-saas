@@ -1,6 +1,6 @@
 import { FormEvent } from 'react';
 import { Button } from '../../../components/ui/Button';
-import { FormModal } from '../../../components/ui/FormModal';
+import { FormModal } from '../../../components/ui/forms/FormModal';
 import { TENANT_MODULE_META, getAlwaysAvailableFeatureLabels, type TenantModuleId } from '../../../types/modules';
 
 interface ManageCompanyModulesModalProps {

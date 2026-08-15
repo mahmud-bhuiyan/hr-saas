@@ -1,29 +1,29 @@
-import type { TenantModuleId } from './modules';
+import type { TenantModuleId } from "./modules";
 
 export type UserRole =
-  | 'super_admin'
-  | 'company_admin'
-  | 'hr_manager'
-  | 'manager'
-  | 'employee';
+  | "super_admin"
+  | "company_admin"
+  | "hr_manager"
+  | "manager"
+  | "employee";
 
-export type ColorScheme = 'light' | 'dark';
+export type ColorScheme = "light" | "dark";
 
-export type ThemeColor = 'purple' | 'blue' | 'pink' | 'green' | 'orange';
+export type ThemeColor = "purple" | "blue" | "pink" | "green" | "orange";
 
 export interface ApiHealthResponse {
-  status: 'ok';
+  status: "ok";
   service: string;
   timestamp: string;
 }
 
 export interface ApiErrorResponse {
-  status: 'error';
+  status: "error";
   message: string;
 }
 
 export interface ApiSuccessResponse<T> {
-  status: 'ok';
+  status: "ok";
   data: T;
 }
 
@@ -109,11 +109,11 @@ export interface RegisterPendingResponse {
   tenantId: string;
   companyName: string;
   email: string;
-  status: 'pending';
+  status: "pending";
   message: string;
 }
 
-export type TenantApprovalStatus = 'pending' | 'approved' | 'rejected';
+export type TenantApprovalStatus = "pending" | "approved" | "rejected";
 
 export interface RegistrationRequest {
   tenantId: string;
@@ -130,13 +130,13 @@ export interface RegistrationRequest {
   updatedAt?: string;
   billingExempt?: boolean;
   subscriptionStatus?:
-    | 'trialing'
-    | 'active'
-    | 'past_due'
-    | 'canceled'
-    | 'incomplete'
-    | 'exempt'
-    | 'none';
+    | "trialing"
+    | "active"
+    | "past_due"
+    | "canceled"
+    | "incomplete"
+    | "exempt"
+    | "none";
   seatCount?: number;
   enabledModules?: TenantModuleId[];
 }
@@ -150,11 +150,11 @@ export interface UpdateTenantModulesInput {
   enabledModules: TenantModuleId[];
 }
 
-export type EmployeeStatus = 'active' | 'on_leave' | 'terminated';
+export type EmployeeStatus = "active" | "on_leave" | "terminated";
 
-export type PayRateType = 'hourly' | 'salary';
+export type PayRateType = "hourly" | "salary";
 
-export type PayPeriodType = 'weekly' | 'biweekly' | 'monthly';
+export type PayPeriodType = "weekly" | "biweekly" | "monthly";
 
 export interface EmployeeManagerSummary {
   id: string;
@@ -203,11 +203,11 @@ export interface MyEmployeeProfile {
 export interface CreateEmployeeInput {
   firstName: string;
   lastName: string;
-  email?: string;
-  phone?: string;
-  jobTitle?: string;
+  email: string;
+  phone: string;
+  jobTitle: string;
   department?: string;
-  startDate?: string;
+  startDate: string;
   managerId?: string;
   employeeNumber?: string;
   status?: EmployeeStatus;
@@ -235,18 +235,22 @@ export interface ListEmployeesQuery {
   department?: string;
   status?: EmployeeStatus;
   sortBy?: EmployeeSortField;
-  sortOrder?: 'asc' | 'desc';
+  sortOrder?: "asc" | "desc";
 }
 
 export type EmployeeSortField =
-  | 'name'
-  | 'employeeNumber'
-  | 'jobTitle'
-  | 'department'
-  | 'manager';
+  | "name"
+  | "employeeNumber"
+  | "jobTitle"
+  | "department"
+  | "manager";
 
-export type LeaveType = 'annual' | 'sick' | 'unpaid' | 'planned';
-export type LeaveRequestStatus = 'pending' | 'approved' | 'declined' | 'cancelled';
+export type LeaveType = "annual" | "sick" | "unpaid" | "planned";
+export type LeaveRequestStatus =
+  | "pending"
+  | "approved"
+  | "declined"
+  | "cancelled";
 
 export interface LeaveEmployeeSummary {
   id: string;
@@ -271,7 +275,7 @@ export interface LeaveShiftConflictSummary {
   date: string;
   startTime: string;
   endTime: string;
-  status: 'draft' | 'published' | 'open';
+  status: "draft" | "published" | "open";
   locationName: string;
 }
 
@@ -349,7 +353,7 @@ export interface FaviconDisplaySettings {
   mimeType: FaviconMimeType;
 }
 
-export type SidebarBehavior = 'fixed_collapsed' | 'collapsible';
+export type SidebarBehavior = "fixed_collapsed" | "collapsible";
 
 export interface SidebarDisplaySettings {
   behavior: SidebarBehavior;
@@ -366,16 +370,16 @@ export interface SiteConfig {
   sidebarDisplay: SidebarDisplaySettings;
 }
 
-export type LogoObjectFit = 'contain' | 'cover';
+export type LogoObjectFit = "contain" | "cover";
 
-export type LogoShape = 'default' | 'circle';
+export type LogoShape = "default" | "circle";
 
 export type FaviconMimeType =
-  | 'auto'
-  | 'image/png'
-  | 'image/x-icon'
-  | 'image/svg+xml'
-  | 'image/webp';
+  | "auto"
+  | "image/png"
+  | "image/x-icon"
+  | "image/svg+xml"
+  | "image/webp";
 
 export interface LogoDisplaySettings {
   heightPx: number;
@@ -408,14 +412,14 @@ export interface PatchPlatformSiteSettingsInput {
 }
 
 export interface UploadPlatformAssetInput {
-  asset: 'logo' | 'favicon';
+  asset: "logo" | "favicon";
   imageBase64: string;
   filename: string;
 }
 
 export interface UploadPlatformAssetResponse {
   url: string;
-  asset: 'logo' | 'favicon';
+  asset: "logo" | "favicon";
 }
 
 export interface PatchTenantBrandingInput {
@@ -426,6 +430,7 @@ export interface CompanyProfile {
   name: string;
   address: string | null;
   logoUrl: string | null;
+  defaultPhoneDialCode: string;
   updatedAt: string;
 }
 
@@ -433,6 +438,7 @@ export interface PatchCompanyProfileInput {
   name?: string;
   address?: string;
   logoUrl?: string | null;
+  defaultPhoneDialCode?: string;
 }
 
 export interface Department {
@@ -451,6 +457,44 @@ export interface CreateDepartmentInput {
 export interface PatchDepartmentInput {
   name?: string;
   isArchived?: boolean;
+}
+
+export interface CountryDialCodeRecord {
+  id: string;
+  code: string;
+  name: string;
+  dialCode: string;
+  minNationalLength: number;
+  maxNationalLength: number;
+  isArchived: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CountryDialCodesBundle {
+  countryDialCodes: CountryDialCodeRecord[];
+  defaultPhoneDialCode: string;
+}
+
+export interface CreateCountryDialCodeInput {
+  code: string;
+  name: string;
+  dialCode: string;
+  minNationalLength?: number;
+  maxNationalLength?: number;
+}
+
+export interface PatchCountryDialCodeInput {
+  code?: string;
+  name?: string;
+  dialCode?: string;
+  minNationalLength?: number;
+  maxNationalLength?: number;
+  isArchived?: boolean;
+}
+
+export interface ManagedCountryDialCodesList {
+  countryDialCodes: CountryDialCodeRecord[];
 }
 
 export interface WorkLocation {
@@ -476,7 +520,7 @@ export interface PatchWorkLocationInput {
   isArchived?: boolean;
 }
 
-export type ShiftStatus = 'draft' | 'published' | 'open';
+export type ShiftStatus = "draft" | "published" | "open";
 
 export interface ShiftEmployeeSummary {
   id: string;
@@ -566,7 +610,7 @@ export interface PatchPayrollSettingsInput {
 }
 
 export interface AccountingConnectionStatus {
-  provider: 'xero';
+  provider: "xero";
   configured: boolean;
   connected: boolean;
   organisationName?: string;
@@ -577,12 +621,12 @@ export interface AccountingConnectionStatus {
 
 export interface PayrollSyncResult {
   periodId: string;
-  provider: 'xero';
+  provider: "xero";
   externalReference: string;
   syncedAt: string;
 }
 
-export type PayrollPeriodStatus = 'draft' | 'generated' | 'exported';
+export type PayrollPeriodStatus = "draft" | "generated" | "exported";
 
 export interface EmployeePayrollSummary {
   employeeId: string;
@@ -607,7 +651,7 @@ export interface PayrollPeriod {
   generatedBy?: string;
   exportedAt?: string;
   exportedBy?: string;
-  accountingProvider?: 'xero';
+  accountingProvider?: "xero";
   accountingReference?: string;
   accountingSyncedAt?: string;
   accountingSyncedBy?: string;
@@ -632,11 +676,11 @@ export interface TenantUser {
 }
 
 export interface PatchTenantUserInput {
-  role?: Exclude<UserRole, 'super_admin'>;
+  role?: Exclude<UserRole, "super_admin">;
   isActive?: boolean;
 }
 
-export type DocumentCategory = 'contract' | 'id' | 'certification' | 'other';
+export type DocumentCategory = "contract" | "id" | "certification" | "other";
 
 export interface DocumentEmployeeSummary {
   id: string;
@@ -693,16 +737,16 @@ export interface DocumentDownloadResponse {
   fileName: string;
 }
 
-export type AuditAction = 'create' | 'update' | 'delete';
+export type AuditAction = "create" | "update" | "delete";
 
 export type AuditEntityType =
-  | 'Employee'
-  | 'HrDocument'
-  | 'User'
-  | 'LeaveRequest'
-  | 'AttendanceLog'
-  | 'Timesheet'
-  | 'Expense';
+  | "Employee"
+  | "HrDocument"
+  | "User"
+  | "LeaveRequest"
+  | "AttendanceLog"
+  | "Timesheet"
+  | "Expense";
 
 export interface AuditLogEntry {
   id: string;
@@ -752,10 +796,10 @@ export interface MessageResponse {
 }
 
 export interface InviteEmployeeInput {
-  role?: 'employee' | 'manager' | 'hr_manager';
+  role?: "employee" | "manager" | "hr_manager";
 }
 
-export type AttendanceMethod = 'web' | 'app' | 'kiosk';
+export type AttendanceMethod = "web" | "app" | "kiosk";
 
 export interface AttendanceLog {
   id: string;
@@ -816,7 +860,7 @@ export interface AttendanceCalendar {
 }
 
 export interface ClockInInput {
-  method?: Extract<AttendanceMethod, 'web' | 'kiosk'>;
+  method?: Extract<AttendanceMethod, "web" | "kiosk">;
   location?: { lat: number; lng: number };
 }
 
@@ -830,8 +874,8 @@ export interface PatchAttendanceSettingsInput {
   attendanceGpsEnabled: boolean;
 }
 
-export type TimesheetEntrySource = 'attendance' | 'manual';
-export type TimesheetStatus = 'draft' | 'submitted' | 'approved' | 'declined';
+export type TimesheetEntrySource = "attendance" | "manual";
+export type TimesheetStatus = "draft" | "submitted" | "approved" | "declined";
 
 export interface TimesheetEmployeeSummary {
   id: string;
@@ -891,9 +935,9 @@ export interface DeclineTimesheetInput {
   declineReason?: string;
 }
 
-export type ExpenseCategory = 'travel' | 'meals' | 'equipment' | 'other';
+export type ExpenseCategory = "travel" | "meals" | "equipment" | "other";
 
-export type ExpenseStatus = 'pending' | 'approved' | 'declined' | 'reimbursed';
+export type ExpenseStatus = "pending" | "approved" | "declined" | "reimbursed";
 
 export interface ExpenseEmployeeSummary {
   id: string;
@@ -961,7 +1005,7 @@ export interface PatchExpenseInput {
 }
 
 export interface ListExpensesQuery {
-  scope?: 'own' | 'approval';
+  scope?: "own" | "approval";
   status?: ExpenseStatus;
   page?: number;
   limit?: number;
@@ -1054,11 +1098,11 @@ export interface AbsenceSummaryQuery {
 }
 
 export type SubscriptionStatus =
-  | 'trialing'
-  | 'active'
-  | 'past_due'
-  | 'canceled'
-  | 'incomplete';
+  | "trialing"
+  | "active"
+  | "past_due"
+  | "canceled"
+  | "incomplete";
 
 export interface BillingSubscription {
   status: SubscriptionStatus;

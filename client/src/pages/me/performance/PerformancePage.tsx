@@ -4,7 +4,7 @@ import { MeTabs } from "../components/MeTabs";
 
 export const PerformancePage = () => {
   return (
-    <PageContainer>
+    <PageContainer flushTop>
       <MeTabs />
       <PageHeader
         label="Performance"

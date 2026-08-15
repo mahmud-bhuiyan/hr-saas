@@ -1,8 +1,12 @@
-import { HiArrowDownTray, HiArrowPath, HiBolt } from 'react-icons/hi2';
-import { Button } from '../../../components/ui/Button';
-import { Table } from '../../../components/ui/Table';
-import type { PayrollPeriod } from '../../../types';
-import { formatPeriodRange, payrollStatusClass, payrollStatusLabel } from '../utils';
+import { HiArrowDownTray, HiArrowPath, HiBolt } from "react-icons/hi2";
+import { Button } from "../../../components/ui/Button";
+import { Table } from "../../../components/ui/primitives/Table";
+import type { PayrollPeriod } from "../../../types";
+import {
+  formatPeriodRange,
+  payrollStatusClass,
+  payrollStatusLabel,
+} from "../utils";
 
 interface PayrollPeriodsTableProps {
   periods: PayrollPeriod[];
@@ -40,16 +44,16 @@ export const PayrollPeriodsTable = ({
       emptyMessage="No payroll periods yet. Create one to get started."
       columns={[
         {
-          key: 'period',
-          header: 'Period',
+          key: "period",
+          header: "Period",
           render: (period) => (
             <button
               type="button"
               onClick={() => onSelect(period)}
               className={`font-medium ${
                 selectedPeriodId === period.id
-                  ? 'text-brand-700 dark:text-brand-400'
-                  : 'text-slate-900 hover:text-brand-700 dark:text-slate-100 dark:hover:text-brand-400'
+                  ? "text-brand-700 dark:text-brand-400"
+                  : "text-slate-900 hover:text-brand-700 dark:text-slate-100 dark:hover:text-brand-400"
               }`}
             >
               {formatPeriodRange(period.periodStart, period.periodEnd)}
@@ -57,8 +61,8 @@ export const PayrollPeriodsTable = ({
           ),
         },
         {
-          key: 'status',
-          header: 'Status',
+          key: "status",
+          header: "Status",
           render: (period) => (
             <span
               className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-medium ${payrollStatusClass(period.status)}`}
@@ -68,18 +72,18 @@ export const PayrollPeriodsTable = ({
           ),
         },
         {
-          key: 'employees',
-          header: 'Employees',
-          align: 'center',
+          key: "employees",
+          header: "Employees",
+          align: "center",
           render: (period) => period.employeeSummaries.length,
         },
         {
-          key: 'actions',
-          header: 'Actions',
-          align: 'right',
+          key: "actions",
+          header: "Actions",
+          align: "right",
           render: (period) => (
             <div className="flex justify-end gap-2">
-              {canGenerate && period.status !== 'exported' && (
+              {canGenerate && period.status !== "exported" && (
                 <Button
                   type="button"
                   variant="secondary"
@@ -89,10 +93,10 @@ export const PayrollPeriodsTable = ({
                   loadingText="Generating…"
                   onClick={() => onGenerate(period)}
                 >
-                  {period.status === 'draft' ? 'Generate' : 'Regenerate'}
+                  {period.status === "draft" ? "Generate" : "Regenerate"}
                 </Button>
               )}
-              {canExport && period.status !== 'draft' && (
+              {canExport && period.status !== "draft" && (
                 <Button
                   type="button"
                   variant="secondary"
@@ -105,7 +109,7 @@ export const PayrollPeriodsTable = ({
                   CSV
                 </Button>
               )}
-              {canSync && period.status !== 'draft' && (
+              {canSync && period.status !== "draft" && (
                 <Button
                   type="button"
                   variant="secondary"
@@ -115,7 +119,7 @@ export const PayrollPeriodsTable = ({
                   loadingText="Syncing…"
                   onClick={() => onSync(period)}
                 >
-                  {period.accountingReference ? 'Re-sync' : 'Sync Xero'}
+                  {period.accountingReference ? "Re-sync" : "Sync Xero"}
                 </Button>
               )}
             </div>

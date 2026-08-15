@@ -1,32 +1,54 @@
-import type { Employee } from '../../types';
+import type { Employee } from "../../types";
 
-export const EMPLOYEES_BASE_PATH = '/employees';
-export const EMPLOYEES_ACTIVE_PATH = '/employees/active';
-export const EMPLOYEES_INACTIVE_PATH = '/employees/inactive';
+export const EMPLOYEE_REQUIRED_FIELD_KEYS = [
+  "firstName",
+  "lastName",
+  "email",
+  "phone",
+  "jobTitle",
+  "startDate",
+] as const;
 
-export const employeeViewPath = (id: string): string => `${EMPLOYEES_BASE_PATH}/${id}`;
+export const EMPLOYEES_BASE_PATH = "/employees";
+export const EMPLOYEES_ACTIVE_PATH = "/employees/active";
+export const EMPLOYEES_INACTIVE_PATH = "/employees/inactive";
 
-export const employeeEditPath = (id: string): string => `${EMPLOYEES_BASE_PATH}/${id}/edit`;
+export const employeeViewPath = (
+  id: string,
+  basePath = EMPLOYEES_ACTIVE_PATH,
+): string => `${basePath}?view=${encodeURIComponent(id)}`;
 
-export const isActiveEmployee = (employee: Employee): boolean => employee.status !== 'terminated';
+export const employeeEditPath = (
+  id: string,
+  basePath = EMPLOYEES_ACTIVE_PATH,
+): string => `${basePath}?edit=${encodeURIComponent(id)}`;
 
-export const personName = (person: { firstName: string; lastName: string }): string => {
+export const isActiveEmployee = (employee: Employee): boolean =>
+  employee.status !== "terminated";
+
+export const personName = (person: {
+  firstName: string;
+  lastName: string;
+}): string => {
   return `${person.firstName} ${person.lastName}`;
-}
+};
 
 export const employeeName = (employee: Employee): string => {
   return personName(employee);
-}
+};
 
 export const formatDateTime = (iso: string): string => {
   return new Date(iso).toLocaleString();
-}
+};
 
 export const statusLabel = (status: string): string => {
-  return status.replace(/_/g, ' ');
-}
+  return status.replace(/_/g, " ");
+};
 
-export const employeeMatchesSearch = (employee: Employee, search: string): boolean => {
+export const employeeMatchesSearch = (
+  employee: Employee,
+  search: string,
+): boolean => {
   const trimmed = search.trim();
   if (!trimmed) {
     return true;
@@ -48,7 +70,7 @@ export const employeeMatchesSearch = (employee: Employee, search: string): boole
 
   const needle = trimmed.toLowerCase();
 
-  if (needle.includes('@') || !/\s/.test(trimmed)) {
+  if (needle.includes("@") || !/\s/.test(trimmed)) {
     return fields.some((field) => field.includes(needle));
   }
 

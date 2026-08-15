@@ -1,88 +1,128 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { FormEvent, useState } from 'react';
-import { Navigate } from 'react-router-dom';
-import { HiPlus } from 'react-icons/hi2';
-import { toast } from 'react-toastify';
-import { Button } from '../../../components/ui/Button';
-import { PageContainer } from '../../../components/ui/PageContainer';
-import { SettingsPageHeader } from '../components/SettingsPageHeader';
-import { TabGroup } from '../../../components/ui/TabGroup';
-import { useTabUrlState } from '../../../hooks/useTabUrlState';
-import { useAuth } from '../../../contexts/AuthContext';
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { FormEvent, useState } from "react";
+import { Navigate } from "react-router-dom";
+import { HiPlus } from "react-icons/hi2";
+import { toast } from "react-toastify";
+import { Button } from "../../../components/ui/Button";
+import { ConfirmModal } from "../../../components/ui/forms/ConfirmModal";
+import { PageContainer } from "../../../components/ui/PageContainer";
+import { SettingsPageHeader } from "../components/SettingsPageHeader";
+import { TabGroup } from "../../../components/ui/TabGroup";
+import { useTabUrlState } from "../../../hooks/useTabUrlState";
+import { useAuth } from "../../../contexts/AuthContext";
 import {
   ApiError,
   createDepartment,
+  deleteDepartment,
   fetchManagedDepartments,
   updateDepartment,
-} from '../../../lib/api';
-import type { Department } from '../../../types';
-import { areRequiredFieldsFilled } from '../../../utils/form';
-import { isQueryInitialLoad } from '../../../utils/query';
-import { DepartmentFormModal } from './components/DepartmentFormModal';
-import { DepartmentsTable } from './components/DepartmentsTable';
+} from "../../../lib/api";
+import type { Department } from "../../../types";
+import { areRequiredFieldsFilled } from "../../../utils/form";
+import { isQueryInitialLoad } from "../../../utils/query";
+import { DepartmentFormModal } from "./components/DepartmentFormModal";
+import { DepartmentsTable } from "./components/DepartmentsTable";
 
-type DepartmentsTab = 'active' | 'archived';
+type DepartmentsTab = "active" | "archived";
 
-const DEPARTMENTS_TAB_IDS = ['active', 'archived'] as const satisfies readonly DepartmentsTab[];
+const DEPARTMENTS_TAB_IDS = [
+  "active",
+  "archived",
+] as const satisfies readonly DepartmentsTab[];
 
 export const DepartmentsPage = () => {
   const { user } = useAuth();
   const queryClient = useQueryClient();
-  const { activeTab, setActiveTab } = useTabUrlState(DEPARTMENTS_TAB_IDS, { defaultTab: 'active' });
+  const { activeTab, setActiveTab } = useTabUrlState(DEPARTMENTS_TAB_IDS, {
+    defaultTab: "active",
+  });
   const [createOpen, setCreateOpen] = useState(false);
-  const [createName, setCreateName] = useState('');
+  const [createName, setCreateName] = useState("");
   const [editTarget, setEditTarget] = useState<Department | null>(null);
-  const [editName, setEditName] = useState('');
+  const [editName, setEditName] = useState("");
   const [archiveLoadingId, setArchiveLoadingId] = useState<string | null>(null);
   const [restoreLoadingId, setRestoreLoadingId] = useState<string | null>(null);
+  const [deleteLoadingId, setDeleteLoadingId] = useState<string | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<Department | null>(null);
 
-  const canAccess = user && ['company_admin', 'hr_manager'].includes(user.role);
+  const canAccess = user && ["company_admin", "hr_manager"].includes(user.role);
 
   const departmentsQuery = useQuery({
-    queryKey: ['settings', 'departments', 'all'],
+    queryKey: ["settings", "departments", "all"],
     queryFn: () => fetchManagedDepartments(true),
     enabled: Boolean(canAccess),
   });
 
   const invalidateDepartments = () => {
-    void queryClient.invalidateQueries({ queryKey: ['settings', 'departments'] });
-    void queryClient.invalidateQueries({ queryKey: ['employees', 'departments'] });
+    void queryClient.invalidateQueries({
+      queryKey: ["settings", "departments"],
+    });
+    void queryClient.invalidateQueries({
+      queryKey: ["employees", "departments"],
+    });
   };
 
   const createMutation = useMutation({
     mutationFn: createDepartment,
     onSuccess: () => {
-      toast.success('Department created.');
+      toast.success("Department created.");
       setCreateOpen(false);
-      setCreateName('');
+      setCreateName("");
       invalidateDepartments();
     },
     onError: (err) => {
-      toast.error(err instanceof ApiError ? err.message : 'Failed to create department');
+      toast.error(
+        err instanceof ApiError ? err.message : "Failed to create department",
+      );
     },
   });
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, input }: { id: string; input: { name?: string; isArchived?: boolean } }) =>
-      updateDepartment(id, input),
+    mutationFn: ({
+      id,
+      input,
+    }: {
+      id: string;
+      input: { name?: string; isArchived?: boolean };
+    }) => updateDepartment(id, input),
     onSuccess: (_, variables) => {
       if (variables.input.isArchived === true) {
-        toast.success('Department archived.');
+        toast.success("Department archived.");
       } else if (variables.input.isArchived === false) {
-        toast.success('Department restored.');
+        toast.success("Department restored.");
       } else {
-        toast.success('Department updated.');
+        toast.success("Department updated.");
         setEditTarget(null);
-        setEditName('');
+        setEditName("");
       }
       setArchiveLoadingId(null);
       setRestoreLoadingId(null);
       invalidateDepartments();
     },
     onError: (err) => {
-      toast.error(err instanceof ApiError ? err.message : 'Failed to update department');
+      toast.error(
+        err instanceof ApiError ? err.message : "Failed to update department",
+      );
       setArchiveLoadingId(null);
       setRestoreLoadingId(null);
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: deleteDepartment,
+    onSuccess: () => {
+      toast.success("Department permanently deleted.");
+      setDeleteTarget(null);
+      setDeleteLoadingId(null);
+      invalidateDepartments();
+    },
+    onError: (err) => {
+      toast.error(
+        err instanceof ApiError
+          ? err.message
+          : "Failed to delete department permanently",
+      );
+      setDeleteLoadingId(null);
     },
   });
 
@@ -96,7 +136,10 @@ export const DepartmentsPage = () => {
     if (!editTarget || editName.trim() === editTarget.name) {
       return;
     }
-    updateMutation.mutate({ id: editTarget.id, input: { name: editName.trim() } });
+    updateMutation.mutate({
+      id: editTarget.id,
+      input: { name: editName.trim() },
+    });
   };
 
   const handleArchive = (department: Department) => {
@@ -109,6 +152,18 @@ export const DepartmentsPage = () => {
     updateMutation.mutate({ id: department.id, input: { isArchived: false } });
   };
 
+  const handleDelete = (department: Department) => {
+    setDeleteTarget(department);
+  };
+
+  const handleDeleteConfirm = () => {
+    if (!deleteTarget) {
+      return;
+    }
+    setDeleteLoadingId(deleteTarget.id);
+    deleteMutation.mutate(deleteTarget.id);
+  };
+
   if (!canAccess) {
     return <Navigate to="/dashboard" replace />;
   }
@@ -116,6 +171,14 @@ export const DepartmentsPage = () => {
   const allDepartments = departmentsQuery.data ?? [];
   const activeDepartments = allDepartments.filter((dept) => !dept.isArchived);
   const archivedDepartments = allDepartments.filter((dept) => dept.isArchived);
+
+  const tableActionPending =
+    createMutation.isPending ||
+    updateMutation.isPending ||
+    deleteMutation.isPending ||
+    archiveLoadingId !== null ||
+    restoreLoadingId !== null ||
+    deleteLoadingId !== null;
 
   const tableProps = {
     loading: isQueryInitialLoad(departmentsQuery),
@@ -127,6 +190,7 @@ export const DepartmentsPage = () => {
     onRestore: handleRestore,
     archiveLoadingId,
     restoreLoadingId,
+    actionPending: tableActionPending,
   };
 
   return (
@@ -149,16 +213,28 @@ export const DepartmentsPage = () => {
         onChange={setActiveTab}
         tabs={[
           {
-            id: 'active',
-            label: 'Active',
+            id: "active",
+            label: "Active",
             count: activeDepartments.length,
-            content: <DepartmentsTable departments={activeDepartments} {...tableProps} />,
+            content: (
+              <DepartmentsTable
+                departments={activeDepartments}
+                {...tableProps}
+              />
+            ),
           },
           {
-            id: 'archived',
-            label: 'Archived',
+            id: "archived",
+            label: "Archived",
             count: archivedDepartments.length,
-            content: <DepartmentsTable departments={archivedDepartments} {...tableProps} />,
+            content: (
+              <DepartmentsTable
+                departments={archivedDepartments}
+                {...tableProps}
+                onDelete={handleDelete}
+                deleteLoadingId={deleteLoadingId}
+              />
+            ),
           },
         ]}
       />
@@ -167,7 +243,7 @@ export const DepartmentsPage = () => {
         open={createOpen}
         onClose={() => {
           setCreateOpen(false);
-          setCreateName('');
+          setCreateName("");
         }}
         onSubmit={handleCreateSubmit}
         title="Add department"
@@ -176,14 +252,16 @@ export const DepartmentsPage = () => {
         name={createName}
         onNameChange={setCreateName}
         loading={createMutation.isPending}
-        submitDisabled={!areRequiredFieldsFilled({ name: createName }, ['name'])}
+        submitDisabled={
+          !areRequiredFieldsFilled({ name: createName }, ["name"])
+        }
       />
 
       <DepartmentFormModal
         open={Boolean(editTarget)}
         onClose={() => {
           setEditTarget(null);
-          setEditName('');
+          setEditName("");
         }}
         onSubmit={handleEditSubmit}
         title="Rename department"
@@ -192,7 +270,29 @@ export const DepartmentsPage = () => {
         name={editName}
         onNameChange={setEditName}
         loading={updateMutation.isPending}
-        submitDisabled={!editTarget || editName.trim() === editTarget.name || !editName.trim()}
+        submitDisabled={
+          !editTarget || editName.trim() === editTarget.name || !editName.trim()
+        }
+      />
+
+      <ConfirmModal
+        open={Boolean(deleteTarget)}
+        onClose={() => {
+          if (!deleteMutation.isPending) {
+            setDeleteTarget(null);
+          }
+        }}
+        onConfirm={handleDeleteConfirm}
+        title="Delete department permanently"
+        description={
+          deleteTarget
+            ? `Permanently delete ${deleteTarget.name}? This cannot be undone.`
+            : undefined
+        }
+        confirmLabel="Delete permanently"
+        confirmVariant="danger"
+        loading={deleteMutation.isPending}
+        loadingText="Deleting…"
       />
     </PageContainer>
   );

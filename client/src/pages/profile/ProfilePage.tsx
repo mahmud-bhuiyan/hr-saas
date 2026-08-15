@@ -1,36 +1,36 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { FormEvent, useEffect, useMemo, useState } from 'react';
-import { ChangePasswordModal } from '../../components/ChangePasswordModal';
-import { PageContainer } from '../../components/ui/PageContainer';
-import { useAuth } from '../../contexts/AuthContext';
-import { useMyAttendanceStatus } from '../../hooks/useMyAttendanceStatus';
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { FormEvent, useEffect, useMemo, useState } from "react";
+import { ChangePasswordModal } from "../../components/ChangePasswordModal";
+import { PageContainer } from "../../components/ui/PageContainer";
+import { useAuth } from "../../contexts/AuthContext";
+import { useMyAttendanceStatus } from "../../hooks/useMyAttendanceStatus";
 import {
   ApiError,
-  fetchMyEmployee,
   fetchProfile,
   readFileAsBase64,
   updateProfile,
   uploadProfileAvatar,
-} from '../../lib/api';
-import { toast } from 'react-toastify';
-import { hasFormChanges, pickChangedFields } from '../../utils/form';
-import { hasPermission } from '../../utils/permissions';
-import { isQueryInitialLoad } from '../../utils/query';
-import { ProfileEditForm } from './components/ProfileEditForm';
-import { ProfileHeaderBanner } from './components/ProfileHeaderBanner';
-import { ProfileSecuritySection } from './components/ProfileSecuritySection';
-import type { AuthUser } from '../../types';
+} from "../../lib/api";
+import { useLinkedEmployee } from "../../hooks/useLinkedEmployee";
+import { toast } from "react-toastify";
+import { hasFormChanges, pickChangedFields } from "../../utils/form";
+import { hasPermission } from "../../utils/permissions";
+import { isQueryInitialLoad } from "../../utils/query";
+import { ProfileEditForm } from "./components/ProfileEditForm";
+import { ProfileHeaderBanner } from "./components/ProfileHeaderBanner";
+import { ProfileSecuritySection } from "./components/ProfileSecuritySection";
+import type { AuthUser } from "../../types";
 
 const toAuthUser = (profile: {
   id: string;
   email: string;
-  role: AuthUser['role'];
+  role: AuthUser["role"];
   tenantId?: string;
   firstName?: string;
   lastName?: string;
   avatarUrl?: string;
-  colorScheme?: AuthUser['colorScheme'];
-  themeColor?: AuthUser['themeColor'];
+  colorScheme?: AuthUser["colorScheme"];
+  themeColor?: AuthUser["themeColor"];
 }): AuthUser => ({
   id: profile.id,
   email: profile.email,
@@ -47,24 +47,22 @@ export const ProfilePage = () => {
   const { user, setUser, setAuth, accessToken } = useAuth();
   const queryClient = useQueryClient();
 
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
-  const [email, setEmail] = useState('');
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [email, setEmail] = useState("");
   const [passwordModalOpen, setPasswordModalOpen] = useState(false);
 
   const profileQuery = useQuery({
-    queryKey: ['profile', 'me'],
+    queryKey: ["profile", "me"],
     queryFn: fetchProfile,
   });
 
-  const employeeQuery = useQuery({
-    queryKey: ['employees', 'me'],
-    queryFn: fetchMyEmployee,
-    retry: false,
-  });
+  const employeeQuery = useLinkedEmployee();
 
   const statusQuery = useMyAttendanceStatus();
-  const canClock = Boolean(user && hasPermission(user.role, 'attendance:clock:own'));
+  const canClock = Boolean(
+    user && hasPermission(user.role, "attendance:clock:own"),
+  );
   const clockedIn =
     canClock && !statusQuery.isError && statusQuery.data
       ? statusQuery.data.clockedIn
@@ -74,68 +72,83 @@ export const ProfilePage = () => {
 
   const originalValues = useMemo(
     () => ({
-      firstName: profile?.firstName ?? '',
-      lastName: profile?.lastName ?? '',
-      email: profile?.email ?? '',
+      firstName: profile?.firstName ?? "",
+      lastName: profile?.lastName ?? "",
+      email: profile?.email ?? "",
     }),
-    [profile]
+    [profile],
   );
 
   const currentValues = useMemo(
     () => ({ firstName, lastName, email }),
-    [firstName, lastName, email]
+    [firstName, lastName, email],
   );
 
-  const profileFields = ['firstName', 'lastName', 'email'] as const;
-  const hasChanges = hasFormChanges(currentValues, originalValues, [...profileFields]);
+  const profileFields = ["firstName", "lastName", "email"] as const;
+  const hasChanges = hasFormChanges(currentValues, originalValues, [
+    ...profileFields,
+  ]);
 
   useEffect(() => {
     if (profile) {
-      setFirstName(profile.firstName ?? '');
-      setLastName(profile.lastName ?? '');
+      setFirstName(profile.firstName ?? "");
+      setLastName(profile.lastName ?? "");
       setEmail(profile.email);
     }
   }, [profile]);
 
-  const applyProfileUpdate = (data: { user: Parameters<typeof toAuthUser>[0]; accessToken?: string }) => {
+  const applyProfileUpdate = (data: {
+    user: Parameters<typeof toAuthUser>[0];
+    accessToken?: string;
+  }) => {
     const nextUser = toAuthUser(data.user);
     setUser(nextUser);
     if (data.accessToken && accessToken) {
       setAuth(nextUser, data.accessToken);
     }
-    void queryClient.invalidateQueries({ queryKey: ['profile', 'me'] });
+    void queryClient.invalidateQueries({ queryKey: ["profile", "me"] });
   };
 
   const updateMutation = useMutation({
     mutationFn: updateProfile,
     onSuccess: (data) => {
-      toast.success('Profile updated successfully.');
+      toast.success("Profile updated successfully.");
       applyProfileUpdate(data);
     },
     onError: (err) => {
-      toast.error(err instanceof ApiError ? err.message : 'Failed to update profile');
+      toast.error(
+        err instanceof ApiError ? err.message : "Failed to update profile",
+      );
     },
   });
 
   const avatarUploadMutation = useMutation({
     mutationFn: uploadProfileAvatar,
     onSuccess: (data) => {
-      toast.success('Profile photo updated.');
+      toast.success("Profile photo updated.");
       applyProfileUpdate(data);
     },
     onError: (err) => {
-      toast.error(err instanceof ApiError ? err.message : 'Failed to upload profile photo');
+      toast.error(
+        err instanceof ApiError
+          ? err.message
+          : "Failed to upload profile photo",
+      );
     },
   });
 
   const avatarRemoveMutation = useMutation({
     mutationFn: () => updateProfile({ avatarUrl: null }),
     onSuccess: (data) => {
-      toast.success('Profile photo removed.');
+      toast.success("Profile photo removed.");
       applyProfileUpdate(data);
     },
     onError: (err) => {
-      toast.error(err instanceof ApiError ? err.message : 'Failed to remove profile photo');
+      toast.error(
+        err instanceof ApiError
+          ? err.message
+          : "Failed to remove profile photo",
+      );
     },
   });
 
@@ -159,7 +172,7 @@ export const ProfilePage = () => {
     }
 
     updateMutation.mutate(
-      pickChangedFields(currentValues, originalValues, [...profileFields])
+      pickChangedFields(currentValues, originalValues, [...profileFields]),
     );
   };
 
@@ -212,7 +225,7 @@ export const ProfilePage = () => {
       <ChangePasswordModal
         open={passwordModalOpen}
         onClose={() => setPasswordModalOpen(false)}
-        onSuccess={() => toast.success('Password updated successfully.')}
+        onSuccess={() => toast.success("Password updated successfully.")}
       />
     </PageContainer>
   );

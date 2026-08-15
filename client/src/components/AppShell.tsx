@@ -13,6 +13,7 @@ import {
   HiCurrencyDollar,
   HiDocumentText,
   HiHome,
+  HiPhone,
   HiTableCells,
   HiUserGroup,
 } from "react-icons/hi2";
@@ -21,6 +22,8 @@ import type { IconType } from "react-icons";
 
 import { useAuth } from "../contexts/AuthContext";
 
+import { useHasLinkedEmployee } from "../hooks/useLinkedEmployee";
+
 import { useSiteConfig } from "../contexts/SiteConfigContext";
 
 import {
@@ -28,7 +31,7 @@ import {
   saveSidebarExpanded,
 } from "../lib/sidebar-storage";
 
-import { GlobalSearch } from "./GlobalSearch";
+import { GlobalSearch } from "./layout/GlobalSearch";
 
 import { BrandMark } from "./BrandMark";
 
@@ -38,7 +41,10 @@ import { NotificationBell } from "./NotificationBell";
 
 import type { UserRole } from "../types";
 import type { TenantModuleId } from "../types/modules";
-import { hasAnyMeModuleEnabled, isModuleEnabledForUser } from "../utils/modules";
+import {
+  hasAnyMeModuleEnabled,
+  isModuleEnabledForUser,
+} from "../utils/modules";
 
 const navItems: Array<{
   to: string;
@@ -61,10 +67,11 @@ const navItems: Array<{
   { to: "/dashboard", label: "Home", icon: HiHome, end: true },
 
   {
-    to: "/dashboard/registrations",
+    to: "/companies/registered",
     label: "Companies",
     icon: HiBuildingOffice2,
     roles: ["super_admin"],
+    activePrefix: "/companies",
   },
 
   {
@@ -75,6 +82,14 @@ const navItems: Array<{
     icon: HiCog6Tooth,
 
     roles: ["super_admin"],
+  },
+
+  {
+    to: "/country-codes/active",
+    label: "Country codes",
+    icon: HiPhone,
+    roles: ["super_admin"],
+    activePrefix: "/country-codes",
   },
 
   {
@@ -162,6 +177,7 @@ const isNavItemActive = (
 
 export const AppShell = () => {
   const { user } = useAuth();
+  const hasLinkedEmployee = useHasLinkedEmployee();
   const { config } = useSiteConfig();
   const location = useLocation();
 
@@ -206,7 +222,9 @@ export const AppShell = () => {
   const isCompact = !isCollapsible || !sidebarExpanded;
   const activeWidthPx = isCompact ? collapsedWidthPx : expandedWidthPx;
   const sidebarWidthStyle = { width: activeWidthPx };
-  const mainOffsetStyle = isDesktopSidebar ? { left: activeWidthPx } : undefined;
+  const mainOffsetStyle = isDesktopSidebar
+    ? { left: activeWidthPx }
+    : undefined;
 
   const compactNavItemClass =
     "flex flex-col items-center gap-0.5 px-1 py-2 text-center text-[10px] leading-tight";
@@ -214,7 +232,9 @@ export const AppShell = () => {
   const expandedNavItemClass =
     "flex flex-row items-center gap-3 px-3 py-2 text-sm";
 
-  const navItemLayoutClass = isCompact ? compactNavItemClass : expandedNavItemClass;
+  const navItemLayoutClass = isCompact
+    ? compactNavItemClass
+    : expandedNavItemClass;
 
   const iconClass = isCompact ? "h-[18px] w-[18px]" : "h-5 w-5";
 
@@ -274,7 +294,18 @@ export const AppShell = () => {
                 return false;
               }
 
-              if (item.activePrefix === "/me/" && !hasAnyMeModuleEnabled(user)) {
+              if (
+                item.activePrefix === "/me/" &&
+                !hasAnyMeModuleEnabled(user)
+              ) {
+                return false;
+              }
+
+              if (
+                item.activePrefix === "/me/" &&
+                user?.role === "company_admin" &&
+                hasLinkedEmployee !== true
+              ) {
                 return false;
               }
 
@@ -345,18 +376,26 @@ export const AppShell = () => {
             <button
               type="button"
               onClick={toggleSidebar}
-              aria-label={sidebarExpanded ? "Collapse sidebar" : "Expand sidebar"}
+              aria-label={
+                sidebarExpanded ? "Collapse sidebar" : "Expand sidebar"
+              }
               title={sidebarExpanded ? "Collapse sidebar" : "Expand sidebar"}
               className={`flex w-full rounded-md text-slate-400 transition hover:bg-[#122E44] hover:text-white ${navItemLayoutClass}`}
             >
               {sidebarExpanded ? (
                 <>
-                  <HiChevronLeft className={`${iconClass} shrink-0`} aria-hidden />
+                  <HiChevronLeft
+                    className={`${iconClass} shrink-0`}
+                    aria-hidden
+                  />
                   <span className="truncate font-medium">Collapse</span>
                 </>
               ) : (
                 <>
-                  <HiChevronRight className={`${iconClass} shrink-0`} aria-hidden />
+                  <HiChevronRight
+                    className={`${iconClass} shrink-0`}
+                    aria-hidden
+                  />
                   <span className="max-w-full text-center font-medium leading-tight">
                     Expand
                   </span>
@@ -369,7 +408,7 @@ export const AppShell = () => {
 
       <main
         id="app-main"
-        className="thin-scrollbar fixed bottom-0 left-0 right-0 top-14 overflow-y-auto px-3 py-6 transition-[left] duration-200 md:px-4"
+        className="thin-scrollbar fixed bottom-0 left-0 right-0 top-14 overflow-y-auto px-3 pb-6 pt-0 transition-[left] duration-200 md:px-4"
         style={mainOffsetStyle}
       >
         <Outlet />

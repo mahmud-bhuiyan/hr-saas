@@ -1,22 +1,21 @@
-import mongoose from 'mongoose';
-import type { TenantApprovalStatus } from '../auth/tenant.model.js';
-import { Tenant } from '../auth/tenant.model.js';
-import { getTenantBillingSummaries } from '../billing/billing.service.js';
-import { hashPassword } from '../../utils/password.js';
-import { ensureEmployeeRecordForUser } from '../employees/employee.service.js';
-import { writeAuditLog } from '../audit/audit.service.js';
+import mongoose from "mongoose";
+import type { TenantApprovalStatus } from "../auth/tenant.model.js";
+import { Tenant } from "../auth/tenant.model.js";
+import { getTenantBillingSummaries } from "../billing/billing.service.js";
+import { hashPassword } from "../../utils/password.js";
+import { writeAuditLog } from "../audit/audit.service.js";
 import {
   normalizeEnabledModules,
   resolveEnabledModules,
   type TenantModuleId,
-} from '../../types/modules.js';
-import { findUserByEmail } from './admin.service.js';
-import { User } from './user.model.js';
+} from "../../types/modules.js";
+import { findUserByEmail } from "./admin.service.js";
+import { User } from "./user.model.js";
 import type {
   CreateCompanyInput,
   UpdateCompanyInput,
   UpdateTenantModulesInput,
-} from './registration.validation.js';
+} from "./registration.validation.js";
 
 export interface RegistrationRequest {
   tenantId: string;
@@ -32,7 +31,14 @@ export interface RegistrationRequest {
   updatedByName?: string;
   updatedAt?: string;
   billingExempt?: boolean;
-  subscriptionStatus?: 'trialing' | 'active' | 'past_due' | 'canceled' | 'incomplete' | 'exempt' | 'none';
+  subscriptionStatus?:
+    | "trialing"
+    | "active"
+    | "past_due"
+    | "canceled"
+    | "incomplete"
+    | "exempt"
+    | "none";
   seatCount?: number;
   enabledModules?: TenantModuleId[];
 }
@@ -48,17 +54,19 @@ interface UserSummary {
   lastName?: string;
 }
 
-const userDisplayName = (user: UserSummary | null | undefined): string | undefined => {
+const userDisplayName = (
+  user: UserSummary | null | undefined,
+): string | undefined => {
   if (!user) {
     return undefined;
   }
 
   if (user.firstName || user.lastName) {
-    return [user.firstName, user.lastName].filter(Boolean).join(' ');
+    return [user.firstName, user.lastName].filter(Boolean).join(" ");
   }
 
   return user.email;
-}
+};
 
 const toRegistrationRequest = (
   tenant: {
@@ -74,15 +82,19 @@ const toRegistrationRequest = (
     enabledModules?: string[];
   },
   admin: UserSummary | null,
-  auditUsers: Map<string, UserSummary>
+  auditUsers: Map<string, UserSummary>,
 ): RegistrationRequest => {
-  const createdBy = tenant.createdBy ? auditUsers.get(tenant.createdBy.toString()) : undefined;
-  const updatedBy = tenant.updatedBy ? auditUsers.get(tenant.updatedBy.toString()) : undefined;
+  const createdBy = tenant.createdBy
+    ? auditUsers.get(tenant.createdBy.toString())
+    : undefined;
+  const updatedBy = tenant.updatedBy
+    ? auditUsers.get(tenant.updatedBy.toString())
+    : undefined;
 
   return {
     tenantId: tenant._id.toString(),
     companyName: tenant.name,
-    adminEmail: admin?.email ?? 'unknown',
+    adminEmail: admin?.email ?? "unknown",
     adminFirstName: admin?.firstName,
     adminLastName: admin?.lastName,
     status: tenant.approvalStatus,
@@ -94,13 +106,13 @@ const toRegistrationRequest = (
     updatedAt: tenant.updatedAt.toISOString(),
     enabledModules: resolveEnabledModules(tenant.enabledModules),
   };
-}
+};
 
 const loadAuditUsers = async (
   tenants: Array<{
     createdBy?: mongoose.Types.ObjectId;
     updatedBy?: mongoose.Types.ObjectId;
-  }>
+  }>,
 ): Promise<Map<string, UserSummary>> => {
   const userIds = new Set<string>();
 
@@ -118,7 +130,7 @@ const loadAuditUsers = async (
   }
 
   const users = await User.find({ _id: { $in: [...userIds] } })
-    .select('email firstName lastName')
+    .select("email firstName lastName")
     .lean();
 
   return new Map(
@@ -129,17 +141,17 @@ const loadAuditUsers = async (
         firstName: user.firstName,
         lastName: user.lastName,
       },
-    ])
+    ]),
   );
-}
+};
 
 export const createCompany = async (
   input: CreateCompanyInput,
-  createdByUserId: string
+  createdByUserId: string,
 ): Promise<RegistrationRequest> => {
   const existing = await findUserByEmail(input.email);
   if (existing) {
-    throw new RegistrationServiceError('Email already in use', 409);
+    throw new RegistrationServiceError("Email already in use", 409);
   }
 
   const session = await mongoose.startSession();
@@ -154,7 +166,7 @@ export const createCompany = async (
         {
           name: input.companyName,
           isActive: true,
-          approvalStatus: 'approved' as const,
+          approvalStatus: "approved" as const,
           approvedAt: new Date(),
           approvedBy: actorId,
           createdBy: actorId,
@@ -164,7 +176,7 @@ export const createCompany = async (
             : {}),
         },
       ],
-      { session }
+      { session },
     );
 
     const passwordHash = await hashPassword(input.password);
@@ -174,30 +186,21 @@ export const createCompany = async (
         {
           email: input.email,
           passwordHash,
-          role: 'company_admin' as const,
+          role: "company_admin" as const,
           tenantId: tenant._id,
           firstName: input.firstName,
           lastName: input.lastName,
           isActive: true,
         },
       ],
-      { session }
+      { session },
     );
 
     await session.commitTransaction();
 
-    await ensureEmployeeRecordForUser(
-      tenant._id.toString(),
-      {
-        userId: admin._id.toString(),
-        email: admin.email,
-        firstName: admin.firstName,
-        lastName: admin.lastName,
-      },
-      { createdByUserId: createdByUserId }
-    );
-
-    const actor = await User.findById(createdByUserId).select('email firstName lastName').lean();
+    const actor = await User.findById(createdByUserId)
+      .select("email firstName lastName")
+      .lean();
     const auditUsers = new Map<string, UserSummary>();
     if (actor) {
       auditUsers.set(actor._id.toString(), {
@@ -214,14 +217,14 @@ export const createCompany = async (
   } finally {
     session.endSession();
   }
-}
+};
 
 export const listRegistrationRequests = async (
-  status?: TenantApprovalStatus
+  status?: TenantApprovalStatus,
 ): Promise<RegistrationRequest[]> => {
   const filter = status
     ? { approvalStatus: status }
-    : { approvalStatus: { $ne: 'approved' as const } };
+    : { approvalStatus: { $ne: "approved" as const } };
 
   const tenants = await Tenant.find(filter).sort({ createdAt: -1 }).lean();
   const auditUsers = await loadAuditUsers(tenants);
@@ -231,9 +234,9 @@ export const listRegistrationRequests = async (
   for (const tenant of tenants) {
     const admin = await User.findOne({
       tenantId: tenant._id,
-      role: 'company_admin',
+      role: "company_admin",
     })
-      .select('email firstName lastName')
+      .select("email firstName lastName")
       .lean();
 
     results.push(
@@ -257,14 +260,14 @@ export const listRegistrationRequests = async (
               lastName: admin.lastName,
             }
           : null,
-        auditUsers
-      )
+        auditUsers,
+      ),
     );
   }
 
-  if (status === 'approved' && results.length > 0) {
+  if (status === "approved" && results.length > 0) {
     const billingSummaries = await getTenantBillingSummaries(
-      results.map((row) => row.tenantId)
+      results.map((row) => row.tenantId),
     );
 
     return results.map((row) => {
@@ -283,32 +286,35 @@ export const listRegistrationRequests = async (
   }
 
   return results;
-}
+};
 
 export const approveRegistration = async (
   tenantId: string,
-  approvedByUserId: string
+  approvedByUserId: string,
 ): Promise<RegistrationRequest> => {
   const tenant = await Tenant.findById(tenantId);
   if (!tenant) {
-    throw new RegistrationServiceError('Registration not found', 404);
+    throw new RegistrationServiceError("Registration not found", 404);
   }
 
-  if (tenant.approvalStatus !== 'pending') {
+  if (tenant.approvalStatus !== "pending") {
     throw new RegistrationServiceError(
       `Registration is already ${tenant.approvalStatus}`,
-      409
+      409,
     );
   }
 
-  const admin = await User.findOne({ tenantId: tenant._id, role: 'company_admin' });
+  const admin = await User.findOne({
+    tenantId: tenant._id,
+    role: "company_admin",
+  });
   if (!admin) {
-    throw new RegistrationServiceError('Company admin user not found', 404);
+    throw new RegistrationServiceError("Company admin user not found", 404);
   }
 
   const actorId = new mongoose.Types.ObjectId(approvedByUserId);
 
-  tenant.approvalStatus = 'approved';
+  tenant.approvalStatus = "approved";
   tenant.isActive = true;
   tenant.approvedAt = new Date();
   tenant.approvedBy = actorId;
@@ -319,86 +325,80 @@ export const approveRegistration = async (
   admin.isActive = true;
   await admin.save();
 
-  await ensureEmployeeRecordForUser(
-    tenant._id.toString(),
-    {
-      userId: admin._id.toString(),
-      email: admin.email,
-      firstName: admin.firstName,
-      lastName: admin.lastName,
-    },
-    { createdByUserId: approvedByUserId }
-  );
-
   const auditUsers = await loadAuditUsers([tenant]);
 
-  return toRegistrationRequest(
-    tenant,
-    admin,
-    auditUsers
-  );
-}
+  return toRegistrationRequest(tenant, admin, auditUsers);
+};
 
 export const rejectRegistration = async (
   tenantId: string,
   rejectedByUserId: string,
-  reason?: string
+  reason?: string,
 ): Promise<RegistrationRequest> => {
   const tenant = await Tenant.findById(tenantId);
   if (!tenant) {
-    throw new RegistrationServiceError('Registration not found', 404);
+    throw new RegistrationServiceError("Registration not found", 404);
   }
 
-  if (tenant.approvalStatus !== 'pending') {
+  if (tenant.approvalStatus !== "pending") {
     throw new RegistrationServiceError(
       `Registration is already ${tenant.approvalStatus}`,
-      409
+      409,
     );
   }
 
-  tenant.approvalStatus = 'rejected';
+  tenant.approvalStatus = "rejected";
   tenant.isActive = false;
-  tenant.rejectedReason = reason ?? 'Registration rejected by super admin';
+  tenant.rejectedReason = reason ?? "Registration rejected by super admin";
   tenant.updatedBy = new mongoose.Types.ObjectId(rejectedByUserId);
   await tenant.save();
 
   await User.updateMany({ tenantId: tenant._id }, { isActive: false });
 
-  const admin = await User.findOne({ tenantId: tenant._id, role: 'company_admin' });
+  const admin = await User.findOne({
+    tenantId: tenant._id,
+    role: "company_admin",
+  });
   const auditUsers = await loadAuditUsers([tenant]);
 
   return toRegistrationRequest(tenant, admin, auditUsers);
-}
+};
 
 const findApprovedTenant = async (tenantId: string) => {
   const tenant = await Tenant.findById(tenantId);
   if (!tenant) {
-    throw new RegistrationServiceError('Company not found', 404);
+    throw new RegistrationServiceError("Company not found", 404);
   }
 
-  if (tenant.approvalStatus !== 'approved') {
-    throw new RegistrationServiceError('Only approved companies can be managed here', 409);
+  if (tenant.approvalStatus !== "approved") {
+    throw new RegistrationServiceError(
+      "Only approved companies can be managed here",
+      409,
+    );
   }
 
   return tenant;
-}
+};
 
 export const updateCompany = async (
   tenantId: string,
   input: UpdateCompanyInput,
-  updatedByUserId: string
+  updatedByUserId: string,
 ): Promise<RegistrationRequest> => {
   const tenant = await findApprovedTenant(tenantId);
-  const admin = await User.findOne({ tenantId: tenant._id, role: 'company_admin' });
+  const admin = await User.findOne({
+    tenantId: tenant._id,
+    role: "company_admin",
+  });
 
   if (!admin) {
-    throw new RegistrationServiceError('Company admin user not found', 404);
+    throw new RegistrationServiceError("Company admin user not found", 404);
   }
 
   if (input.adminEmail && input.adminEmail !== admin.email) {
     const existing = await findUserByEmail(input.adminEmail);
     if (existing && existing._id.toString() !== admin._id.toString()) {
-      throw new RegistrationServiceError('Email already in use', 409);
+      throw new RegistrationServiceError("Email already in use", 409);
     }
     admin.email = input.adminEmail;
   }
@@ -417,7 +417,10 @@ export const updateCompany = async (
 
   if (input.isActive !== undefined && input.isActive !== tenant.isActive) {
     tenant.isActive = input.isActive;
-    await User.updateMany({ tenantId: tenant._id }, { isActive: input.isActive });
+    await User.updateMany(
+      { tenantId: tenant._id },
+      { isActive: input.isActive },
+    );
   }
 
   tenant.updatedBy = new mongoose.Types.ObjectId(updatedByUserId);
@@ -426,21 +429,23 @@ export const updateCompany = async (
 
   const auditUsers = await loadAuditUsers([tenant]);
   return toRegistrationRequest(tenant, admin, auditUsers);
-}
+};
 
-export const getTenantModules = async (tenantId: string): Promise<TenantModulesResult> => {
+export const getTenantModules = async (
+  tenantId: string,
+): Promise<TenantModulesResult> => {
   const tenant = await findApprovedTenant(tenantId);
 
   return {
     tenantId: tenant._id.toString(),
     enabledModules: resolveEnabledModules(tenant.enabledModules),
   };
-}
+};
 
 export const updateTenantModules = async (
   tenantId: string,
   input: UpdateTenantModulesInput,
-  updatedByUserId: string
+  updatedByUserId: string,
 ): Promise<TenantModulesResult> => {
   const tenant = await findApprovedTenant(tenantId);
   const beforeModules = resolveEnabledModules(tenant.enabledModules);
@@ -453,8 +458,8 @@ export const updateTenantModules = async (
   await writeAuditLog({
     tenantId: tenant._id.toString(),
     userId: updatedByUserId,
-    action: 'update',
-    entityType: 'Tenant',
+    action: "update",
+    entityType: "Tenant",
     entityId: tenant._id.toString(),
     before: { enabledModules: beforeModules },
     after: { enabledModules: nextModules },
@@ -464,14 +469,14 @@ export const updateTenantModules = async (
     tenantId: tenant._id.toString(),
     enabledModules: nextModules,
   };
-}
+};
 
 export class RegistrationServiceError extends Error {
   constructor(
     message: string,
-    public statusCode: number
+    public statusCode: number,
   ) {
     super(message);
-    this.name = 'RegistrationServiceError';
+    this.name = "RegistrationServiceError";
   }
 }

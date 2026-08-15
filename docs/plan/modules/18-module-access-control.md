@@ -97,7 +97,7 @@ Module routers return `403` when the module is disabled for the tenant.
 ## 6. UI Screens & Flows
 
 ### Screen: Manage company modules (super admin)
-- **Route:** Modal from `/dashboard/registrations` (Registered tab)
+- **Route:** Modal from `/companies/registered`
 - **Access:** `super_admin`
 - **Elements:** Checkbox grid for all 10 modules with labels and descriptions; save disabled until changes
 - **States:** loading, saving, error toast

@@ -64,7 +64,7 @@ paths:
       description: Confirms the server is running.
       operationId: getRoot
       responses:
-        '200':
+        "200":
           description: Plain text confirmation
           content:
             text/plain:
@@ -81,26 +81,26 @@ paths:
         Returns HTTP 503 when MongoDB is unavailable (`status: degraded`).
       operationId: getHealth
       responses:
-        '200':
+        "200":
           description: Service is healthy
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/HealthResponse'
+                $ref: "#/components/schemas/HealthResponse"
               example:
                 status: ok
                 service: Daily HR
-                timestamp: '2026-08-02T12:00:00.000Z'
+                timestamp: "2026-08-02T12:00:00.000Z"
                 checks:
                   mongodb: ok
                   redis: ok
                   stripe: configured
-        '503':
+        "503":
           description: Service degraded (MongoDB unavailable)
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/HealthResponse'
+                $ref: "#/components/schemas/HealthResponse"
 
   /api/v1/auth/register:
     post:
@@ -116,7 +116,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/RegisterRequest'
+              $ref: "#/components/schemas/RegisterRequest"
             example:
               companyName: Acme Ltd
               email: admin@acme.com
@@ -124,20 +124,20 @@ paths:
               firstName: Jane
               lastName: Admin
       responses:
-        '201':
+        "201":
           description: Registration submitted — pending approval
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/RegisterPendingResponse'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '409':
+                $ref: "#/components/schemas/RegisterPendingResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "409":
           description: Email already in use
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
 
   /api/v1/auth/login:
     post:
@@ -152,12 +152,12 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/LoginRequest'
+              $ref: "#/components/schemas/LoginRequest"
             example:
               email: admin@acme.com
               password: TestPass123
       responses:
-        '200':
+        "200":
           description: Login successful
           headers:
             Set-Cookie:
@@ -167,21 +167,21 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AuthSuccessResponse'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
+                $ref: "#/components/schemas/AuthSuccessResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
           description: Invalid email or password
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '403':
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
           description: Company pending approval, rejected, or inactive
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
 
   /api/v1/auth/refresh:
     post:
@@ -192,18 +192,18 @@ paths:
         Cookie path must be `/api/v1/auth`.
       operationId: refreshToken
       responses:
-        '200':
+        "200":
           description: New access token issued
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AuthSuccessResponse'
-        '401':
+                $ref: "#/components/schemas/AuthSuccessResponse"
+        "401":
           description: Missing or invalid refresh token
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
 
   /api/v1/auth/logout:
     post:
@@ -212,7 +212,7 @@ paths:
       description: Clears the refresh token cookie.
       operationId: logout
       responses:
-        '200':
+        "200":
           description: Logged out
           content:
             application/json:
@@ -239,7 +239,7 @@ paths:
       security:
         - bearerAuth: []
       responses:
-        '200':
+        "200":
           description: Current user profile
           content:
             application/json:
@@ -255,9 +255,9 @@ paths:
                     required: [user]
                     properties:
                       user:
-                        $ref: '#/components/schemas/UserProfile'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
+                        $ref: "#/components/schemas/UserProfile"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
 
     patch:
       tags: [Auth]
@@ -273,13 +273,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UpdateProfileRequest'
+              $ref: "#/components/schemas/UpdateProfileRequest"
             example:
               firstName: Jane
               lastName: Admin
               email: admin@acme.com
       responses:
-        '200':
+        "200":
           description: Profile updated
           content:
             application/json:
@@ -291,17 +291,17 @@ paths:
                     type: string
                     enum: [ok]
                   data:
-                    $ref: '#/components/schemas/UpdateProfileResponse'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '409':
+                    $ref: "#/components/schemas/UpdateProfileResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "409":
           description: Email already in use
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
 
   /api/v1/auth/me/avatar:
     post:
@@ -318,12 +318,12 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UploadProfileAvatarRequest'
+              $ref: "#/components/schemas/UploadProfileAvatarRequest"
             example:
               imageBase64: data:image/png;base64,iVBORw0KGgo=
               filename: avatar.png
       responses:
-        '200':
+        "200":
           description: Profile photo uploaded
           content:
             application/json:
@@ -335,17 +335,17 @@ paths:
                     type: string
                     enum: [ok]
                   data:
-                    $ref: '#/components/schemas/UpdateProfileResponse'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '503':
+                    $ref: "#/components/schemas/UpdateProfileResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "503":
           description: Image upload not configured
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
 
   /api/v1/auth/forgot-password:
     post:
@@ -360,11 +360,11 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ForgotPasswordRequest'
+              $ref: "#/components/schemas/ForgotPasswordRequest"
             example:
               email: admin@acme.com
       responses:
-        '200':
+        "200":
           description: Reset email queued (if account exists)
           content:
             application/json:
@@ -376,9 +376,9 @@ paths:
                     type: string
                     enum: [ok]
                   data:
-                    $ref: '#/components/schemas/MessageResponse'
-        '400':
-          $ref: '#/components/responses/BadRequest'
+                    $ref: "#/components/schemas/MessageResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
 
   /api/v1/auth/reset-password:
     post:
@@ -391,12 +391,12 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ResetPasswordRequest'
+              $ref: "#/components/schemas/ResetPasswordRequest"
             example:
               token: reset-token-from-email
               password: NewPass123
       responses:
-        '200':
+        "200":
           description: Password updated
           content:
             application/json:
@@ -408,9 +408,9 @@ paths:
                     type: string
                     enum: [ok]
                   data:
-                    $ref: '#/components/schemas/MessageResponse'
-        '400':
-          $ref: '#/components/responses/BadRequest'
+                    $ref: "#/components/schemas/MessageResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
 
   /api/v1/admins:
     post:
@@ -431,7 +431,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreateAdminRequest'
+              $ref: "#/components/schemas/CreateAdminRequest"
             example:
               email: superadmin@hr.com
               password: User@123
@@ -439,7 +439,7 @@ paths:
               firstName: Super
               lastName: Admin
       responses:
-        '201':
+        "201":
           description: Admin user created
           content:
             application/json:
@@ -451,19 +451,19 @@ paths:
                     type: string
                     enum: [ok]
                   data:
-                    $ref: '#/components/schemas/AdminUser'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '409':
+                    $ref: "#/components/schemas/AdminUser"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "409":
           description: Email already in use
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
 
   /api/v1/admin/registrations:
     get:
@@ -480,7 +480,7 @@ paths:
             type: string
             enum: [pending, approved, rejected]
       responses:
-        '200':
+        "200":
           description: Registration list
           content:
             application/json:
@@ -498,11 +498,11 @@ paths:
                       registrations:
                         type: array
                         items:
-                          $ref: '#/components/schemas/RegistrationRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
+                          $ref: "#/components/schemas/RegistrationRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
     post:
       tags: [Admin]
       summary: Create company (super admin)
@@ -519,7 +519,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreateCompanyRequest'
+              $ref: "#/components/schemas/CreateCompanyRequest"
             example:
               companyName: Acme Ltd
               email: admin@acme.com
@@ -527,7 +527,7 @@ paths:
               firstName: Jane
               lastName: Admin
       responses:
-        '201':
+        "201":
           description: Company created and approved
           content:
             application/json:
@@ -539,19 +539,19 @@ paths:
                     type: string
                     enum: [ok]
                   data:
-                    $ref: '#/components/schemas/RegistrationRequest'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '409':
+                    $ref: "#/components/schemas/RegistrationRequest"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "409":
           description: Email already in use
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
 
   /api/v1/admin/registrations/{tenantId}/approve:
     post:
@@ -568,7 +568,7 @@ paths:
           schema:
             type: string
       responses:
-        '200':
+        "200":
           description: Registration approved
           content:
             application/json:
@@ -580,23 +580,23 @@ paths:
                     type: string
                     enum: [ok]
                   data:
-                    $ref: '#/components/schemas/RegistrationRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '404':
+                    $ref: "#/components/schemas/RegistrationRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
           description: Registration not found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '409':
+                $ref: "#/components/schemas/ErrorResponse"
+        "409":
           description: Registration already processed
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
 
   /api/v1/admin/registrations/{tenantId}/reject:
     post:
@@ -621,7 +621,7 @@ paths:
                   type: string
                   maxLength: 500
       responses:
-        '200':
+        "200":
           description: Registration rejected
           content:
             application/json:
@@ -633,23 +633,23 @@ paths:
                     type: string
                     enum: [ok]
                   data:
-                    $ref: '#/components/schemas/RegistrationRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '404':
+                    $ref: "#/components/schemas/RegistrationRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
           description: Registration not found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '409':
+                $ref: "#/components/schemas/ErrorResponse"
+        "409":
           description: Registration already processed
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
 
   /api/v1/admin/registrations/{tenantId}:
     patch:
@@ -670,7 +670,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UpdateCompanyRequest'
+              $ref: "#/components/schemas/UpdateCompanyRequest"
             example:
               companyName: Acme Ltd
               adminEmail: admin@acme.com
@@ -678,7 +678,7 @@ paths:
               adminLastName: Admin
               isActive: true
       responses:
-        '200':
+        "200":
           description: Company updated
           content:
             application/json:
@@ -690,25 +690,25 @@ paths:
                     type: string
                     enum: [ok]
                   data:
-                    $ref: '#/components/schemas/RegistrationRequest'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '404':
+                    $ref: "#/components/schemas/RegistrationRequest"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
           description: Company not found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '409':
+                $ref: "#/components/schemas/ErrorResponse"
+        "409":
           description: Email already in use or company not approved
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
 
   /api/v1/admin/registrations/{tenantId}/modules:
     get:
@@ -725,7 +725,7 @@ paths:
           schema:
             type: string
       responses:
-        '200':
+        "200":
           description: Module flags for the company
           content:
             application/json:
@@ -737,23 +737,23 @@ paths:
                     type: string
                     enum: [ok]
                   data:
-                    $ref: '#/components/schemas/TenantModulesResult'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '404':
+                    $ref: "#/components/schemas/TenantModulesResult"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
           description: Company not found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '409':
+                $ref: "#/components/schemas/ErrorResponse"
+        "409":
           description: Company not approved
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
     patch:
       tags: [Admin]
       summary: Update company module access
@@ -772,11 +772,11 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UpdateTenantModulesInput'
+              $ref: "#/components/schemas/UpdateTenantModulesInput"
             example:
               enabledModules: [employees, leave, attendance]
       responses:
-        '200':
+        "200":
           description: Updated module flags
           content:
             application/json:
@@ -788,29 +788,29 @@ paths:
                     type: string
                     enum: [ok]
                   data:
-                    $ref: '#/components/schemas/TenantModulesResult'
-        '400':
+                    $ref: "#/components/schemas/TenantModulesResult"
+        "400":
           description: Invalid module id
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '404':
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
           description: Company not found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '409':
+                $ref: "#/components/schemas/ErrorResponse"
+        "409":
           description: Company not approved
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
 
   /api/v1/employees:
     get:
@@ -836,7 +836,7 @@ paths:
         - name: status
           in: query
           schema:
-            $ref: '#/components/schemas/EmployeeStatus'
+            $ref: "#/components/schemas/EmployeeStatus"
         - name: sortBy
           in: query
           schema:
@@ -850,7 +850,7 @@ paths:
             enum: [asc, desc]
           description: Sort direction (default `asc`)
       responses:
-        '200':
+        "200":
           description: Employee list
           content:
             application/json:
@@ -868,11 +868,11 @@ paths:
                       employees:
                         type: array
                         items:
-                          $ref: '#/components/schemas/Employee'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
+                          $ref: "#/components/schemas/Employee"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
     post:
       tags: [Employees]
       summary: Create employee
@@ -885,16 +885,16 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreateEmployeeRequest'
+              $ref: "#/components/schemas/CreateEmployeeRequest"
             example:
               firstName: Alex
               lastName: Morgan
               email: alex.morgan@acme.com
               jobTitle: Software Engineer
               department: Engineering
-              startDate: '2024-03-01'
+              startDate: "2024-03-01"
       responses:
-        '201':
+        "201":
           description: Employee created
           content:
             application/json:
@@ -906,19 +906,19 @@ paths:
                     type: string
                     enum: [ok]
                   data:
-                    $ref: '#/components/schemas/Employee'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '409':
+                    $ref: "#/components/schemas/Employee"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "409":
           description: Employee number or email already in use
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
 
   /api/v1/employees/departments:
     get:
@@ -929,7 +929,7 @@ paths:
       security:
         - bearerAuth: []
       responses:
-        '200':
+        "200":
           description: Department list
           content:
             application/json:
@@ -948,10 +948,10 @@ paths:
                         type: array
                         items:
                           type: string
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
 
   /api/v1/employees/me:
     get:
@@ -959,13 +959,17 @@ paths:
       summary: Current user's employee record
       description: |
         Returns the employee record linked to the authenticated user account.
+        Company admins sign in without an employee record; this endpoint returns **404**
+        until an employee is created and linked to their user. Other roles may receive an
+        auto-linked record when using self-service HR features.
+
         Includes default work location name when set. No special permission required
         beyond tenant membership.
       operationId: getMyEmployee
       security:
         - bearerAuth: []
       responses:
-        '200':
+        "200":
           description: Linked employee profile
           content:
             application/json:
@@ -981,15 +985,15 @@ paths:
                     required: [employee]
                     properties:
                       employee:
-                        $ref: '#/components/schemas/MyEmployeeProfile'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
+                        $ref: "#/components/schemas/MyEmployeeProfile"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
           description: No employee record linked to this account
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
 
   /api/v1/employees/import/validate:
     post:
@@ -1021,7 +1025,7 @@ paths:
                 firstName,lastName,email,jobTitle,department,startDate,managerEmail,phone
                 Jane,Smith,jane.smith@acme.com,Software Engineer,Engineering,2024-01-15,,555-0100
       responses:
-        '200':
+        "200":
           description: Validation preview
           content:
             application/json:
@@ -1033,13 +1037,13 @@ paths:
                     type: string
                     enum: [ok]
                   data:
-                    $ref: '#/components/schemas/EmployeeImportValidateResult'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
+                    $ref: "#/components/schemas/EmployeeImportValidateResult"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
 
   /api/v1/employees/import/commit:
     post:
@@ -1065,9 +1069,9 @@ paths:
                   type: array
                   maxItems: 500
                   items:
-                    $ref: '#/components/schemas/EmployeeImportRow'
+                    $ref: "#/components/schemas/EmployeeImportRow"
       responses:
-        '201':
+        "201":
           description: Import result
           content:
             application/json:
@@ -1079,13 +1083,13 @@ paths:
                     type: string
                     enum: [ok]
                   data:
-                    $ref: '#/components/schemas/EmployeeImportCommitResult'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
+                    $ref: "#/components/schemas/EmployeeImportCommitResult"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
 
   /api/v1/employees/{id}:
     get:
@@ -1101,7 +1105,7 @@ paths:
           schema:
             type: string
       responses:
-        '200':
+        "200":
           description: Employee details
           content:
             application/json:
@@ -1113,17 +1117,17 @@ paths:
                     type: string
                     enum: [ok]
                   data:
-                    $ref: '#/components/schemas/Employee'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '404':
+                    $ref: "#/components/schemas/Employee"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
           description: Employee not found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
     patch:
       tags: [Employees]
       summary: Update employee
@@ -1142,12 +1146,12 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UpdateEmployeeRequest'
+              $ref: "#/components/schemas/UpdateEmployeeRequest"
             example:
               jobTitle: Senior Software Engineer
               status: active
       responses:
-        '200':
+        "200":
           description: Employee updated
           content:
             application/json:
@@ -1159,25 +1163,25 @@ paths:
                     type: string
                     enum: [ok]
                   data:
-                    $ref: '#/components/schemas/Employee'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '404':
+                    $ref: "#/components/schemas/Employee"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
           description: Employee not found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '409':
+                $ref: "#/components/schemas/ErrorResponse"
+        "409":
           description: Email already in use
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
 
   /api/v1/employees/{id}/invite:
     post:
@@ -1199,11 +1203,11 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/InviteEmployeeRequest'
+              $ref: "#/components/schemas/InviteEmployeeRequest"
             example:
               role: employee
       responses:
-        '200':
+        "200":
           description: Invite sent
           content:
             application/json:
@@ -1215,25 +1219,25 @@ paths:
                     type: string
                     enum: [ok]
                   data:
-                    $ref: '#/components/schemas/Employee'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '404':
+                    $ref: "#/components/schemas/Employee"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
           description: Employee not found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '409':
+                $ref: "#/components/schemas/ErrorResponse"
+        "409":
           description: Employee already linked to a user
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
 
   /api/v1/employees/{id}/reports:
     get:
@@ -1249,7 +1253,7 @@ paths:
           schema:
             type: string
       responses:
-        '200':
+        "200":
           description: Direct reports
           content:
             application/json:
@@ -1267,17 +1271,17 @@ paths:
                       reports:
                         type: array
                         items:
-                          $ref: '#/components/schemas/Employee'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '404':
+                          $ref: "#/components/schemas/Employee"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
           description: Employee not found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
 
   /api/v1/leave/requests:
     get:
@@ -1293,7 +1297,7 @@ paths:
         - name: status
           in: query
           schema:
-            $ref: '#/components/schemas/LeaveRequestStatus'
+            $ref: "#/components/schemas/LeaveRequestStatus"
         - name: employeeId
           in: query
           schema:
@@ -1314,7 +1318,7 @@ paths:
             type: string
             format: date
       responses:
-        '200':
+        "200":
           description: Leave request list
           content:
             application/json:
@@ -1332,11 +1336,11 @@ paths:
                       requests:
                         type: array
                         items:
-                          $ref: '#/components/schemas/LeaveRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
+                          $ref: "#/components/schemas/LeaveRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
     post:
       tags: [Leave]
       summary: Submit leave request
@@ -1349,14 +1353,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreateLeaveRequest'
+              $ref: "#/components/schemas/CreateLeaveRequest"
             example:
               type: annual
-              startDate: '2026-03-10'
-              endDate: '2026-03-12'
+              startDate: "2026-03-10"
+              endDate: "2026-03-12"
               reason: Family holiday
       responses:
-        '201':
+        "201":
           description: Leave request created
           content:
             application/json:
@@ -1368,19 +1372,19 @@ paths:
                     type: string
                     enum: [ok]
                   data:
-                    $ref: '#/components/schemas/LeaveRequest'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '409':
+                    $ref: "#/components/schemas/LeaveRequest"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "409":
           description: Overlapping leave request
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
 
   /api/v1/leave/requests/{id}:
     get:
@@ -1396,7 +1400,7 @@ paths:
           schema:
             type: string
       responses:
-        '200':
+        "200":
           description: Leave request
           content:
             application/json:
@@ -1408,13 +1412,13 @@ paths:
                     type: string
                     enum: [ok]
                   data:
-                    $ref: '#/components/schemas/LeaveRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '404':
-          $ref: '#/components/responses/NotFound'
+                    $ref: "#/components/schemas/LeaveRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
 
   /api/v1/leave/requests/{id}/cancel:
     post:
@@ -1431,7 +1435,7 @@ paths:
           schema:
             type: string
       responses:
-        '200':
+        "200":
           description: Cancelled leave request
           content:
             application/json:
@@ -1443,15 +1447,15 @@ paths:
                     type: string
                     enum: [ok]
                   data:
-                    $ref: '#/components/schemas/LeaveRequest'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '404':
-          $ref: '#/components/responses/NotFound'
+                    $ref: "#/components/schemas/LeaveRequest"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
 
   /api/v1/leave/requests/{id}/approve:
     post:
@@ -1468,7 +1472,7 @@ paths:
           schema:
             type: string
       responses:
-        '200':
+        "200":
           description: Approved leave request
           content:
             application/json:
@@ -1480,15 +1484,15 @@ paths:
                     type: string
                     enum: [ok]
                   data:
-                    $ref: '#/components/schemas/LeaveRequest'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '404':
-          $ref: '#/components/responses/NotFound'
+                    $ref: "#/components/schemas/LeaveRequest"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
 
   /api/v1/leave/requests/{id}/decline:
     post:
@@ -1507,9 +1511,9 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/DeclineLeaveRequest'
+              $ref: "#/components/schemas/DeclineLeaveRequest"
       responses:
-        '200':
+        "200":
           description: Declined leave request
           content:
             application/json:
@@ -1521,15 +1525,15 @@ paths:
                     type: string
                     enum: [ok]
                   data:
-                    $ref: '#/components/schemas/LeaveRequest'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '404':
-          $ref: '#/components/responses/NotFound'
+                    $ref: "#/components/schemas/LeaveRequest"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
 
   /api/v1/leave/balances/me:
     get:
@@ -1539,7 +1543,7 @@ paths:
       security:
         - bearerAuth: []
       responses:
-        '200':
+        "200":
           description: Leave balance for current year
           content:
             application/json:
@@ -1551,11 +1555,11 @@ paths:
                     type: string
                     enum: [ok]
                   data:
-                    $ref: '#/components/schemas/LeaveBalance'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
+                    $ref: "#/components/schemas/LeaveBalance"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
 
   /api/v1/leave/balances/{employeeId}:
     get:
@@ -1572,7 +1576,7 @@ paths:
           schema:
             type: string
       responses:
-        '200':
+        "200":
           description: Employee leave balance
           content:
             application/json:
@@ -1584,13 +1588,13 @@ paths:
                     type: string
                     enum: [ok]
                   data:
-                    $ref: '#/components/schemas/LeaveBalance'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '404':
-          $ref: '#/components/responses/NotFound'
+                    $ref: "#/components/schemas/LeaveBalance"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
 
   /api/v1/leave/calendar:
     get:
@@ -1616,7 +1620,7 @@ paths:
             maximum: 12
             example: 3
       responses:
-        '200':
+        "200":
           description: Calendar entries
           content:
             application/json:
@@ -1634,11 +1638,11 @@ paths:
                       entries:
                         type: array
                         items:
-                          $ref: '#/components/schemas/LeaveCalendarEntry'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
+                          $ref: "#/components/schemas/LeaveCalendarEntry"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
 
   /api/v1/leave/pending-count:
     get:
@@ -1649,7 +1653,7 @@ paths:
       security:
         - bearerAuth: []
       responses:
-        '200':
+        "200":
           description: Pending count
           content:
             application/json:
@@ -1666,10 +1670,10 @@ paths:
                     properties:
                       count:
                         type: integer
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
 
   /api/v1/attendance/settings:
     get:
@@ -1680,7 +1684,7 @@ paths:
       security:
         - bearerAuth: []
       responses:
-        '200':
+        "200":
           description: Attendance settings
           content:
             application/json:
@@ -1692,11 +1696,11 @@ paths:
                     type: string
                     enum: [ok]
                   data:
-                    $ref: '#/components/schemas/AttendanceSettings'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
+                    $ref: "#/components/schemas/AttendanceSettings"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
     patch:
       tags: [Attendance]
       summary: Update attendance settings
@@ -1709,11 +1713,11 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PatchAttendanceSettingsRequest'
+              $ref: "#/components/schemas/PatchAttendanceSettingsRequest"
             example:
               attendanceGpsEnabled: true
       responses:
-        '200':
+        "200":
           description: Updated settings
           content:
             application/json:
@@ -1725,13 +1729,13 @@ paths:
                     type: string
                     enum: [ok]
                   data:
-                    $ref: '#/components/schemas/AttendanceSettings'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
+                    $ref: "#/components/schemas/AttendanceSettings"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
 
   /api/v1/attendance/clock-in:
     post:
@@ -1748,9 +1752,9 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ClockInRequest'
+              $ref: "#/components/schemas/ClockInRequest"
       responses:
-        '201':
+        "201":
           description: Attendance session started
           content:
             application/json:
@@ -1762,19 +1766,19 @@ paths:
                     type: string
                     enum: [ok]
                   data:
-                    $ref: '#/components/schemas/AttendanceLog'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '409':
+                    $ref: "#/components/schemas/AttendanceLog"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "409":
           description: Already clocked in
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
 
   /api/v1/attendance/clock-out:
     post:
@@ -1785,7 +1789,7 @@ paths:
       security:
         - bearerAuth: []
       responses:
-        '200':
+        "200":
           description: Attendance session ended
           content:
             application/json:
@@ -1797,15 +1801,15 @@ paths:
                     type: string
                     enum: [ok]
                   data:
-                    $ref: '#/components/schemas/AttendanceLog'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '404':
-          $ref: '#/components/responses/NotFound'
+                    $ref: "#/components/schemas/AttendanceLog"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
 
   /api/v1/attendance/me/status:
     get:
@@ -1816,7 +1820,7 @@ paths:
       security:
         - bearerAuth: []
       responses:
-        '200':
+        "200":
           description: Current clock status
           content:
             application/json:
@@ -1828,11 +1832,11 @@ paths:
                     type: string
                     enum: [ok]
                   data:
-                    $ref: '#/components/schemas/AttendanceStatus'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
+                    $ref: "#/components/schemas/AttendanceStatus"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
 
   /api/v1/attendance/me/calendar:
     get:
@@ -1862,7 +1866,7 @@ paths:
             maximum: 12
           example: 8
       responses:
-        '200':
+        "200":
           description: Attendance calendar for the requested month
           content:
             application/json:
@@ -1874,13 +1878,13 @@ paths:
                     type: string
                     enum: [ok]
                   data:
-                    $ref: '#/components/schemas/AttendanceCalendar'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
+                    $ref: "#/components/schemas/AttendanceCalendar"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
 
   /api/v1/attendance/me:
     get:
@@ -1905,7 +1909,7 @@ paths:
             maximum: 100
             default: 20
       responses:
-        '200':
+        "200":
           description: Paginated attendance history
           content:
             application/json:
@@ -1917,11 +1921,11 @@ paths:
                     type: string
                     enum: [ok]
                   data:
-                    $ref: '#/components/schemas/PaginatedAttendanceLogs'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
+                    $ref: "#/components/schemas/PaginatedAttendanceLogs"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
 
   /api/v1/attendance/employee/{employeeId}:
     get:
@@ -1953,7 +1957,7 @@ paths:
             maximum: 100
             default: 20
       responses:
-        '200':
+        "200":
           description: Paginated attendance history
           content:
             application/json:
@@ -1965,13 +1969,13 @@ paths:
                     type: string
                     enum: [ok]
                   data:
-                    $ref: '#/components/schemas/PaginatedAttendanceLogs'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '404':
-          $ref: '#/components/responses/NotFound'
+                    $ref: "#/components/schemas/PaginatedAttendanceLogs"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
 
   /api/v1/attendance/team/live:
     get:
@@ -1982,7 +1986,7 @@ paths:
       security:
         - bearerAuth: []
       responses:
-        '200':
+        "200":
           description: Currently clocked-in employees
           content:
             application/json:
@@ -1996,11 +2000,11 @@ paths:
                   data:
                     type: array
                     items:
-                      $ref: '#/components/schemas/AttendanceLog'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
+                      $ref: "#/components/schemas/AttendanceLog"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
 
   /api/v1/attendance/{id}:
     patch:
@@ -2023,13 +2027,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PatchAttendanceRequest'
+              $ref: "#/components/schemas/PatchAttendanceRequest"
             example:
-              clockIn: '2026-08-02T09:00:00.000Z'
-              clockOut: '2026-08-02T17:30:00.000Z'
+              clockIn: "2026-08-02T09:00:00.000Z"
+              clockOut: "2026-08-02T17:30:00.000Z"
               notes: Forgot to clock out — corrected from manager report
       responses:
-        '200':
+        "200":
           description: Updated attendance log
           content:
             application/json:
@@ -2041,15 +2045,15 @@ paths:
                     type: string
                     enum: [ok]
                   data:
-                    $ref: '#/components/schemas/AttendanceLog'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '404':
-          $ref: '#/components/responses/NotFound'
+                    $ref: "#/components/schemas/AttendanceLog"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
 
   /api/v1/timesheets/generate:
     post:
@@ -2066,11 +2070,11 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/GenerateTimesheetRequest'
+              $ref: "#/components/schemas/GenerateTimesheetRequest"
             example:
-              weekOf: '2026-08-04'
+              weekOf: "2026-08-04"
       responses:
-        '201':
+        "201":
           description: Generated timesheet
           content:
             application/json:
@@ -2082,13 +2086,13 @@ paths:
                     type: string
                     enum: [ok]
                   data:
-                    $ref: '#/components/schemas/Timesheet'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
+                    $ref: "#/components/schemas/Timesheet"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
 
   /api/v1/timesheets/me:
     get:
@@ -2113,7 +2117,7 @@ paths:
             maximum: 100
             default: 20
       responses:
-        '200':
+        "200":
           description: Paginated timesheets
           content:
             application/json:
@@ -2125,11 +2129,11 @@ paths:
                     type: string
                     enum: [ok]
                   data:
-                    $ref: '#/components/schemas/PaginatedTimesheets'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
+                    $ref: "#/components/schemas/PaginatedTimesheets"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
 
   /api/v1/timesheets/me/{weekOf}:
     get:
@@ -2146,9 +2150,9 @@ paths:
           schema:
             type: string
             format: date
-          example: '2026-08-04'
+          example: "2026-08-04"
       responses:
-        '200':
+        "200":
           description: Timesheet or null
           content:
             application/json:
@@ -2161,14 +2165,14 @@ paths:
                     enum: [ok]
                   data:
                     allOf:
-                      - $ref: '#/components/schemas/Timesheet'
+                      - $ref: "#/components/schemas/Timesheet"
                     nullable: true
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
 
   /api/v1/timesheets:
     get:
@@ -2200,7 +2204,7 @@ paths:
             maximum: 100
             default: 20
       responses:
-        '200':
+        "200":
           description: Paginated timesheets
           content:
             application/json:
@@ -2212,11 +2216,11 @@ paths:
                     type: string
                     enum: [ok]
                   data:
-                    $ref: '#/components/schemas/PaginatedTimesheets'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
+                    $ref: "#/components/schemas/PaginatedTimesheets"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
 
   /api/v1/timesheets/{id}:
     patch:
@@ -2239,14 +2243,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PatchTimesheetRequest'
+              $ref: "#/components/schemas/PatchTimesheetRequest"
             example:
               entries:
-                - date: '2026-08-04'
+                - date: "2026-08-04"
                   hours: 8
                   notes: Forgot to clock out
       responses:
-        '200':
+        "200":
           description: Updated timesheet
           content:
             application/json:
@@ -2258,15 +2262,15 @@ paths:
                     type: string
                     enum: [ok]
                   data:
-                    $ref: '#/components/schemas/Timesheet'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '404':
-          $ref: '#/components/responses/NotFound'
+                    $ref: "#/components/schemas/Timesheet"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
 
   /api/v1/timesheets/{id}/submit:
     post:
@@ -2283,7 +2287,7 @@ paths:
           schema:
             type: string
       responses:
-        '200':
+        "200":
           description: Submitted timesheet
           content:
             application/json:
@@ -2295,15 +2299,15 @@ paths:
                     type: string
                     enum: [ok]
                   data:
-                    $ref: '#/components/schemas/Timesheet'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '404':
-          $ref: '#/components/responses/NotFound'
+                    $ref: "#/components/schemas/Timesheet"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
 
   /api/v1/timesheets/{id}/approve:
     post:
@@ -2320,7 +2324,7 @@ paths:
           schema:
             type: string
       responses:
-        '200':
+        "200":
           description: Approved timesheet
           content:
             application/json:
@@ -2332,15 +2336,15 @@ paths:
                     type: string
                     enum: [ok]
                   data:
-                    $ref: '#/components/schemas/Timesheet'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '404':
-          $ref: '#/components/responses/NotFound'
+                    $ref: "#/components/schemas/Timesheet"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
 
   /api/v1/timesheets/{id}/decline:
     post:
@@ -2360,11 +2364,11 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/DeclineTimesheetRequest'
+              $ref: "#/components/schemas/DeclineTimesheetRequest"
             example:
               declineReason: Hours do not match attendance records
       responses:
-        '200':
+        "200":
           description: Declined timesheet
           content:
             application/json:
@@ -2376,15 +2380,15 @@ paths:
                     type: string
                     enum: [ok]
                   data:
-                    $ref: '#/components/schemas/Timesheet'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '404':
-          $ref: '#/components/responses/NotFound'
+                    $ref: "#/components/schemas/Timesheet"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
 
   /api/v1/expenses/presign:
     post:
@@ -2399,13 +2403,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PresignExpenseRequest'
+              $ref: "#/components/schemas/PresignExpenseRequest"
             example:
               fileName: taxi-receipt.jpg
               mimeType: image/jpeg
               fileSize: 102400
       responses:
-        '200':
+        "200":
           description: Presigned upload URL
           content:
             application/json:
@@ -2417,14 +2421,14 @@ paths:
                     type: string
                     enum: [ok]
                   data:
-                    $ref: '#/components/schemas/PresignExpenseResponse'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '503':
+                    $ref: "#/components/schemas/PresignExpenseResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "503":
           description: S3 not configured
 
   /api/v1/expenses/export:
@@ -2453,17 +2457,17 @@ paths:
             enum: [pending, approved, declined, reimbursed]
             default: approved
       responses:
-        '200':
+        "200":
           description: CSV file
           content:
             text/csv:
               schema:
                 type: string
                 format: binary
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
 
   /api/v1/expenses:
     get:
@@ -2501,7 +2505,7 @@ paths:
             maximum: 100
             default: 20
       responses:
-        '200':
+        "200":
           description: Paginated expenses
           content:
             application/json:
@@ -2513,11 +2517,11 @@ paths:
                     type: string
                     enum: [ok]
                   data:
-                    $ref: '#/components/schemas/PaginatedExpenses'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
+                    $ref: "#/components/schemas/PaginatedExpenses"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
     post:
       tags: [Expenses]
       summary: Create expense claim
@@ -2530,19 +2534,19 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreateExpenseRequest'
+              $ref: "#/components/schemas/CreateExpenseRequest"
             example:
               category: travel
               amount: 45.5
               currency: GBP
-              date: '2026-08-01'
+              date: "2026-08-01"
               description: Client meeting taxi
               receiptFileKey: tenant-id/expenses/uuid/receipt.jpg
               receiptFileName: taxi-receipt.jpg
               mimeType: image/jpeg
               fileSize: 102400
       responses:
-        '201':
+        "201":
           description: Created expense
           content:
             application/json:
@@ -2554,13 +2558,13 @@ paths:
                     type: string
                     enum: [ok]
                   data:
-                    $ref: '#/components/schemas/Expense'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
+                    $ref: "#/components/schemas/Expense"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
 
   /api/v1/expenses/{id}:
     get:
@@ -2576,7 +2580,7 @@ paths:
           schema:
             type: string
       responses:
-        '200':
+        "200":
           description: Expense
           content:
             application/json:
@@ -2588,13 +2592,13 @@ paths:
                     type: string
                     enum: [ok]
                   data:
-                    $ref: '#/components/schemas/Expense'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '404':
-          $ref: '#/components/responses/NotFound'
+                    $ref: "#/components/schemas/Expense"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
     patch:
       tags: [Expenses]
       summary: Edit pending expense
@@ -2613,9 +2617,9 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PatchExpenseRequest'
+              $ref: "#/components/schemas/PatchExpenseRequest"
       responses:
-        '200':
+        "200":
           description: Updated expense
           content:
             application/json:
@@ -2627,15 +2631,15 @@ paths:
                     type: string
                     enum: [ok]
                   data:
-                    $ref: '#/components/schemas/Expense'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '404':
-          $ref: '#/components/responses/NotFound'
+                    $ref: "#/components/schemas/Expense"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
 
   /api/v1/expenses/{id}/receipt:
     get:
@@ -2652,7 +2656,7 @@ paths:
           schema:
             type: string
       responses:
-        '200':
+        "200":
           description: Presigned download URL
           content:
             application/json:
@@ -2664,13 +2668,13 @@ paths:
                     type: string
                     enum: [ok]
                   data:
-                    $ref: '#/components/schemas/ExpenseReceiptDownloadResponse'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '404':
-          $ref: '#/components/responses/NotFound'
+                    $ref: "#/components/schemas/ExpenseReceiptDownloadResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
 
   /api/v1/expenses/{id}/approve:
     post:
@@ -2687,7 +2691,7 @@ paths:
           schema:
             type: string
       responses:
-        '200':
+        "200":
           description: Approved expense
           content:
             application/json:
@@ -2699,15 +2703,15 @@ paths:
                     type: string
                     enum: [ok]
                   data:
-                    $ref: '#/components/schemas/Expense'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '404':
-          $ref: '#/components/responses/NotFound'
+                    $ref: "#/components/schemas/Expense"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
 
   /api/v1/expenses/{id}/decline:
     post:
@@ -2727,9 +2731,9 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/DeclineExpenseRequest'
+              $ref: "#/components/schemas/DeclineExpenseRequest"
       responses:
-        '200':
+        "200":
           description: Declined expense
           content:
             application/json:
@@ -2741,15 +2745,15 @@ paths:
                     type: string
                     enum: [ok]
                   data:
-                    $ref: '#/components/schemas/Expense'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '404':
-          $ref: '#/components/responses/NotFound'
+                    $ref: "#/components/schemas/Expense"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
 
   /api/v1/reports/headcount:
     get:
@@ -2769,7 +2773,7 @@ paths:
             type: string
           description: Optional filter to a single department
       responses:
-        '200':
+        "200":
           description: Headcount breakdown
           content:
             application/json:
@@ -2781,11 +2785,11 @@ paths:
                     type: string
                     enum: [ok]
                   data:
-                    $ref: '#/components/schemas/HeadcountReport'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
+                    $ref: "#/components/schemas/HeadcountReport"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
 
   /api/v1/reports/absence-summary:
     get:
@@ -2819,7 +2823,7 @@ paths:
             type: string
           description: Optional department filter
       responses:
-        '200':
+        "200":
           description: Absence summary
           content:
             application/json:
@@ -2831,13 +2835,13 @@ paths:
                     type: string
                     enum: [ok]
                   data:
-                    $ref: '#/components/schemas/AbsenceSummaryReport'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
+                    $ref: "#/components/schemas/AbsenceSummaryReport"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
 
   /api/v1/billing/status:
     get:
@@ -2851,7 +2855,7 @@ paths:
       security:
         - bearerAuth: []
       responses:
-        '200':
+        "200":
           description: Billing status
           content:
             application/json:
@@ -2863,13 +2867,13 @@ paths:
                     type: string
                     enum: [ok]
                   data:
-                    $ref: '#/components/schemas/BillingStatus'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '404':
-          $ref: '#/components/responses/NotFound'
+                    $ref: "#/components/schemas/BillingStatus"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
 
   /api/v1/billing/checkout-session:
     post:
@@ -2887,9 +2891,9 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/BillingCheckoutSessionRequest'
+              $ref: "#/components/schemas/BillingCheckoutSessionRequest"
       responses:
-        '200':
+        "200":
           description: Checkout session URL
           content:
             application/json:
@@ -2901,14 +2905,14 @@ paths:
                     type: string
                     enum: [ok]
                   data:
-                    $ref: '#/components/schemas/BillingSession'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '409':
-          $ref: '#/components/responses/Conflict'
-        '503':
+                    $ref: "#/components/schemas/BillingSession"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "503":
           description: Stripe not configured
 
   /api/v1/billing/portal-session:
@@ -2927,9 +2931,9 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/BillingPortalSessionRequest'
+              $ref: "#/components/schemas/BillingPortalSessionRequest"
       responses:
-        '200':
+        "200":
           description: Portal session URL
           content:
             application/json:
@@ -2941,14 +2945,14 @@ paths:
                     type: string
                     enum: [ok]
                   data:
-                    $ref: '#/components/schemas/BillingSession'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '503':
+                    $ref: "#/components/schemas/BillingSession"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "503":
           description: Stripe not configured
 
   /api/v1/billing/webhook:
@@ -2969,7 +2973,7 @@ paths:
               type: object
               description: Raw Stripe event payload
       responses:
-        '200':
+        "200":
           description: Event received
           content:
             application/json:
@@ -2978,9 +2982,9 @@ paths:
                 properties:
                   received:
                     type: boolean
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '503':
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "503":
           description: Webhook secret not configured
 
   /api/v1/documents:
@@ -3000,7 +3004,7 @@ paths:
         - name: category
           in: query
           schema:
-            $ref: '#/components/schemas/DocumentCategory'
+            $ref: "#/components/schemas/DocumentCategory"
         - name: expiringWithinDays
           in: query
           schema:
@@ -3008,7 +3012,7 @@ paths:
             minimum: 1
             maximum: 365
       responses:
-        '200':
+        "200":
           description: Document list
           content:
             application/json:
@@ -3026,11 +3030,11 @@ paths:
                       documents:
                         type: array
                         items:
-                          $ref: '#/components/schemas/HrDocument'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
+                          $ref: "#/components/schemas/HrDocument"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
     post:
       tags: [Documents]
       summary: Save document metadata
@@ -3045,7 +3049,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreateDocument'
+              $ref: "#/components/schemas/CreateDocument"
             example:
               fileKey: 664a1b2c3d4e5f6789012345/documents/uuid/contract.pdf
               fileName: contract.pdf
@@ -3053,9 +3057,9 @@ paths:
               fileSize: 102400
               category: contract
               employeeId: 664a1b2c3d4e5f6789012346
-              expiryDate: '2027-01-31'
+              expiryDate: "2027-01-31"
       responses:
-        '201':
+        "201":
           description: Document created
           content:
             application/json:
@@ -3067,14 +3071,14 @@ paths:
                     type: string
                     enum: [ok]
                   data:
-                    $ref: '#/components/schemas/HrDocument'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '503':
+                    $ref: "#/components/schemas/HrDocument"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "503":
           description: Storage not configured
 
   /api/v1/documents/presign:
@@ -3090,9 +3094,9 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PresignDocument'
+              $ref: "#/components/schemas/PresignDocument"
       responses:
-        '200':
+        "200":
           description: Presigned upload URL
           content:
             application/json:
@@ -3104,14 +3108,14 @@ paths:
                     type: string
                     enum: [ok]
                   data:
-                    $ref: '#/components/schemas/PresignDocumentResponse'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '503':
+                    $ref: "#/components/schemas/PresignDocumentResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "503":
           description: Storage not configured
 
   /api/v1/documents/expiring:
@@ -3131,7 +3135,7 @@ paths:
             maximum: 365
             default: 30
       responses:
-        '200':
+        "200":
           description: Expiring documents
           content:
             application/json:
@@ -3149,11 +3153,11 @@ paths:
                       documents:
                         type: array
                         items:
-                          $ref: '#/components/schemas/HrDocument'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
+                          $ref: "#/components/schemas/HrDocument"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
 
   /api/v1/documents/{id}:
     get:
@@ -3169,7 +3173,7 @@ paths:
           schema:
             type: string
       responses:
-        '200':
+        "200":
           description: Document metadata
           content:
             application/json:
@@ -3181,12 +3185,12 @@ paths:
                     type: string
                     enum: [ok]
                   data:
-                    $ref: '#/components/schemas/HrDocument'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '404':
+                    $ref: "#/components/schemas/HrDocument"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
           description: Document not found
     delete:
       tags: [Documents]
@@ -3202,7 +3206,7 @@ paths:
           schema:
             type: string
       responses:
-        '200':
+        "200":
           description: Document deleted
           content:
             application/json:
@@ -3219,11 +3223,11 @@ paths:
                     properties:
                       deleted:
                         type: boolean
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '404':
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
           description: Document not found
 
   /api/v1/documents/{id}/download:
@@ -3240,7 +3244,7 @@ paths:
           schema:
             type: string
       responses:
-        '200':
+        "200":
           description: Presigned download URL
           content:
             application/json:
@@ -3252,12 +3256,12 @@ paths:
                     type: string
                     enum: [ok]
                   data:
-                    $ref: '#/components/schemas/DocumentDownloadResponse'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '404':
+                    $ref: "#/components/schemas/DocumentDownloadResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
           description: Document not found
 
   /api/v1/platform/site-config:
@@ -3269,7 +3273,7 @@ paths:
         No authentication required. Cacheable.
       operationId: getSiteConfig
       responses:
-        '200':
+        "200":
           description: Platform site configuration
           content:
             application/json:
@@ -3281,7 +3285,7 @@ paths:
                     type: string
                     enum: [ok]
                   data:
-                    $ref: '#/components/schemas/SiteConfig'
+                    $ref: "#/components/schemas/SiteConfig"
 
   /api/v1/admin/platform/site-settings:
     get:
@@ -3292,7 +3296,7 @@ paths:
       security:
         - bearerAuth: []
       responses:
-        '200':
+        "200":
           description: Platform site settings
           content:
             application/json:
@@ -3304,11 +3308,11 @@ paths:
                     type: string
                     enum: [ok]
                   data:
-                    $ref: '#/components/schemas/PlatformSiteSettings'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
+                    $ref: "#/components/schemas/PlatformSiteSettings"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
     patch:
       tags: [Platform]
       summary: Update platform site settings
@@ -3321,11 +3325,11 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PatchPlatformSiteSettingsRequest'
+              $ref: "#/components/schemas/PatchPlatformSiteSettingsRequest"
             example:
               siteName: Acme HR Platform
       responses:
-        '200':
+        "200":
           description: Updated platform site settings
           content:
             application/json:
@@ -3337,13 +3341,13 @@ paths:
                     type: string
                     enum: [ok]
                   data:
-                    $ref: '#/components/schemas/PlatformSiteSettings'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
+                    $ref: "#/components/schemas/PlatformSiteSettings"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
 
   /api/v1/admin/platform/site-settings/upload:
     post:
@@ -3361,13 +3365,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UploadPlatformAssetRequest'
+              $ref: "#/components/schemas/UploadPlatformAssetRequest"
             example:
               asset: logo
               filename: logo.png
               imageBase64: iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJ...
       responses:
-        '200':
+        "200":
           description: Uploaded asset URL
           content:
             application/json:
@@ -3379,25 +3383,197 @@ paths:
                     type: string
                     enum: [ok]
                   data:
-                    $ref: '#/components/schemas/UploadPlatformAssetResponse'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '502':
+                    $ref: "#/components/schemas/UploadPlatformAssetResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "502":
           description: ImgBB upload failed
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '503':
+                $ref: "#/components/schemas/ErrorResponse"
+        "503":
           description: IMGBB_API_KEY not configured
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /api/v1/admin/platform/country-dial-codes:
+    get:
+      tags: [Platform]
+      summary: List managed country dial codes
+      description: Super admin only. Lists platform country dial codes, optionally including archived entries.
+      operationId: listPlatformCountryDialCodes
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: includeArchived
+          in: query
+          schema:
+            type: boolean
+            default: false
+      responses:
+        "200":
+          description: Country dial code list
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, data]
+                properties:
+                  status:
+                    type: string
+                    enum: [ok]
+                  data:
+                    $ref: "#/components/schemas/ManagedCountryDialCodesList"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+    post:
+      tags: [Platform]
+      summary: Create country dial code
+      description: Super admin only. Adds a country dial code to the platform list.
+      operationId: createPlatformCountryDialCode
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateCountryDialCodeRequest"
+            example:
+              code: NG
+              name: Nigeria
+              dialCode: "234"
+      responses:
+        "201":
+          description: Created country dial code
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, data]
+                properties:
+                  status:
+                    type: string
+                    enum: [ok]
+                  data:
+                    $ref: "#/components/schemas/CountryDialCode"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "409":
+          description: Country code already exists
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /api/v1/admin/platform/country-dial-codes/{id}:
+    patch:
+      tags: [Platform]
+      summary: Update country dial code
+      description: Super admin only. Update or archive a platform country dial code.
+      operationId: patchPlatformCountryDialCode
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PatchCountryDialCodeRequest"
+            example:
+              name: United Kingdom
+      responses:
+        "200":
+          description: Updated country dial code
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, data]
+                properties:
+                  status:
+                    type: string
+                    enum: [ok]
+                  data:
+                    $ref: "#/components/schemas/CountryDialCode"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          description: Country code already exists
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    delete:
+      tags: [Platform]
+      summary: Permanently delete archived country dial code
+      description: Super admin only. Permanently removes an archived country dial code. Fails if companies still use it as their default dial code.
+      operationId: deletePlatformCountryDialCode
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Country dial code deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, data]
+                properties:
+                  status:
+                    type: string
+                    enum: [ok]
+                  data:
+                    type: object
+                    required: [deleted]
+                    properties:
+                      deleted:
+                        type: boolean
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          description: Country dial code is in use
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
 
   /api/v1/settings/branding:
     get:
@@ -3411,7 +3587,7 @@ paths:
       security:
         - bearerAuth: []
       responses:
-        '200':
+        "200":
           description: Effective site branding
           content:
             application/json:
@@ -3423,11 +3599,11 @@ paths:
                     type: string
                     enum: [ok]
                   data:
-                    $ref: '#/components/schemas/EffectiveBranding'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
+                    $ref: "#/components/schemas/EffectiveBranding"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
     patch:
       tags: [Settings]
       summary: Update tenant branding overrides
@@ -3442,11 +3618,11 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PatchTenantBrandingRequest'
+              $ref: "#/components/schemas/PatchTenantBrandingRequest"
             example:
               logoUrl: https://example.com/logo.png
       responses:
-        '200':
+        "200":
           description: Effective branding after update
           content:
             application/json:
@@ -3458,19 +3634,19 @@ paths:
                     type: string
                     enum: [ok]
                   data:
-                    $ref: '#/components/schemas/EffectiveBranding'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '404':
+                    $ref: "#/components/schemas/EffectiveBranding"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
           description: Tenant not found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
 
   /api/v1/settings/branding/overrides:
     get:
@@ -3481,7 +3657,7 @@ paths:
       security:
         - bearerAuth: []
       responses:
-        '200':
+        "200":
           description: Tenant branding overrides
           content:
             application/json:
@@ -3493,17 +3669,17 @@ paths:
                     type: string
                     enum: [ok]
                   data:
-                    $ref: '#/components/schemas/TenantBrandingOverrides'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '404':
+                    $ref: "#/components/schemas/TenantBrandingOverrides"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
           description: Tenant not found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
 
   /api/v1/settings/company:
     get:
@@ -3514,7 +3690,7 @@ paths:
       security:
         - bearerAuth: []
       responses:
-        '200':
+        "200":
           description: Company profile
           content:
             application/json:
@@ -3526,13 +3702,13 @@ paths:
                     type: string
                     enum: [ok]
                   data:
-                    $ref: '#/components/schemas/CompanyProfile'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '404':
-          $ref: '#/components/responses/NotFound'
+                    $ref: "#/components/schemas/CompanyProfile"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
     patch:
       tags: [Settings]
       summary: Update company profile
@@ -3545,13 +3721,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PatchCompanyProfileRequest'
+              $ref: "#/components/schemas/PatchCompanyProfileRequest"
             example:
               name: Acme Ltd
               address: 123 Main Street, London, UK
               logoUrl: https://example.com/acme-logo.png
       responses:
-        '200':
+        "200":
           description: Updated company profile
           content:
             application/json:
@@ -3563,15 +3739,15 @@ paths:
                     type: string
                     enum: [ok]
                   data:
-                    $ref: '#/components/schemas/CompanyProfile'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '404':
-          $ref: '#/components/responses/NotFound'
+                    $ref: "#/components/schemas/CompanyProfile"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
 
   /api/v1/settings/leave:
     get:
@@ -3582,7 +3758,7 @@ paths:
       security:
         - bearerAuth: []
       responses:
-        '200':
+        "200":
           description: Leave policy settings
           content:
             application/json:
@@ -3594,13 +3770,13 @@ paths:
                     type: string
                     enum: [ok]
                   data:
-                    $ref: '#/components/schemas/LeaveSettings'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '404':
-          $ref: '#/components/responses/NotFound'
+                    $ref: "#/components/schemas/LeaveSettings"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
     patch:
       tags: [Settings]
       summary: Update leave policy settings
@@ -3613,13 +3789,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PatchLeaveSettingsRequest'
+              $ref: "#/components/schemas/PatchLeaveSettingsRequest"
             example:
               annualEntitlement: 25
               maxCarryOverDays: 5
               multiStepApprovalEnabled: true
       responses:
-        '200':
+        "200":
           description: Updated leave policy settings
           content:
             application/json:
@@ -3631,15 +3807,15 @@ paths:
                     type: string
                     enum: [ok]
                   data:
-                    $ref: '#/components/schemas/LeaveSettings'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '404':
-          $ref: '#/components/responses/NotFound'
+                    $ref: "#/components/schemas/LeaveSettings"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
 
   /api/v1/settings/payroll:
     get:
@@ -3650,7 +3826,7 @@ paths:
       security:
         - bearerAuth: []
       responses:
-        '200':
+        "200":
           description: Payroll settings
           content:
             application/json:
@@ -3662,13 +3838,13 @@ paths:
                     type: string
                     enum: [ok]
                   data:
-                    $ref: '#/components/schemas/PayrollSettings'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '404':
-          $ref: '#/components/responses/NotFound'
+                    $ref: "#/components/schemas/PayrollSettings"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
     patch:
       tags: [Settings]
       summary: Update payroll settings
@@ -3681,15 +3857,15 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PatchPayrollSettingsRequest'
+              $ref: "#/components/schemas/PatchPayrollSettingsRequest"
             example:
               payPeriodType: weekly
               defaultPayCurrency: GBP
               payrollWeekStartDay: 1
-              xeroExpenseAccountCode: '477'
-              xeroPayableAccountCode: '804'
+              xeroExpenseAccountCode: "477"
+              xeroPayableAccountCode: "804"
       responses:
-        '200':
+        "200":
           description: Updated payroll settings
           content:
             application/json:
@@ -3701,15 +3877,15 @@ paths:
                     type: string
                     enum: [ok]
                   data:
-                    $ref: '#/components/schemas/PayrollSettings'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '404':
-          $ref: '#/components/responses/NotFound'
+                    $ref: "#/components/schemas/PayrollSettings"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
 
   /api/v1/locations:
     get:
@@ -3726,7 +3902,7 @@ paths:
             type: boolean
             default: false
       responses:
-        '200':
+        "200":
           description: Work location list
           content:
             application/json:
@@ -3744,11 +3920,11 @@ paths:
                       locations:
                         type: array
                         items:
-                          $ref: '#/components/schemas/WorkLocation'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
+                          $ref: "#/components/schemas/WorkLocation"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
     post:
       tags: [Locations]
       summary: Create work location
@@ -3761,13 +3937,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreateWorkLocationRequest'
+              $ref: "#/components/schemas/CreateWorkLocationRequest"
             example:
               name: Main Office
               address: 1 High Street, London
               timezone: Europe/London
       responses:
-        '201':
+        "201":
           description: Work location created
           content:
             application/json:
@@ -3779,19 +3955,19 @@ paths:
                     type: string
                     enum: [ok]
                   data:
-                    $ref: '#/components/schemas/WorkLocation'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '409':
+                    $ref: "#/components/schemas/WorkLocation"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "409":
           description: Location name already exists
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
 
   /api/v1/locations/{id}:
     patch:
@@ -3812,11 +3988,11 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PatchWorkLocationRequest'
+              $ref: "#/components/schemas/PatchWorkLocationRequest"
             example:
               name: HQ Office
       responses:
-        '200':
+        "200":
           description: Updated work location
           content:
             application/json:
@@ -3828,21 +4004,66 @@ paths:
                     type: string
                     enum: [ok]
                   data:
-                    $ref: '#/components/schemas/WorkLocation'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '409':
+                    $ref: "#/components/schemas/WorkLocation"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
           description: Location name already exists
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
+    delete:
+      tags: [Locations]
+      summary: Permanently delete archived work location
+      description: HR manager or company admin. Permanently removes an archived location. Fails if shifts or rota templates still reference it.
+      operationId: deleteWorkLocation
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Work location deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, data]
+                properties:
+                  status:
+                    type: string
+                    enum: [ok]
+                  data:
+                    type: object
+                    required: [deleted]
+                    properties:
+                      deleted:
+                        type: boolean
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          description: Location is still in use
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
 
   /api/v1/rotas/{weekOf}:
     get:
@@ -3863,9 +4084,9 @@ paths:
           schema:
             type: string
             format: date
-            example: '2026-08-04'
+            example: "2026-08-04"
       responses:
-        '200':
+        "200":
           description: Weekly rota
           content:
             application/json:
@@ -3877,13 +4098,13 @@ paths:
                     type: string
                     enum: [ok]
                   data:
-                    $ref: '#/components/schemas/WeekRota'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
+                    $ref: "#/components/schemas/WeekRota"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
 
   /api/v1/rotas/shifts:
     post:
@@ -3898,16 +4119,16 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreateShiftRequest'
+              $ref: "#/components/schemas/CreateShiftRequest"
             example:
-              employeeId: '507f1f77bcf86cd799439011'
-              date: '2026-08-04'
-              startTime: '09:00'
-              endTime: '17:00'
-              locationId: '507f1f77bcf86cd799439012'
+              employeeId: "507f1f77bcf86cd799439011"
+              date: "2026-08-04"
+              startTime: "09:00"
+              endTime: "17:00"
+              locationId: "507f1f77bcf86cd799439012"
               role: Floor
       responses:
-        '201':
+        "201":
           description: Shift created
           content:
             application/json:
@@ -3919,19 +4140,19 @@ paths:
                     type: string
                     enum: [ok]
                   data:
-                    $ref: '#/components/schemas/Shift'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '409':
+                    $ref: "#/components/schemas/Shift"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "409":
           description: Leave conflict or overlapping shift
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
 
   /api/v1/rotas/shifts/{id}:
     patch:
@@ -3952,12 +4173,12 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PatchShiftRequest'
+              $ref: "#/components/schemas/PatchShiftRequest"
             example:
-              startTime: '10:00'
-              endTime: '18:00'
+              startTime: "10:00"
+              endTime: "18:00"
       responses:
-        '200':
+        "200":
           description: Updated shift
           content:
             application/json:
@@ -3969,21 +4190,21 @@ paths:
                     type: string
                     enum: [ok]
                   data:
-                    $ref: '#/components/schemas/Shift'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '409':
+                    $ref: "#/components/schemas/Shift"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
           description: Leave conflict or overlapping shift
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
     delete:
       tags: [Rotas]
       summary: Delete draft shift
@@ -3998,7 +4219,7 @@ paths:
           schema:
             type: string
       responses:
-        '200':
+        "200":
           description: Shift deleted
           content:
             application/json:
@@ -4016,14 +4237,14 @@ paths:
                       deleted:
                         type: boolean
                         enum: [true]
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '404':
-          $ref: '#/components/responses/NotFound'
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
 
   /api/v1/rotas/publish:
     post:
@@ -4040,11 +4261,11 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PublishRotaRequest'
+              $ref: "#/components/schemas/PublishRotaRequest"
             example:
-              weekOf: '2026-08-04'
+              weekOf: "2026-08-04"
       responses:
-        '200':
+        "200":
           description: Rota published
           content:
             application/json:
@@ -4056,19 +4277,19 @@ paths:
                     type: string
                     enum: [ok]
                   data:
-                    $ref: '#/components/schemas/PublishRotaResult'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '409':
+                    $ref: "#/components/schemas/PublishRotaResult"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "409":
           description: Leave conflict on a draft shift
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
 
   /api/v1/rotas/copy-week:
     post:
@@ -4085,11 +4306,11 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CopyWeekRequest'
+              $ref: "#/components/schemas/CopyWeekRequest"
             example:
-              weekOf: '2026-08-04'
+              weekOf: "2026-08-04"
       responses:
-        '200':
+        "200":
           description: Week copied
           content:
             application/json:
@@ -4101,13 +4322,13 @@ paths:
                     type: string
                     enum: [ok]
                   data:
-                    $ref: '#/components/schemas/CopyRotaResult'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
+                    $ref: "#/components/schemas/CopyRotaResult"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
 
   /api/v1/rotas/shifts/{id}/claim:
     post:
@@ -4127,7 +4348,7 @@ paths:
           schema:
             type: string
       responses:
-        '200':
+        "200":
           description: Shift claimed
           content:
             application/json:
@@ -4139,21 +4360,21 @@ paths:
                     type: string
                     enum: [ok]
                   data:
-                    $ref: '#/components/schemas/Shift'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '409':
+                    $ref: "#/components/schemas/Shift"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
           description: Leave conflict or overlapping shift
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
 
   /api/v1/payroll/periods:
     get:
@@ -4164,7 +4385,7 @@ paths:
       security:
         - bearerAuth: []
       responses:
-        '200':
+        "200":
           description: Payroll periods
           content:
             application/json:
@@ -4178,11 +4399,11 @@ paths:
                   data:
                     type: array
                     items:
-                      $ref: '#/components/schemas/PayrollPeriod'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
+                      $ref: "#/components/schemas/PayrollPeriod"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
     post:
       tags: [Payroll]
       summary: Create payroll period
@@ -4195,12 +4416,12 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreatePayrollPeriodRequest'
+              $ref: "#/components/schemas/CreatePayrollPeriodRequest"
             example:
-              periodStart: '2026-08-01'
-              periodEnd: '2026-08-07'
+              periodStart: "2026-08-01"
+              periodEnd: "2026-08-07"
       responses:
-        '201':
+        "201":
           description: Payroll period created
           content:
             application/json:
@@ -4212,13 +4433,13 @@ paths:
                     type: string
                     enum: [ok]
                   data:
-                    $ref: '#/components/schemas/PayrollPeriod'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
+                    $ref: "#/components/schemas/PayrollPeriod"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
 
   /api/v1/payroll/periods/{id}:
     get:
@@ -4235,7 +4456,7 @@ paths:
           schema:
             type: string
       responses:
-        '200':
+        "200":
           description: Payroll period detail
           content:
             application/json:
@@ -4247,15 +4468,15 @@ paths:
                     type: string
                     enum: [ok]
                   data:
-                    $ref: '#/components/schemas/PayrollPeriod'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '404':
-          $ref: '#/components/responses/NotFound'
+                    $ref: "#/components/schemas/PayrollPeriod"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
 
   /api/v1/payroll/periods/{id}/generate:
     post:
@@ -4275,7 +4496,7 @@ paths:
           schema:
             type: string
       responses:
-        '200':
+        "200":
           description: Payroll period generated
           content:
             application/json:
@@ -4287,21 +4508,21 @@ paths:
                     type: string
                     enum: [ok]
                   data:
-                    $ref: '#/components/schemas/PayrollPeriod'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '409':
+                    $ref: "#/components/schemas/PayrollPeriod"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
           description: Period already exported
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
 
   /api/v1/payroll/periods/{id}/export:
     get:
@@ -4321,7 +4542,7 @@ paths:
           schema:
             type: string
       responses:
-        '200':
+        "200":
           description: Payroll CSV file
           content:
             text/csv:
@@ -4335,18 +4556,18 @@ paths:
               schema:
                 type: string
               example: attachment; filename="payroll-2026-08-01-to-2026-08-07.csv"
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '409':
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
           description: Period is draft or has no summaries
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
 
   /api/v1/payroll/periods/{id}/sync:
     post:
@@ -4366,7 +4587,7 @@ paths:
           schema:
             type: string
       responses:
-        '200':
+        "200":
           description: Payroll synced to Xero
           content:
             application/json:
@@ -4378,32 +4599,32 @@ paths:
                     type: string
                     enum: [ok]
                   data:
-                    $ref: '#/components/schemas/PayrollSyncResult'
+                    $ref: "#/components/schemas/PayrollSyncResult"
               example:
                 status: ok
                 data:
                   periodId: 64f1a2b3c4d5e6f7a8b9c0d1
                   provider: xero
                   externalReference: a1b2c3d4-e5f6-7890-abcd-ef1234567890
-                  syncedAt: '2026-08-03T12:00:00.000Z'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '409':
+                  syncedAt: "2026-08-03T12:00:00.000Z"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
           description: Period is draft, Xero not connected, or no gross amounts
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '503':
+                $ref: "#/components/schemas/ErrorResponse"
+        "503":
           description: Xero integration not configured on server
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
 
   /api/v1/payroll/accounting/status:
     get:
@@ -4416,7 +4637,7 @@ paths:
       security:
         - bearerAuth: []
       responses:
-        '200':
+        "200":
           description: Accounting connection status
           content:
             application/json:
@@ -4428,11 +4649,11 @@ paths:
                     type: string
                     enum: [ok]
                   data:
-                    $ref: '#/components/schemas/AccountingConnectionStatus'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
+                    $ref: "#/components/schemas/AccountingConnectionStatus"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
 
   /api/v1/payroll/accounting/connect:
     get:
@@ -4445,7 +4666,7 @@ paths:
       security:
         - bearerAuth: []
       responses:
-        '200':
+        "200":
           description: Xero authorization URL
           content:
             application/json:
@@ -4463,16 +4684,16 @@ paths:
                       url:
                         type: string
                         format: uri
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '503':
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "503":
           description: Xero integration not configured on server
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
 
   /api/v1/payroll/accounting/callback:
     get:
@@ -4495,7 +4716,7 @@ paths:
           schema:
             type: string
       responses:
-        '302':
+        "302":
           description: Redirect to client payroll settings with `?xero=connected` or `?xero=error`
 
   /api/v1/payroll/accounting/disconnect:
@@ -4507,7 +4728,7 @@ paths:
       security:
         - bearerAuth: []
       responses:
-        '200':
+        "200":
           description: Xero disconnected
           content:
             application/json:
@@ -4525,10 +4746,10 @@ paths:
                       disconnected:
                         type: boolean
                         enum: [true]
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
 
   /api/v1/settings/departments:
     get:
@@ -4545,7 +4766,7 @@ paths:
             type: boolean
             default: false
       responses:
-        '200':
+        "200":
           description: Department list
           content:
             application/json:
@@ -4563,11 +4784,11 @@ paths:
                       departments:
                         type: array
                         items:
-                          $ref: '#/components/schemas/Department'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
+                          $ref: "#/components/schemas/Department"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
     post:
       tags: [Settings]
       summary: Create department
@@ -4580,11 +4801,11 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreateDepartmentRequest'
+              $ref: "#/components/schemas/CreateDepartmentRequest"
             example:
               name: Engineering
       responses:
-        '201':
+        "201":
           description: Department created
           content:
             application/json:
@@ -4596,19 +4817,19 @@ paths:
                     type: string
                     enum: [ok]
                   data:
-                    $ref: '#/components/schemas/Department'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '409':
+                    $ref: "#/components/schemas/Department"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "409":
           description: Department name already exists
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
 
   /api/v1/settings/departments/{id}:
     patch:
@@ -4629,11 +4850,11 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PatchDepartmentRequest'
+              $ref: "#/components/schemas/PatchDepartmentRequest"
             example:
               name: Product Engineering
       responses:
-        '200':
+        "200":
           description: Updated department
           content:
             application/json:
@@ -4645,21 +4866,93 @@ paths:
                     type: string
                     enum: [ok]
                   data:
-                    $ref: '#/components/schemas/Department'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '409':
+                    $ref: "#/components/schemas/Department"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
           description: Department name already exists
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
+    delete:
+      tags: [Settings]
+      summary: Permanently delete archived department
+      description: Company admin or HR manager. Permanently removes an archived department. Fails if active employees are still assigned to it.
+      operationId: deleteSettingsDepartment
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Department deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, data]
+                properties:
+                  status:
+                    type: string
+                    enum: [ok]
+                  data:
+                    type: object
+                    required: [deleted]
+                    properties:
+                      deleted:
+                        type: boolean
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          description: Department still has assigned employees
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /api/v1/country-dial-codes:
+    get:
+      tags: [Settings]
+      summary: List country dial codes for tenant
+      description: Any authenticated tenant user. Returns active platform country dial codes and the tenant default dial code.
+      operationId: listCountryDialCodes
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Country dial codes bundle
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, data]
+                properties:
+                  status:
+                    type: string
+                    enum: [ok]
+                  data:
+                    $ref: "#/components/schemas/CountryDialCodesBundle"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
 
   /api/v1/settings/users:
     get:
@@ -4670,7 +4963,7 @@ paths:
       security:
         - bearerAuth: []
       responses:
-        '200':
+        "200":
           description: Tenant user list
           content:
             application/json:
@@ -4688,11 +4981,11 @@ paths:
                       users:
                         type: array
                         items:
-                          $ref: '#/components/schemas/TenantUser'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
+                          $ref: "#/components/schemas/TenantUser"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
 
   /api/v1/settings/users/{id}:
     patch:
@@ -4715,12 +5008,12 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PatchTenantUserRequest'
+              $ref: "#/components/schemas/PatchTenantUserRequest"
             example:
               role: hr_manager
               isActive: true
       responses:
-        '200':
+        "200":
           description: Updated tenant user
           content:
             application/json:
@@ -4732,15 +5025,15 @@ paths:
                     type: string
                     enum: [ok]
                   data:
-                    $ref: '#/components/schemas/TenantUser'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '404':
-          $ref: '#/components/responses/NotFound'
+                    $ref: "#/components/schemas/TenantUser"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
 
   /api/v1/audit-logs:
     get:
@@ -4789,7 +5082,7 @@ paths:
             maximum: 100
             default: 25
       responses:
-        '200':
+        "200":
           description: Audit log entries
           content:
             application/json:
@@ -4807,13 +5100,13 @@ paths:
                       logs:
                         type: array
                         items:
-                          $ref: '#/components/schemas/AuditLogEntry'
+                          $ref: "#/components/schemas/AuditLogEntry"
                       total:
                         type: integer
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
 
   /api/v1/notifications:
     get:
@@ -4824,7 +5117,7 @@ paths:
       security:
         - bearerAuth: []
       responses:
-        '200':
+        "200":
           description: Notifications
           content:
             application/json:
@@ -4842,9 +5135,9 @@ paths:
                       notifications:
                         type: array
                         items:
-                          $ref: '#/components/schemas/Notification'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
+                          $ref: "#/components/schemas/Notification"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
 
   /api/v1/notifications/unread-count:
     get:
@@ -4854,7 +5147,7 @@ paths:
       security:
         - bearerAuth: []
       responses:
-        '200':
+        "200":
           description: Unread count
           content:
             application/json:
@@ -4871,8 +5164,8 @@ paths:
                     properties:
                       count:
                         type: integer
-        '401':
-          $ref: '#/components/responses/Unauthorized'
+        "401":
+          $ref: "#/components/responses/Unauthorized"
 
   /api/v1/notifications/read-all:
     post:
@@ -4882,7 +5175,7 @@ paths:
       security:
         - bearerAuth: []
       responses:
-        '200':
+        "200":
           description: Notifications marked read
           content:
             application/json:
@@ -4899,8 +5192,8 @@ paths:
                     properties:
                       count:
                         type: integer
-        '401':
-          $ref: '#/components/responses/Unauthorized'
+        "401":
+          $ref: "#/components/responses/Unauthorized"
 
   /api/v1/notifications/{id}/read:
     patch:
@@ -4916,7 +5209,7 @@ paths:
           schema:
             type: string
       responses:
-        '200':
+        "200":
           description: Updated notification
           content:
             application/json:
@@ -4928,11 +5221,11 @@ paths:
                     type: string
                     enum: [ok]
                   data:
-                    $ref: '#/components/schemas/Notification'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
+                    $ref: "#/components/schemas/Notification"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
 
 components:
   securitySchemes:
@@ -4948,25 +5241,25 @@ components:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/ErrorResponse'
+            $ref: "#/components/schemas/ErrorResponse"
     Unauthorized:
       description: Authentication required or token invalid
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/ErrorResponse'
+            $ref: "#/components/schemas/ErrorResponse"
     Forbidden:
       description: Insufficient permissions
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/ErrorResponse'
+            $ref: "#/components/schemas/ErrorResponse"
     NotFound:
       description: Resource not found
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/ErrorResponse'
+            $ref: "#/components/schemas/ErrorResponse"
 
   schemas:
     UserRole:
@@ -5025,7 +5318,7 @@ components:
           type: string
           format: email
         role:
-          $ref: '#/components/schemas/UserRole'
+          $ref: "#/components/schemas/UserRole"
         tenantId:
           type: string
           description: Omitted for super_admin
@@ -5048,7 +5341,7 @@ components:
         enabledModules:
           type: array
           items:
-            $ref: '#/components/schemas/TenantModuleId'
+            $ref: "#/components/schemas/TenantModuleId"
           description: Enabled business modules for tenant users (omitted for super_admin)
 
     TenantModuleId:
@@ -5074,7 +5367,7 @@ components:
         enabledModules:
           type: array
           items:
-            $ref: '#/components/schemas/TenantModuleId'
+            $ref: "#/components/schemas/TenantModuleId"
 
     UpdateTenantModulesInput:
       type: object
@@ -5083,7 +5376,7 @@ components:
         enabledModules:
           type: array
           items:
-            $ref: '#/components/schemas/TenantModuleId'
+            $ref: "#/components/schemas/TenantModuleId"
 
     ThemeColor:
       type: string
@@ -5091,7 +5384,7 @@ components:
 
     UserProfile:
       allOf:
-        - $ref: '#/components/schemas/AuthUser'
+        - $ref: "#/components/schemas/AuthUser"
         - type: object
           required: [isActive, createdAt, updatedAt]
           properties:
@@ -5134,7 +5427,7 @@ components:
           enum: [light, dark]
           description: Display mode preference (light or dark mode)
         themeColor:
-          $ref: '#/components/schemas/ThemeColor'
+          $ref: "#/components/schemas/ThemeColor"
           description: User theme accent color and profile banner
 
     UpdateProfileResponse:
@@ -5142,7 +5435,7 @@ components:
       required: [user]
       properties:
         user:
-          $ref: '#/components/schemas/UserProfile'
+          $ref: "#/components/schemas/UserProfile"
         accessToken:
           type: string
           description: New JWT when email changed
@@ -5161,7 +5454,7 @@ components:
 
     AdminUser:
       allOf:
-        - $ref: '#/components/schemas/AuthUser'
+        - $ref: "#/components/schemas/AuthUser"
         - type: object
           required: [isActive, createdAt]
           properties:
@@ -5256,7 +5549,17 @@ components:
 
     AuditLogEntry:
       type: object
-      required: [id, userId, userName, userEmail, action, entityType, entityId, createdAt]
+      required:
+        [
+          id,
+          userId,
+          userName,
+          userEmail,
+          action,
+          entityType,
+          entityId,
+          createdAt,
+        ]
       properties:
         id:
           type: string
@@ -5322,7 +5625,7 @@ components:
           type: string
           minLength: 8
         role:
-          $ref: '#/components/schemas/UserRole'
+          $ref: "#/components/schemas/UserRole"
         firstName:
           type: string
         lastName:
@@ -5354,7 +5657,8 @@ components:
 
     RegistrationRequest:
       type: object
-      required: [tenantId, companyName, adminEmail, status, isActive, submittedAt]
+      required:
+        [tenantId, companyName, adminEmail, status, isActive, submittedAt]
       properties:
         tenantId:
           type: string
@@ -5398,7 +5702,7 @@ components:
         enabledModules:
           type: array
           items:
-            $ref: '#/components/schemas/TenantModuleId'
+            $ref: "#/components/schemas/TenantModuleId"
           description: Enabled business modules for the tenant
 
     BillingSubscription:
@@ -5431,7 +5735,7 @@ components:
         subscription:
           nullable: true
           allOf:
-            - $ref: '#/components/schemas/BillingSubscription'
+            - $ref: "#/components/schemas/BillingSubscription"
 
     BillingSession:
       type: object
@@ -5487,7 +5791,7 @@ components:
           required: [user, accessToken]
           properties:
             user:
-              $ref: '#/components/schemas/AuthUser'
+              $ref: "#/components/schemas/AuthUser"
             accessToken:
               type: string
               description: JWT access token (15 min)
@@ -5509,7 +5813,8 @@ components:
 
     Employee:
       type: object
-      required: [id, employeeNumber, firstName, lastName, status, createdAt, updatedAt]
+      required:
+        [id, employeeNumber, firstName, lastName, status, createdAt, updatedAt]
       properties:
         id:
           type: string
@@ -5536,9 +5841,9 @@ components:
         managerId:
           type: string
         manager:
-          $ref: '#/components/schemas/EmployeeManagerSummary'
+          $ref: "#/components/schemas/EmployeeManagerSummary"
         status:
-          $ref: '#/components/schemas/EmployeeStatus'
+          $ref: "#/components/schemas/EmployeeStatus"
         userId:
           type: string
           description: Linked login user, when set
@@ -5600,14 +5905,14 @@ components:
         department:
           type: string
         status:
-          $ref: '#/components/schemas/EmployeeStatus'
+          $ref: "#/components/schemas/EmployeeStatus"
         defaultLocationName:
           type: string
           description: Resolved name of the employee default work location, when set
 
     CreateEmployeeRequest:
       type: object
-      required: [firstName, lastName]
+      required: [firstName, lastName, email, phone, jobTitle, startDate]
       properties:
         firstName:
           type: string
@@ -5618,10 +5923,13 @@ components:
         email:
           type: string
           format: email
+          minLength: 1
         phone:
           type: string
+          minLength: 1
         jobTitle:
           type: string
+          minLength: 1
         department:
           type: string
         startDate:
@@ -5632,7 +5940,7 @@ components:
         employeeNumber:
           type: string
         status:
-          $ref: '#/components/schemas/EmployeeStatus'
+          $ref: "#/components/schemas/EmployeeStatus"
 
     UpdateEmployeeRequest:
       type: object
@@ -5657,7 +5965,7 @@ components:
           type: string
           nullable: true
         status:
-          $ref: '#/components/schemas/EmployeeStatus'
+          $ref: "#/components/schemas/EmployeeStatus"
         payRate:
           type: number
           minimum: 0
@@ -5716,7 +6024,7 @@ components:
 
     EmployeeImportValidRow:
       allOf:
-        - $ref: '#/components/schemas/EmployeeImportRow'
+        - $ref: "#/components/schemas/EmployeeImportRow"
         - type: object
           required: [row]
           properties:
@@ -5731,11 +6039,11 @@ components:
         valid:
           type: array
           items:
-            $ref: '#/components/schemas/EmployeeImportValidRow'
+            $ref: "#/components/schemas/EmployeeImportValidRow"
         errors:
           type: array
           items:
-            $ref: '#/components/schemas/EmployeeImportError'
+            $ref: "#/components/schemas/EmployeeImportError"
         totalRows:
           type: integer
 
@@ -5748,7 +6056,7 @@ components:
         errors:
           type: array
           items:
-            $ref: '#/components/schemas/EmployeeImportError'
+            $ref: "#/components/schemas/EmployeeImportError"
 
     HeadcountDepartmentBreakdown:
       type: object
@@ -5772,7 +6080,7 @@ components:
         byDepartment:
           type: array
           items:
-            $ref: '#/components/schemas/HeadcountDepartmentBreakdown'
+            $ref: "#/components/schemas/HeadcountDepartmentBreakdown"
         byStatus:
           type: object
           required: [active, on_leave, terminated]
@@ -5804,7 +6112,7 @@ components:
         byType:
           type: array
           items:
-            $ref: '#/components/schemas/AbsenceTypeBreakdown'
+            $ref: "#/components/schemas/AbsenceTypeBreakdown"
 
     AbsenceSummaryReport:
       type: object
@@ -5821,15 +6129,23 @@ components:
         byType:
           type: array
           items:
-            $ref: '#/components/schemas/AbsenceTypeBreakdown'
+            $ref: "#/components/schemas/AbsenceTypeBreakdown"
         byDepartment:
           type: array
           items:
-            $ref: '#/components/schemas/AbsenceDepartmentBreakdown'
+            $ref: "#/components/schemas/AbsenceDepartmentBreakdown"
 
     SiteConfig:
       type: object
-      required: [siteName, logoUrl, faviconUrl, logoDisplay, faviconDisplay, sidebarDisplay]
+      required:
+        [
+          siteName,
+          logoUrl,
+          faviconUrl,
+          logoDisplay,
+          faviconDisplay,
+          sidebarDisplay,
+        ]
       properties:
         siteName:
           type: string
@@ -5843,11 +6159,11 @@ components:
           nullable: true
           format: uri
         logoDisplay:
-          $ref: '#/components/schemas/LogoDisplay'
+          $ref: "#/components/schemas/LogoDisplay"
         faviconDisplay:
-          $ref: '#/components/schemas/FaviconDisplay'
+          $ref: "#/components/schemas/FaviconDisplay"
         sidebarDisplay:
-          $ref: '#/components/schemas/SidebarDisplay'
+          $ref: "#/components/schemas/SidebarDisplay"
 
     LogoDisplay:
       type: object
@@ -5930,7 +6246,7 @@ components:
 
     EffectiveBranding:
       allOf:
-        - $ref: '#/components/schemas/SiteConfig'
+        - $ref: "#/components/schemas/SiteConfig"
         - type: object
           properties:
             tenantDisplayName:
@@ -5939,7 +6255,7 @@ components:
 
     PlatformSiteSettings:
       allOf:
-        - $ref: '#/components/schemas/SiteConfig'
+        - $ref: "#/components/schemas/SiteConfig"
         - type: object
           properties:
             updatedAt:
@@ -6025,7 +6341,7 @@ components:
 
     CompanyProfile:
       type: object
-      required: [name, address, logoUrl, updatedAt]
+      required: [name, address, logoUrl, defaultPhoneDialCode, updatedAt]
       properties:
         name:
           type: string
@@ -6036,6 +6352,9 @@ components:
           type: string
           nullable: true
           format: uri
+        defaultPhoneDialCode:
+          type: string
+          description: Tenant default dial code digits (without plus)
         updatedAt:
           type: string
           format: date-time
@@ -6055,6 +6374,11 @@ components:
           type: string
           nullable: true
           format: uri
+        defaultPhoneDialCode:
+          type: string
+          minLength: 1
+          maxLength: 4
+          pattern: "^\\d+$"
 
     LeaveSettings:
       type: object
@@ -6128,6 +6452,129 @@ components:
         isArchived:
           type: boolean
 
+    CountryDialCode:
+      type: object
+      required:
+        [
+          id,
+          code,
+          name,
+          dialCode,
+          minNationalLength,
+          maxNationalLength,
+          isArchived,
+          createdAt,
+          updatedAt,
+        ]
+      properties:
+        id:
+          type: string
+        code:
+          type: string
+          minLength: 2
+          maxLength: 2
+          description: ISO 3166-1 alpha-2 country code
+        name:
+          type: string
+        dialCode:
+          type: string
+          description: Digits only, without leading plus
+        minNationalLength:
+          type: integer
+          minimum: 1
+          maximum: 15
+          description: Minimum digits allowed after the country code
+        maxNationalLength:
+          type: integer
+          minimum: 1
+          maximum: 15
+          description: Maximum digits allowed after the country code
+        isArchived:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    CountryDialCodesBundle:
+      type: object
+      required: [countryDialCodes, defaultPhoneDialCode]
+      properties:
+        countryDialCodes:
+          type: array
+          items:
+            $ref: "#/components/schemas/CountryDialCode"
+        defaultPhoneDialCode:
+          type: string
+          description: Tenant default dial code digits (without plus)
+
+    ManagedCountryDialCodesList:
+      type: object
+      required: [countryDialCodes]
+      properties:
+        countryDialCodes:
+          type: array
+          items:
+            $ref: "#/components/schemas/CountryDialCode"
+
+    CreateCountryDialCodeRequest:
+      type: object
+      required: [code, name, dialCode]
+      properties:
+        code:
+          type: string
+          minLength: 2
+          maxLength: 2
+        name:
+          type: string
+          minLength: 1
+          maxLength: 100
+        dialCode:
+          type: string
+          minLength: 1
+          maxLength: 4
+          pattern: "^\\d+$"
+        minNationalLength:
+          type: integer
+          minimum: 1
+          maximum: 15
+          default: 7
+        maxNationalLength:
+          type: integer
+          minimum: 1
+          maximum: 15
+          default: 11
+
+    PatchCountryDialCodeRequest:
+      type: object
+      minProperties: 1
+      properties:
+        code:
+          type: string
+          minLength: 2
+          maxLength: 2
+        name:
+          type: string
+          minLength: 1
+          maxLength: 100
+        dialCode:
+          type: string
+          minLength: 1
+          maxLength: 4
+          pattern: "^\\d+$"
+        minNationalLength:
+          type: integer
+          minimum: 1
+          maximum: 15
+        maxNationalLength:
+          type: integer
+          minimum: 1
+          maximum: 15
+        isArchived:
+          type: boolean
+
     PayrollSettings:
       type: object
       required:
@@ -6152,11 +6599,11 @@ components:
           description: 0=Sunday through 6=Saturday
         xeroExpenseAccountCode:
           type: string
-          example: '477'
+          example: "477"
           description: Xero chart of accounts code for wages expense (manual journal debit lines)
         xeroPayableAccountCode:
           type: string
-          example: '804'
+          example: "804"
           description: Xero chart of accounts code for wages payable (manual journal credit line)
 
     PatchPayrollSettingsRequest:
@@ -6249,7 +6696,7 @@ components:
         employeeSummaries:
           type: array
           items:
-            $ref: '#/components/schemas/EmployeePayrollSummary'
+            $ref: "#/components/schemas/EmployeePayrollSummary"
         generatedAt:
           type: string
           format: date-time
@@ -6417,7 +6864,18 @@ components:
 
     Shift:
       type: object
-      required: [id, employeeId, date, startTime, endTime, locationId, status, createdAt, updatedAt]
+      required:
+        [
+          id,
+          employeeId,
+          date,
+          startTime,
+          endTime,
+          locationId,
+          status,
+          createdAt,
+          updatedAt,
+        ]
       properties:
         id:
           type: string
@@ -6425,25 +6883,25 @@ components:
           type: string
           nullable: true
         employee:
-          $ref: '#/components/schemas/ShiftEmployeeSummary'
+          $ref: "#/components/schemas/ShiftEmployeeSummary"
         date:
           type: string
           format: date
-          example: '2026-08-04'
+          example: "2026-08-04"
         startTime:
           type: string
-          example: '09:00'
+          example: "09:00"
         endTime:
           type: string
-          example: '17:00'
+          example: "17:00"
         role:
           type: string
         locationId:
           type: string
         location:
-          $ref: '#/components/schemas/ShiftLocationSummary'
+          $ref: "#/components/schemas/ShiftLocationSummary"
         status:
-          $ref: '#/components/schemas/ShiftStatus'
+          $ref: "#/components/schemas/ShiftStatus"
         publishedAt:
           type: string
           format: date-time
@@ -6464,11 +6922,11 @@ components:
         weekOf:
           type: string
           format: date
-          example: '2026-08-04'
+          example: "2026-08-04"
         shifts:
           type: array
           items:
-            $ref: '#/components/schemas/Shift'
+            $ref: "#/components/schemas/Shift"
 
     CreateShiftRequest:
       type: object
@@ -6517,7 +6975,7 @@ components:
         locationId:
           type: string
         status:
-          $ref: '#/components/schemas/ShiftStatus'
+          $ref: "#/components/schemas/ShiftStatus"
 
     PublishRotaRequest:
       type: object
@@ -6569,7 +7027,7 @@ components:
           type: string
           format: email
         role:
-          $ref: '#/components/schemas/UserRole'
+          $ref: "#/components/schemas/UserRole"
         firstName:
           type: string
         lastName:
@@ -6617,16 +7075,29 @@ components:
 
     LeaveRequest:
       type: object
-      required: [id, employeeId, employee, type, startDate, endDate, halfDay, days, status, createdAt, updatedAt]
+      required:
+        [
+          id,
+          employeeId,
+          employee,
+          type,
+          startDate,
+          endDate,
+          halfDay,
+          days,
+          status,
+          createdAt,
+          updatedAt,
+        ]
       properties:
         id:
           type: string
         employeeId:
           type: string
         employee:
-          $ref: '#/components/schemas/LeaveEmployeeSummary'
+          $ref: "#/components/schemas/LeaveEmployeeSummary"
         type:
-          $ref: '#/components/schemas/LeaveType'
+          $ref: "#/components/schemas/LeaveType"
         startDate:
           type: string
           format: date
@@ -6640,7 +7111,7 @@ components:
         reason:
           type: string
         status:
-          $ref: '#/components/schemas/LeaveRequestStatus'
+          $ref: "#/components/schemas/LeaveRequestStatus"
         approverId:
           type: string
         approvedAt:
@@ -6663,16 +7134,17 @@ components:
           type: array
           description: Other pending or approved leave that overlaps these dates (approver roles only)
           items:
-            $ref: '#/components/schemas/LeaveOverlapSummary'
+            $ref: "#/components/schemas/LeaveOverlapSummary"
         conflictingShifts:
           type: array
           description: Scheduled shifts overlapping this leave (approver roles only)
           items:
-            $ref: '#/components/schemas/LeaveShiftConflictSummary'
+            $ref: "#/components/schemas/LeaveShiftConflictSummary"
 
     LeaveOverlapSummary:
       type: object
-      required: [id, employeeId, employeeName, status, startDate, endDate, halfDay]
+      required:
+        [id, employeeId, employeeName, status, startDate, endDate, halfDay]
       properties:
         id:
           type: string
@@ -6681,7 +7153,7 @@ components:
         employeeName:
           type: string
         status:
-          $ref: '#/components/schemas/LeaveRequestStatus'
+          $ref: "#/components/schemas/LeaveRequestStatus"
         startDate:
           type: string
           format: date
@@ -6717,7 +7189,7 @@ components:
       required: [type, startDate, endDate, reason]
       properties:
         type:
-          $ref: '#/components/schemas/LeaveType'
+          $ref: "#/components/schemas/LeaveType"
         startDate:
           type: string
           format: date
@@ -6741,7 +7213,8 @@ components:
 
     LeaveBalance:
       type: object
-      required: [employeeId, year, entitlement, taken, pending, carriedOver, remaining]
+      required:
+        [employeeId, year, entitlement, taken, pending, carriedOver, remaining]
       properties:
         employeeId:
           type: string
@@ -6760,7 +7233,17 @@ components:
 
     LeaveCalendarEntry:
       type: object
-      required: [id, employeeId, employeeName, type, startDate, endDate, halfDay, status]
+      required:
+        [
+          id,
+          employeeId,
+          employeeName,
+          type,
+          startDate,
+          endDate,
+          halfDay,
+          status,
+        ]
       properties:
         id:
           type: string
@@ -6769,7 +7252,7 @@ components:
         employeeName:
           type: string
         type:
-          $ref: '#/components/schemas/LeaveType'
+          $ref: "#/components/schemas/LeaveType"
         startDate:
           type: string
           format: date
@@ -6779,7 +7262,7 @@ components:
         halfDay:
           type: boolean
         status:
-          $ref: '#/components/schemas/LeaveRequestStatus'
+          $ref: "#/components/schemas/LeaveRequestStatus"
 
     DocumentCategory:
       type: string
@@ -6809,16 +7292,26 @@ components:
 
     HrDocument:
       type: object
-      required: [id, category, fileName, mimeType, fileSize, uploadedBy, createdAt, updatedAt]
+      required:
+        [
+          id,
+          category,
+          fileName,
+          mimeType,
+          fileSize,
+          uploadedBy,
+          createdAt,
+          updatedAt,
+        ]
       properties:
         id:
           type: string
         employeeId:
           type: string
         employee:
-          $ref: '#/components/schemas/DocumentEmployeeSummary'
+          $ref: "#/components/schemas/DocumentEmployeeSummary"
         category:
-          $ref: '#/components/schemas/DocumentCategory'
+          $ref: "#/components/schemas/DocumentCategory"
         fileName:
           type: string
         mimeType:
@@ -6826,7 +7319,7 @@ components:
         fileSize:
           type: integer
         uploadedBy:
-          $ref: '#/components/schemas/DocumentUploaderSummary'
+          $ref: "#/components/schemas/DocumentUploaderSummary"
         expiryDate:
           type: string
           format: date
@@ -6848,7 +7341,7 @@ components:
         fileSize:
           type: integer
         category:
-          $ref: '#/components/schemas/DocumentCategory'
+          $ref: "#/components/schemas/DocumentCategory"
         employeeId:
           type: string
         expiryDate:
@@ -6867,7 +7360,7 @@ components:
 
     CreateDocument:
       allOf:
-        - $ref: '#/components/schemas/PresignDocument'
+        - $ref: "#/components/schemas/PresignDocument"
         - type: object
           required: [fileKey]
           properties:
@@ -6908,14 +7401,24 @@ components:
 
     AttendanceLog:
       type: object
-      required: [id, employeeId, clockIn, clockOut, method, durationMinutes, createdAt, updatedAt]
+      required:
+        [
+          id,
+          employeeId,
+          clockIn,
+          clockOut,
+          method,
+          durationMinutes,
+          createdAt,
+          updatedAt,
+        ]
       properties:
         id:
           type: string
         employeeId:
           type: string
         employee:
-          $ref: '#/components/schemas/AttendanceEmployeeSummary'
+          $ref: "#/components/schemas/AttendanceEmployeeSummary"
         clockIn:
           type: string
           format: date-time
@@ -6924,7 +7427,7 @@ components:
           format: date-time
           nullable: true
         method:
-          $ref: '#/components/schemas/AttendanceMethod'
+          $ref: "#/components/schemas/AttendanceMethod"
         location:
           type: object
           nullable: true
@@ -6955,7 +7458,7 @@ components:
           type: boolean
         session:
           allOf:
-            - $ref: '#/components/schemas/AttendanceLog'
+            - $ref: "#/components/schemas/AttendanceLog"
           nullable: true
 
     AttendanceSettings:
@@ -6972,7 +7475,7 @@ components:
         logs:
           type: array
           items:
-            $ref: '#/components/schemas/AttendanceLog'
+            $ref: "#/components/schemas/AttendanceLog"
         total:
           type: integer
         page:
@@ -6987,14 +7490,14 @@ components:
         date:
           type: string
           format: date
-          example: '2026-08-03'
+          example: "2026-08-03"
         totalMinutes:
           type: integer
           minimum: 0
         sessions:
           type: array
           items:
-            $ref: '#/components/schemas/AttendanceLog'
+            $ref: "#/components/schemas/AttendanceLog"
 
     AttendanceCalendarSummary:
       type: object
@@ -7026,9 +7529,9 @@ components:
         days:
           type: array
           items:
-            $ref: '#/components/schemas/AttendanceCalendarDay'
+            $ref: "#/components/schemas/AttendanceCalendarDay"
         summary:
-          $ref: '#/components/schemas/AttendanceCalendarSummary'
+          $ref: "#/components/schemas/AttendanceCalendarSummary"
 
     ClockInRequest:
       type: object
@@ -7093,7 +7596,7 @@ components:
           type: number
           minimum: 0
         source:
-          $ref: '#/components/schemas/TimesheetEntrySource'
+          $ref: "#/components/schemas/TimesheetEntrySource"
         attendanceLogId:
           type: string
           nullable: true
@@ -7132,14 +7635,14 @@ components:
         employeeId:
           type: string
         employee:
-          $ref: '#/components/schemas/TimesheetEmployeeSummary'
+          $ref: "#/components/schemas/TimesheetEmployeeSummary"
         weekOf:
           type: string
           format: date
         entries:
           type: array
           items:
-            $ref: '#/components/schemas/TimesheetEntry'
+            $ref: "#/components/schemas/TimesheetEntry"
         totalHours:
           type: number
         overtimeHours:
@@ -7147,7 +7650,7 @@ components:
         overtimeThresholdHours:
           type: number
         status:
-          $ref: '#/components/schemas/TimesheetStatus'
+          $ref: "#/components/schemas/TimesheetStatus"
         submittedAt:
           type: string
           format: date-time
@@ -7172,7 +7675,7 @@ components:
         timesheets:
           type: array
           items:
-            $ref: '#/components/schemas/Timesheet'
+            $ref: "#/components/schemas/Timesheet"
         total:
           type: integer
         page:
@@ -7211,7 +7714,7 @@ components:
           type: array
           minItems: 1
           items:
-            $ref: '#/components/schemas/PatchTimesheetEntryRequest'
+            $ref: "#/components/schemas/PatchTimesheetEntryRequest"
 
     DeclineTimesheetRequest:
       type: object
@@ -7261,9 +7764,9 @@ components:
         employeeId:
           type: string
         employee:
-          $ref: '#/components/schemas/ExpenseEmployeeSummary'
+          $ref: "#/components/schemas/ExpenseEmployeeSummary"
         category:
-          $ref: '#/components/schemas/ExpenseCategory'
+          $ref: "#/components/schemas/ExpenseCategory"
         amount:
           type: number
         currency:
@@ -7280,7 +7783,7 @@ components:
         fileSize:
           type: integer
         status:
-          $ref: '#/components/schemas/ExpenseStatus'
+          $ref: "#/components/schemas/ExpenseStatus"
         approverId:
           type: string
         approvedAt:
@@ -7302,7 +7805,7 @@ components:
         expenses:
           type: array
           items:
-            $ref: '#/components/schemas/Expense'
+            $ref: "#/components/schemas/Expense"
         total:
           type: integer
         page:
@@ -7346,7 +7849,7 @@ components:
         - fileSize
       properties:
         category:
-          $ref: '#/components/schemas/ExpenseCategory'
+          $ref: "#/components/schemas/ExpenseCategory"
         amount:
           type: number
           minimum: 0.01
@@ -7373,7 +7876,7 @@ components:
       type: object
       properties:
         category:
-          $ref: '#/components/schemas/ExpenseCategory'
+          $ref: "#/components/schemas/ExpenseCategory"
         amount:
           type: number
           minimum: 0.01

@@ -1,12 +1,12 @@
-import { useState } from 'react';
-import { HiCheck, HiXMark, HiChatBubbleLeftEllipsis } from 'react-icons/hi2';
-import { Button } from '../../../components/ui/Button';
-import { FormField } from '../../../components/ui/FormField';
-import { Modal } from '../../../components/ui/Modal';
-import { Table } from '../../../components/ui/Table';
-import { Textarea } from '../../../components/ui/Textarea';
-import type { Timesheet } from '../../../types';
-import { formatWeekRange } from '../utils';
+import { useState } from "react";
+import { HiCheck, HiXMark, HiChatBubbleLeftEllipsis } from "react-icons/hi2";
+import { Button } from "../../../components/ui/Button";
+import { FormField } from "../../../components/ui/FormField";
+import { Modal } from "../../../components/ui/Modal";
+import { Table } from "../../../components/ui/primitives/Table";
+import { Textarea } from "../../../components/ui/Textarea";
+import type { Timesheet } from "../../../types";
+import { formatWeekRange } from "../utils";
 
 interface TimesheetApprovalQueueProps {
   timesheets: Timesheet[];
@@ -24,7 +24,7 @@ export const TimesheetApprovalQueue = ({
   actionLoadingId,
 }: TimesheetApprovalQueueProps) => {
   const [declineTarget, setDeclineTarget] = useState<Timesheet | null>(null);
-  const [declineReason, setDeclineReason] = useState('');
+  const [declineReason, setDeclineReason] = useState("");
 
   const handleDeclineSubmit = () => {
     if (!declineTarget) {
@@ -32,7 +32,7 @@ export const TimesheetApprovalQueue = ({
     }
     onDecline(declineTarget, declineReason.trim() || undefined);
     setDeclineTarget(null);
-    setDeclineReason('');
+    setDeclineReason("");
   };
 
   return (
@@ -44,49 +44,53 @@ export const TimesheetApprovalQueue = ({
         getRowKey={(row) => row.id}
         columns={[
           {
-            key: 'employee',
-            header: 'Employee',
+            key: "employee",
+            header: "Employee",
             render: (row: Timesheet) =>
               row.employee
                 ? `${row.employee.firstName} ${row.employee.lastName}`
-                : '—',
+                : "—",
           },
           {
-            key: 'week',
-            header: 'Week',
+            key: "week",
+            header: "Week",
             render: (row: Timesheet) => formatWeekRange(row.weekOf),
           },
           {
-            key: 'totalHours',
-            header: 'Total',
+            key: "totalHours",
+            header: "Total",
             render: (row: Timesheet) => `${row.totalHours.toFixed(2)}h`,
           },
           {
-            key: 'overtime',
-            header: 'Overtime',
+            key: "overtime",
+            header: "Overtime",
             render: (row: Timesheet) => (
-              <span className={row.overtimeHours > 0 ? 'font-medium text-amber-600' : ''}>
+              <span
+                className={
+                  row.overtimeHours > 0 ? "font-medium text-amber-600" : ""
+                }
+              >
                 {row.overtimeHours.toFixed(2)}h
               </span>
             ),
           },
           {
-            key: 'submittedAt',
-            header: 'Submitted',
+            key: "submittedAt",
+            header: "Submitted",
             render: (row: Timesheet) =>
               row.submittedAt
                 ? new Date(row.submittedAt).toLocaleDateString(undefined, {
-                    month: 'short',
-                    day: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit',
+                    month: "short",
+                    day: "numeric",
+                    hour: "2-digit",
+                    minute: "2-digit",
                   })
-                : '—',
+                : "—",
           },
           {
-            key: 'actions',
-            header: 'Actions',
-            align: 'right',
+            key: "actions",
+            header: "Actions",
+            align: "right",
             render: (row: Timesheet) => (
               <div className="flex justify-end gap-2">
                 <Button
@@ -107,7 +111,7 @@ export const TimesheetApprovalQueue = ({
                   disabled={actionLoadingId === row.id}
                   onClick={() => {
                     setDeclineTarget(row);
-                    setDeclineReason('');
+                    setDeclineReason("");
                   }}
                 >
                   Decline
@@ -129,14 +133,20 @@ export const TimesheetApprovalQueue = ({
         }
         footer={
           <div className="flex justify-end gap-2">
-            <Button type="button" variant="secondary" onClick={() => setDeclineTarget(null)}>
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={() => setDeclineTarget(null)}
+            >
               Cancel
             </Button>
             <Button
               type="button"
               variant="secondary"
               icon={<HiXMark className="h-4 w-4 text-red-500" />}
-              loading={Boolean(declineTarget && actionLoadingId === declineTarget.id)}
+              loading={Boolean(
+                declineTarget && actionLoadingId === declineTarget.id,
+              )}
               loadingText="Declining…"
               onClick={handleDeclineSubmit}
             >
@@ -151,7 +161,9 @@ export const TimesheetApprovalQueue = ({
             value={declineReason}
             onChange={(event) => setDeclineReason(event.target.value)}
             rows={3}
-            icon={<HiChatBubbleLeftEllipsis className="h-4 w-4 text-brand-600" />}
+            icon={
+              <HiChatBubbleLeftEllipsis className="h-4 w-4 text-brand-600" />
+            }
           />
         </FormField>
       </Modal>

@@ -1,0 +1,3 @@
+export const DEFAULT_MIN_NATIONAL_LENGTH = 7;
+export const DEFAULT_MAX_NATIONAL_LENGTH = 11;
+export const E164_MAX_TOTAL_DIGITS = 15;

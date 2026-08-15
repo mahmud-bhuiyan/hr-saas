@@ -54,7 +54,7 @@ export const Button = ({
       disabled={disabled || loading}
       aria-label={ariaLabel ?? (isIconOnly ? textLabel : undefined)}
       title={title ?? (isIconOnly ? textLabel : undefined)}
-      className={`inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium transition focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60 ${variants[variant]} ${isIconOnly ? 'px-2.5' : ''} ${className}`}
+      className={`inline-flex items-center justify-center gap-2 rounded-lg text-sm font-medium transition focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60 ${variants[variant]} ${isIconOnly ? 'h-9 w-9 shrink-0 p-0' : 'px-4 py-2.5'} ${className}`}
       {...props}
     >
       {loading && <Spinner />}

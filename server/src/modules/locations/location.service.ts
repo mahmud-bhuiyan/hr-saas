@@ -1,16 +1,21 @@
-import mongoose from 'mongoose';
-import { writeAuditLog, type AuditContext } from '../audit/audit.service.js';
-import { locationAuditSnapshot } from '../../utils/audit-snapshot.js';
-import { WorkLocation, type IWorkLocationDocument } from './location.model.js';
-import type { CreateLocationInput, PatchLocationInput } from './location.validation.js';
+import mongoose from "mongoose";
+import { writeAuditLog, type AuditContext } from "../audit/audit.service.js";
+import { locationAuditSnapshot } from "../../utils/audit-snapshot.js";
+import { Shift } from "../rotas/shift.model.js";
+import { RotaTemplate } from "../rotas/rota-template.model.js";
+import { WorkLocation, type IWorkLocationDocument } from "./location.model.js";
+import type {
+  CreateLocationInput,
+  PatchLocationInput,
+} from "./location.validation.js";
 
 export class LocationServiceError extends Error {
   constructor(
     message: string,
-    public statusCode: number
+    public statusCode: number,
   ) {
     super(message);
-    this.name = 'LocationServiceError';
+    this.name = "LocationServiceError";
   }
 }
 
@@ -24,7 +29,9 @@ export interface WorkLocationPublic {
   updatedAt: string;
 }
 
-const toLocationPublic = (location: IWorkLocationDocument): WorkLocationPublic => ({
+const toLocationPublic = (
+  location: IWorkLocationDocument,
+): WorkLocationPublic => ({
   id: location._id.toString(),
   name: location.name,
   address: location.address,
@@ -36,7 +43,7 @@ const toLocationPublic = (location: IWorkLocationDocument): WorkLocationPublic =
 
 export const listWorkLocations = async (
   tenantId: string,
-  includeArchived = false
+  includeArchived = false,
 ): Promise<WorkLocationPublic[]> => {
   const filter: Record<string, unknown> = {
     tenantId: new mongoose.Types.ObjectId(tenantId),
@@ -54,13 +61,18 @@ export const createWorkLocation = async (
   tenantId: string,
   input: CreateLocationInput,
   userId: string,
-  audit?: AuditContext
+  audit?: AuditContext,
 ): Promise<WorkLocationPublic> => {
   const name = input.name.trim();
 
   const existing = await WorkLocation.findOne({
     tenantId: new mongoose.Types.ObjectId(tenantId),
-    name: { $regex: new RegExp(`^${name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, 'i') },
+    name: {
+      $regex: new RegExp(
+        `^${name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}$`,
+        "i",
+      ),
+    },
   });
 
   if (existing) {
@@ -74,8 +86,8 @@ export const createWorkLocation = async (
       void writeAuditLog({
         tenantId,
         userId,
-        action: 'update',
-        entityType: 'WorkLocation',
+        action: "update",
+        entityType: "WorkLocation",
         entityId: existing._id.toString(),
         after: locationAuditSnapshot(existing),
         context: audit,
@@ -83,7 +95,10 @@ export const createWorkLocation = async (
 
       return toLocationPublic(existing);
     }
-    throw new LocationServiceError('A location with this name already exists', 409);
+    throw new LocationServiceError(
+      "A location with this name already exists",
+      409,
+    );
   }
 
   const location = await WorkLocation.create({
@@ -99,8 +114,8 @@ export const createWorkLocation = async (
   void writeAuditLog({
     tenantId,
     userId,
-    action: 'create',
-    entityType: 'WorkLocation',
+    action: "create",
+    entityType: "WorkLocation",
     entityId: location._id.toString(),
     after: locationAuditSnapshot(location),
     context: audit,
@@ -114,7 +129,7 @@ export const patchWorkLocation = async (
   locationId: string,
   input: PatchLocationInput,
   userId: string,
-  audit?: AuditContext
+  audit?: AuditContext,
 ): Promise<WorkLocationPublic> => {
   const location = await WorkLocation.findOne({
     _id: new mongoose.Types.ObjectId(locationId),
@@ -122,7 +137,7 @@ export const patchWorkLocation = async (
   });
 
   if (!location) {
-    throw new LocationServiceError('Location not found', 404);
+    throw new LocationServiceError("Location not found", 404);
   }
 
   const beforeSnapshot = locationAuditSnapshot(location);
@@ -133,14 +148,17 @@ export const patchWorkLocation = async (
       _id: { $ne: location._id },
       name: {
         $regex: new RegExp(
-          `^${input.name.trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`,
-          'i'
+          `^${input.name.trim().replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}$`,
+          "i",
         ),
       },
     });
 
     if (duplicate) {
-      throw new LocationServiceError('A location with this name already exists', 409);
+      throw new LocationServiceError(
+        "A location with this name already exists",
+        409,
+      );
     }
 
     location.name = input.name.trim();
@@ -164,8 +182,8 @@ export const patchWorkLocation = async (
   void writeAuditLog({
     tenantId,
     userId,
-    action: 'update',
-    entityType: 'WorkLocation',
+    action: "update",
+    entityType: "WorkLocation",
     entityId: location._id.toString(),
     before: beforeSnapshot,
     after: locationAuditSnapshot(location),
@@ -175,9 +193,58 @@ export const patchWorkLocation = async (
   return toLocationPublic(location);
 };
 
+export const deleteWorkLocation = async (
+  tenantId: string,
+  locationId: string,
+  userId: string,
+  audit?: AuditContext,
+): Promise<void> => {
+  const location = await WorkLocation.findOne({
+    _id: new mongoose.Types.ObjectId(locationId),
+    tenantId: new mongoose.Types.ObjectId(tenantId),
+  });
+
+  if (!location) {
+    throw new LocationServiceError("Location not found", 404);
+  }
+
+  if (!location.isArchived) {
+    throw new LocationServiceError(
+      "Only archived locations can be permanently deleted",
+      400,
+    );
+  }
+
+  const locationObjectId = location._id;
+  const [shiftCount, templateCount] = await Promise.all([
+    Shift.countDocuments({ locationId: locationObjectId }),
+    RotaTemplate.countDocuments({ locationId: locationObjectId }),
+  ]);
+
+  if (shiftCount > 0 || templateCount > 0) {
+    throw new LocationServiceError(
+      "Cannot delete a location that is still used by shifts or rota templates",
+      409,
+    );
+  }
+
+  const beforeSnapshot = locationAuditSnapshot(location);
+  await location.deleteOne();
+
+  void writeAuditLog({
+    tenantId,
+    userId,
+    action: "delete",
+    entityType: "WorkLocation",
+    entityId: locationId,
+    before: beforeSnapshot,
+    context: audit,
+  });
+};
+
 export const assertActiveWorkLocation = async (
   tenantId: string,
-  locationId: string | null | undefined
+  locationId: string | null | undefined,
 ): Promise<void> => {
   if (!locationId) {
     return;
@@ -190,6 +257,6 @@ export const assertActiveWorkLocation = async (
   });
 
   if (!location) {
-    throw new LocationServiceError('Work location not found or archived', 400);
+    throw new LocationServiceError("Work location not found or archived", 400);
   }
 };

@@ -1,21 +1,21 @@
-import { useQuery } from '@tanstack/react-query';
-import { Navigate } from 'react-router-dom';
-import { PageContainer } from '../../../components/ui/PageContainer';
-import { SettingsPageHeader } from '../components/SettingsPageHeader';
-import { Table } from '../../../components/ui/Table';
-import { useAuth } from '../../../contexts/AuthContext';
-import { fetchAuditLogs } from '../../../lib/api';
-import { hasPermission } from '../../../utils/permissions';
-import { isQueryInitialLoad } from '../../../utils/query';
-import type { AuditLogEntry } from '../../../types';
+import { useQuery } from "@tanstack/react-query";
+import { Navigate } from "react-router-dom";
+import { PageContainer } from "../../../components/ui/PageContainer";
+import { SettingsPageHeader } from "../components/SettingsPageHeader";
+import { Table } from "../../../components/ui/primitives/Table";
+import { useAuth } from "../../../contexts/AuthContext";
+import { fetchAuditLogs } from "../../../lib/api";
+import { hasPermission } from "../../../utils/permissions";
+import { isQueryInitialLoad } from "../../../utils/query";
+import type { AuditLogEntry } from "../../../types";
 
 export const AuditLogPage = () => {
   const { user } = useAuth();
 
-  const canRead = user && hasPermission(user.role, 'audit:read');
+  const canRead = user && hasPermission(user.role, "audit:read");
 
   const auditQuery = useQuery({
-    queryKey: ['audit-logs'],
+    queryKey: ["audit-logs"],
     queryFn: () => fetchAuditLogs({ limit: 50 }),
     enabled: Boolean(canRead),
   });
@@ -36,13 +36,13 @@ export const AuditLogPage = () => {
         emptyMessage="No audit entries yet"
         columns={[
           {
-            key: 'createdAt',
-            header: 'When',
+            key: "createdAt",
+            header: "When",
             render: (row) => new Date(row.createdAt).toLocaleString(),
           },
           {
-            key: 'userName',
-            header: 'User',
+            key: "userName",
+            header: "User",
             render: (row) => (
               <div>
                 <div className="font-medium text-slate-900">{row.userName}</div>
@@ -51,8 +51,8 @@ export const AuditLogPage = () => {
             ),
           },
           {
-            key: 'action',
-            header: 'Action',
+            key: "action",
+            header: "Action",
             render: (row) => (
               <span className="capitalize">
                 {row.action} {row.entityType}
@@ -60,12 +60,16 @@ export const AuditLogPage = () => {
             ),
           },
           {
-            key: 'details',
-            header: 'Details',
-            align: 'left',
+            key: "details",
+            header: "Details",
+            align: "left",
             render: (row) => (
               <div className="max-w-md truncate text-xs text-slate-600">
-                {row.after ? JSON.stringify(row.after) : row.before ? JSON.stringify(row.before) : '—'}
+                {row.after
+                  ? JSON.stringify(row.after)
+                  : row.before
+                    ? JSON.stringify(row.before)
+                    : "—"}
               </div>
             ),
           },

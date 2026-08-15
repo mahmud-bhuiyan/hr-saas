@@ -1,11 +1,14 @@
-import mongoose, { Schema, type Document, type Model } from 'mongoose';
-import { ALL_TENANT_MODULE_IDS, type TenantModuleId } from '../../types/modules.js';
+import mongoose, { Schema, type Document, type Model } from "mongoose";
+import {
+  ALL_TENANT_MODULE_IDS,
+  type TenantModuleId,
+} from "../../types/modules.js";
 
-export type TenantApprovalStatus = 'pending' | 'approved' | 'rejected';
+export type TenantApprovalStatus = "pending" | "approved" | "rejected";
 
-export type PayPeriodType = 'weekly' | 'biweekly' | 'monthly';
+export type PayPeriodType = "weekly" | "biweekly" | "monthly";
 
-export type PayRateType = 'hourly' | 'salary';
+export type PayRateType = "hourly" | "salary";
 
 export interface TenantBranding {
   logoUrl: string | null;
@@ -31,6 +34,7 @@ export interface ITenant {
   billingExempt?: boolean;
   payPeriodType?: PayPeriodType;
   defaultPayCurrency?: string;
+  defaultPhoneDialCode?: string;
   payrollWeekStartDay?: number;
   xeroExpenseAccountCode?: string;
   xeroPayableAccountCode?: string;
@@ -51,14 +55,14 @@ const tenantSchema = new Schema<ITenantDocument>(
     isActive: { type: Boolean, default: false },
     approvalStatus: {
       type: String,
-      enum: ['pending', 'approved', 'rejected'],
-      default: 'pending',
+      enum: ["pending", "approved", "rejected"],
+      default: "pending",
     },
     rejectedReason: { type: String, trim: true },
     approvedAt: { type: Date },
-    approvedBy: { type: Schema.Types.ObjectId, ref: 'User' },
-    createdBy: { type: Schema.Types.ObjectId, ref: 'User' },
-    updatedBy: { type: Schema.Types.ObjectId, ref: 'User' },
+    approvedBy: { type: Schema.Types.ObjectId, ref: "User" },
+    createdBy: { type: Schema.Types.ObjectId, ref: "User" },
+    updatedBy: { type: Schema.Types.ObjectId, ref: "User" },
     branding: {
       logoUrl: { type: String, default: null },
     },
@@ -70,21 +74,28 @@ const tenantSchema = new Schema<ITenantDocument>(
     billingExempt: { type: Boolean, default: false },
     payPeriodType: {
       type: String,
-      enum: ['weekly', 'biweekly', 'monthly'],
-      default: 'weekly',
+      enum: ["weekly", "biweekly", "monthly"],
+      default: "weekly",
     },
-    defaultPayCurrency: { type: String, default: 'GBP', trim: true, uppercase: true },
+    defaultPayCurrency: {
+      type: String,
+      default: "GBP",
+      trim: true,
+      uppercase: true,
+    },
+    defaultPhoneDialCode: { type: String, default: "1", trim: true },
     payrollWeekStartDay: { type: Number, default: 1, min: 0, max: 6 },
-    xeroExpenseAccountCode: { type: String, default: '477', trim: true },
-    xeroPayableAccountCode: { type: String, default: '804', trim: true },
+    xeroExpenseAccountCode: { type: String, default: "477", trim: true },
+    xeroPayableAccountCode: { type: String, default: "804", trim: true },
     enabledModules: {
       type: [String],
       enum: ALL_TENANT_MODULE_IDS,
       default: () => [...ALL_TENANT_MODULE_IDS],
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 export const Tenant: Model<ITenantDocument> =
-  mongoose.models.Tenant ?? mongoose.model<ITenantDocument>('Tenant', tenantSchema);
+  mongoose.models.Tenant ??
+  mongoose.model<ITenantDocument>("Tenant", tenantSchema);

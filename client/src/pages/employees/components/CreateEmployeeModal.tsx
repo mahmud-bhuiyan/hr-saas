@@ -1,4 +1,4 @@
-import { FormEvent } from 'react';
+import { FormEvent } from "react";
 import {
   HiBriefcase,
   HiCalendarDays,
@@ -7,20 +7,23 @@ import {
   HiRectangleGroup,
   HiUser,
   HiUserGroup,
-} from 'react-icons/hi2';
-import { FormField } from '../../../components/ui/FormField';
-import { FormModal } from '../../../components/ui/FormModal';
-import { Input } from '../../../components/ui/Input';
-import { Select } from '../../../components/ui/Select';
-import type { CreateEmployeeInput, Employee } from '../../../types';
-import { employeeName } from '../utils';
+} from "react-icons/hi2";
+import { FormField } from "../../../components/ui/FormField";
+import { FormModal } from "../../../components/ui/forms/FormModal";
+import { Input } from "../../../components/ui/Input";
+import { PhoneInput } from "../../../components/ui/PhoneInput";
+import { Select } from "../../../components/ui/Select";
+import type { CreateEmployeeInput, Employee } from "../../../types";
+import { employeeName } from "../utils";
 
 interface CreateEmployeeModalProps {
   open: boolean;
   onClose: () => void;
   onSubmit: (event: FormEvent<HTMLFormElement>) => void;
   form: CreateEmployeeInput;
-  onFormChange: (updater: (prev: CreateEmployeeInput) => CreateEmployeeInput) => void;
+  onFormChange: (
+    updater: (prev: CreateEmployeeInput) => CreateEmployeeInput,
+  ) => void;
   managerOptions: Employee[];
   departmentOptions: string[];
   loading: boolean;
@@ -51,20 +54,24 @@ export const CreateEmployeeModal = ({
       size="lg"
     >
       <div className="grid gap-4 sm:grid-cols-2">
-        <FormField label="First name" htmlFor="create-firstName">
+        <FormField label="First name" htmlFor="create-firstName" required>
           <Input
             id="create-firstName"
             value={form.firstName}
-            onChange={(e) => onFormChange((f) => ({ ...f, firstName: e.target.value }))}
+            onChange={(e) =>
+              onFormChange((f) => ({ ...f, firstName: e.target.value }))
+            }
             required
             icon={<HiUser className="h-4 w-4 text-brand-600" />}
           />
         </FormField>
-        <FormField label="Last name" htmlFor="create-lastName">
+        <FormField label="Last name" htmlFor="create-lastName" required>
           <Input
             id="create-lastName"
             value={form.lastName}
-            onChange={(e) => onFormChange((f) => ({ ...f, lastName: e.target.value }))}
+            onChange={(e) =>
+              onFormChange((f) => ({ ...f, lastName: e.target.value }))
+            }
             required
             icon={<HiUser className="h-4 w-4 text-brand-600" />}
           />
@@ -72,39 +79,51 @@ export const CreateEmployeeModal = ({
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2">
-        <FormField label="Email" htmlFor="create-email">
+        <FormField label="Email" htmlFor="create-email" required>
           <Input
             id="create-email"
             type="email"
-            value={form.email ?? ''}
-            onChange={(e) => onFormChange((f) => ({ ...f, email: e.target.value }))}
+            value={form.email}
+            onChange={(e) =>
+              onFormChange((f) => ({ ...f, email: e.target.value }))
+            }
+            required
             icon={<HiEnvelope className="h-4 w-4 text-brand-600" />}
           />
         </FormField>
-        <FormField label="Phone" htmlFor="create-phone">
-          <Input
+        <FormField label="Phone" htmlFor="create-phone" required>
+          <PhoneInput
             id="create-phone"
-            value={form.phone ?? ''}
-            onChange={(e) => onFormChange((f) => ({ ...f, phone: e.target.value }))}
+            value={form.phone}
+            onChange={(phone) => onFormChange((f) => ({ ...f, phone }))}
+            required
             icon={<HiPhone className="h-4 w-4 text-brand-600" />}
           />
         </FormField>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2">
-        <FormField label="Job title" htmlFor="create-jobTitle">
+        <FormField label="Job title" htmlFor="create-jobTitle" required>
           <Input
             id="create-jobTitle"
-            value={form.jobTitle ?? ''}
-            onChange={(e) => onFormChange((f) => ({ ...f, jobTitle: e.target.value }))}
+            value={form.jobTitle}
+            onChange={(e) =>
+              onFormChange((f) => ({ ...f, jobTitle: e.target.value }))
+            }
+            required
             icon={<HiBriefcase className="h-4 w-4 text-brand-600" />}
           />
         </FormField>
         <FormField label="Department" htmlFor="create-department">
           <Select
             id="create-department"
-            value={form.department ?? ''}
-            onChange={(e) => onFormChange((f) => ({ ...f, department: e.target.value || undefined }))}
+            value={form.department ?? ""}
+            onChange={(e) =>
+              onFormChange((f) => ({
+                ...f,
+                department: e.target.value || undefined,
+              }))
+            }
             icon={<HiRectangleGroup className="h-4 w-4 text-brand-600" />}
           >
             <option value="">No department</option>
@@ -118,21 +137,27 @@ export const CreateEmployeeModal = ({
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2">
-        <FormField label="Start date" htmlFor="create-startDate">
+        <FormField label="Start date" htmlFor="create-startDate" required>
           <Input
             id="create-startDate"
             type="date"
-            value={form.startDate ?? ''}
-            onChange={(e) => onFormChange((f) => ({ ...f, startDate: e.target.value }))}
+            value={form.startDate}
+            onChange={(e) =>
+              onFormChange((f) => ({ ...f, startDate: e.target.value }))
+            }
+            required
             icon={<HiCalendarDays className="h-4 w-4 text-brand-600" />}
           />
         </FormField>
         <FormField label="Manager" htmlFor="create-managerId">
           <Select
             id="create-managerId"
-            value={form.managerId ?? ''}
+            value={form.managerId ?? ""}
             onChange={(e) =>
-              onFormChange((f) => ({ ...f, managerId: e.target.value || undefined }))
+              onFormChange((f) => ({
+                ...f,
+                managerId: e.target.value || undefined,
+              }))
             }
             icon={<HiUserGroup className="h-4 w-4 text-brand-600" />}
           >

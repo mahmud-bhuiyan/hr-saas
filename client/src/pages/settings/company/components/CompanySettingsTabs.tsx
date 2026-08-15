@@ -1,11 +1,19 @@
-import { FormEvent } from 'react';
-import { TabGroup } from '../../../../components/ui/TabGroup';
-import { useTabUrlState } from '../../../../hooks/useTabUrlState';
-import { COMPANY_SETTINGS_TAB_IDS, type CompanySettingsTab } from '../utils';
-import { CompanyProfileForm, type CompanyProfileFormValues } from './CompanyProfileForm';
-import { TenantBrandingForm, type TenantBrandingFormValues } from './TenantBrandingForm';
+import { FormEvent } from "react";
+import { TabGroup } from "../../../../components/ui/TabGroup";
+import { useTabUrlState } from "../../../../hooks/useTabUrlState";
+import { COMPANY_SETTINGS_TAB_IDS, type CompanySettingsTab } from "../utils";
+import type { CountryDialCode } from "../../../../utils/phone";
+import {
+  CompanyProfileForm,
+  type CompanyProfileFormValues,
+} from "./CompanyProfileForm";
+import {
+  TenantBrandingForm,
+  type TenantBrandingFormValues,
+} from "./TenantBrandingForm";
 
 interface CompanySettingsTabsProps {
+  dialCodeOptions: CountryDialCode[];
   profile: {
     values: CompanyProfileFormValues;
     onChange: (field: keyof CompanyProfileFormValues, value: string) => void;
@@ -24,9 +32,13 @@ interface CompanySettingsTabsProps {
   };
 }
 
-export const CompanySettingsTabs = ({ profile, branding }: CompanySettingsTabsProps) => {
+export const CompanySettingsTabs = ({
+  dialCodeOptions,
+  profile,
+  branding,
+}: CompanySettingsTabsProps) => {
   const { activeTab, setActiveTab } = useTabUrlState(COMPANY_SETTINGS_TAB_IDS, {
-    defaultTab: 'profile',
+    defaultTab: "profile",
   });
 
   return (
@@ -35,11 +47,12 @@ export const CompanySettingsTabs = ({ profile, branding }: CompanySettingsTabsPr
       onChange={setActiveTab}
       tabs={[
         {
-          id: 'profile',
-          label: 'Profile',
+          id: "profile",
+          label: "Profile",
           content: (
             <CompanyProfileForm
               values={profile.values}
+              dialCodeOptions={dialCodeOptions}
               onChange={profile.onChange}
               onSubmit={profile.onSubmit}
               loading={profile.loading}
@@ -48,8 +61,8 @@ export const CompanySettingsTabs = ({ profile, branding }: CompanySettingsTabsPr
           ),
         },
         {
-          id: 'branding',
-          label: 'Branding',
+          id: "branding",
+          label: "Branding",
           content: (
             <TenantBrandingForm
               values={branding.values}

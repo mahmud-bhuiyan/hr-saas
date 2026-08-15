@@ -1,8 +1,15 @@
-import { HiArrowDownTray, HiTrash } from 'react-icons/hi2';
-import { Button } from '../../../components/ui/Button';
-import { Table, type TableColumn } from '../../../components/ui/Table';
-import type { HrDocument } from '../../../types';
-import { DOCUMENT_CATEGORY_LABELS, formatDocumentDate, formatFileSize } from '../utils';
+import { HiArrowDownTray, HiTrash } from "react-icons/hi2";
+import { Button } from "../../../components/ui/Button";
+import {
+  Table,
+  type TableColumn,
+} from "../../../components/ui/primitives/Table";
+import type { HrDocument } from "../../../types";
+import {
+  DOCUMENT_CATEGORY_LABELS,
+  formatDocumentDate,
+  formatFileSize,
+} from "../utils";
 
 interface DocumentsTableProps {
   documents: HrDocument[];
@@ -17,7 +24,7 @@ interface DocumentsTableProps {
 export const DocumentsTable = ({
   documents,
   loading,
-  emptyMessage = 'No documents found.',
+  emptyMessage = "No documents found.",
   onDownload,
   onDelete,
   downloadLoadingId,
@@ -25,48 +32,52 @@ export const DocumentsTable = ({
 }: DocumentsTableProps) => {
   const columns: TableColumn<HrDocument>[] = [
     {
-      key: 'fileName',
-      header: 'File',
+      key: "fileName",
+      header: "File",
       render: (doc) => (
-        <div className="max-w-xs truncate font-medium text-slate-900" title={doc.fileName}>
+        <div
+          className="max-w-xs truncate font-medium text-slate-900"
+          title={doc.fileName}
+        >
           {doc.fileName}
         </div>
       ),
     },
     {
-      key: 'category',
-      header: 'Category',
+      key: "category",
+      header: "Category",
       render: (doc) => DOCUMENT_CATEGORY_LABELS[doc.category],
     },
     {
-      key: 'employee',
-      header: 'Employee',
+      key: "employee",
+      header: "Employee",
       render: (doc) =>
         doc.employee
           ? `${doc.employee.firstName} ${doc.employee.lastName}`
           : doc.employeeId
-            ? '—'
-            : 'Company',
+            ? "—"
+            : "Company",
     },
     {
-      key: 'fileSize',
-      header: 'Size',
+      key: "fileSize",
+      header: "Size",
       render: (doc) => formatFileSize(doc.fileSize),
     },
     {
-      key: 'expiryDate',
-      header: 'Expires',
-      render: (doc) => (doc.expiryDate ? formatDocumentDate(doc.expiryDate) : '—'),
+      key: "expiryDate",
+      header: "Expires",
+      render: (doc) =>
+        doc.expiryDate ? formatDocumentDate(doc.expiryDate) : "—",
     },
     {
-      key: 'createdAt',
-      header: 'Uploaded',
+      key: "createdAt",
+      header: "Uploaded",
       render: (doc) => formatDocumentDate(doc.createdAt.slice(0, 10)),
     },
     {
-      key: 'actions',
-      header: 'Actions',
-      align: 'right',
+      key: "actions",
+      header: "Actions",
+      align: "right",
       render: (doc) => (
         <div className="flex items-center justify-end gap-2">
           <Button

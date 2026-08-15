@@ -1,9 +1,9 @@
-import type { ReactNode } from 'react';
-import { HiMagnifyingGlass, HiQueueList } from 'react-icons/hi2';
-import { PAGE_SIZE_OPTIONS } from '../../hooks/usePagination';
-import { FormField } from './FormField';
-import { Input } from './Input';
-import { Select } from './Select';
+import type { ReactNode } from "react";
+import { HiMagnifyingGlass, HiQueueList } from "react-icons/hi2";
+import { PAGE_SIZE_OPTIONS } from "../../../hooks/usePagination";
+import { FormField } from "../FormField";
+import { Input } from "../Input";
+import { Select } from "../Select";
 
 export interface SearchToolbarSelectOption {
   value: string;
@@ -50,24 +50,21 @@ export const SearchToolbar = ({
   pageSize,
   search,
   filters = [],
-  className = '',
+  className = "",
 }: SearchToolbarProps) => {
   if (!pageSize && !search && filters.length === 0) {
     return null;
   }
 
-  const pageSizeId = pageSize?.id ?? 'search-toolbar-page-size';
-  const searchId = search?.id ?? 'search-toolbar-search';
+  const pageSizeId = pageSize?.id ?? "search-toolbar-page-size";
+  const searchId = search?.id ?? "search-toolbar-search";
 
   return (
     <div
       className={`card-surface flex flex-col gap-3 p-4 sm:flex-row sm:items-end ${className}`}
     >
       {pageSize && (
-        <FormField
-          label={pageSize.label ?? "Per page"}
-          htmlFor={pageSizeId}
-        >
+        <FormField label={pageSize.label ?? "Per page"} htmlFor={pageSizeId}>
           <Select
             id={pageSizeId}
             value={String(pageSize.value)}

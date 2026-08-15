@@ -1,7 +1,7 @@
 import type { FormEvent } from 'react';
 import { HiCalendarDays } from 'react-icons/hi2';
 import { FormField } from '../../../components/ui/FormField';
-import { FormModal } from '../../../components/ui/FormModal';
+import { FormModal } from '../../../components/ui/forms/FormModal';
 import { Input } from '../../../components/ui/Input';
 
 export type CreatePayrollPeriodForm = {

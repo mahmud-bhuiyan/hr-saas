@@ -1,15 +1,18 @@
-import mongoose from 'mongoose';
-import { Employee } from '../employees/employee.model.js';
-import { Department, type IDepartmentDocument } from './department.model.js';
-import type { CreateDepartmentInput, PatchDepartmentInput } from './department.validation.js';
+import mongoose from "mongoose";
+import { Employee } from "../employees/employee.model.js";
+import { Department, type IDepartmentDocument } from "./department.model.js";
+import type {
+  CreateDepartmentInput,
+  PatchDepartmentInput,
+} from "./department.validation.js";
 
 export class DepartmentServiceError extends Error {
   constructor(
     message: string,
-    public statusCode: number
+    public statusCode: number,
   ) {
     super(message);
-    this.name = 'DepartmentServiceError';
+    this.name = "DepartmentServiceError";
   }
 }
 
@@ -24,12 +27,12 @@ export interface DepartmentPublic {
 
 const toDepartmentPublic = async (
   department: IDepartmentDocument,
-  tenantId: string
+  tenantId: string,
 ): Promise<DepartmentPublic> => {
   const employeeCount = await Employee.countDocuments({
     tenantId: new mongoose.Types.ObjectId(tenantId),
     department: department.name,
-    status: { $ne: 'terminated' },
+    status: { $ne: "terminated" },
   });
 
   return {
@@ -44,7 +47,7 @@ const toDepartmentPublic = async (
 
 export const listDepartments = async (
   tenantId: string,
-  includeArchived = false
+  includeArchived = false,
 ): Promise<DepartmentPublic[]> => {
   const filter: Record<string, unknown> = {
     tenantId: new mongoose.Types.ObjectId(tenantId),
@@ -55,10 +58,14 @@ export const listDepartments = async (
   }
 
   const departments = await Department.find(filter).sort({ name: 1 });
-  return Promise.all(departments.map((dept) => toDepartmentPublic(dept, tenantId)));
+  return Promise.all(
+    departments.map((dept) => toDepartmentPublic(dept, tenantId)),
+  );
 };
 
-export const listActiveDepartmentNames = async (tenantId: string): Promise<string[]> => {
+export const listActiveDepartmentNames = async (
+  tenantId: string,
+): Promise<string[]> => {
   const departments = await Department.find({
     tenantId: new mongoose.Types.ObjectId(tenantId),
     isArchived: false,
@@ -68,9 +75,9 @@ export const listActiveDepartmentNames = async (tenantId: string): Promise<strin
 
   const managedNames = departments.map((dept) => dept.name);
 
-  const legacyNames = await Employee.distinct('department', {
+  const legacyNames = await Employee.distinct("department", {
     tenantId: new mongoose.Types.ObjectId(tenantId),
-    department: { $exists: true, $nin: [null, ''] },
+    department: { $exists: true, $nin: [null, ""] },
   });
 
   const merged = new Set([...managedNames, ...(legacyNames as string[])]);
@@ -80,13 +87,18 @@ export const listActiveDepartmentNames = async (tenantId: string): Promise<strin
 export const createDepartment = async (
   tenantId: string,
   input: CreateDepartmentInput,
-  userId: string
+  userId: string,
 ): Promise<DepartmentPublic> => {
   const name = input.name.trim();
 
   const existing = await Department.findOne({
     tenantId: new mongoose.Types.ObjectId(tenantId),
-    name: { $regex: new RegExp(`^${name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, 'i') },
+    name: {
+      $regex: new RegExp(
+        `^${name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}$`,
+        "i",
+      ),
+    },
   });
 
   if (existing) {
@@ -96,7 +108,10 @@ export const createDepartment = async (
       await existing.save();
       return toDepartmentPublic(existing, tenantId);
     }
-    throw new DepartmentServiceError('A department with this name already exists', 409);
+    throw new DepartmentServiceError(
+      "A department with this name already exists",
+      409,
+    );
   }
 
   const department = await Department.create({
@@ -114,7 +129,7 @@ export const patchDepartment = async (
   tenantId: string,
   departmentId: string,
   input: PatchDepartmentInput,
-  userId: string
+  userId: string,
 ): Promise<DepartmentPublic> => {
   const department = await Department.findOne({
     _id: new mongoose.Types.ObjectId(departmentId),
@@ -122,7 +137,7 @@ export const patchDepartment = async (
   });
 
   if (!department) {
-    throw new DepartmentServiceError('Department not found', 404);
+    throw new DepartmentServiceError("Department not found", 404);
   }
 
   const oldName = department.name;
@@ -131,11 +146,19 @@ export const patchDepartment = async (
     const duplicate = await Department.findOne({
       tenantId: new mongoose.Types.ObjectId(tenantId),
       _id: { $ne: department._id },
-      name: { $regex: new RegExp(`^${input.name.trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, 'i') },
+      name: {
+        $regex: new RegExp(
+          `^${input.name.trim().replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}$`,
+          "i",
+        ),
+      },
     });
 
     if (duplicate) {
-      throw new DepartmentServiceError('A department with this name already exists', 409);
+      throw new DepartmentServiceError(
+        "A department with this name already exists",
+        409,
+      );
     }
 
     department.name = input.name.trim();
@@ -145,7 +168,7 @@ export const patchDepartment = async (
         tenantId: new mongoose.Types.ObjectId(tenantId),
         department: oldName,
       },
-      { $set: { department: department.name } }
+      { $set: { department: department.name } },
     );
   }
 
@@ -159,9 +182,45 @@ export const patchDepartment = async (
   return toDepartmentPublic(department, tenantId);
 };
 
+export const deleteDepartment = async (
+  tenantId: string,
+  departmentId: string,
+): Promise<void> => {
+  const department = await Department.findOne({
+    _id: new mongoose.Types.ObjectId(departmentId),
+    tenantId: new mongoose.Types.ObjectId(tenantId),
+  });
+
+  if (!department) {
+    throw new DepartmentServiceError("Department not found", 404);
+  }
+
+  if (!department.isArchived) {
+    throw new DepartmentServiceError(
+      "Only archived departments can be permanently deleted",
+      400,
+    );
+  }
+
+  const employeeCount = await Employee.countDocuments({
+    tenantId: new mongoose.Types.ObjectId(tenantId),
+    department: department.name,
+    status: { $ne: "terminated" },
+  });
+
+  if (employeeCount > 0) {
+    throw new DepartmentServiceError(
+      "Cannot delete a department that still has assigned employees",
+      409,
+    );
+  }
+
+  await department.deleteOne();
+};
+
 export const assertActiveDepartmentName = async (
   tenantId: string,
-  departmentName: string | undefined
+  departmentName: string | undefined,
 ): Promise<void> => {
   if (!departmentName?.trim()) {
     return;
@@ -179,14 +238,19 @@ export const assertActiveDepartmentName = async (
   const name = departmentName.trim();
   const department = await Department.findOne({
     tenantId: new mongoose.Types.ObjectId(tenantId),
-    name: { $regex: new RegExp(`^${name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, 'i') },
+    name: {
+      $regex: new RegExp(
+        `^${name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}$`,
+        "i",
+      ),
+    },
     isArchived: false,
   });
 
   if (!department) {
     throw new DepartmentServiceError(
-      'Department must be selected from the managed departments list',
-      400
+      "Department must be selected from the managed departments list",
+      400,
     );
   }
 };
