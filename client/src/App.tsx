@@ -1,15 +1,14 @@
-import { Navigate, Route, Routes } from "react-router-dom";
+import { Route, Routes } from "react-router-dom";
 import { AppShell } from "./components/AppShell";
 import { ScrollToTop } from "./components/ScrollToTop";
 import { GuestRoute } from "./components/GuestRoute";
 import { ModuleRoute } from "./components/ModuleRoute";
 import { ProtectedRoute } from "./components/ProtectedRoute";
-import { DashboardPage } from "./pages/dashboard/DashboardPage";
+import { HomeRedirect } from "./routes/HomeRedirect";
+import { TenantDashboardPage } from "./pages/dashboard/TenantDashboardPage";
 import {
-  EmployeeEditRedirect,
   EmployeesIndexRedirect,
   EmployeesPage,
-  EmployeeViewRedirect,
 } from "./pages/employees/EmployeesPage";
 import { LoginPage } from "./pages/login/LoginPage";
 import { ForgotPasswordPage } from "./pages/login/ForgotPasswordPage";
@@ -19,12 +18,16 @@ import { RegisterPage } from "./pages/register/RegisterPage";
 import {
   RegistrationsPage,
   RegistrationsIndexRedirect,
-} from "./pages/registrations/RegistrationsPage";
-import { PlatformSiteSettingsPage } from "./pages/platform/site-settings/PlatformSiteSettingsPage";
+} from "./pages/super-admin/companies/RegistrationsPage";
+import {
+  SiteSettingsIndexRedirect,
+  SiteSettingsPage,
+} from "./pages/super-admin/site/SiteSettingsPage";
 import {
   CountryCodesIndexRedirect,
-  PlatformCountryCodesPage,
-} from "./pages/platform/country-codes/PlatformCountryCodesPage";
+  CountryCodesPage,
+} from "./pages/super-admin/country-codes/CountryCodesPage";
+import { SuperAdminDashboardPage } from "./pages/super-admin/dashboard/SuperAdminDashboardPage";
 import { SettingsPage } from "./pages/settings/SettingsPage";
 import { CompanySettingsPage } from "./pages/settings/company/CompanySettingsPage";
 import { DepartmentsPage } from "./pages/settings/departments/DepartmentsPage";
@@ -63,14 +66,24 @@ const App = () => {
 
         <Route element={<ProtectedRoute />}>
           <Route element={<AppShell />}>
-            <Route path="/dashboard" element={<DashboardPage />} />
+            <Route path="/dashboard" element={<TenantDashboardPage />} />
+            <Route
+              path="/super-admin/dashboard"
+              element={<SuperAdminDashboardPage />}
+            />
             <Route path="/dashboard/profile" element={<ProfilePage />} />
-            <Route path="/companies" element={<RegistrationsPage />}>
+            <Route
+              path="/super-admin/companies"
+              element={<RegistrationsPage />}
+            >
               <Route index element={<RegistrationsIndexRedirect />} />
               <Route path="registered" />
               <Route path="pending" />
             </Route>
-            <Route path="/country-codes" element={<PlatformCountryCodesPage />}>
+            <Route
+              path="/super-admin/country-codes"
+              element={<CountryCodesPage />}
+            >
               <Route index element={<CountryCodesIndexRedirect />} />
               <Route path="active" />
               <Route path="archived" />
@@ -87,22 +100,6 @@ const App = () => {
               <Route path="active" />
               <Route path="inactive" />
             </Route>
-            <Route
-              path="/employees/:id/edit"
-              element={
-                <ModuleRoute module="employees">
-                  <EmployeeEditRedirect />
-                </ModuleRoute>
-              }
-            />
-            <Route
-              path="/employees/:id"
-              element={
-                <ModuleRoute module="employees">
-                  <EmployeeViewRedirect />
-                </ModuleRoute>
-              }
-            />
             <Route
               path="/me/leave"
               element={
@@ -184,10 +181,13 @@ const App = () => {
                 </ModuleRoute>
               }
             />
-            <Route
-              path="/dashboard/platform/site-settings"
-              element={<PlatformSiteSettingsPage />}
-            />
+            <Route path="/super-admin/site" element={<SiteSettingsPage />}>
+              <Route index element={<SiteSettingsIndexRedirect />} />
+              <Route path="general" />
+              <Route path="logo" />
+              <Route path="favicon" />
+              <Route path="sidebar" />
+            </Route>
             <Route
               path="/dashboard/settings"
               element={
@@ -202,15 +202,6 @@ const App = () => {
                 <ModuleRoute module="settings">
                   <CompanySettingsPage />
                 </ModuleRoute>
-              }
-            />
-            <Route
-              path="/dashboard/settings/branding"
-              element={
-                <Navigate
-                  to="/dashboard/settings/company?tab=branding"
-                  replace
-                />
               }
             />
             <Route
@@ -283,8 +274,8 @@ const App = () => {
         <Route path="/terms" element={<TermsOfUsePage />} />
         <Route path="/privacy" element={<PrivacyPolicyPage />} />
 
-        <Route path="/" element={<Navigate to="/dashboard" replace />} />
-        <Route path="*" element={<Navigate to="/dashboard" replace />} />
+        <Route path="/" element={<HomeRedirect />} />
+        <Route path="*" element={<HomeRedirect />} />
       </Routes>
     </>
   );

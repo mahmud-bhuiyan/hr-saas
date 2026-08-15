@@ -45,6 +45,14 @@ import {
   hasAnyMeModuleEnabled,
   isModuleEnabledForUser,
 } from "../utils/modules";
+import { REGISTERED_COMPANIES_PATH } from "../pages/super-admin/companies/utils";
+import { COUNTRY_CODES_ACTIVE_PATH } from "../pages/super-admin/country-codes/utils";
+import { SITE_SETTINGS_GENERAL_PATH } from "../pages/super-admin/site/utils";
+import {
+  SUPER_ADMIN_BASE_PATH,
+  SUPER_ADMIN_DASHBOARD_PATH,
+  TENANT_DASHBOARD_PATH,
+} from "../utils/routes";
 
 const navItems: Array<{
   to: string;
@@ -64,32 +72,45 @@ const navItems: Array<{
 
   module?: TenantModuleId;
 }> = [
-  { to: "/dashboard", label: "Home", icon: HiHome, end: true },
+  {
+    to: TENANT_DASHBOARD_PATH,
+    label: "Home",
+    icon: HiHome,
+    end: true,
+    roles: ["company_admin", "hr_manager", "manager", "employee"],
+  },
 
   {
-    to: "/companies/registered",
+    to: SUPER_ADMIN_DASHBOARD_PATH,
+    label: "Home",
+    icon: HiHome,
+    end: true,
+    roles: ["super_admin"],
+    activePrefix: SUPER_ADMIN_DASHBOARD_PATH,
+  },
+
+  {
+    to: REGISTERED_COMPANIES_PATH,
     label: "Companies",
     icon: HiBuildingOffice2,
     roles: ["super_admin"],
-    activePrefix: "/companies",
+    activePrefix: `${SUPER_ADMIN_BASE_PATH}/companies`,
   },
 
   {
-    to: "/dashboard/platform/site-settings",
-
+    to: SITE_SETTINGS_GENERAL_PATH,
     label: "Site settings",
-
     icon: HiCog6Tooth,
-
     roles: ["super_admin"],
+    activePrefix: `${SUPER_ADMIN_BASE_PATH}/site`,
   },
 
   {
-    to: "/country-codes/active",
+    to: COUNTRY_CODES_ACTIVE_PATH,
     label: "Country codes",
     icon: HiPhone,
     roles: ["super_admin"],
-    activePrefix: "/country-codes",
+    activePrefix: `${SUPER_ADMIN_BASE_PATH}/country-codes`,
   },
 
   {

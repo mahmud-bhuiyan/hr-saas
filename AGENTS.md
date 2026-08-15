@@ -152,19 +152,49 @@ Feature-specific composites compose the UI kit and live in the feature folder (n
 
 Keep page entry files thin. **Existing** screens live under `client/src/pages/` — do not move them unless asked. **New** features use `client/src/features/<feature>/`.
 
-Current layout (do not reorganize):
+#### Folder naming (`pages/`)
+
+| Kind | Convention | Examples |
+|------|------------|----------|
+| **Folders** | lowercase; **kebab-case** for multiple words | `employees`, `super-admin`, `country-codes`, `audit-log` |
+| **Page / component files** | **PascalCase** | `EmployeesPage.tsx`, `SiteSettingsPage.tsx` |
+
+Do **not** use camelCase, PascalCase, or snake_case for page folders.
+
+#### Super admin vs tenant pages
+
+**Super admin** screens (`super_admin` role only) live under `pages/super-admin/` with one subfolder per feature. **Tenant** company settings stay under `pages/settings/`. Do not add super-admin pages under `pages/settings/` or tenant pages under `pages/super-admin/`.
 
 ```
 client/src/pages/
+├── super-admin/                   # super_admin only
+│   ├── dashboard/
+│   │   ├── SuperAdminDashboardPage.tsx
+│   │   ├── hooks/
+│   │   └── utils.ts
+│   ├── companies/                 # /companies/* (registrations)
+│   │   ├── RegistrationsPage.tsx
+│   │   ├── components/
+│   │   └── utils.ts
+│   ├── site/                      # /settings/site/* (global branding)
+│   │   ├── SiteSettingsPage.tsx
+│   │   ├── components/            # SiteSettingsTabs uses NavTabBar + routes
+│   │   └── utils.ts
+│   └── country-codes/             # /settings/country-codes/*
+│       ├── CountryCodesPage.tsx
+│       ├── components/
+│       └── utils.ts
+├── settings/                      # tenant company_admin / hr_manager (module: settings)
+│   ├── company/
+│   ├── departments/
+│   └── users/
 ├── employees/
 │   ├── EmployeesPage.tsx          # route entry — data fetching, state, composition
-│   ├── EmployeeProfilePage.tsx
 │   ├── utils.ts                   # page-local helpers (optional)
-│   └── components/                # feature UI extracted from the page
-│       ├── EmployeesTable.tsx
-│       └── CreateEmployeeModal.tsx
-├── registrations/
-│   ├── RegistrationsPage.tsx
+│   └── components/
+├── dashboard/                     # tenant home; DashboardPage delegates super_admin to super-admin/dashboard
+│   ├── DashboardPage.tsx
+│   ├── TenantDashboardPage.tsx
 │   └── components/
 └── login/
     ├── LoginPage.tsx
@@ -172,17 +202,19 @@ client/src/pages/
         └── LoginForm.tsx
 ```
 
+**Route-based tabs:** multi-section screens that are separate URLs (not query tabs) use `NavTabBar` from `components/ui/navigation/NavTabBar.tsx` with `to` links — see `super-admin/site/components/SiteSettingsTabs.tsx`, `super-admin/country-codes/components/CountryCodesTabs.tsx`, and `super-admin/companies/components/CompaniesTabs.tsx`.
+
 **Page entry file** (`*Page.tsx`): routing guard, queries/mutations, local state, and composing child components. Target ~150 lines or less when possible.
 
 **Page components** (`pages/<feature>/components/` or `features/<feature>/components/`): tables, filters, forms, modals, and sections used by that page only. Pass data and callbacks via props — do not duplicate fetch logic in child components unless shared across multiple pages.
 
-**Page utils** (`utils.ts` next to the feature): small pure helpers shared within that feature (formatters, mappers). Do not put these in `components/ui/`.
+**Page utils** (`utils.ts` next to the feature): small pure helpers shared within that feature (formatters, mappers, route path constants). Do not put these in `components/ui/`.
 
 When adding a new screen, create the feature folder and `components/` subfolder from the start — do not grow monolithic page files.
 
 ### Page layout (required for new screens)
 
-Follow existing dashboard pages (`employees/EmployeesPage`, `registrations/RegistrationsPage`) as the template:
+Follow existing dashboard pages (`employees/EmployeesPage`, `super-admin/companies/RegistrationsPage`) as the template:
 
 1. Wrap content in `PageContainer`
 2. Use `PageHeader` with `label`, `title`, `description`, and optional primary `action` (`Button` with icon)

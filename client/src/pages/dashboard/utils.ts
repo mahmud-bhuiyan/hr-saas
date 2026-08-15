@@ -1,12 +1,6 @@
 import { isModuleEnabledForUser } from "../../utils/modules";
 import { EMPLOYEES_ACTIVE_PATH } from "../employees/utils";
-import type {
-  AuthUser,
-  Employee,
-  LeaveBalance,
-  RegistrationRequest,
-  UserRole,
-} from "../../types";
+import type { AuthUser, Employee, LeaveBalance, UserRole } from "../../types";
 import type { TenantModuleId } from "../../types/modules";
 
 export type DashboardCard = {
@@ -35,44 +29,6 @@ const countByStatus = (
   employees: Employee[],
   status: Employee["status"],
 ): number => employees.filter((employee) => employee.status === status).length;
-
-export const superAdminCards = (
-  pending: RegistrationRequest[],
-  approved: RegistrationRequest[],
-): DashboardCard[] => {
-  const activeCompanies = approved.filter((company) => company.isActive).length;
-  const inactiveCompanies = approved.length - activeCompanies;
-
-  return [
-    {
-      label: "Pending registrations",
-      value: pending.length,
-      note: "Awaiting review",
-    },
-    {
-      label: "Registered companies",
-      value: approved.length,
-      note: "Approved tenants",
-    },
-    {
-      label: "Active companies",
-      value: activeCompanies,
-      note: "Currently enabled",
-    },
-    {
-      label: "Inactive companies",
-      value: inactiveCompanies,
-      note: "Deactivated tenants",
-    },
-  ];
-};
-
-export const superAdminLinks = (): DashboardLink[] => [
-  { label: "View registered companies", to: "/companies/registered" },
-  { label: "Review pending sign-ups", to: "/companies/pending" },
-  { label: "Platform site settings", to: "/dashboard/platform/site-settings" },
-  { label: "Country codes", to: "/country-codes/active" },
-];
 
 export const tenantAdminCards = (
   employees: Employee[],
@@ -199,8 +155,6 @@ export const employeeLinks = (user?: AuthUser | null): DashboardLink[] =>
 
 export const dashboardDescription = (role: UserRole): string => {
   switch (role) {
-    case "super_admin":
-      return "Review company registrations and manage platform tenants.";
     case "company_admin":
       return "Manage your workforce, leave, and documents from one place.";
     case "hr_manager":

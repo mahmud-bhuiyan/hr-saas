@@ -121,6 +121,8 @@ Do not put these in generic UI folders.
 
 Until an existing feature is migrated out of `client/src/pages/<feature>/`, add new files for that feature next to its current code. Do not split one feature across `pages/` and `features/`.
 
+**Super admin** features belong under `client/src/pages/super-admin/<feature>/` (kebab-case folder names), not under `pages/settings/`.
+
 New features (no existing `pages/` folder) use `client/src/features/<feature>/`.
 
 ---
@@ -252,7 +254,8 @@ Generic low-level UI?              → components/ui/primitives/
 Form-related reusable component?   → components/ui/forms/
 Navigation-related reusable?       → components/ui/navigation/
 Application layout?                → components/layout/
-Feature-specific?                  → features/<feature>/components/
+Feature-specific?                  → features/<feature>/components/ (or existing pages/<feature>/components/)
+Super admin feature-specific?      → pages/super-admin/<feature>/components/
 Routing-related?                   → routes/
 ```
 

@@ -1,8 +1,9 @@
-import type { ReactNode } from 'react';
-import { Navigate } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
-import type { TenantModuleId } from '../types/modules';
-import { isModuleEnabledForUser } from '../utils/modules';
+import type { ReactNode } from "react";
+import { Navigate } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
+import type { TenantModuleId } from "../types/modules";
+import { isModuleEnabledForUser } from "../utils/modules";
+import { homePathForRole } from "../utils/routes";
 
 type ModuleRouteProps = {
   module: TenantModuleId;
@@ -16,12 +17,12 @@ export const ModuleRoute = ({ module, children }: ModuleRouteProps) => {
     return null;
   }
 
-  if (user.role === 'super_admin') {
+  if (user.role === "super_admin") {
     return <>{children}</>;
   }
 
   if (!isModuleEnabledForUser(user, module)) {
-    return <Navigate to="/dashboard" replace />;
+    return <Navigate to={homePathForRole(user.role)} replace />;
   }
 
   return <>{children}</>;

@@ -101,9 +101,9 @@ Authentication, multi-tenant isolation, and company onboarding. Every business r
 | Register company                     | `/register`                         | ✅                                                                  |
 | My profile                           | `/dashboard/profile`                | ✅                                                                  |
 | Theme toggle (light/dark)            | App shell header                    | ✅                                                                  |
-| Companies (super admin)              | `/companies`                        | ✅                                                                  |
-| Platform site settings (super admin) | `/dashboard/platform/site-settings` | ✅ Complete                                                         |
-| Manage company modules (super admin) | `/companies` modal                  | ✅ See [18-module-access-control.md](./18-module-access-control.md) |
+| Companies (super admin)              | `/super-admin/companies`            | ✅                                                                  |
+| Platform site settings (super admin) | `/super-admin/site/*` | ✅ Complete                                                         |
+| Manage company modules (super admin) | `/super-admin/companies` modal    | ✅ See [18-module-access-control.md](./18-module-access-control.md) |
 | Forgot password                      | `/forgot-password`                  | ✅                                                                  |
 | Reset password                       | `/reset-password`                   | ✅                                                                  |
 

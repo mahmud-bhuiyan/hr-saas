@@ -129,9 +129,9 @@ Be explicit with the client so expectations stay aligned.
 
 ### Super admin
 - [x] Companies — pending queue, approve/reject, add company directly
-- [x] Platform site settings — site name, theme color, logo, favicon (`/dashboard/platform/site-settings`)
+- [x] Platform site settings — site name, theme color, logo, favicon (`/super-admin/site/*`)
 - [x] Manage company modules — enable/disable HR modules per tenant (modal on companies page)
-- [x] Company branding overrides — logo + primary color (`/dashboard/settings/branding`)
+- [x] Company branding overrides — logo + primary color (`/dashboard/settings/company?tab=branding`)
 
 ### Dashboard
 - [x] Home dashboard (summary cards + quick links — **placeholders**; real counts in Step 7)

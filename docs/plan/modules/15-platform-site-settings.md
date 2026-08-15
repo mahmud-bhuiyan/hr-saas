@@ -115,7 +115,7 @@ Update `docs/openapi.yaml` and Postman collection when implemented.
 
 ### Screen: Platform site settings
 
-- **Route:** `/dashboard/platform/site-settings`
+- **Route:** `/super-admin/site/*` (e.g. `/super-admin/site/general`)
 - **Access:** `super_admin` only
 - **Layout:** `PageContainer` → `PageHeader` → form + live preview panel
 - **Fields:**
@@ -192,7 +192,7 @@ None for Stage 1.
 - [x] `SiteConfigProvider` + `useSiteConfig` hook
 - [x] Personal theme colors via user theme picker (`ThemeContext`)
 - [x] Dynamic `document.title` and favicon
-- [x] Super admin page: `/dashboard/platform/site-settings`
+- [x] Super admin page: `/super-admin/site/*`
 - [x] Sidebar nav item for super admin
 - [x] Replace hardcoded `APP_NAME` in shell and auth layout
 

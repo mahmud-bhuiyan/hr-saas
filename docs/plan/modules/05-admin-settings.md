@@ -90,12 +90,12 @@ Platform site settings endpoints live in [15-platform-site-settings.md](./15-pla
 
 | Screen | Route | Access | Status |
 |--------|-------|--------|--------|
-| Company branding | `/dashboard/settings/branding` | `company_admin` | ✅ |
+| Company branding | `/dashboard/settings/company?tab=branding` | `company_admin` | ✅ |
 | Settings hub | `/dashboard/settings` | `company_admin`, `hr_manager` | ✅ |
 | Company profile | `/dashboard/settings/company` | `company_admin` | ✅ |
 | Departments | `/dashboard/settings/departments` | `company_admin`, `hr_manager` | ✅ |
 | Users & roles | `/dashboard/settings/users` | `company_admin` | ✅ |
-| Platform site settings | `/dashboard/platform/site-settings` | `super_admin` | ✅ (module 15) |
+| Platform site settings | `/super-admin/site/*` | `super_admin` | ✅ (module 15) |
 
 ---
 
