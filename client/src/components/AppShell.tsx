@@ -28,7 +28,7 @@ import {
   saveSidebarExpanded,
 } from "../lib/sidebar-storage";
 
-import { GlobalSearch } from "./GlobalSearch";
+import { GlobalSearch } from "./layout/GlobalSearch";
 
 import { BrandMark } from "./BrandMark";
 
@@ -38,7 +38,10 @@ import { NotificationBell } from "./NotificationBell";
 
 import type { UserRole } from "../types";
 import type { TenantModuleId } from "../types/modules";
-import { hasAnyMeModuleEnabled, isModuleEnabledForUser } from "../utils/modules";
+import {
+  hasAnyMeModuleEnabled,
+  isModuleEnabledForUser,
+} from "../utils/modules";
 
 const navItems: Array<{
   to: string;
@@ -206,7 +209,9 @@ export const AppShell = () => {
   const isCompact = !isCollapsible || !sidebarExpanded;
   const activeWidthPx = isCompact ? collapsedWidthPx : expandedWidthPx;
   const sidebarWidthStyle = { width: activeWidthPx };
-  const mainOffsetStyle = isDesktopSidebar ? { left: activeWidthPx } : undefined;
+  const mainOffsetStyle = isDesktopSidebar
+    ? { left: activeWidthPx }
+    : undefined;
 
   const compactNavItemClass =
     "flex flex-col items-center gap-0.5 px-1 py-2 text-center text-[10px] leading-tight";
@@ -214,7 +219,9 @@ export const AppShell = () => {
   const expandedNavItemClass =
     "flex flex-row items-center gap-3 px-3 py-2 text-sm";
 
-  const navItemLayoutClass = isCompact ? compactNavItemClass : expandedNavItemClass;
+  const navItemLayoutClass = isCompact
+    ? compactNavItemClass
+    : expandedNavItemClass;
 
   const iconClass = isCompact ? "h-[18px] w-[18px]" : "h-5 w-5";
 
@@ -274,7 +281,10 @@ export const AppShell = () => {
                 return false;
               }
 
-              if (item.activePrefix === "/me/" && !hasAnyMeModuleEnabled(user)) {
+              if (
+                item.activePrefix === "/me/" &&
+                !hasAnyMeModuleEnabled(user)
+              ) {
                 return false;
               }
 
@@ -345,18 +355,26 @@ export const AppShell = () => {
             <button
               type="button"
               onClick={toggleSidebar}
-              aria-label={sidebarExpanded ? "Collapse sidebar" : "Expand sidebar"}
+              aria-label={
+                sidebarExpanded ? "Collapse sidebar" : "Expand sidebar"
+              }
               title={sidebarExpanded ? "Collapse sidebar" : "Expand sidebar"}
               className={`flex w-full rounded-md text-slate-400 transition hover:bg-[#122E44] hover:text-white ${navItemLayoutClass}`}
             >
               {sidebarExpanded ? (
                 <>
-                  <HiChevronLeft className={`${iconClass} shrink-0`} aria-hidden />
+                  <HiChevronLeft
+                    className={`${iconClass} shrink-0`}
+                    aria-hidden
+                  />
                   <span className="truncate font-medium">Collapse</span>
                 </>
               ) : (
                 <>
-                  <HiChevronRight className={`${iconClass} shrink-0`} aria-hidden />
+                  <HiChevronRight
+                    className={`${iconClass} shrink-0`}
+                    aria-hidden
+                  />
                   <span className="max-w-full text-center font-medium leading-tight">
                     Expand
                   </span>

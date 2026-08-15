@@ -9,7 +9,7 @@ import {
 } from 'react-icons/hi2';
 import { Button } from '../../../components/ui/Button';
 import { FormField } from '../../../components/ui/FormField';
-import { FormModal } from '../../../components/ui/FormModal';
+import { FormModal } from '../../../components/ui/forms/FormModal';
 import { Input } from '../../../components/ui/Input';
 import { Modal } from '../../../components/ui/Modal';
 import { PasswordInput } from '../../../components/ui/PasswordInput';

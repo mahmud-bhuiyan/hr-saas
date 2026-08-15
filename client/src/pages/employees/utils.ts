@@ -4,9 +4,11 @@ export const EMPLOYEES_BASE_PATH = '/employees';
 export const EMPLOYEES_ACTIVE_PATH = '/employees/active';
 export const EMPLOYEES_INACTIVE_PATH = '/employees/inactive';
 
-export const employeeViewPath = (id: string): string => `${EMPLOYEES_BASE_PATH}/${id}`;
+export const employeeViewPath = (id: string, basePath = EMPLOYEES_ACTIVE_PATH): string =>
+  `${basePath}?view=${encodeURIComponent(id)}`;
 
-export const employeeEditPath = (id: string): string => `${EMPLOYEES_BASE_PATH}/${id}/edit`;
+export const employeeEditPath = (id: string, basePath = EMPLOYEES_ACTIVE_PATH): string =>
+  `${basePath}?edit=${encodeURIComponent(id)}`;
 
 export const isActiveEmployee = (employee: Employee): boolean => employee.status !== 'terminated';
 

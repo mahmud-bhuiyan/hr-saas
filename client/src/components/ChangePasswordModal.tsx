@@ -6,7 +6,7 @@ import { ApiError, updateProfile } from '../lib/api';
 import { toast } from 'react-toastify';
 import { areRequiredFieldsFilled } from '../utils/form';
 import { FormField } from './ui/FormField';
-import { FormModal } from './ui/FormModal';
+import { FormModal } from './ui/forms/FormModal';
 import { PasswordInput } from './ui/PasswordInput';
 
 interface ChangePasswordModalProps {

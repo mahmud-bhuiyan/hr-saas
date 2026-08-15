@@ -1,7 +1,7 @@
 import { FormEvent } from 'react';
 import { HiSignal, HiUser } from 'react-icons/hi2';
 import { FormField } from '../../../../components/ui/FormField';
-import { FormModal } from '../../../../components/ui/FormModal';
+import { FormModal } from '../../../../components/ui/forms/FormModal';
 import { Select } from '../../../../components/ui/Select';
 import type { TenantUser, UserRole } from '../../../../types';
 import { assignableRoles, roleLabel, userDisplayName } from '../../utils';

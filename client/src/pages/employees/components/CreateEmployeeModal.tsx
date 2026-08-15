@@ -9,7 +9,7 @@ import {
   HiUserGroup,
 } from 'react-icons/hi2';
 import { FormField } from '../../../components/ui/FormField';
-import { FormModal } from '../../../components/ui/FormModal';
+import { FormModal } from '../../../components/ui/forms/FormModal';
 import { Input } from '../../../components/ui/Input';
 import { Select } from '../../../components/ui/Select';
 import type { CreateEmployeeInput, Employee } from '../../../types';

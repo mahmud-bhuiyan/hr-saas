@@ -5,9 +5,12 @@ import { GuestRoute } from "./components/GuestRoute";
 import { ModuleRoute } from "./components/ModuleRoute";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { DashboardPage } from "./pages/dashboard/DashboardPage";
-import { EmployeeEditPage } from "./pages/employees/EmployeeEditPage";
-import { EmployeeViewPage } from "./pages/employees/EmployeeViewPage";
-import { EmployeesIndexRedirect, EmployeesPage } from "./pages/employees/EmployeesPage";
+import {
+  EmployeeEditRedirect,
+  EmployeesIndexRedirect,
+  EmployeesPage,
+  EmployeeViewRedirect,
+} from "./pages/employees/EmployeesPage";
 import { LoginPage } from "./pages/login/LoginPage";
 import { ForgotPasswordPage } from "./pages/login/ForgotPasswordPage";
 import { ResetPasswordPage } from "./pages/login/ResetPasswordPage";
@@ -75,7 +78,7 @@ const App = () => {
             path="/employees/:id/edit"
             element={
               <ModuleRoute module="employees">
-                <EmployeeEditPage />
+                <EmployeeEditRedirect />
               </ModuleRoute>
             }
           />
@@ -83,7 +86,7 @@ const App = () => {
             path="/employees/:id"
             element={
               <ModuleRoute module="employees">
-                <EmployeeViewPage />
+                <EmployeeViewRedirect />
               </ModuleRoute>
             }
           />
