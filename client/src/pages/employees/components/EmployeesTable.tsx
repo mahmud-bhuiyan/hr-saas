@@ -12,7 +12,7 @@ import {
 } from "../../../components/ui/primitives/Table";
 import type { TablePaginationConfig } from "../../../components/ui/primitives/TablePagination";
 import type { Employee } from "../../../types";
-import { employeeName } from "../utils";
+import { employeeName, isCompanyAdminEmployee } from "../utils";
 import { EmployeeStatusBadge } from "./EmployeeStatusBadge";
 
 interface EmployeesTableProps {
@@ -126,20 +126,22 @@ export const EmployeesTable = ({
               >
                 Edit
               </Button>
-              {row.status !== "terminated" && onDeactivate && (
-                <Button
-                  display="icon"
-                  variant="secondary"
-                  loading={deactivateLoadingId === row.id}
-                  disabled={Boolean(
-                    deactivateLoadingId && deactivateLoadingId !== row.id,
-                  )}
-                  onClick={() => onDeactivate(row)}
-                  icon={<HiXCircle className="h-4 w-4 text-amber-600" />}
-                >
-                  Deactivate
-                </Button>
-              )}
+              {row.status !== "terminated" &&
+                onDeactivate &&
+                !isCompanyAdminEmployee(row) && (
+                  <Button
+                    display="icon"
+                    variant="secondary"
+                    loading={deactivateLoadingId === row.id}
+                    disabled={Boolean(
+                      deactivateLoadingId && deactivateLoadingId !== row.id,
+                    )}
+                    onClick={() => onDeactivate(row)}
+                    icon={<HiXCircle className="h-4 w-4 text-amber-600" />}
+                  >
+                    Deactivate
+                  </Button>
+                )}
               {row.status !== "active" && onActivate && (
                 <Button
                   display="icon"

@@ -89,7 +89,7 @@ export const PhoneInput = forwardRef<HTMLInputElement, PhoneInputProps>(
       emitChange(dialCode, digits);
     };
 
-    const fieldClassName = `relative flex w-full items-center gap-1.5 rounded-lg border bg-white py-2.5 pl-2 pr-3 text-sm shadow-sm transition focus-within:outline-none focus-within:ring-2 focus-within:ring-brand-500 dark:border-slate-600 dark:bg-slate-800 ${
+    const fieldClassName = `relative flex w-full items-center gap-1 rounded-lg border bg-white py-2.5 pl-2 pr-3 text-sm shadow-sm transition focus-within:outline-none focus-within:ring-2 focus-within:ring-brand-500 dark:border-slate-600 dark:bg-slate-800 ${
       error
         ? "border-red-300 focus-within:border-red-500 focus-within:ring-red-500 dark:border-red-500/60"
         : "border-slate-300 focus-within:border-brand-500"

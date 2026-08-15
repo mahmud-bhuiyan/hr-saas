@@ -819,6 +819,8 @@ paths:
       description: |
         Returns employees for the authenticated user's tenant.
 
+        Company administrator login accounts are excluded from this list and cannot be deactivated as employees.
+
         **Permissions:** `employee:read` (all employees) or `employee:read:team` (direct reports only).
       operationId: listEmployees
       security:
@@ -876,7 +878,10 @@ paths:
     post:
       tags: [Employees]
       summary: Create employee
-      description: Requires `employee:create` permission.
+      description: |
+        Requires `employee:create` permission.
+
+        Returns 409 if the email belongs to the tenant company administrator login.
       operationId: createEmployee
       security:
         - bearerAuth: []
@@ -1131,7 +1136,10 @@ paths:
     patch:
       tags: [Employees]
       summary: Update employee
-      description: Partial update — only fields present in the body are applied. Requires `employee:update`.
+      description: |
+        Partial update — only fields present in the body are applied. Requires `employee:update`.
+
+        Setting `status` to `terminated` is rejected for employee records linked to the company administrator login (403).
       operationId: updateEmployee
       security:
         - bearerAuth: []
@@ -5847,6 +5855,11 @@ components:
         userId:
           type: string
           description: Linked login user, when set
+        isCompanyAdminAccount:
+          type: boolean
+          description: >
+            True when this employee record is linked to the tenant company_admin login.
+            Such records are omitted from list responses and cannot be set to terminated.
         payRate:
           type: number
           minimum: 0

@@ -7,6 +7,7 @@ import {
   DepartmentServiceError,
 } from "../settings/department.service.js";
 import { listCountryDialCodes } from "../settings/country-dial-code.service.js";
+import { User } from "../admin/user.model.js";
 import { Tenant } from "../auth/tenant.model.js";
 import { validatePhoneNationalLength } from "../../utils/phone.js";
 import { Employee } from "./employee.model.js";
@@ -166,6 +167,16 @@ export const validateEmployeeImport = async (
   const countryDialCodes = await listCountryDialCodes(false);
   const tenant = await Tenant.findById(tenantId).select("defaultPhoneDialCode");
   const fallbackDialCode = tenant?.defaultPhoneDialCode ?? "1";
+  const companyAdminEmails = new Set(
+    (
+      await User.find({
+        tenantId: tenantObjectId,
+        role: "company_admin",
+      })
+        .select("email")
+        .lean()
+    ).map((user) => user.email.toLowerCase().trim()),
+  );
 
   const csvEmails = new Map<string, number>();
   const valid: EmployeeImportValidRow[] = [];
@@ -212,6 +223,13 @@ export const validateEmployeeImport = async (
         row: rowNumber,
         field: "email",
         message: "Invalid email address",
+      });
+    } else if (companyAdminEmails.has(email)) {
+      rowErrors.push({
+        row: rowNumber,
+        field: "email",
+        message:
+          "This email belongs to the company administrator and cannot be used for an employee record.",
       });
     } else {
       if (existingEmails.has(email)) {
