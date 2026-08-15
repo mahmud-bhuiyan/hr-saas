@@ -1,8 +1,8 @@
-import { HiArchiveBox, HiPencilSquare } from 'react-icons/hi2';
-import { Button } from '../../../../components/ui/Button';
-import type { TableColumn } from '../../../../components/ui/Table';
-import { Table } from '../../../../components/ui/Table';
-import type { WorkLocation } from '../../../../types';
+import { HiArchiveBox, HiPencilSquare } from "react-icons/hi2";
+import { Button } from "../../../../components/ui/Button";
+import type { TableColumn } from "../../../../components/ui/primitives/Table";
+import { Table } from "../../../../components/ui/primitives/Table";
+import type { WorkLocation } from "../../../../types";
 
 interface LocationsTableProps {
   locations: WorkLocation[];
@@ -25,13 +25,15 @@ export const LocationsTable = ({
 }: LocationsTableProps) => {
   const columns: TableColumn<WorkLocation>[] = [
     {
-      key: 'name',
-      header: 'Name',
-      align: 'left',
+      key: "name",
+      header: "Name",
+      align: "left",
       render: (location) => (
         <span
           className={
-            location.isArchived ? 'text-slate-400 line-through' : 'font-medium text-slate-900 dark:text-slate-100'
+            location.isArchived
+              ? "text-slate-400 line-through"
+              : "font-medium text-slate-900 dark:text-slate-100"
           }
         >
           {location.name}
@@ -39,34 +41,34 @@ export const LocationsTable = ({
       ),
     },
     {
-      key: 'address',
-      header: 'Address',
-      align: 'left',
-      render: (location) => location.address ?? '—',
+      key: "address",
+      header: "Address",
+      align: "left",
+      render: (location) => location.address ?? "—",
     },
     {
-      key: 'timezone',
-      header: 'Timezone',
-      render: (location) => location.timezone ?? '—',
+      key: "timezone",
+      header: "Timezone",
+      render: (location) => location.timezone ?? "—",
     },
     {
-      key: 'status',
-      header: 'Status',
+      key: "status",
+      header: "Status",
       render: (location) => (
         <span
           className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-medium ${
             location.isArchived
-              ? 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400'
-              : 'bg-emerald-50 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-400'
+              ? "bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400"
+              : "bg-emerald-50 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-400"
           }`}
         >
-          {location.isArchived ? 'Archived' : 'Active'}
+          {location.isArchived ? "Archived" : "Active"}
         </span>
       ),
     },
     {
-      key: 'actions',
-      header: 'Actions',
+      key: "actions",
+      header: "Actions",
       render: (location) => (
         <div className="flex items-center justify-center gap-2">
           {!location.isArchived ? (

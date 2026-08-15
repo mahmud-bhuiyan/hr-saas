@@ -1,5 +1,5 @@
-import { Button } from './Button';
-import { Select } from './Select';
+import { Button } from "../Button";
+import { Select } from "../Select";
 
 export interface TablePaginationConfig {
   page: number;
@@ -25,21 +25,21 @@ interface TablePaginationProps {
   footerClassName?: string;
 }
 
-type PaginationItem = number | 'ellipsis';
+type PaginationItem = number | "ellipsis";
 
 const getPaginationItems = (totalPages: number): PaginationItem[] => {
   if (totalPages <= 3) {
     return Array.from({ length: totalPages }, (_, index) => index + 1);
   }
 
-  return [1, 2, 'ellipsis', totalPages];
+  return [1, 2, "ellipsis", totalPages];
 };
 
 export const TablePageSizeControl = ({
   pageSize,
   onPageSizeChange,
   pageSizeOptions = [5, 10, 20, 50, 100],
-  className = '',
+  className = "",
 }: TablePageSizeControlProps) => {
   return (
     <div className={`flex items-center justify-end ${className}`}>
@@ -62,25 +62,24 @@ export const TablePageSizeControl = ({
   );
 };
 
-export const TablePagination = ({ pagination, footerClassName = 'border-slate-200 bg-slate-50 dark:border-slate-700 dark:bg-slate-800/50' }: TablePaginationProps) => {
-  const {
-    page,
-    total,
-    rangeStart,
-    rangeEnd,
-    totalPages,
-    onPageChange,
-  } = pagination;
+export const TablePagination = ({
+  pagination,
+  footerClassName = "border-slate-200 bg-slate-50 dark:border-slate-700 dark:bg-slate-800/50",
+}: TablePaginationProps) => {
+  const { page, total, rangeStart, rangeEnd, totalPages, onPageChange } =
+    pagination;
 
   const pageItems = getPaginationItems(totalPages);
-  const navButtonClass = 'px-3 py-1.5 text-xs';
-  const pageButtonClass = 'min-w-[2.25rem] px-2.5 py-1.5 text-xs';
+  const navButtonClass = "px-3 py-1.5 text-xs";
+  const pageButtonClass = "min-w-[2.25rem] px-2.5 py-1.5 text-xs";
 
   return (
-    <div className={`flex flex-col gap-3 border-t px-4 py-3 lg:flex-row lg:items-center lg:justify-between ${footerClassName}`}>
+    <div
+      className={`flex flex-col gap-3 border-t px-4 py-3 lg:flex-row lg:items-center lg:justify-between ${footerClassName}`}
+    >
       <p className="text-sm text-slate-600 dark:text-slate-400">
         {total === 0
-          ? 'No records'
+          ? "No records"
           : `Showing ${rangeStart}–${rangeEnd} of ${total}`}
       </p>
 
@@ -108,7 +107,7 @@ export const TablePagination = ({ pagination, footerClassName = 'border-slate-20
         </Button>
 
         {pageItems.map((item, index) =>
-          item === 'ellipsis' ? (
+          item === "ellipsis" ? (
             <span
               key={`ellipsis-${index}`}
               className={`inline-flex items-center justify-center text-slate-400 ${pageButtonClass}`}
@@ -120,14 +119,14 @@ export const TablePagination = ({ pagination, footerClassName = 'border-slate-20
             <Button
               key={item}
               type="button"
-              variant={item === page ? 'primary' : 'secondary'}
+              variant={item === page ? "primary" : "secondary"}
               className={pageButtonClass}
-              aria-current={item === page ? 'page' : undefined}
+              aria-current={item === page ? "page" : undefined}
               onClick={() => onPageChange(item)}
             >
               {item}
             </Button>
-          )
+          ),
         )}
 
         <Button

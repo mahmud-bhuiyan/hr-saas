@@ -1,16 +1,19 @@
-import { useMemo } from 'react';
+import { useMemo } from "react";
 import {
   HiCheckCircle,
   HiEye,
   HiPencilSquare,
   HiXCircle,
-} from 'react-icons/hi2';
-import { Button } from '../../../components/ui/Button';
-import { Table, type TableSortState } from '../../../components/ui/Table';
-import type { TablePaginationConfig } from '../../../components/ui/TablePagination';
-import type { Employee } from '../../../types';
-import { employeeName } from '../utils';
-import { EmployeeStatusBadge } from './EmployeeStatusBadge';
+} from "react-icons/hi2";
+import { Button } from "../../../components/ui/Button";
+import {
+  Table,
+  type TableSortState,
+} from "../../../components/ui/primitives/Table";
+import type { TablePaginationConfig } from "../../../components/ui/primitives/TablePagination";
+import type { Employee } from "../../../types";
+import { employeeName } from "../utils";
+import { EmployeeStatusBadge } from "./EmployeeStatusBadge";
 
 interface EmployeesTableProps {
   employees: Employee[];
@@ -33,7 +36,7 @@ export const EmployeesTable = ({
   employees,
   loading,
   pagination,
-  emptyMessage = 'No employees match your filters.',
+  emptyMessage = "No employees match your filters.",
   showStatus = false,
   sort,
   onSortChange,
@@ -48,8 +51,8 @@ export const EmployeesTable = ({
   const columns = useMemo(() => {
     const baseColumns = [
       {
-        key: 'name',
-        header: 'Name',
+        key: "name",
+        header: "Name",
         sortable: true,
         width: showStatus ? 15 : 17,
         render: (row: Employee) => (
@@ -63,33 +66,35 @@ export const EmployeesTable = ({
         ),
       },
       {
-        key: 'jobTitle',
-        header: 'Job title',
+        key: "jobTitle",
+        header: "Job title",
         sortable: true,
         width: showStatus ? 15 : 17,
-        render: (row: Employee) => row.jobTitle ?? '—',
+        render: (row: Employee) => row.jobTitle ?? "—",
       },
       {
-        key: 'department',
-        header: 'Department',
+        key: "department",
+        header: "Department",
         sortable: true,
         width: showStatus ? 15 : 17,
-        render: (row: Employee) => row.department ?? '—',
+        render: (row: Employee) => row.department ?? "—",
       },
       {
-        key: 'manager',
-        header: 'Manager',
+        key: "manager",
+        header: "Manager",
         sortable: true,
         width: showStatus ? 15 : 18,
         render: (row: Employee) =>
-          row.manager ? `${row.manager.firstName} ${row.manager.lastName}` : '—',
+          row.manager
+            ? `${row.manager.firstName} ${row.manager.lastName}`
+            : "—",
       },
     ];
 
     if (showStatus) {
       baseColumns.push({
-        key: 'status',
-        header: 'Status',
+        key: "status",
+        header: "Status",
         sortable: false,
         width: 10,
         render: (row: Employee) => <EmployeeStatusBadge status={row.status} />,
@@ -97,8 +102,8 @@ export const EmployeesTable = ({
     }
 
     baseColumns.push({
-      key: 'actions',
-      header: 'Actions',
+      key: "actions",
+      header: "Actions",
       sortable: false,
       width: 30,
       render: (row: Employee) => (
@@ -123,28 +128,32 @@ export const EmployeesTable = ({
               >
                 Edit
               </Button>
-              {row.status !== 'terminated' && onDeactivate && (
+              {row.status !== "terminated" && onDeactivate && (
                 <Button
                   display="both"
                   variant="secondary"
                   className="px-3 py-1.5 text-xs"
                   loading={deactivateLoadingId === row.id}
                   loadingText="Deactivating…"
-                  disabled={Boolean(deactivateLoadingId && deactivateLoadingId !== row.id)}
+                  disabled={Boolean(
+                    deactivateLoadingId && deactivateLoadingId !== row.id,
+                  )}
                   onClick={() => onDeactivate(row)}
                   icon={<HiXCircle className="h-4 w-4 text-amber-600" />}
                 >
                   Deactivate
                 </Button>
               )}
-              {row.status !== 'active' && onActivate && (
+              {row.status !== "active" && onActivate && (
                 <Button
                   display="both"
                   variant="secondary"
                   className="px-3 py-1.5 text-xs"
                   loading={activateLoadingId === row.id}
                   loadingText="Activating…"
-                  disabled={Boolean(activateLoadingId && activateLoadingId !== row.id)}
+                  disabled={Boolean(
+                    activateLoadingId && activateLoadingId !== row.id,
+                  )}
                   onClick={() => onActivate(row)}
                   icon={<HiCheckCircle className="h-4 w-4 text-green-600" />}
                 >

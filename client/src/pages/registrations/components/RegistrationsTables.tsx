@@ -4,14 +4,14 @@ import {
   HiEye,
   HiPencilSquare,
   HiXCircle,
-} from 'react-icons/hi2';
-import { Button } from '../../../components/ui/Button';
-import { Table } from '../../../components/ui/Table';
-import { TablePageSizeControl } from '../../../components/ui/TablePagination';
-import { usePagination } from '../../../hooks/usePagination';
-import type { RegistrationRequest } from '../../../types';
-import { adminDisplayName, formatDate } from '../utils';
-import { CompanyStatusBadge } from './CompanyStatusBadge';
+} from "react-icons/hi2";
+import { Button } from "../../../components/ui/Button";
+import { Table } from "../../../components/ui/primitives/Table";
+import { TablePageSizeControl } from "../../../components/ui/primitives/TablePagination";
+import { usePagination } from "../../../hooks/usePagination";
+import type { RegistrationRequest } from "../../../types";
+import { adminDisplayName, formatDate } from "../utils";
+import { CompanyStatusBadge } from "./CompanyStatusBadge";
 
 interface PendingRegistrationsTableProps {
   pending: RegistrationRequest[];
@@ -90,7 +90,9 @@ export const PendingRegistrationsTable = ({
             header: "Admin email",
             width: 20,
             render: (row) => (
-              <span className="text-slate-600 dark:text-slate-400">{row.adminEmail}</span>
+              <span className="text-slate-600 dark:text-slate-400">
+                {row.adminEmail}
+              </span>
             ),
           },
           {
@@ -234,7 +236,9 @@ export const RegisteredCompaniesTable = ({
             header: "Admin email",
             width: 20,
             render: (row) => (
-              <span className="text-slate-600 dark:text-slate-400">{row.adminEmail}</span>
+              <span className="text-slate-600 dark:text-slate-400">
+                {row.adminEmail}
+              </span>
             ),
           },
           {

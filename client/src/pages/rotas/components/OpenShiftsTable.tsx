@@ -1,9 +1,9 @@
-import { HiHandRaised } from 'react-icons/hi2';
-import { Button } from '../../../components/ui/Button';
-import { Table } from '../../../components/ui/Table';
-import type { Shift } from '../../../types';
-import { formatDayLabel, formatShiftTime } from '../utils';
-import { ShiftStatusBadge } from './ShiftStatusBadge';
+import { HiHandRaised } from "react-icons/hi2";
+import { Button } from "../../../components/ui/Button";
+import { Table } from "../../../components/ui/primitives/Table";
+import type { Shift } from "../../../types";
+import { formatDayLabel, formatShiftTime } from "../utils";
+import { ShiftStatusBadge } from "./ShiftStatusBadge";
 
 interface OpenShiftsTableProps {
   shifts: Shift[];
@@ -23,33 +23,33 @@ export const OpenShiftsTable = ({
     emptyMessage="No open shifts available for this week."
     columns={[
       {
-        key: 'date',
-        header: 'Date',
+        key: "date",
+        header: "Date",
         render: (shift) => formatDayLabel(shift.date),
       },
       {
-        key: 'time',
-        header: 'Time',
+        key: "time",
+        header: "Time",
         render: (shift) => formatShiftTime(shift.startTime, shift.endTime),
       },
       {
-        key: 'location',
-        header: 'Location',
-        render: (shift) => shift.location?.name ?? '—',
+        key: "location",
+        header: "Location",
+        render: (shift) => shift.location?.name ?? "—",
       },
       {
-        key: 'role',
-        header: 'Role',
-        render: (shift) => shift.role ?? '—',
+        key: "role",
+        header: "Role",
+        render: (shift) => shift.role ?? "—",
       },
       {
-        key: 'status',
-        header: 'Status',
+        key: "status",
+        header: "Status",
         render: () => <ShiftStatusBadge status="open" />,
       },
       {
-        key: 'actions',
-        header: 'Actions',
+        key: "actions",
+        header: "Actions",
         render: (shift) => (
           <Button
             type="button"

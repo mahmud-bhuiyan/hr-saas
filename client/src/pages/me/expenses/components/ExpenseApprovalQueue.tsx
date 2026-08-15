@@ -1,15 +1,17 @@
-import { useState } from 'react';
-import { HiArrowDownTray, HiCheck, HiXMark, HiChatBubbleLeftEllipsis } from 'react-icons/hi2';
-import { Button } from '../../../../components/ui/Button';
-import { FormField } from '../../../../components/ui/FormField';
-import { Modal } from '../../../../components/ui/Modal';
-import { Table } from '../../../../components/ui/Table';
-import { Textarea } from '../../../../components/ui/Textarea';
-import type { Expense } from '../../../../types';
+import { useState } from "react";
 import {
-  EXPENSE_CATEGORY_LABELS,
-  formatExpenseAmount,
-} from '../utils';
+  HiArrowDownTray,
+  HiCheck,
+  HiXMark,
+  HiChatBubbleLeftEllipsis,
+} from "react-icons/hi2";
+import { Button } from "../../../../components/ui/Button";
+import { FormField } from "../../../../components/ui/FormField";
+import { Modal } from "../../../../components/ui/Modal";
+import { Table } from "../../../../components/ui/primitives/Table";
+import { Textarea } from "../../../../components/ui/Textarea";
+import type { Expense } from "../../../../types";
+import { EXPENSE_CATEGORY_LABELS, formatExpenseAmount } from "../utils";
 
 interface ExpenseApprovalQueueProps {
   expenses: Expense[];
@@ -31,7 +33,7 @@ export const ExpenseApprovalQueue = ({
   onViewReceipt,
 }: ExpenseApprovalQueueProps) => {
   const [declineTarget, setDeclineTarget] = useState<Expense | null>(null);
-  const [declineReason, setDeclineReason] = useState('');
+  const [declineReason, setDeclineReason] = useState("");
 
   const handleDeclineSubmit = () => {
     if (!declineTarget) {
@@ -39,7 +41,7 @@ export const ExpenseApprovalQueue = ({
     }
     onDecline(declineTarget, declineReason.trim() || undefined);
     setDeclineTarget(null);
-    setDeclineReason('');
+    setDeclineReason("");
   };
 
   return (
@@ -51,44 +53,47 @@ export const ExpenseApprovalQueue = ({
         getRowKey={(row) => row.id}
         columns={[
           {
-            key: 'employee',
-            header: 'Employee',
+            key: "employee",
+            header: "Employee",
             render: (row: Expense) =>
               row.employee
                 ? `${row.employee.firstName} ${row.employee.lastName}`
-                : '—',
+                : "—",
           },
           {
-            key: 'date',
-            header: 'Date',
+            key: "date",
+            header: "Date",
             render: (row: Expense) =>
               new Date(`${row.date}T00:00:00`).toLocaleDateString(undefined, {
-                month: 'short',
-                day: 'numeric',
-                year: 'numeric',
+                month: "short",
+                day: "numeric",
+                year: "numeric",
               }),
           },
           {
-            key: 'category',
-            header: 'Category',
+            key: "category",
+            header: "Category",
             render: (row: Expense) => EXPENSE_CATEGORY_LABELS[row.category],
           },
           {
-            key: 'amount',
-            header: 'Amount',
-            render: (row: Expense) => formatExpenseAmount(row.amount, row.currency),
+            key: "amount",
+            header: "Amount",
+            render: (row: Expense) =>
+              formatExpenseAmount(row.amount, row.currency),
           },
           {
-            key: 'description',
-            header: 'Description',
-            align: 'left',
+            key: "description",
+            header: "Description",
+            align: "left",
             render: (row: Expense) => (
-              <span className="line-clamp-2 max-w-xs text-left">{row.description}</span>
+              <span className="line-clamp-2 max-w-xs text-left">
+                {row.description}
+              </span>
             ),
           },
           {
-            key: 'receipt',
-            header: 'Receipt',
+            key: "receipt",
+            header: "Receipt",
             render: (row: Expense) => (
               <Button
                 type="button"
@@ -104,9 +109,9 @@ export const ExpenseApprovalQueue = ({
             ),
           },
           {
-            key: 'actions',
-            header: 'Actions',
-            align: 'right',
+            key: "actions",
+            header: "Actions",
+            align: "right",
             render: (row: Expense) => (
               <div className="flex justify-end gap-2">
                 <Button
@@ -127,7 +132,7 @@ export const ExpenseApprovalQueue = ({
                   disabled={actionLoadingId === row.id}
                   onClick={() => {
                     setDeclineTarget(row);
-                    setDeclineReason('');
+                    setDeclineReason("");
                   }}
                 >
                   Decline
@@ -149,14 +154,20 @@ export const ExpenseApprovalQueue = ({
         }
         footer={
           <div className="flex justify-end gap-2">
-            <Button type="button" variant="secondary" onClick={() => setDeclineTarget(null)}>
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={() => setDeclineTarget(null)}
+            >
               Cancel
             </Button>
             <Button
               type="button"
               variant="secondary"
               icon={<HiXMark className="h-4 w-4 text-red-500" />}
-              loading={Boolean(declineTarget && actionLoadingId === declineTarget.id)}
+              loading={Boolean(
+                declineTarget && actionLoadingId === declineTarget.id,
+              )}
               loadingText="Declining…"
               onClick={handleDeclineSubmit}
             >
@@ -171,7 +182,9 @@ export const ExpenseApprovalQueue = ({
             value={declineReason}
             onChange={(event) => setDeclineReason(event.target.value)}
             rows={3}
-            icon={<HiChatBubbleLeftEllipsis className="h-4 w-4 text-brand-600" />}
+            icon={
+              <HiChatBubbleLeftEllipsis className="h-4 w-4 text-brand-600" />
+            }
           />
         </FormField>
       </Modal>

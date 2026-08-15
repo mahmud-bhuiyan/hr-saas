@@ -1,10 +1,10 @@
-import type { CSSProperties, ReactNode } from 'react';
-import { HiChevronDown, HiChevronUp } from 'react-icons/hi2';
-import { Spinner } from './Spinner';
-import { TablePagination, type TablePaginationConfig } from './TablePagination';
+import type { CSSProperties, ReactNode } from "react";
+import { HiChevronDown, HiChevronUp } from "react-icons/hi2";
+import { Spinner } from "../Spinner";
+import { TablePagination, type TablePaginationConfig } from "./TablePagination";
 
-export type TableAlign = 'left' | 'center' | 'right';
-export type TableSortDirection = 'asc' | 'desc';
+export type TableAlign = "left" | "center" | "right";
+export type TableSortDirection = "asc" | "desc";
 
 export interface TableSortState {
   key: string;
@@ -12,9 +12,9 @@ export interface TableSortState {
 }
 
 const alignClasses: Record<TableAlign, string> = {
-  left: 'text-left',
-  center: 'text-center',
-  right: 'text-right',
+  left: "text-left",
+  center: "text-center",
+  right: "text-right",
 };
 
 export interface TableColumn<T> {
@@ -49,9 +49,12 @@ interface TableProps<T> {
   pagination?: TablePaginationConfig;
 }
 
-const columnAlign = <T,>(column: TableColumn<T>, tableAlign: TableAlign): TableAlign => {
+const columnAlign = <T,>(
+  column: TableColumn<T>,
+  tableAlign: TableAlign,
+): TableAlign => {
   return column.align ?? tableAlign;
-}
+};
 
 const columnWidthStyle = (width?: number): CSSProperties | undefined => {
   if (width == null) {
@@ -59,15 +62,16 @@ const columnWidthStyle = (width?: number): CSSProperties | undefined => {
   }
 
   return { width: `${width}%` };
-}
+};
 
-const cellWrapClass = 'whitespace-normal break-words [overflow-wrap:anywhere]';
-const columnBorderClass = 'border-r border-slate-200 last:border-r-0 dark:border-slate-700';
+const cellWrapClass = "whitespace-normal break-words [overflow-wrap:anywhere]";
+const columnBorderClass =
+  "border-r border-slate-200 last:border-r-0 dark:border-slate-700";
 
 const sortAlignClass: Record<TableAlign, string> = {
-  left: 'justify-start',
-  center: 'justify-center',
-  right: 'justify-end',
+  left: "justify-start",
+  center: "justify-center",
+  right: "justify-end",
 };
 
 interface SortableHeaderProps {
@@ -78,7 +82,13 @@ interface SortableHeaderProps {
   onSortChange?: (sort: TableSortState) => void;
 }
 
-const SortableHeader = ({ label, columnKey, align, sort, onSortChange }: SortableHeaderProps) => {
+const SortableHeader = ({
+  label,
+  columnKey,
+  align,
+  sort,
+  onSortChange,
+}: SortableHeaderProps) => {
   const isActive = sort?.key === columnKey;
   const direction = isActive ? sort.direction : undefined;
 
@@ -88,13 +98,13 @@ const SortableHeader = ({ label, columnKey, align, sort, onSortChange }: Sortabl
     }
 
     if (!isActive) {
-      onSortChange({ key: columnKey, direction: 'asc' });
+      onSortChange({ key: columnKey, direction: "asc" });
       return;
     }
 
     onSortChange({
       key: columnKey,
-      direction: direction === 'asc' ? 'desc' : 'asc',
+      direction: direction === "asc" ? "desc" : "asc",
     });
   };
 
@@ -107,11 +117,11 @@ const SortableHeader = ({ label, columnKey, align, sort, onSortChange }: Sortabl
       <span>{label}</span>
       <span className="inline-flex shrink-0 flex-col -space-y-1">
         <HiChevronUp
-          className={`h-3 w-3 ${direction === 'asc' ? 'text-brand-600' : 'text-slate-300 dark:text-slate-600'}`}
+          className={`h-3 w-3 ${direction === "asc" ? "text-brand-600" : "text-slate-300 dark:text-slate-600"}`}
           aria-hidden
         />
         <HiChevronDown
-          className={`h-3 w-3 ${direction === 'desc' ? 'text-brand-600' : 'text-slate-300 dark:text-slate-600'}`}
+          className={`h-3 w-3 ${direction === "desc" ? "text-brand-600" : "text-slate-300 dark:text-slate-600"}`}
           aria-hidden
         />
       </span>
@@ -123,19 +133,21 @@ export const Table = <T,>({
   columns,
   data,
   getRowKey,
-  align = 'center',
+  align = "center",
   loading = false,
-  loadingMessage = 'Loading…',
-  emptyMessage = 'No records found.',
-  className = '',
+  loadingMessage = "Loading…",
+  emptyMessage = "No records found.",
+  className = "",
   bordered = false,
   borderless = false,
   sort,
   onSortChange,
   pagination,
 }: TableProps<T>) => {
-  const cellColumnBorderClass = bordered ? columnBorderClass : '';
-  const containerBorderClass = borderless ? '' : 'border border-slate-200 shadow-sm dark:border-slate-700';
+  const cellColumnBorderClass = bordered ? columnBorderClass : "";
+  const containerBorderClass = borderless
+    ? ""
+    : "border border-slate-200 shadow-sm dark:border-slate-700";
 
   if (loading) {
     return (
@@ -159,7 +171,9 @@ export const Table = <T,>({
   }
 
   return (
-    <div className={`overflow-hidden rounded-xl bg-white dark:bg-slate-900 ${containerBorderClass} ${className}`}>
+    <div
+      className={`overflow-hidden rounded-xl bg-white dark:bg-slate-900 ${containerBorderClass} ${className}`}
+    >
       <div className="overflow-x-auto">
         <table className="w-full table-fixed divide-y divide-slate-200 text-sm dark:divide-slate-700">
           <colgroup>
@@ -176,7 +190,7 @@ export const Table = <T,>({
                     key={column.key}
                     scope="col"
                     style={columnWidthStyle(column.width)}
-                    className={`px-4 py-3 ${cellWrapClass} ${alignClasses[cellAlign]} ${cellColumnBorderClass} ${column.className ?? ''}`}
+                    className={`px-4 py-3 ${cellWrapClass} ${alignClasses[cellAlign]} ${cellColumnBorderClass} ${column.className ?? ""}`}
                   >
                     {column.sortable && onSortChange ? (
                       <SortableHeader
@@ -198,14 +212,17 @@ export const Table = <T,>({
           </thead>
           <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
             {data.map((row) => (
-              <tr key={getRowKey(row)} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/50">
+              <tr
+                key={getRowKey(row)}
+                className="hover:bg-slate-50/80 dark:hover:bg-slate-800/50"
+              >
                 {columns.map((column) => {
                   const cellAlign = columnAlign(column, align);
                   return (
                     <td
                       key={column.key}
                       style={columnWidthStyle(column.width)}
-                      className={`px-4 py-3 text-slate-700 dark:text-slate-300 ${cellWrapClass} ${alignClasses[cellAlign]} ${cellColumnBorderClass} ${column.className ?? ''}`}
+                      className={`px-4 py-3 text-slate-700 dark:text-slate-300 ${cellWrapClass} ${alignClasses[cellAlign]} ${cellColumnBorderClass} ${column.className ?? ""}`}
                     >
                       {column.render(row)}
                     </td>
@@ -216,7 +233,9 @@ export const Table = <T,>({
           </tbody>
         </table>
       </div>
-      {pagination && pagination.total > 0 && <TablePagination pagination={pagination} />}
+      {pagination && pagination.total > 0 && (
+        <TablePagination pagination={pagination} />
+      )}
     </div>
   );
-}
+};

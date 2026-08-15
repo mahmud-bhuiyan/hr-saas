@@ -1,13 +1,13 @@
-import { HiArrowDownTray } from 'react-icons/hi2';
-import { Button } from '../../../../components/ui/Button';
-import { Table } from '../../../../components/ui/Table';
-import type { Expense } from '../../../../types';
+import { HiArrowDownTray } from "react-icons/hi2";
+import { Button } from "../../../../components/ui/Button";
+import { Table } from "../../../../components/ui/primitives/Table";
+import type { Expense } from "../../../../types";
 import {
   EXPENSE_CATEGORY_LABELS,
   EXPENSE_STATUS_CLASSES,
   EXPENSE_STATUS_LABELS,
   formatExpenseAmount,
-} from '../utils';
+} from "../utils";
 
 interface MyExpensesTableProps {
   expenses: Expense[];
@@ -29,36 +29,38 @@ export const MyExpensesTable = ({
     getRowKey={(row) => row.id}
     columns={[
       {
-        key: 'date',
-        header: 'Date',
+        key: "date",
+        header: "Date",
         render: (row: Expense) =>
           new Date(`${row.date}T00:00:00`).toLocaleDateString(undefined, {
-            month: 'short',
-            day: 'numeric',
-            year: 'numeric',
+            month: "short",
+            day: "numeric",
+            year: "numeric",
           }),
       },
       {
-        key: 'category',
-        header: 'Category',
+        key: "category",
+        header: "Category",
         render: (row: Expense) => EXPENSE_CATEGORY_LABELS[row.category],
       },
       {
-        key: 'amount',
-        header: 'Amount',
+        key: "amount",
+        header: "Amount",
         render: (row: Expense) => formatExpenseAmount(row.amount, row.currency),
       },
       {
-        key: 'description',
-        header: 'Description',
-        align: 'left',
+        key: "description",
+        header: "Description",
+        align: "left",
         render: (row: Expense) => (
-          <span className="line-clamp-2 max-w-xs text-left">{row.description}</span>
+          <span className="line-clamp-2 max-w-xs text-left">
+            {row.description}
+          </span>
         ),
       },
       {
-        key: 'status',
-        header: 'Status',
+        key: "status",
+        header: "Status",
         render: (row: Expense) => (
           <span
             className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-medium ring-1 ring-inset ${EXPENSE_STATUS_CLASSES[row.status]}`}
@@ -68,8 +70,8 @@ export const MyExpensesTable = ({
         ),
       },
       {
-        key: 'receipt',
-        header: 'Receipt',
+        key: "receipt",
+        header: "Receipt",
         render: (row: Expense) => (
           <Button
             type="button"

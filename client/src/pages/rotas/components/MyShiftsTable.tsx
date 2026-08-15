@@ -1,7 +1,7 @@
-import { Table } from '../../../components/ui/Table';
-import type { Shift } from '../../../types';
-import { formatDayLabel, formatShiftTime } from '../utils';
-import { ShiftStatusBadge } from './ShiftStatusBadge';
+import { Table } from "../../../components/ui/primitives/Table";
+import type { Shift } from "../../../types";
+import { formatDayLabel, formatShiftTime } from "../utils";
+import { ShiftStatusBadge } from "./ShiftStatusBadge";
 
 interface MyShiftsTableProps {
   shifts: Shift[];
@@ -14,28 +14,28 @@ export const MyShiftsTable = ({ shifts, loading }: MyShiftsTableProps) => (
     emptyMessage="No shifts assigned for this week."
     columns={[
       {
-        key: 'date',
-        header: 'Date',
+        key: "date",
+        header: "Date",
         render: (shift) => formatDayLabel(shift.date),
       },
       {
-        key: 'time',
-        header: 'Time',
+        key: "time",
+        header: "Time",
         render: (shift) => formatShiftTime(shift.startTime, shift.endTime),
       },
       {
-        key: 'location',
-        header: 'Location',
-        render: (shift) => shift.location?.name ?? '—',
+        key: "location",
+        header: "Location",
+        render: (shift) => shift.location?.name ?? "—",
       },
       {
-        key: 'role',
-        header: 'Role',
-        render: (shift) => shift.role ?? '—',
+        key: "role",
+        header: "Role",
+        render: (shift) => shift.role ?? "—",
       },
       {
-        key: 'status',
-        header: 'Status',
+        key: "status",
+        header: "Status",
         render: (shift) => <ShiftStatusBadge status={shift.status} />,
       },
     ]}

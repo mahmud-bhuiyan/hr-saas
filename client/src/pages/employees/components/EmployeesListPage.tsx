@@ -3,10 +3,10 @@ import { FormEvent, useEffect, useMemo, useState } from "react";
 import { Navigate, useSearchParams } from "react-router-dom";
 import { HiArrowUpTray, HiPlus, HiRectangleGroup } from "react-icons/hi2";
 import { Button } from "../../../components/ui/Button";
-import { SearchToolbar } from "../../../components/ui/SearchToolbar";
+import { SearchToolbar } from "../../../components/ui/forms/SearchToolbar";
 import { PageContainer } from "../../../components/ui/PageContainer";
 import { PageHeader } from "../../../components/layout/PageHeader";
-import type { TableSortState } from "../../../components/ui/Table";
+import type { TableSortState } from "../../../components/ui/primitives/Table";
 import { useAuth } from "../../../contexts/AuthContext";
 import {
   ApiError,
@@ -118,7 +118,9 @@ export const EmployeesListPage = ({ variant }: EmployeesListPageProps) => {
 
   const editableKeys = useMemo(
     () =>
-      canEditPay ? [...baseEditableKeys, ...payEditableKeys] : [...baseEditableKeys],
+      canEditPay
+        ? [...baseEditableKeys, ...payEditableKeys]
+        : [...baseEditableKeys],
     [canEditPay],
   );
 
@@ -195,7 +197,9 @@ export const EmployeesListPage = ({ variant }: EmployeesListPageProps) => {
         variables.input.status === "terminated" &&
         Object.keys(variables.input).length === 1;
       toast.success(
-        isDeactivateOnly ? "Employee deactivated." : "Employee updated successfully.",
+        isDeactivateOnly
+          ? "Employee deactivated."
+          : "Employee updated successfully.",
       );
       setEditForm(toEmployeeFormValues(updated));
       setSearchParams(
@@ -288,7 +292,8 @@ export const EmployeesListPage = ({ variant }: EmployeesListPageProps) => {
     () =>
       managerOptions.filter(
         (candidate) =>
-          candidate.id !== editEmployee?.id && candidate.status !== "terminated",
+          candidate.id !== editEmployee?.id &&
+          candidate.status !== "terminated",
       ),
     [managerOptions, editEmployee?.id],
   );
@@ -401,13 +406,20 @@ export const EmployeesListPage = ({ variant }: EmployeesListPageProps) => {
     key: K,
     value: EmployeeFormValues[K],
   ) => {
-    setEditForm((current) => (current ? { ...current, [key]: value } : current));
+    setEditForm((current) =>
+      current ? { ...current, [key]: value } : current,
+    );
   };
 
   const handleEditSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    if (!editForm || !editOriginalValues || !editEmployeeId || !hasEditChanges) {
+    if (
+      !editForm ||
+      !editOriginalValues ||
+      !editEmployeeId ||
+      !hasEditChanges
+    ) {
       return;
     }
 
@@ -429,7 +441,8 @@ export const EmployeesListPage = ({ variant }: EmployeesListPageProps) => {
             : Number(changes.payRate);
       }
       if ("payRateType" in changes) {
-        changes.payRateType = changes.payRateType === "" ? null : changes.payRateType;
+        changes.payRateType =
+          changes.payRateType === "" ? null : changes.payRateType;
       }
       if ("payCurrency" in changes && changes.payCurrency === "") {
         changes.payCurrency = "";
