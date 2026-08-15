@@ -3,6 +3,7 @@ import { FormEvent, useEffect, useMemo, useState } from "react";
 import { Navigate, useSearchParams } from "react-router-dom";
 import { HiArrowUpTray, HiPlus, HiRectangleGroup } from "react-icons/hi2";
 import { Button } from "../../../components/ui/Button";
+import { ConfirmModal } from "../../../components/ui/forms/ConfirmModal";
 import { SearchToolbar } from "../../../components/ui/forms/SearchToolbar";
 import { PageContainer } from "../../../components/ui/PageContainer";
 import { PageHeader } from "../../../components/layout/PageHeader";
@@ -96,6 +97,9 @@ export const EmployeesListPage = ({ variant }: EmployeesListPageProps) => {
   const [importOpen, setImportOpen] = useState(false);
   const [createForm, setCreateForm] =
     useState<CreateEmployeeInput>(emptyCreateForm);
+  const [deactivateTarget, setDeactivateTarget] = useState<Employee | null>(
+    null,
+  );
   const [deactivateLoadingId, setDeactivateLoadingId] = useState<string | null>(
     null,
   );
@@ -245,6 +249,7 @@ export const EmployeesListPage = ({ variant }: EmployeesListPageProps) => {
     },
     onSuccess: () => {
       toast.success("Employee deactivated.");
+      setDeactivateTarget(null);
       void queryClient.invalidateQueries({ queryKey: ["employees"] });
     },
     onError: (err) => {
@@ -478,16 +483,15 @@ export const EmployeesListPage = ({ variant }: EmployeesListPageProps) => {
   };
 
   const handleDeactivate = (employee: Employee) => {
-    const name = employeeName(employee);
-    if (
-      !window.confirm(
-        `Deactivate ${name}? Their status will be set to terminated.`,
-      )
-    ) {
+    setDeactivateTarget(employee);
+  };
+
+  const handleDeactivateConfirm = () => {
+    if (!deactivateTarget) {
       return;
     }
 
-    deactivateMutation.mutate(employee.id);
+    deactivateMutation.mutate(deactivateTarget.id);
   };
 
   const handleActivate = (employee: Employee) => {
@@ -650,6 +654,22 @@ export const EmployeesListPage = ({ variant }: EmployeesListPageProps) => {
         onSuccess={() => {
           void queryClient.invalidateQueries({ queryKey: ["employees"] });
         }}
+      />
+
+      <ConfirmModal
+        open={Boolean(deactivateTarget)}
+        onClose={() => setDeactivateTarget(null)}
+        onConfirm={handleDeactivateConfirm}
+        title="Deactivate employee"
+        description={
+          deactivateTarget
+            ? `Deactivate ${employeeName(deactivateTarget)}? Their status will be set to terminated.`
+            : undefined
+        }
+        confirmLabel="Deactivate"
+        confirmVariant="danger"
+        loading={deactivateMutation.isPending}
+        loadingText="Deactivating…"
       />
     </PageContainer>
   );

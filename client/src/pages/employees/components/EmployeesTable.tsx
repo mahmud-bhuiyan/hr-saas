@@ -107,11 +107,10 @@ export const EmployeesTable = ({
       sortable: false,
       width: 30,
       render: (row: Employee) => (
-        <div className="flex flex-wrap justify-center gap-2">
+        <div className="flex flex-wrap justify-center gap-1">
           <Button
-            display="both"
+            display="icon"
             variant="secondary"
-            className="px-3 py-1.5 text-xs"
             onClick={() => onView?.(row)}
             icon={<HiEye className="h-4 w-4 text-brand-600" />}
           >
@@ -120,9 +119,8 @@ export const EmployeesTable = ({
           {canUpdate && (
             <>
               <Button
-                display="both"
+                display="icon"
                 variant="secondary"
-                className="px-3 py-1.5 text-xs"
                 onClick={() => onEdit?.(row)}
                 icon={<HiPencilSquare className="h-4 w-4 text-brand-600" />}
               >
@@ -130,11 +128,9 @@ export const EmployeesTable = ({
               </Button>
               {row.status !== "terminated" && onDeactivate && (
                 <Button
-                  display="both"
+                  display="icon"
                   variant="secondary"
-                  className="px-3 py-1.5 text-xs"
                   loading={deactivateLoadingId === row.id}
-                  loadingText="Deactivating…"
                   disabled={Boolean(
                     deactivateLoadingId && deactivateLoadingId !== row.id,
                   )}
@@ -146,11 +142,9 @@ export const EmployeesTable = ({
               )}
               {row.status !== "active" && onActivate && (
                 <Button
-                  display="both"
+                  display="icon"
                   variant="secondary"
-                  className="px-3 py-1.5 text-xs"
                   loading={activateLoadingId === row.id}
-                  loadingText="Activating…"
                   disabled={Boolean(
                     activateLoadingId && activateLoadingId !== row.id,
                   )}

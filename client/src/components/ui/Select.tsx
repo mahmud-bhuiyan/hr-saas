@@ -12,8 +12,8 @@ import {
   type ReactElement,
   type ReactNode,
   type SelectHTMLAttributes,
-} from 'react';
-import { HiChevronDown } from 'react-icons/hi2';
+} from "react";
+import { HiChevronDown } from "react-icons/hi2";
 
 interface SelectOption {
   value: string;
@@ -21,7 +21,10 @@ interface SelectOption {
   disabled?: boolean;
 }
 
-interface SelectProps extends Omit<SelectHTMLAttributes<HTMLSelectElement>, 'onChange'> {
+interface SelectProps extends Omit<
+  SelectHTMLAttributes<HTMLSelectElement>,
+  "onChange"
+> {
   error?: string;
   icon?: ReactNode;
   wrapperClassName?: string;
@@ -32,18 +35,20 @@ const parseOptions = (children: ReactNode): SelectOption[] => {
   const options: SelectOption[] = [];
 
   Children.forEach(children, (child) => {
-    if (!isValidElement(child) || child.type !== 'option') {
+    if (!isValidElement(child) || child.type !== "option") {
       return;
     }
 
-    const props = (child as ReactElement<OptionHTMLAttributes<HTMLOptionElement>>).props;
+    const props = (
+      child as ReactElement<OptionHTMLAttributes<HTMLOptionElement>>
+    ).props;
     const label =
-      typeof props.children === 'string' || typeof props.children === 'number'
+      typeof props.children === "string" || typeof props.children === "number"
         ? String(props.children)
-        : Children.toArray(props.children).join('');
+        : Children.toArray(props.children).join("");
 
     options.push({
-      value: String(props.value ?? ''),
+      value: String(props.value ?? ""),
       label,
       disabled: props.disabled,
     });
@@ -60,11 +65,11 @@ const createChangeEvent = (value: string): ChangeEvent<HTMLSelectElement> =>
 
 export const Select = ({
   error,
-  className = '',
+  className = "",
   id,
   icon,
   children,
-  wrapperClassName = '',
+  wrapperClassName = "",
   value,
   defaultValue,
   disabled,
@@ -72,7 +77,7 @@ export const Select = ({
   name,
   onChange,
   onBlur: _onBlur,
-  'aria-label': ariaLabel,
+  "aria-label": ariaLabel,
 }: SelectProps) => {
   const generatedId = useId();
   const fieldId = id ?? generatedId;
@@ -82,13 +87,20 @@ export const Select = ({
   const [activeIndex, setActiveIndex] = useState(-1);
 
   const options = useMemo(() => parseOptions(children), [children]);
-  const selectedValue = value !== undefined ? String(value) : defaultValue !== undefined ? String(defaultValue) : '';
-  const selectedOption = options.find((option) => option.value === selectedValue);
-  const selectedLabel = selectedOption?.label ?? (selectedValue || 'Select…');
+  const selectedValue =
+    value !== undefined
+      ? String(value)
+      : defaultValue !== undefined
+        ? String(defaultValue)
+        : "";
+  const selectedOption = options.find(
+    (option) => option.value === selectedValue,
+  );
+  const selectedLabel = selectedOption?.label ?? (selectedValue || "Select…");
 
   const borderClassName = error
-    ? 'border-red-300 focus-within:border-red-500 focus-within:ring-red-500 dark:border-red-500/60'
-    : 'border-slate-300 focus-within:border-brand-500';
+    ? "border-red-300 focus-within:border-red-500 focus-within:ring-red-500 dark:border-red-500/60"
+    : "border-slate-300 focus-within:border-brand-500";
 
   const closeMenu = () => {
     setOpen(false);
@@ -111,12 +123,16 @@ export const Select = ({
       return;
     }
 
-    const currentIndex = activeIndex >= 0 ? activeIndex : enabledOptions.findIndex((option) => option.value === selectedValue);
+    const currentIndex =
+      activeIndex >= 0
+        ? activeIndex
+        : enabledOptions.findIndex((option) => option.value === selectedValue);
     const startIndex = currentIndex >= 0 ? currentIndex : 0;
     let nextIndex = startIndex;
 
     for (let step = 0; step < enabledOptions.length; step += 1) {
-      nextIndex = (nextIndex + direction + enabledOptions.length) % enabledOptions.length;
+      nextIndex =
+        (nextIndex + direction + enabledOptions.length) % enabledOptions.length;
       if (!enabledOptions[nextIndex]?.disabled) {
         setActiveIndex(nextIndex);
         break;
@@ -130,23 +146,26 @@ export const Select = ({
     }
 
     const handleClickOutside = (event: MouseEvent) => {
-      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+      if (
+        containerRef.current &&
+        !containerRef.current.contains(event.target as Node)
+      ) {
         closeMenu();
       }
     };
 
     const handleEscape = (event: globalThis.KeyboardEvent) => {
-      if (event.key === 'Escape') {
+      if (event.key === "Escape") {
         closeMenu();
       }
     };
 
-    document.addEventListener('mousedown', handleClickOutside);
-    document.addEventListener('keydown', handleEscape);
+    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("keydown", handleEscape);
 
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-      document.removeEventListener('keydown', handleEscape);
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("keydown", handleEscape);
     };
   }, [open]);
 
@@ -155,8 +174,10 @@ export const Select = ({
       return;
     }
 
-    const activeItem = listRef.current.children.item(activeIndex) as HTMLElement | null;
-    activeItem?.scrollIntoView({ block: 'nearest' });
+    const activeItem = listRef.current.children.item(
+      activeIndex,
+    ) as HTMLElement | null;
+    activeItem?.scrollIntoView({ block: "nearest" });
   }, [activeIndex, open]);
 
   const handleTriggerKeyDown = (event: KeyboardEvent<HTMLButtonElement>) => {
@@ -164,33 +185,33 @@ export const Select = ({
       return;
     }
 
-    if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+    if (event.key === "ArrowDown" || event.key === "ArrowUp") {
       event.preventDefault();
       setOpen(true);
-      moveActiveIndex(event.key === 'ArrowDown' ? 1 : -1);
+      moveActiveIndex(event.key === "ArrowDown" ? 1 : -1);
       return;
     }
 
-    if (event.key === 'Enter' || event.key === ' ') {
+    if (event.key === "Enter" || event.key === " ") {
       event.preventDefault();
       setOpen((prev) => !prev);
     }
   };
 
   const handleListKeyDown = (event: KeyboardEvent<HTMLUListElement>) => {
-    if (event.key === 'ArrowDown') {
+    if (event.key === "ArrowDown") {
       event.preventDefault();
       moveActiveIndex(1);
       return;
     }
 
-    if (event.key === 'ArrowUp') {
+    if (event.key === "ArrowUp") {
       event.preventDefault();
       moveActiveIndex(-1);
       return;
     }
 
-    if (event.key === 'Enter' || event.key === ' ') {
+    if (event.key === "Enter" || event.key === " ") {
       event.preventDefault();
       const option = enabledOptions[activeIndex];
       if (option) {
@@ -199,14 +220,14 @@ export const Select = ({
       return;
     }
 
-    if (event.key === 'Escape') {
+    if (event.key === "Escape") {
       event.preventDefault();
       closeMenu();
     }
   };
 
   return (
-    <div className={wrapperClassName} ref={containerRef}>
+    <div className={`w-full min-w-0 ${wrapperClassName}`} ref={containerRef}>
       {name && <input type="hidden" name={name} value={selectedValue} />}
       <div
         className={`relative w-full rounded-lg border bg-white text-sm shadow-sm transition focus-within:outline-none focus-within:ring-2 focus-within:ring-brand-500 dark:border-slate-600 dark:bg-slate-800 ${borderClassName} ${className}`}
@@ -230,13 +251,18 @@ export const Select = ({
           className="flex w-full items-center gap-2 px-3 py-2.5 text-left disabled:cursor-not-allowed disabled:opacity-50"
         >
           {icon && (
-            <span className="pointer-events-none shrink-0 text-slate-400" aria-hidden>
+            <span
+              className="pointer-events-none shrink-0 text-slate-400"
+              aria-hidden
+            >
               {icon}
             </span>
           )}
-          <span className="min-w-0 flex-1 truncate text-slate-900 dark:text-slate-100">{selectedLabel}</span>
+          <span className="min-w-0 flex-1 truncate text-slate-900 dark:text-slate-100">
+            {selectedLabel}
+          </span>
           <HiChevronDown
-            className={`h-4 w-4 shrink-0 text-slate-400 transition-transform ${open ? 'rotate-180' : ''}`}
+            className={`h-4 w-4 shrink-0 text-slate-400 transition-transform ${open ? "rotate-180" : ""}`}
             aria-hidden
           />
         </button>
@@ -251,7 +277,9 @@ export const Select = ({
             className="absolute inset-x-0 top-full z-50 mt-1 max-h-60 overflow-auto rounded-lg border border-slate-200 bg-white py-1 shadow-lg dark:border-slate-700 dark:bg-slate-900"
           >
             {options.map((option) => {
-              const enabledIndex = enabledOptions.findIndex((item) => item.value === option.value);
+              const enabledIndex = enabledOptions.findIndex(
+                (item) => item.value === option.value,
+              );
               const isSelected = option.value === selectedValue;
               const isActive = enabledIndex === activeIndex;
 
@@ -270,10 +298,10 @@ export const Select = ({
                     onClick={() => selectOption(option)}
                     className={`flex w-full items-center px-3 py-2.5 text-left text-sm transition disabled:cursor-not-allowed disabled:opacity-50 ${
                       isSelected
-                        ? 'bg-brand-600 text-white'
+                        ? "bg-brand-600 text-white"
                         : isActive
-                          ? 'bg-brand-50 text-brand-700 dark:bg-brand-950/40 dark:text-brand-200'
-                          : 'text-slate-700 hover:bg-slate-50 dark:text-slate-200 dark:hover:bg-slate-800'
+                          ? "bg-brand-50 text-brand-700 dark:bg-brand-950/40 dark:text-brand-200"
+                          : "text-slate-700 hover:bg-slate-50 dark:text-slate-200 dark:hover:bg-slate-800"
                     }`}
                   >
                     {option.label}
