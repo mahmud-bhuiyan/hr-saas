@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { FormEvent, useState } from "react";
-import { Navigate } from "react-router-dom";
+import { Navigate, useLocation } from "react-router-dom";
 import { ADMIN_DASHBOARD_PATH } from "../../utils";
 import { HiPlus } from "react-icons/hi2";
 import { toast } from "react-toastify";
@@ -8,8 +8,6 @@ import { Button } from "../../../../components/ui/Button";
 import { ConfirmModal } from "../../../../components/ui/forms/ConfirmModal";
 import { PageContainer } from "../../../../components/ui/PageContainer";
 import { SettingsPageHeader } from "../components/SettingsPageHeader";
-import { TabGroup } from "../../../../components/ui/TabGroup";
-import { useTabUrlState } from "../../../../hooks/useTabUrlState";
 import { useAuth } from "../../../../contexts/AuthContext";
 import {
   ApiError,
@@ -23,20 +21,16 @@ import { areRequiredFieldsFilled } from "../../../../utils/form";
 import { isQueryInitialLoad } from "../../../../utils/query";
 import { DepartmentFormModal } from "./components/DepartmentFormModal";
 import { DepartmentsTable } from "./components/DepartmentsTable";
-
-type DepartmentsTab = "active" | "archived";
-
-const DEPARTMENTS_TAB_IDS = [
-  "active",
-  "archived",
-] as const satisfies readonly DepartmentsTab[];
+import { DepartmentsTabs } from "./components/DepartmentsTabs";
+import { DEPARTMENTS_ACTIVE_PATH, departmentsListVariant } from "./utils";
 
 export const DepartmentsPage = () => {
+  const { pathname } = useLocation();
+  const variant = departmentsListVariant(pathname);
+  const isActiveList = variant === "active";
+
   const { user } = useAuth();
   const queryClient = useQueryClient();
-  const { activeTab, setActiveTab } = useTabUrlState(DEPARTMENTS_TAB_IDS, {
-    defaultTab: "active",
-  });
   const [createOpen, setCreateOpen] = useState(false);
   const [createName, setCreateName] = useState("");
   const [editTarget, setEditTarget] = useState<Department | null>(null);
@@ -169,9 +163,14 @@ export const DepartmentsPage = () => {
     return <Navigate to={ADMIN_DASHBOARD_PATH} replace />;
   }
 
+  if (!variant) {
+    return <Navigate to={DEPARTMENTS_ACTIVE_PATH} replace />;
+  }
+
   const allDepartments = departmentsQuery.data ?? [];
-  const activeDepartments = allDepartments.filter((dept) => !dept.isArchived);
-  const archivedDepartments = allDepartments.filter((dept) => dept.isArchived);
+  const departments = allDepartments.filter((dept) =>
+    isActiveList ? !dept.isArchived : dept.isArchived,
+  );
 
   const tableActionPending =
     createMutation.isPending ||
@@ -181,63 +180,43 @@ export const DepartmentsPage = () => {
     restoreLoadingId !== null ||
     deleteLoadingId !== null;
 
-  const tableProps = {
-    loading: isQueryInitialLoad(departmentsQuery),
-    onEdit: (dept: Department) => {
-      setEditTarget(dept);
-      setEditName(dept.name);
-    },
-    onArchive: handleArchive,
-    onRestore: handleRestore,
-    archiveLoadingId,
-    restoreLoadingId,
-    actionPending: tableActionPending,
-  };
-
   return (
-    <PageContainer className="space-y-6">
+    <PageContainer flushTop>
+      <DepartmentsTabs />
       <SettingsPageHeader
-        title="Departments"
+        title={isActiveList ? "Active departments" : "Archived departments"}
         description="Manage departments for employee assignment and filtering."
         action={
-          <Button
-            icon={<HiPlus className="h-4 w-4 text-white" />}
-            onClick={() => setCreateOpen(true)}
-          >
-            Add department
-          </Button>
+          isActiveList ? (
+            <Button
+              icon={<HiPlus className="h-4 w-4 text-white" />}
+              onClick={() => setCreateOpen(true)}
+            >
+              Add department
+            </Button>
+          ) : undefined
         }
       />
 
-      <TabGroup<DepartmentsTab>
-        activeId={activeTab}
-        onChange={setActiveTab}
-        tabs={[
-          {
-            id: "active",
-            label: "Active",
-            count: activeDepartments.length,
-            content: (
-              <DepartmentsTable
-                departments={activeDepartments}
-                {...tableProps}
-              />
-            ),
-          },
-          {
-            id: "archived",
-            label: "Archived",
-            count: archivedDepartments.length,
-            content: (
-              <DepartmentsTable
-                departments={archivedDepartments}
-                {...tableProps}
-                onDelete={handleDelete}
-                deleteLoadingId={deleteLoadingId}
-              />
-            ),
-          },
-        ]}
+      <DepartmentsTable
+        departments={departments}
+        variant={variant}
+        loading={isQueryInitialLoad(departmentsQuery)}
+        onEdit={(dept) => {
+          setEditTarget(dept);
+          setEditName(dept.name);
+        }}
+        onArchive={handleArchive}
+        onRestore={handleRestore}
+        archiveLoadingId={archiveLoadingId}
+        restoreLoadingId={restoreLoadingId}
+        actionPending={tableActionPending}
+        {...(isActiveList
+          ? {}
+          : {
+              onDelete: handleDelete,
+              deleteLoadingId,
+            })}
       />
 
       <DepartmentFormModal
@@ -297,4 +276,8 @@ export const DepartmentsPage = () => {
       />
     </PageContainer>
   );
+};
+
+export const DepartmentsIndexRedirect = () => {
+  return <Navigate to="active" replace />;
 };

@@ -577,6 +577,19 @@ export const uploadPlatformAsset = async (
   return json.data;
 };
 
+export const uploadTenantBrandingAsset = async (
+  input: UploadPlatformAssetInput,
+): Promise<UploadPlatformAssetResponse> => {
+  const json = await apiFetch<ApiSuccessResponse<UploadPlatformAssetResponse>>(
+    "/api/v1/settings/branding/upload",
+    {
+      method: "POST",
+      body: JSON.stringify(input),
+    },
+  );
+  return json.data;
+};
+
 export const readFileAsBase64 = (file: File): Promise<string> =>
   new Promise((resolve, reject) => {
     const reader = new FileReader();

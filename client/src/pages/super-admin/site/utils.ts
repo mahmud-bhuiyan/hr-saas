@@ -30,6 +30,7 @@ export interface SiteSettingsFormValues extends Record<string, unknown> {
   logoObjectFit: LogoObjectFit;
   logoShape: LogoShape;
   logoShowSiteName: boolean;
+  faviconShape: LogoShape;
   sidebarBehavior: SidebarBehavior;
   sidebarCollapsedWidthPx: number;
   sidebarExpandedWidthPx: number;
@@ -66,7 +67,7 @@ export const SITE_SETTINGS_TAB_KEYS: Record<
     "logoShape",
     "logoShowSiteName",
   ],
-  favicon: ["faviconUrl"],
+  favicon: ["faviconUrl", "faviconShape"],
   sidebar: [
     "sidebarBehavior",
     "sidebarCollapsedWidthPx",
@@ -109,6 +110,12 @@ export const toTabPatchInput = (
 
   if (changed.faviconUrl !== undefined) {
     input.faviconUrl = changed.faviconUrl ? String(changed.faviconUrl) : null;
+  }
+
+  if (changed.faviconShape !== undefined) {
+    input.faviconDisplay = {
+      shape: changed.faviconShape as SiteSettingsFormValues["faviconShape"],
+    };
   }
 
   const logoDisplayChanged =

@@ -3787,6 +3787,50 @@ paths:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
 
+  /api/v1/settings/branding/upload:
+    post:
+      tags: [Settings]
+      summary: Upload tenant logo or favicon
+      description: |
+        Company admin only. Uploads an image to ImgBB via the server (requires `IMGBB_API_KEY`).
+        Returns a hosted URL — does not save branding until PATCH `/settings/branding`.
+        Clients should normalize favicons to a square PNG before upload when possible.
+      operationId: uploadTenantBrandingAsset
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UploadPlatformAssetRequest"
+            example:
+              asset: favicon
+              filename: favicon.png
+              imageBase64: iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJ...
+      responses:
+        "200":
+          description: Uploaded asset URL
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, data]
+                properties:
+                  status:
+                    type: string
+                    enum: [ok]
+                  data:
+                    $ref: "#/components/schemas/UploadPlatformAssetResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "503":
+          description: ImgBB not configured
+
   /api/v1/settings/company:
     get:
       tags: [Settings]
@@ -6310,18 +6354,22 @@ components:
           enum: [contain, cover]
         shape:
           type: string
-          enum: [default, circle]
+          enum: [default, rounded, circle, square]
           example: circle
         showSiteName:
           type: boolean
 
     FaviconDisplay:
       type: object
-      required: [mimeType]
+      required: [mimeType, shape]
       properties:
         mimeType:
           type: string
           enum: [auto, image/png, image/x-icon, image/svg+xml, image/webp]
+        shape:
+          type: string
+          enum: [default, rounded, circle, square]
+          example: circle
 
     SidebarDisplay:
       type: object
@@ -6393,7 +6441,7 @@ components:
 
     TenantBrandingOverrides:
       type: object
-      required: [logoUrl, faviconUrl]
+      required: [logoUrl, faviconUrl, logoShape, faviconShape]
       properties:
         logoUrl:
           type: string
@@ -6403,6 +6451,14 @@ components:
           type: string
           nullable: true
           format: uri
+        logoShape:
+          type: string
+          nullable: true
+          enum: [default, rounded, circle, square]
+        faviconShape:
+          type: string
+          nullable: true
+          enum: [default, rounded, circle, square]
 
     PatchPlatformSiteSettingsRequest:
       type: object
@@ -6436,7 +6492,7 @@ components:
               enum: [contain, cover]
             shape:
               type: string
-              enum: [default, circle]
+              enum: [default, rounded, circle, square]
             showSiteName:
               type: boolean
         faviconDisplay:
@@ -6445,6 +6501,9 @@ components:
             mimeType:
               type: string
               enum: [auto, image/png, image/x-icon, image/svg+xml, image/webp]
+            shape:
+              type: string
+              enum: [default, rounded, circle, square]
         sidebarDisplay:
           type: object
           properties:
@@ -6472,6 +6531,14 @@ components:
           type: string
           nullable: true
           format: uri
+        logoShape:
+          type: string
+          nullable: true
+          enum: [default, rounded, circle, square]
+        faviconShape:
+          type: string
+          nullable: true
+          enum: [default, rounded, circle, square]
 
     CompanyProfile:
       type: object

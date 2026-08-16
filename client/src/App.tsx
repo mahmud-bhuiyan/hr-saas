@@ -34,7 +34,10 @@ import {
 import { SuperAdminDashboardPage } from "./pages/super-admin/dashboard/SuperAdminDashboardPage";
 import { SettingsPage } from "./pages/admin/settings/SettingsPage";
 import { CompanySettingsPage } from "./pages/admin/settings/company/CompanySettingsPage";
-import { DepartmentsPage } from "./pages/admin/settings/departments/DepartmentsPage";
+import {
+  DepartmentsIndexRedirect,
+  DepartmentsPage,
+} from "./pages/admin/settings/departments/DepartmentsPage";
 import { AuditLogPage } from "./pages/admin/settings/audit-log/AuditLogPage";
 import { LeavePage } from "./pages/users/leave/LeavePage";
 import { DocumentsPage } from "./pages/documents/DocumentsPage";
@@ -239,7 +242,11 @@ const App = () => {
                     <DepartmentsPage />
                   </ModuleRoute>
                 }
-              />
+              >
+                <Route index element={<DepartmentsIndexRedirect />} />
+                <Route path="active" />
+                <Route path="archived" />
+              </Route>
               <Route
                 path={ADMIN_SETTINGS_LOCATIONS_PATH}
                 element={

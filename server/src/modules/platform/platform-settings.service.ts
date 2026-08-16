@@ -55,6 +55,7 @@ const mergeFaviconDisplay = (
   current?: Partial<FaviconDisplaySettings> | null,
 ): FaviconDisplaySettings => ({
   mimeType: current?.mimeType ?? DEFAULT_FAVICON_DISPLAY.mimeType,
+  shape: current?.shape ?? DEFAULT_FAVICON_DISPLAY.shape,
 });
 
 const mergeSidebarDisplay = (
@@ -208,6 +209,8 @@ const getTenantBrandingOverrides = (
 ): TenantBrandingOverrides => ({
   logoUrl: tenant.branding?.logoUrl ?? null,
   faviconUrl: tenant.branding?.faviconUrl ?? null,
+  logoShape: tenant.branding?.logoShape ?? null,
+  faviconShape: tenant.branding?.faviconShape ?? null,
 });
 
 export const mergeBranding = (
@@ -217,6 +220,14 @@ export const mergeBranding = (
   ...platform,
   logoUrl: overrides.logoUrl ?? platform.logoUrl,
   faviconUrl: overrides.faviconUrl ?? platform.faviconUrl,
+  logoDisplay: {
+    ...platform.logoDisplay,
+    ...(overrides.logoShape ? { shape: overrides.logoShape } : {}),
+  },
+  faviconDisplay: {
+    ...platform.faviconDisplay,
+    ...(overrides.faviconShape ? { shape: overrides.faviconShape } : {}),
+  },
 });
 
 export const getEffectiveBranding = async (
@@ -260,7 +271,12 @@ export const patchTenantBranding = async (
   }
 
   if (!tenant.branding) {
-    tenant.branding = { logoUrl: null, faviconUrl: null };
+    tenant.branding = {
+      logoUrl: null,
+      faviconUrl: null,
+      logoShape: null,
+      faviconShape: null,
+    };
   }
 
   if (input.logoUrl !== undefined) {
@@ -269,6 +285,14 @@ export const patchTenantBranding = async (
 
   if (input.faviconUrl !== undefined) {
     tenant.branding.faviconUrl = normalizeUrl(input.faviconUrl);
+  }
+
+  if (input.logoShape !== undefined) {
+    tenant.branding.logoShape = input.logoShape;
+  }
+
+  if (input.faviconShape !== undefined) {
+    tenant.branding.faviconShape = input.faviconShape;
   }
 
   tenant.updatedBy = new mongoose.Types.ObjectId(userId);

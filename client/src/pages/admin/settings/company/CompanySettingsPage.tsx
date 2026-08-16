@@ -1,5 +1,5 @@
+import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { FormEvent, useEffect, useMemo, useState } from "react";
 import { Navigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { PageContainer } from "../../../../components/ui/PageContainer";
@@ -15,8 +15,10 @@ import {
 } from "../../../../lib/api";
 import type {
   CompanyProfile,
+  LogoShape,
   PatchCompanyProfileInput,
   PatchTenantBrandingInput,
+  TenantBrandingOverrides,
 } from "../../../../types";
 import { hasFormChanges, pickChangedFields } from "../../../../utils/form";
 import { getUniqueDialCodes } from "../../../../utils/phone";
@@ -27,12 +29,20 @@ import { CompanyProfileCards } from "./components/CompanyProfileCards";
 import { CompanyProfileEditModal } from "./components/CompanyProfileEditModal";
 import type { CompanyProfileFormValues } from "./components/CompanyProfileEditModal";
 import { TenantBrandingForm } from "./components/TenantBrandingForm";
-import type { TenantBrandingFormValues } from "./components/TenantBrandingForm";
+import type {
+  BrandingSaveStatus,
+  TenantBrandingFormValues,
+} from "./components/TenantBrandingForm";
 
 const profileFormKeys = ["name", "address", "defaultPhoneDialCode"] as const;
-const brandingFormKeys = ["logoUrl", "faviconUrl"] as const;
+const brandingFormKeys = [
+  "logoUrl",
+  "faviconUrl",
+  "logoShape",
+  "faviconShape",
+] as const;
 
-type SavingSection = "profile" | "branding" | null;
+const BRANDING_AUTOSAVE_MS = 650;
 
 const toProfileFormValues = (
   profile: CompanyProfile,
@@ -42,12 +52,15 @@ const toProfileFormValues = (
   defaultPhoneDialCode: profile.defaultPhoneDialCode,
 });
 
-const toBrandingFormValues = (overrides: {
-  logoUrl: string | null;
-  faviconUrl: string | null;
-}): TenantBrandingFormValues => ({
+const toBrandingFormValues = (
+  overrides: TenantBrandingOverrides,
+  platformLogoShape: LogoShape,
+  platformFaviconShape: LogoShape,
+): TenantBrandingFormValues => ({
   logoUrl: overrides.logoUrl ?? "",
   faviconUrl: overrides.faviconUrl ?? "",
+  logoShape: overrides.logoShape ?? platformLogoShape,
+  faviconShape: overrides.faviconShape ?? platformFaviconShape,
 });
 
 const toProfilePatchInput = (
@@ -87,13 +100,32 @@ const toBrandingPatchInput = (
   if (changed.faviconUrl !== undefined) {
     input.faviconUrl = String(changed.faviconUrl) || null;
   }
+  if (changed.logoShape !== undefined) {
+    input.logoShape = changed.logoShape as LogoShape;
+  }
+  if (changed.faviconShape !== undefined) {
+    input.faviconShape = changed.faviconShape as LogoShape;
+  }
 
   return input;
 };
 
+const mergeBrandingAfterSave = (
+  prev: TenantBrandingFormValues,
+  server: TenantBrandingFormValues,
+  saved: PatchTenantBrandingInput,
+): TenantBrandingFormValues => ({
+  logoUrl: saved.logoUrl !== undefined ? server.logoUrl : prev.logoUrl,
+  faviconUrl:
+    saved.faviconUrl !== undefined ? server.faviconUrl : prev.faviconUrl,
+  logoShape: saved.logoShape !== undefined ? server.logoShape : prev.logoShape,
+  faviconShape:
+    saved.faviconShape !== undefined ? server.faviconShape : prev.faviconShape,
+});
+
 export const CompanySettingsPage = () => {
   const { user } = useAuth();
-  const { displayName, refresh } = useSiteConfig();
+  const { config, displayName, refresh } = useSiteConfig();
   const queryClient = useQueryClient();
   const [profileValues, setProfileValues] =
     useState<CompanyProfileFormValues | null>(null);
@@ -103,8 +135,11 @@ export const CompanySettingsPage = () => {
     useState<TenantBrandingFormValues | null>(null);
   const [brandingOriginal, setBrandingOriginal] =
     useState<TenantBrandingFormValues | null>(null);
-  const [savingSection, setSavingSection] = useState<SavingSection>(null);
+  const [brandingSaveStatus, setBrandingSaveStatus] =
+    useState<BrandingSaveStatus>("idle");
   const [profileEditOpen, setProfileEditOpen] = useState(false);
+  const brandingHydratedRef = useRef(false);
+  const savedStatusTimerRef = useRef<number | null>(null);
 
   const profileQuery = useQuery({
     queryKey: ["settings", "company"],
@@ -144,11 +179,30 @@ export const CompanySettingsPage = () => {
 
   useEffect(() => {
     if (brandingQuery.data) {
-      const formValues = toBrandingFormValues(brandingQuery.data);
+      const formValues = toBrandingFormValues(
+        brandingQuery.data,
+        config.logoDisplay.shape,
+        config.faviconDisplay.shape,
+      );
       setBrandingValues(formValues);
       setBrandingOriginal(formValues);
+      brandingHydratedRef.current = true;
+      setBrandingSaveStatus("idle");
     }
-  }, [brandingQuery.data]);
+  }, [
+    brandingQuery.data,
+    config.logoDisplay.shape,
+    config.faviconDisplay.shape,
+  ]);
+
+  useEffect(
+    () => () => {
+      if (savedStatusTimerRef.current) {
+        window.clearTimeout(savedStatusTimerRef.current);
+      }
+    },
+    [],
+  );
 
   const profileHasChanges = useMemo(() => {
     if (!profileValues || !profileOriginal) {
@@ -161,15 +215,6 @@ export const CompanySettingsPage = () => {
     );
   }, [profileValues, profileOriginal]);
 
-  const brandingHasChanges = useMemo(() => {
-    if (!brandingValues || !brandingOriginal) {
-      return false;
-    }
-    return hasFormChanges(brandingValues, brandingOriginal, [
-      ...brandingFormKeys,
-    ]);
-  }, [brandingValues, brandingOriginal]);
-
   const profileMutation = useMutation({
     mutationFn: updateCompanyProfile,
     onSuccess: async (profile) => {
@@ -180,11 +225,9 @@ export const CompanySettingsPage = () => {
       const formValues = toProfileFormValues(profile);
       setProfileValues(formValues);
       setProfileOriginal(formValues);
-      setSavingSection(null);
       setProfileEditOpen(false);
     },
     onError: (err) => {
-      setSavingSection(null);
       toast.error(
         err instanceof ApiError
           ? err.message
@@ -195,20 +238,31 @@ export const CompanySettingsPage = () => {
 
   const brandingMutation = useMutation({
     mutationFn: updateTenantBranding,
-    onSuccess: async () => {
-      toast.success("Company branding updated.");
+    onSuccess: async (effective, variables) => {
       void queryClient.invalidateQueries({
         queryKey: ["settings", "branding"],
       });
       await refresh();
       const refreshed = await fetchTenantBrandingOverrides();
-      const formValues = toBrandingFormValues(refreshed);
-      setBrandingValues(formValues);
-      setBrandingOriginal(formValues);
-      setSavingSection(null);
+      const serverValues = toBrandingFormValues(
+        refreshed,
+        effective.logoDisplay.shape,
+        effective.faviconDisplay.shape,
+      );
+      setBrandingOriginal(serverValues);
+      setBrandingValues((prev) =>
+        prev ? mergeBrandingAfterSave(prev, serverValues, variables) : serverValues,
+      );
+      setBrandingSaveStatus("saved");
+      if (savedStatusTimerRef.current) {
+        window.clearTimeout(savedStatusTimerRef.current);
+      }
+      savedStatusTimerRef.current = window.setTimeout(() => {
+        setBrandingSaveStatus("idle");
+      }, 1600);
     },
     onError: (err) => {
-      setSavingSection(null);
+      setBrandingSaveStatus("error");
       toast.error(
         err instanceof ApiError
           ? err.message
@@ -217,12 +271,34 @@ export const CompanySettingsPage = () => {
     },
   });
 
+  useEffect(() => {
+    if (!brandingHydratedRef.current || !brandingValues || !brandingOriginal) {
+      return;
+    }
+    if (
+      !hasFormChanges(brandingValues, brandingOriginal, [...brandingFormKeys])
+    ) {
+      return;
+    }
+
+    const timer = window.setTimeout(() => {
+      const input = toBrandingPatchInput(brandingValues, brandingOriginal);
+      if (Object.keys(input).length === 0) {
+        return;
+      }
+      setBrandingSaveStatus("saving");
+      brandingMutation.mutate(input);
+    }, BRANDING_AUTOSAVE_MS);
+
+    return () => window.clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- mutate identity is unstable; values/original drive saves
+  }, [brandingValues, brandingOriginal]);
+
   const handleProfileSubmit = (e: FormEvent) => {
     e.preventDefault();
     if (!profileValues || !profileOriginal || !profileHasChanges) {
       return;
     }
-    setSavingSection("profile");
     profileMutation.mutate(toProfilePatchInput(profileValues, profileOriginal));
   };
 
@@ -240,18 +316,7 @@ export const CompanySettingsPage = () => {
     }
   };
 
-  const handleBrandingSubmit = (e: FormEvent) => {
-    e.preventDefault();
-    if (!brandingValues || !brandingOriginal || !brandingHasChanges) {
-      return;
-    }
-    setSavingSection("branding");
-    brandingMutation.mutate(
-      toBrandingPatchInput(brandingValues, brandingOriginal),
-    );
-  };
-
-  const handleClearBrandingField = (field: keyof TenantBrandingFormValues) => {
+  const handleClearBrandingField = (field: "logoUrl" | "faviconUrl") => {
     setBrandingValues((prev) => (prev ? { ...prev, [field]: "" } : prev));
   };
 
@@ -306,9 +371,7 @@ export const CompanySettingsPage = () => {
           )
         }
         onClearField={handleClearBrandingField}
-        onSubmit={handleBrandingSubmit}
-        loading={brandingMutation.isPending && savingSection === "branding"}
-        hasChanges={brandingHasChanges}
+        saveStatus={brandingSaveStatus}
       />
 
       {profileValues && (
@@ -323,7 +386,7 @@ export const CompanySettingsPage = () => {
             )
           }
           onSubmit={handleProfileSubmit}
-          loading={profileMutation.isPending && savingSection === "profile"}
+          loading={profileMutation.isPending}
           hasChanges={profileHasChanges}
         />
       )}

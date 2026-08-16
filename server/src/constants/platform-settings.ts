@@ -2,7 +2,7 @@ export const PLATFORM_SETTINGS_KEY = "default";
 
 export type LogoObjectFit = "contain" | "cover";
 
-export type LogoShape = "default" | "circle";
+export type LogoShape = "default" | "rounded" | "circle" | "square";
 
 export type FaviconMimeType =
   | "auto"
@@ -21,6 +21,7 @@ export interface LogoDisplaySettings {
 
 export interface FaviconDisplaySettings {
   mimeType: FaviconMimeType;
+  shape: LogoShape;
 }
 
 export type SidebarBehavior = "fixed_collapsed" | "collapsible";
@@ -52,6 +53,8 @@ export interface EffectiveBranding extends SiteConfig {
 export interface TenantBrandingOverrides {
   logoUrl: string | null;
   faviconUrl: string | null;
+  logoShape: LogoShape | null;
+  faviconShape: LogoShape | null;
 }
 
 export const DEFAULT_LOGO_DISPLAY: LogoDisplaySettings = {
@@ -64,6 +67,7 @@ export const DEFAULT_LOGO_DISPLAY: LogoDisplaySettings = {
 
 export const DEFAULT_FAVICON_DISPLAY: FaviconDisplaySettings = {
   mimeType: "auto",
+  shape: "circle",
 };
 
 export const DEFAULT_SIDEBAR_DISPLAY: SidebarDisplaySettings = {

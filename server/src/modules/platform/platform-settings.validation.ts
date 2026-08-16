@@ -11,10 +11,12 @@ const logoDisplaySchema = z
     heightPx: z.number().int().min(24).max(80).optional(),
     maxWidthPx: z.number().int().min(80).max(320).optional(),
     objectFit: z.enum(["contain", "cover"]).optional(),
-    shape: z.enum(["default", "circle"]).optional(),
+    shape: z.enum(["default", "rounded", "circle", "square"]).optional(),
     showSiteName: z.boolean().optional(),
   })
   .optional();
+
+const brandShapeSchema = z.enum(["default", "rounded", "circle", "square"]);
 
 const faviconDisplaySchema = z
   .object({
@@ -27,6 +29,7 @@ const faviconDisplaySchema = z
         "image/webp",
       ])
       .optional(),
+    shape: brandShapeSchema.optional(),
   })
   .optional();
 
@@ -66,6 +69,8 @@ export const patchTenantBrandingSchema = z
   .object({
     logoUrl: optionalUrlSchema.optional(),
     faviconUrl: optionalUrlSchema.optional(),
+    logoShape: brandShapeSchema.nullable().optional(),
+    faviconShape: brandShapeSchema.nullable().optional(),
   })
   .refine((data) => Object.keys(data).length > 0, {
     message: "At least one field is required",

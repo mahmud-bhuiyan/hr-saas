@@ -3,6 +3,7 @@ import {
   ALL_TENANT_MODULE_IDS,
   type TenantModuleId,
 } from "../../types/modules.js";
+import type { LogoShape } from "../../constants/platform-settings.js";
 
 export type TenantApprovalStatus = "pending" | "approved" | "rejected";
 
@@ -13,6 +14,8 @@ export type PayRateType = "hourly" | "salary";
 export interface TenantBranding {
   logoUrl: string | null;
   faviconUrl: string | null;
+  logoShape?: LogoShape | null;
+  faviconShape?: LogoShape | null;
 }
 
 export interface ITenant {
@@ -67,6 +70,16 @@ const tenantSchema = new Schema<ITenantDocument>(
     branding: {
       logoUrl: { type: String, default: null },
       faviconUrl: { type: String, default: null },
+      logoShape: {
+        type: String,
+        enum: ["default", "rounded", "circle", "square"],
+        default: null,
+      },
+      faviconShape: {
+        type: String,
+        enum: ["default", "rounded", "circle", "square"],
+        default: null,
+      },
     },
     attendanceGpsEnabled: { type: Boolean, default: false },
     overtimeThresholdHours: { type: Number, default: 40, min: 1, max: 168 },

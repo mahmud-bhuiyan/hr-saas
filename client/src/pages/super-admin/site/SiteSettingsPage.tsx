@@ -43,6 +43,7 @@ const toFormValues = (
   logoObjectFit: settings.logoDisplay.objectFit,
   logoShape: settings.logoDisplay.shape,
   logoShowSiteName: settings.logoDisplay.showSiteName,
+  faviconShape: settings.faviconDisplay.shape,
   sidebarBehavior: settings.sidebarDisplay.behavior,
   sidebarCollapsedWidthPx: settings.sidebarDisplay.collapsedWidthPx,
   sidebarExpandedWidthPx: settings.sidebarDisplay.expandedWidthPx,

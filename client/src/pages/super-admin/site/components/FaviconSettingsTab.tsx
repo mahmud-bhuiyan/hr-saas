@@ -1,6 +1,13 @@
 import { FormEvent } from "react";
-import { HiLink } from "react-icons/hi2";
+import { HiLink, HiSquares2X2 } from "react-icons/hi2";
 import { FormActions } from "../../../../components/ui/FormActions";
+import { FormField } from "../../../../components/ui/FormField";
+import { Select } from "../../../../components/ui/Select";
+import {
+  FAVICON_IMAGE_SIZE_HINT,
+  LOGO_SHAPE_OPTIONS,
+} from "../../../../constants/branding";
+import type { LogoShape } from "../../../../types";
 import { ImageAssetField } from "./ImageAssetField";
 import type { SiteSettingsFormValues } from "../utils";
 
@@ -35,8 +42,28 @@ export const FaviconSettingsTab = ({
       disabled={loading}
       icon={<HiLink className="h-4 w-4 text-brand-600" />}
       placeholder="https://example.com/favicon.ico"
-      saveHint="Paste a URL or upload an image, then save favicon settings to apply changes."
+      description={FAVICON_IMAGE_SIZE_HINT}
+      saveHint="Upload crops to 64×64 PNG. Save to apply."
+      previewShape={values.faviconShape}
     />
+
+    <FormField label="Favicon shape" htmlFor="faviconShape">
+      <Select
+        id="faviconShape"
+        value={values.faviconShape}
+        onChange={(e) =>
+          onChange("faviconShape", e.target.value as LogoShape)
+        }
+        icon={<HiSquares2X2 className="h-4 w-4 text-brand-600" />}
+        disabled={loading}
+      >
+        {LOGO_SHAPE_OPTIONS.map((option) => (
+          <option key={option.value} value={option.value}>
+            {option.label}
+          </option>
+        ))}
+      </Select>
+    </FormField>
 
     <FormActions
       submitLabel="Save favicon settings"

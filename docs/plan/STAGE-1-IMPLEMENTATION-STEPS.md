@@ -36,6 +36,8 @@ Features added during implementation that extend the original step list. Keep th
 | Company branding on profile page | 7 | Logo/favicon edits live on `/admin/settings/company/profile` (branding tab removed) |
 | ImgBB logo/favicon upload | 7 | Super admin: upload or URL for platform logo/favicon via `IMGBB_API_KEY` |
 | Logo/favicon display settings | 7 | Super admin: logo size/fit/name toggle; favicon MIME type + preview |
+| Tenant logo/favicon shape overrides | 7 | Company admin: shape controls (default/rounded/circle/square) on branding form; merged into effective branding for BrandMark |
+| Tenant branding ImgBB upload | 7 | Company admin: paste URL or upload logo/favicon; client normalizes favicon to 64×64 PNG and logo to max 800×240 before ImgBB upload |
 | Document storage (Step 6) | 6 | S3 presigned upload/download; `document:read:own` for employees; MinIO in docker compose |
 | User light/dark theme preference | 3 | Per-user `colorScheme` on User model; `PATCH /api/v1/auth/me`; header toggle; `ThemeContext` + localStorage cache; dark-mode styling on dashboard surfaces |
 | Per-company module access control | 2 | Super admin toggles tenant `enabledModules`; server middleware + client nav guards — see [18-module-access-control.md](./modules/18-module-access-control.md) |

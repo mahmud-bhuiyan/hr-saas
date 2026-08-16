@@ -33,7 +33,7 @@
 | User list & role assignment | — | ✅ | — | — | — |
 | Tenant branding overrides | — | ✅ | — | — | — |
 
-*(Tenant branding: company admin sets optional logo + favicon overrides that merge with platform defaults from module 15.)*
+*(Tenant branding: company admin sets optional logo + favicon URL and shape overrides that merge with platform defaults from module 15.)*
 
 ---
 
@@ -48,7 +48,9 @@
   logoUrl: String | null,    // company logo (tenant-scoped) — future company profile
   branding: {
     logoUrl: String | null,
-    faviconUrl: String | null
+    faviconUrl: String | null,
+    logoShape: 'default' | 'rounded' | 'circle' | 'square' | null,
+    faviconShape: 'default' | 'rounded' | 'circle' | 'square' | null
   }
 }
 ```
@@ -75,6 +77,7 @@ Replaces free-text `department` on employees with a reference or normalized name
 | GET | `/api/v1/settings/branding` | Authenticated tenant user | Merged effective branding |
 | GET | `/api/v1/settings/branding/overrides` | `company_admin` | Raw tenant overrides for edit form |
 | PATCH | `/api/v1/settings/branding` | `company_admin` | Partial update tenant overrides |
+| POST | `/api/v1/settings/branding/upload` | `company_admin` | Upload logo/favicon to ImgBB (returns URL) |
 | GET | `/api/v1/settings/company` | `company_admin` | Company profile |
 | PATCH | `/api/v1/settings/company` | `company_admin` | Partial update (name, address, logo) |
 | GET | `/api/v1/settings/departments` | `hr_manager+` | List departments |

@@ -2516,10 +2516,39 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"logoUrl\": \"https://example.com/logo.png\",\n  \"faviconUrl\": \"https://example.com/favicon.ico\"\n}"
+              "raw": "{\n  \"logoUrl\": \"https://example.com/logo.png\",\n  \"faviconUrl\": \"https://example.com/favicon.ico\",\n  \"logoShape\": \"rounded\",\n  \"faviconShape\": \"circle\"\n}"
             },
             "url": "{{baseUrl}}/api/v1/settings/branding",
-            "description": "Company admin only. Set null or empty to revert logo/favicon overrides to platform defaults."
+            "description": "Company admin only. Set null or empty to revert logo/favicon URL overrides to platform defaults. Shape values control in-app logo/favicon clip shape."
+          },
+          "response": []
+        },
+        {
+          "name": "Upload Tenant Branding Asset",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"asset\": \"favicon\",\n  \"filename\": \"favicon.png\",\n  \"imageBase64\": \"<base64-without-prefix>\"\n}"
+            },
+            "url": "{{baseUrl}}/api/v1/settings/branding/upload",
+            "description": "Company admin only. Uploads logo or favicon to ImgBB; returns URL (does not auto-save branding)."
           },
           "response": []
         },
