@@ -112,7 +112,7 @@ Features added during implementation that extend the original step list. Keep th
 
 ## Step 5 — Done when
 
-- [x] Leave types (annual, sick, unpaid)
+- [x] Leave types (planned, unplanned, unpaid)
 - [x] Submit leave request API + employee UI
 - [x] Approval queue for manager / HR
 - [x] Leave balance per employee (fixed entitlement)

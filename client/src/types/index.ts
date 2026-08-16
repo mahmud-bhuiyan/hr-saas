@@ -250,7 +250,7 @@ export type EmployeeSortField =
   | "department"
   | "manager";
 
-export type LeaveType = "annual" | "sick" | "unpaid" | "planned";
+export type LeaveType = "planned" | "unplanned" | "unpaid" | "annual" | "sick";
 export type LeaveRequestStatus =
   | "pending"
   | "approved"
@@ -332,13 +332,17 @@ export interface LeaveBalance {
 }
 
 export interface LeaveSettings {
-  annualEntitlement: number;
+  plannedLeaveEntitlement: number;
+  unplannedLeaveEntitlement: number;
+  unpaidLeaveEntitlement: number;
   maxCarryOverDays: number;
   multiStepApprovalEnabled: boolean;
 }
 
 export interface PatchLeaveSettingsInput {
-  annualEntitlement?: number;
+  plannedLeaveEntitlement?: number;
+  unplannedLeaveEntitlement?: number;
+  unpaidLeaveEntitlement?: number;
   maxCarryOverDays?: number;
   multiStepApprovalEnabled?: boolean;
 }

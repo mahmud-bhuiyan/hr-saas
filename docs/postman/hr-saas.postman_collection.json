@@ -984,7 +984,7 @@
             "header": [{ "key": "Content-Type", "value": "application/json" }],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"type\": \"annual\",\n  \"startDate\": \"2026-03-10\",\n  \"endDate\": \"2026-03-12\",\n  \"reason\": \"Family holiday\"\n}"
+              "raw": "{\n  \"type\": \"planned\",\n  \"startDate\": \"2026-03-10\",\n  \"endDate\": \"2026-03-12\",\n  \"reason\": \"Family holiday\"\n}"
             },
             "url": "{{baseUrl}}/api/v1/leave/requests",
             "description": "Requires leave:create:own. Employee email must match employee record."
@@ -2663,7 +2663,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"annualEntitlement\": 25,\n  \"maxCarryOverDays\": 5,\n  \"multiStepApprovalEnabled\": true\n}"
+              "raw": "{\n  \"plannedLeaveEntitlement\": 25,\n  \"unplannedLeaveEntitlement\": 5,\n  \"unpaidLeaveEntitlement\": 0,\n  \"maxCarryOverDays\": 5,\n  \"multiStepApprovalEnabled\": true\n}"
             },
             "url": "{{baseUrl}}/api/v1/settings/leave",
             "description": "Company admin only. Partial update."

@@ -41,6 +41,10 @@ import { Shift } from "../rotas/shift.model.js";
 import { WorkLocation } from "../locations/location.model.js";
 import type { ShiftStatus } from "../rotas/shift.model.js";
 
+/** Planned leave (and legacy annual) deducts from the planned leave balance */
+const affectsPlannedBalance = (type: LeaveType): boolean =>
+  type === "planned" || type === "annual";
+
 export class LeaveServiceError extends Error {
   constructor(
     message: string,
@@ -767,7 +771,7 @@ export const createLeaveRequest = async (
 
   await assertNoOverlap(tenantId, employee._id.toString(), startDate, endDate);
 
-  if (input.type === "annual") {
+  if (affectsPlannedBalance(input.type)) {
     const year = startDate.getUTCFullYear();
     const balance = await getOrCreateBalance(
       tenantId,
@@ -782,7 +786,7 @@ export const createLeaveRequest = async (
 
     if (days > remaining) {
       throw new LeaveServiceError(
-        `Insufficient annual leave balance. ${remaining} day(s) remaining.`,
+        `Insufficient planned leave balance. ${remaining} day(s) remaining.`,
         400,
       );
     }
@@ -862,7 +866,7 @@ export const cancelLeaveRequest = async (
 
   const beforeSnapshot = leaveRequestAuditSnapshot(request);
 
-  if (request.type === "annual") {
+  if (affectsPlannedBalance(request.type)) {
     const days = calculateLeaveDays(
       request.startDate,
       request.endDate,
@@ -953,7 +957,7 @@ export const approveLeaveRequest = async (
     return toLeaveRequestPublic(request);
   }
 
-  if (request.type === "annual") {
+  if (affectsPlannedBalance(request.type)) {
     const days = calculateLeaveDays(
       request.startDate,
       request.endDate,
@@ -1025,7 +1029,7 @@ export const declineLeaveRequest = async (
 
   const beforeSnapshot = leaveRequestAuditSnapshot(request);
 
-  if (request.type === "annual") {
+  if (affectsPlannedBalance(request.type)) {
     const days = calculateLeaveDays(
       request.startDate,
       request.endDate,

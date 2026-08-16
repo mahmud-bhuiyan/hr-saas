@@ -1,59 +1,81 @@
-import mongoose from 'mongoose';
-import { Tenant } from '../auth/tenant.model.js';
-import { Employee } from '../employees/employee.model.js';
-import { LeaveBalance } from './leave.model.js';
+import mongoose from "mongoose";
+import { Tenant } from "../auth/tenant.model.js";
+import { Employee } from "../employees/employee.model.js";
+import { LeaveBalance } from "./leave.model.js";
 import {
   calculateCarryOverAmount,
   calculateProRataEntitlement,
-  DEFAULT_ANNUAL_ENTITLEMENT,
   DEFAULT_MAX_CARRY_OVER_DAYS,
-} from './leave.utils.js';
-import type { PatchLeaveSettingsInput } from './leave-settings.validation.js';
+  DEFAULT_PLANNED_LEAVE_ENTITLEMENT,
+  DEFAULT_UNPAID_LEAVE_ENTITLEMENT,
+  DEFAULT_UNPLANNED_LEAVE_ENTITLEMENT,
+} from "./leave.utils.js";
+import type { PatchLeaveSettingsInput } from "./leave-settings.validation.js";
 
 export class LeaveSettingsServiceError extends Error {
   constructor(
     message: string,
-    public statusCode: number
+    public statusCode: number,
   ) {
     super(message);
-    this.name = 'LeaveSettingsServiceError';
+    this.name = "LeaveSettingsServiceError";
   }
 }
 
 export interface TenantLeaveSettings {
-  annualEntitlement: number;
+  plannedLeaveEntitlement: number;
+  unplannedLeaveEntitlement: number;
+  unpaidLeaveEntitlement: number;
   maxCarryOverDays: number;
   multiStepApprovalEnabled: boolean;
 }
 
-export const getTenantLeaveSettings = async (tenantId: string): Promise<TenantLeaveSettings> => {
+export const getTenantLeaveSettings = async (
+  tenantId: string,
+): Promise<TenantLeaveSettings> => {
   const tenant = await Tenant.findById(tenantId);
   if (!tenant) {
-    throw new LeaveSettingsServiceError('Tenant not found', 404);
+    throw new LeaveSettingsServiceError("Tenant not found", 404);
   }
 
   return {
-    annualEntitlement: tenant.annualEntitlement ?? DEFAULT_ANNUAL_ENTITLEMENT,
+    plannedLeaveEntitlement:
+      tenant.plannedLeaveEntitlement ??
+      tenant.annualEntitlement ??
+      DEFAULT_PLANNED_LEAVE_ENTITLEMENT,
+    unplannedLeaveEntitlement:
+      tenant.unplannedLeaveEntitlement ?? DEFAULT_UNPLANNED_LEAVE_ENTITLEMENT,
+    unpaidLeaveEntitlement:
+      tenant.unpaidLeaveEntitlement ?? DEFAULT_UNPAID_LEAVE_ENTITLEMENT,
     maxCarryOverDays: tenant.maxCarryOverDays ?? DEFAULT_MAX_CARRY_OVER_DAYS,
     multiStepApprovalEnabled: tenant.multiStepApprovalEnabled ?? false,
   };
 };
 
-export const getLeaveSettings = async (tenantId: string): Promise<TenantLeaveSettings> =>
-  getTenantLeaveSettings(tenantId);
+export const getLeaveSettings = async (
+  tenantId: string,
+): Promise<TenantLeaveSettings> => getTenantLeaveSettings(tenantId);
 
 export const patchLeaveSettings = async (
   tenantId: string,
   input: PatchLeaveSettingsInput,
-  userId: string
+  userId: string,
 ): Promise<TenantLeaveSettings> => {
   const tenant = await Tenant.findById(tenantId);
   if (!tenant) {
-    throw new LeaveSettingsServiceError('Tenant not found', 404);
+    throw new LeaveSettingsServiceError("Tenant not found", 404);
   }
 
-  if (input.annualEntitlement !== undefined) {
-    tenant.annualEntitlement = input.annualEntitlement;
+  if (input.plannedLeaveEntitlement !== undefined) {
+    tenant.plannedLeaveEntitlement = input.plannedLeaveEntitlement;
+    // Keep legacy field in sync for older balance readers
+    tenant.annualEntitlement = input.plannedLeaveEntitlement;
+  }
+  if (input.unplannedLeaveEntitlement !== undefined) {
+    tenant.unplannedLeaveEntitlement = input.unplannedLeaveEntitlement;
+  }
+  if (input.unpaidLeaveEntitlement !== undefined) {
+    tenant.unpaidLeaveEntitlement = input.unpaidLeaveEntitlement;
   }
   if (input.maxCarryOverDays !== undefined) {
     tenant.maxCarryOverDays = input.maxCarryOverDays;
@@ -71,7 +93,7 @@ export const patchLeaveSettings = async (
 export const ensureLeaveBalanceForYear = async (
   tenantId: string,
   employeeId: string,
-  year: number
+  year: number,
 ): Promise<InstanceType<typeof LeaveBalance>> => {
   const tenantObjectId = new mongoose.Types.ObjectId(tenantId);
   const employeeObjectId = new mongoose.Types.ObjectId(employeeId);
@@ -100,14 +122,17 @@ export const ensureLeaveBalanceForYear = async (
   });
 
   if (prevBalance) {
-    carriedOver = calculateCarryOverAmount(prevBalance, settings.maxCarryOverDays);
+    carriedOver = calculateCarryOverAmount(
+      prevBalance,
+      settings.maxCarryOverDays,
+    );
   }
 
   const entitlement = calculateProRataEntitlement(
-    settings.annualEntitlement,
+    settings.plannedLeaveEntitlement,
     employee?.startDate,
     year,
-    employee?.fteFactor ?? 1
+    employee?.fteFactor ?? 1,
   );
 
   return LeaveBalance.create({
@@ -125,7 +150,7 @@ export const ensureLeaveBalanceForYear = async (
 export const refreshBalanceEntitlement = async (
   tenantId: string,
   employeeId: string,
-  year: number
+  year: number,
 ): Promise<void> => {
   const settings = await getTenantLeaveSettings(tenantId);
   const employee = await Employee.findOne({
@@ -144,23 +169,23 @@ export const refreshBalanceEntitlement = async (
   }
 
   balance.entitlement = calculateProRataEntitlement(
-    settings.annualEntitlement,
+    settings.plannedLeaveEntitlement,
     employee?.startDate,
     year,
-    employee?.fteFactor ?? 1
+    employee?.fteFactor ?? 1,
   );
   await balance.save();
 };
 
 export const processCarryOverForTenant = async (
   tenantId: string,
-  targetYear: number
+  targetYear: number,
 ): Promise<number> => {
   const settings = await getTenantLeaveSettings(tenantId);
   const employees = await Employee.find({
     tenantId: new mongoose.Types.ObjectId(tenantId),
-    status: { $ne: 'terminated' },
-  }).select('_id startDate');
+    status: { $ne: "terminated" },
+  }).select("_id startDate");
 
   let processed = 0;
 
@@ -184,8 +209,13 @@ export const processCarryOverForTenant = async (
   return processed;
 };
 
-export const processCarryOverAllTenants = async (targetYear: number): Promise<void> => {
-  const tenants = await Tenant.find({ approvalStatus: 'approved', isActive: true }).select('_id');
+export const processCarryOverAllTenants = async (
+  targetYear: number,
+): Promise<void> => {
+  const tenants = await Tenant.find({
+    approvalStatus: "approved",
+    isActive: true,
+  }).select("_id");
 
   for (const tenant of tenants) {
     await processCarryOverForTenant(tenant._id.toString(), targetYear);

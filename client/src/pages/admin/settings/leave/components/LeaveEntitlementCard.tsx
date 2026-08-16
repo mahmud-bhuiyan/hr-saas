@@ -45,7 +45,7 @@ export const LeaveEntitlementCard = ({
           Leave entitlement
         </h2>
         <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-          Annual days and carry-over limits.
+          Planned, unplanned, and unpaid days plus carry-over limits.
         </p>
       </div>
       <Button
@@ -58,10 +58,20 @@ export const LeaveEntitlementCard = ({
       </Button>
     </div>
 
-    <dl className="space-y-5 p-5">
+    <dl className="grid gap-5 p-5 sm:grid-cols-2">
       <DetailItem
-        label="Annual entitlement (days)"
-        value={values.annualEntitlement}
+        label="Planned leave (days)"
+        value={values.plannedLeaveEntitlement}
+        icon={<HiCalendarDays className={iconClass} />}
+      />
+      <DetailItem
+        label="Unplanned leave (days)"
+        value={values.unplannedLeaveEntitlement}
+        icon={<HiCalendarDays className={iconClass} />}
+      />
+      <DetailItem
+        label="Unpaid leave (days)"
+        value={values.unpaidLeaveEntitlement}
         icon={<HiCalendarDays className={iconClass} />}
       />
       <DetailItem

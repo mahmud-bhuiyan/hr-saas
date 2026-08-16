@@ -1,5 +1,7 @@
 export interface LeaveEntitlementFormValues {
-  annualEntitlement: string;
+  plannedLeaveEntitlement: string;
+  unplannedLeaveEntitlement: string;
+  unpaidLeaveEntitlement: string;
   maxCarryOverDays: string;
 }
 
@@ -21,17 +23,23 @@ export const APPROVAL_OPTIONS = [
 ];
 
 export const DEFAULT_LEAVE_FORM: LeaveSettingsFormValues = {
-  annualEntitlement: "25",
+  plannedLeaveEntitlement: "25",
+  unplannedLeaveEntitlement: "5",
+  unpaidLeaveEntitlement: "0",
   maxCarryOverDays: "5",
   multiStepApprovalEnabled: "false",
 };
 
 export const toLeaveForm = (settings: {
-  annualEntitlement: number;
+  plannedLeaveEntitlement: number;
+  unplannedLeaveEntitlement: number;
+  unpaidLeaveEntitlement: number;
   maxCarryOverDays: number;
   multiStepApprovalEnabled: boolean;
 }): LeaveSettingsFormValues => ({
-  annualEntitlement: String(settings.annualEntitlement),
+  plannedLeaveEntitlement: String(settings.plannedLeaveEntitlement),
+  unplannedLeaveEntitlement: String(settings.unplannedLeaveEntitlement),
+  unpaidLeaveEntitlement: String(settings.unpaidLeaveEntitlement),
   maxCarryOverDays: String(settings.maxCarryOverDays),
   multiStepApprovalEnabled: settings.multiStepApprovalEnabled
     ? "true"

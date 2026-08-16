@@ -31,7 +31,8 @@ Employees submit leave requests; managers and HR approve or decline them. Tracks
 {
   tenantId: ObjectId,
   employeeId: ObjectId,
-  type: 'annual' | 'sick' | 'unpaid' | 'planned',
+  type: 'planned' | 'unplanned' | 'unpaid' | 'annual' | 'sick',
+  // primary: planned | unplanned | unpaid; annual | sick kept for legacy records
   startDate: Date,
   endDate: Date,
   halfDay: Boolean,
@@ -49,9 +50,11 @@ Employees submit leave requests; managers and HR approve or decline them. Tracks
 
 ```js
 {
-  annualEntitlement: Number,       // default 25
-  maxCarryOverDays: Number,        // default 5
-  multiStepApprovalEnabled: Boolean // default false
+  plannedLeaveEntitlement: Number,   // default 25 (feeds LeaveBalance; legacy annualEntitlement still read as fallback)
+  unplannedLeaveEntitlement: Number, // default 5
+  unpaidLeaveEntitlement: Number,    // default 0
+  maxCarryOverDays: Number,          // default 5
+  multiStepApprovalEnabled: Boolean  // default false
 }
 ```
 
@@ -95,14 +98,14 @@ Employees submit leave requests; managers and HR approve or decline them. Tracks
 
 1. All queries scoped by `tenantId` from JWT.
 2. User → employee resolution: `Employee.userId` first, then email fallback (`User.email` = `Employee.email`).
-3. Leave types: `annual`, `sick`, `unpaid`, `planned` (fixed list).
+3. Leave types: `planned`, `unplanned`, `unpaid` (primary). Legacy `annual` / `sick` still accepted.
 4. Day count: `(endDate - startDate) + 1`; half-day = 0.5 (single-day only).
-5. Only **annual** leave affects `LeaveBalance`; sick, unpaid, and planned are tracked but don't deduct.
-6. Submit creates `pending`; annual increments `pending` on balance.
-7. Approve moves annual days `pending → taken`; decline/cancel reverses `pending`.
+5. Only **planned** leave (and legacy **annual**) affects `LeaveBalance`; unplanned and unpaid are tracked but don't deduct.
+6. Submit creates `pending`; planned increments `pending` on balance.
+7. Approve moves planned days `pending → taken`; decline/cancel reverses `pending`.
 8. Reject overlapping pending/approved requests for same employee.
-9. Reject annual submit if insufficient balance.
-10. Default entitlement: 25 days/year (hardcoded for Stage 1).
+9. Reject planned submit if insufficient balance.
+10. Default planned entitlement: 25 days/year (tenant policy; unplanned default 5, unpaid default 0).
 
 ---
 
@@ -143,14 +146,14 @@ Employees submit leave requests; managers and HR approve or decline them. Tracks
 
 ### Pro-rata accrual
 
-- Entitlement for calendar year = `annualEntitlement × (days employed in year / days in year)`.
+- Entitlement for calendar year = `plannedLeaveEntitlement × (days employed in year / days in year)`.
 - Mid-year starters get prorated entitlement on first balance access or via cron.
 - Part-time FTE factor (default 1.0) — ✅ scales entitlement in `calculateProRataEntitlement` (S3-7).
 
 ### Carry-over
 
 - On year boundary (or manual HR trigger): `carriedOver = min(remaining, maxCarryOverDays)`.
-- New year balance: `entitlement = annualEntitlement`, `carriedOver` set, `taken/pending` reset.
+- New year balance: `entitlement = plannedLeaveEntitlement`, `carriedOver` set, `taken/pending` reset.
 
 ### Multi-step approval
 
@@ -185,10 +188,10 @@ Decline at any step → status `declined`, reverse pending balance.
 
 ## 12. Acceptance Criteria
 
-- [x] Employee can submit annual/sick/unpaid leave when employee record matches login email
+- [x] Employee can submit planned/unplanned/unpaid leave when employee record matches login email
 - [x] Manager sees and approves team pending requests
 - [x] HR/admin sees all pending requests
-- [x] Annual balance updates on approve/decline/cancel
+- [x] Planned leave balance updates on approve/decline/cancel
 - [x] Team calendar shows approved + pending leave for the month
 - [x] Email sent on submit, approve, decline (SendGrid)
 - [x] OpenAPI and Postman updated

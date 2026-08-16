@@ -1,11 +1,22 @@
-import { z } from 'zod';
+import { z } from "zod";
 
-const leaveTypeSchema = z.enum(['annual', 'sick', 'unpaid', 'planned']);
-const leaveStatusSchema = z.enum(['pending', 'approved', 'declined', 'cancelled']);
+const leaveTypeSchema = z.enum([
+  "planned",
+  "unplanned",
+  "unpaid",
+  "annual",
+  "sick",
+]);
+const leaveStatusSchema = z.enum([
+  "pending",
+  "approved",
+  "declined",
+  "cancelled",
+]);
 
 const dateStringSchema = z
   .string()
-  .regex(/^\d{4}-\d{2}-\d{2}$/, 'Date must be YYYY-MM-DD');
+  .regex(/^\d{4}-\d{2}-\d{2}$/, "Date must be YYYY-MM-DD");
 
 export const createLeaveRequestSchema = z
   .object({
@@ -13,15 +24,15 @@ export const createLeaveRequestSchema = z
     startDate: dateStringSchema,
     endDate: dateStringSchema,
     halfDay: z.boolean().optional().default(false),
-    reason: z.string().trim().min(1, 'Reason is required').max(500),
+    reason: z.string().trim().min(1, "Reason is required").max(500),
   })
   .refine((data) => data.endDate >= data.startDate, {
-    message: 'End date must be on or after start date',
-    path: ['endDate'],
+    message: "End date must be on or after start date",
+    path: ["endDate"],
   })
   .refine((data) => !data.halfDay || data.startDate === data.endDate, {
-    message: 'Half day is only valid for single-day requests',
-    path: ['halfDay'],
+    message: "Half day is only valid for single-day requests",
+    path: ["halfDay"],
   });
 
 export const listLeaveRequestsQuerySchema = z.object({
@@ -29,7 +40,7 @@ export const listLeaveRequestsQuerySchema = z.object({
   employeeId: z.string().min(1).optional(),
   from: dateStringSchema.optional(),
   to: dateStringSchema.optional(),
-  mine: z.enum(['true', 'false']).optional(),
+  mine: z.enum(["true", "false"]).optional(),
 });
 
 export const declineLeaveRequestSchema = z.object({
@@ -42,6 +53,10 @@ export const leaveCalendarQuerySchema = z.object({
 });
 
 export type CreateLeaveRequestInput = z.infer<typeof createLeaveRequestSchema>;
-export type ListLeaveRequestsQuery = z.infer<typeof listLeaveRequestsQuerySchema>;
-export type DeclineLeaveRequestInput = z.infer<typeof declineLeaveRequestSchema>;
+export type ListLeaveRequestsQuery = z.infer<
+  typeof listLeaveRequestsQuerySchema
+>;
+export type DeclineLeaveRequestInput = z.infer<
+  typeof declineLeaveRequestSchema
+>;
 export type LeaveCalendarQuery = z.infer<typeof leaveCalendarQuerySchema>;
