@@ -1,7 +1,11 @@
-import mongoose, { Schema, type Document, type Model } from 'mongoose';
+import mongoose, { Schema, type Document, type Model } from "mongoose";
 
-export type LeaveType = 'annual' | 'sick' | 'unpaid' | 'planned';
-export type LeaveRequestStatus = 'pending' | 'approved' | 'declined' | 'cancelled';
+export type LeaveType = "planned" | "unplanned" | "unpaid" | "annual" | "sick";
+export type LeaveRequestStatus =
+  | "pending"
+  | "approved"
+  | "declined"
+  | "cancelled";
 
 export interface ILeaveRequest {
   tenantId: mongoose.Types.ObjectId;
@@ -42,12 +46,21 @@ export interface ILeaveBalanceDocument extends ILeaveBalance, Document {
 
 const leaveRequestSchema = new Schema<ILeaveRequestDocument>(
   {
-    tenantId: { type: Schema.Types.ObjectId, ref: 'Tenant', required: true, index: true },
-    employeeId: { type: Schema.Types.ObjectId, ref: 'Employee', required: true },
+    tenantId: {
+      type: Schema.Types.ObjectId,
+      ref: "Tenant",
+      required: true,
+      index: true,
+    },
+    employeeId: {
+      type: Schema.Types.ObjectId,
+      ref: "Employee",
+      required: true,
+    },
     type: {
       type: String,
       required: true,
-      enum: ['annual', 'sick', 'unpaid', 'planned'],
+      enum: ["planned", "unplanned", "unpaid", "annual", "sick"],
     },
     startDate: { type: Date, required: true },
     endDate: { type: Date, required: true },
@@ -56,15 +69,15 @@ const leaveRequestSchema = new Schema<ILeaveRequestDocument>(
     status: {
       type: String,
       required: true,
-      enum: ['pending', 'approved', 'declined', 'cancelled'],
-      default: 'pending',
+      enum: ["pending", "approved", "declined", "cancelled"],
+      default: "pending",
     },
-    approverId: { type: Schema.Types.ObjectId, ref: 'User', default: null },
+    approverId: { type: Schema.Types.ObjectId, ref: "User", default: null },
     approvedAt: { type: Date, default: null },
     declineReason: { type: String, trim: true },
     approvalStep: { type: Number, default: 1, min: 1, max: 2 },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 leaveRequestSchema.index({ tenantId: 1, employeeId: 1, status: 1 });
@@ -72,23 +85,35 @@ leaveRequestSchema.index({ tenantId: 1, status: 1, startDate: 1 });
 
 const leaveBalanceSchema = new Schema<ILeaveBalanceDocument>(
   {
-    tenantId: { type: Schema.Types.ObjectId, ref: 'Tenant', required: true, index: true },
-    employeeId: { type: Schema.Types.ObjectId, ref: 'Employee', required: true },
+    tenantId: {
+      type: Schema.Types.ObjectId,
+      ref: "Tenant",
+      required: true,
+      index: true,
+    },
+    employeeId: {
+      type: Schema.Types.ObjectId,
+      ref: "Employee",
+      required: true,
+    },
     year: { type: Number, required: true },
     entitlement: { type: Number, required: true, default: 25 },
     taken: { type: Number, required: true, default: 0 },
     pending: { type: Number, required: true, default: 0 },
     carriedOver: { type: Number, required: true, default: 0 },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
-leaveBalanceSchema.index({ tenantId: 1, employeeId: 1, year: 1 }, { unique: true });
+leaveBalanceSchema.index(
+  { tenantId: 1, employeeId: 1, year: 1 },
+  { unique: true },
+);
 
 export const LeaveRequest: Model<ILeaveRequestDocument> =
   mongoose.models.LeaveRequest ??
-  mongoose.model<ILeaveRequestDocument>('LeaveRequest', leaveRequestSchema);
+  mongoose.model<ILeaveRequestDocument>("LeaveRequest", leaveRequestSchema);
 
 export const LeaveBalance: Model<ILeaveBalanceDocument> =
   mongoose.models.LeaveBalance ??
-  mongoose.model<ILeaveBalanceDocument>('LeaveBalance', leaveBalanceSchema);
+  mongoose.model<ILeaveBalanceDocument>("LeaveBalance", leaveBalanceSchema);

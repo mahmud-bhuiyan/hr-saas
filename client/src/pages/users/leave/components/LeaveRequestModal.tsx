@@ -24,10 +24,9 @@ interface LeaveRequestModalProps {
 }
 
 const typeOptions: Array<{ value: LeaveType; label: string }> = [
-  { value: "annual", label: "Annual leave" },
-  { value: "sick", label: "Sick leave" },
-  { value: "unpaid", label: "Unpaid leave" },
   { value: "planned", label: "Planned leave" },
+  { value: "unplanned", label: "Unplanned leave" },
+  { value: "unpaid", label: "Unpaid leave" },
 ];
 
 export const LeaveRequestModal = ({

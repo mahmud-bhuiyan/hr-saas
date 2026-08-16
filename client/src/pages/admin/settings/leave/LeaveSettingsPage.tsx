@@ -24,8 +24,22 @@ import {
   type LeaveSettingsFormValues,
 } from "./utils";
 
-const ENTITLEMENT_KEYS = ["annualEntitlement", "maxCarryOverDays"] as const;
+const ENTITLEMENT_KEYS = [
+  "plannedLeaveEntitlement",
+  "unplannedLeaveEntitlement",
+  "unpaidLeaveEntitlement",
+  "maxCarryOverDays",
+] as const;
 const APPROVAL_KEYS = ["multiStepApprovalEnabled"] as const;
+
+const entitlementSlice = (
+  values: LeaveSettingsFormValues | LeaveEntitlementFormValues,
+): LeaveEntitlementFormValues => ({
+  plannedLeaveEntitlement: values.plannedLeaveEntitlement,
+  unplannedLeaveEntitlement: values.unplannedLeaveEntitlement,
+  unpaidLeaveEntitlement: values.unpaidLeaveEntitlement,
+  maxCarryOverDays: values.maxCarryOverDays,
+});
 
 export const LeaveSettingsPage = () => {
   const { user } = useAuth();
@@ -42,10 +56,7 @@ export const LeaveSettingsPage = () => {
   const [original, setOriginal] =
     useState<LeaveSettingsFormValues>(DEFAULT_LEAVE_FORM);
   const [entitlementForm, setEntitlementForm] =
-    useState<LeaveEntitlementFormValues>({
-      annualEntitlement: DEFAULT_LEAVE_FORM.annualEntitlement,
-      maxCarryOverDays: DEFAULT_LEAVE_FORM.maxCarryOverDays,
-    });
+    useState<LeaveEntitlementFormValues>(entitlementSlice(DEFAULT_LEAVE_FORM));
   const [approvalForm, setApprovalForm] = useState<LeaveApprovalFormValues>({
     multiStepApprovalEnabled: DEFAULT_LEAVE_FORM.multiStepApprovalEnabled,
   });
@@ -56,10 +67,7 @@ export const LeaveSettingsPage = () => {
     if (settingsQuery.data) {
       const next = toLeaveForm(settingsQuery.data);
       setOriginal(next);
-      setEntitlementForm({
-        annualEntitlement: next.annualEntitlement,
-        maxCarryOverDays: next.maxCarryOverDays,
-      });
+      setEntitlementForm(entitlementSlice(next));
       setApprovalForm({
         multiStepApprovalEnabled: next.multiStepApprovalEnabled,
       });
@@ -75,16 +83,31 @@ export const LeaveSettingsPage = () => {
     mutationFn: () => {
       const changed = pickChangedFields(
         entitlementForm as unknown as Record<string, unknown>,
-        {
-          annualEntitlement: original.annualEntitlement,
-          maxCarryOverDays: original.maxCarryOverDays,
-        } as unknown as Record<string, unknown>,
+        entitlementSlice(original) as unknown as Record<string, unknown>,
         [...ENTITLEMENT_KEYS],
       );
 
       return patchLeaveSettings({
-        ...(changed.annualEntitlement !== undefined
-          ? { annualEntitlement: Number(entitlementForm.annualEntitlement) }
+        ...(changed.plannedLeaveEntitlement !== undefined
+          ? {
+              plannedLeaveEntitlement: Number(
+                entitlementForm.plannedLeaveEntitlement,
+              ),
+            }
+          : {}),
+        ...(changed.unplannedLeaveEntitlement !== undefined
+          ? {
+              unplannedLeaveEntitlement: Number(
+                entitlementForm.unplannedLeaveEntitlement,
+              ),
+            }
+          : {}),
+        ...(changed.unpaidLeaveEntitlement !== undefined
+          ? {
+              unpaidLeaveEntitlement: Number(
+                entitlementForm.unpaidLeaveEntitlement,
+              ),
+            }
           : {}),
         ...(changed.maxCarryOverDays !== undefined
           ? { maxCarryOverDays: Number(entitlementForm.maxCarryOverDays) }
@@ -133,10 +156,7 @@ export const LeaveSettingsPage = () => {
 
   const entitlementChanged = hasFormChanges(
     entitlementForm as unknown as Record<string, unknown>,
-    {
-      annualEntitlement: original.annualEntitlement,
-      maxCarryOverDays: original.maxCarryOverDays,
-    } as unknown as Record<string, unknown>,
+    entitlementSlice(original) as unknown as Record<string, unknown>,
     [...ENTITLEMENT_KEYS],
   );
 
@@ -149,19 +169,13 @@ export const LeaveSettingsPage = () => {
   );
 
   const handleOpenEntitlementEdit = () => {
-    setEntitlementForm({
-      annualEntitlement: original.annualEntitlement,
-      maxCarryOverDays: original.maxCarryOverDays,
-    });
+    setEntitlementForm(entitlementSlice(original));
     setEntitlementEditOpen(true);
   };
 
   const handleCloseEntitlementEdit = () => {
     setEntitlementEditOpen(false);
-    setEntitlementForm({
-      annualEntitlement: original.annualEntitlement,
-      maxCarryOverDays: original.maxCarryOverDays,
-    });
+    setEntitlementForm(entitlementSlice(original));
   };
 
   const handleOpenApprovalEdit = () => {
@@ -194,7 +208,7 @@ export const LeaveSettingsPage = () => {
     <PageContainer className="space-y-6">
       <SettingsPageHeader
         title="Leave policy"
-        description="Configure annual entitlement, carry-over limits, and approval workflow."
+        description="Configure planned, unplanned, and unpaid leave days, carry-over limits, and approval workflow."
       />
 
       <div className="grid gap-6 sm:grid-cols-2">

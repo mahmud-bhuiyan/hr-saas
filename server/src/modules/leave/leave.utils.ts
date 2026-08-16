@@ -1,5 +1,14 @@
-/** Default annual leave entitlement for Stage 1 */
-export const DEFAULT_ANNUAL_ENTITLEMENT = 25;
+/** Default planned leave entitlement (days/year) */
+export const DEFAULT_PLANNED_LEAVE_ENTITLEMENT = 25;
+
+/** Default unplanned leave entitlement (days/year) */
+export const DEFAULT_UNPLANNED_LEAVE_ENTITLEMENT = 5;
+
+/** Default unpaid leave entitlement (days/year); 0 = not capped in balance */
+export const DEFAULT_UNPAID_LEAVE_ENTITLEMENT = 0;
+
+/** @deprecated Use DEFAULT_PLANNED_LEAVE_ENTITLEMENT */
+export const DEFAULT_ANNUAL_ENTITLEMENT = DEFAULT_PLANNED_LEAVE_ENTITLEMENT;
 
 export const DEFAULT_MAX_CARRY_OVER_DAYS = 5;
 
@@ -16,7 +25,7 @@ export const calculateProRataEntitlement = (
   annualEntitlement: number,
   startDate: Date | undefined | null,
   year: number,
-  fteFactor = 1
+  fteFactor = 1,
 ): number => {
   const daysInYear = getDaysInYear(year);
   const yearStart = Date.UTC(year, 0, 1);
@@ -29,13 +38,14 @@ export const calculateProRataEntitlement = (
     const startMs = Date.UTC(
       startDate.getUTCFullYear(),
       startDate.getUTCMonth(),
-      startDate.getUTCDate()
+      startDate.getUTCDate(),
     );
 
     if (startMs > yearEnd) {
       baseEntitlement = 0;
     } else if (startMs > yearStart) {
-      const employedDays = Math.floor((yearEnd - startMs) / (1000 * 60 * 60 * 24)) + 1;
+      const employedDays =
+        Math.floor((yearEnd - startMs) / (1000 * 60 * 60 * 24)) + 1;
       baseEntitlement = (annualEntitlement * employedDays) / daysInYear;
     }
   }
@@ -46,8 +56,13 @@ export const calculateProRataEntitlement = (
 
 /** Unused annual leave available to carry into the next year */
 export const calculateCarryOverAmount = (
-  balance: { entitlement: number; carriedOver: number; taken: number; pending: number },
-  maxCarryOverDays: number
+  balance: {
+    entitlement: number;
+    carriedOver: number;
+    taken: number;
+    pending: number;
+  },
+  maxCarryOverDays: number,
 ): number => {
   const remaining =
     balance.entitlement + balance.carriedOver - balance.taken - balance.pending;
@@ -56,7 +71,7 @@ export const calculateCarryOverAmount = (
 
 /** Parse YYYY-MM-DD to UTC midnight Date */
 export const parseDateString = (dateStr: string): Date => {
-  const [year, month, day] = dateStr.split('-').map(Number);
+  const [year, month, day] = dateStr.split("-").map(Number);
   return new Date(Date.UTC(year, month - 1, day));
 };
 
@@ -69,10 +84,18 @@ export const formatDateString = (date: Date): string => {
 export const calculateLeaveDays = (
   startDate: Date,
   endDate: Date,
-  halfDay: boolean
+  halfDay: boolean,
 ): number => {
-  const start = Date.UTC(startDate.getUTCFullYear(), startDate.getUTCMonth(), startDate.getUTCDate());
-  const end = Date.UTC(endDate.getUTCFullYear(), endDate.getUTCMonth(), endDate.getUTCDate());
+  const start = Date.UTC(
+    startDate.getUTCFullYear(),
+    startDate.getUTCMonth(),
+    startDate.getUTCDate(),
+  );
+  const end = Date.UTC(
+    endDate.getUTCFullYear(),
+    endDate.getUTCMonth(),
+    endDate.getUTCDate(),
+  );
   const diffMs = end - start;
   const days = Math.floor(diffMs / (1000 * 60 * 60 * 24)) + 1;
 
@@ -88,7 +111,7 @@ export const dateRangesOverlap = (
   startA: Date,
   endA: Date,
   startB: Date,
-  endB: Date
+  endB: Date,
 ): boolean => {
   return startA <= endB && endA >= startB;
 };

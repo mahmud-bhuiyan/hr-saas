@@ -65,10 +65,10 @@ This flow covers **signup → people → leave workflow → documents → settin
 
 ### 2.4 Leave & Absence
 
-- Leave types: annual, sick, unpaid (fixed list for Stage 1)
+- Leave types: planned, unplanned, unpaid (primary; legacy annual/sick still accepted)
 - Submit leave request (date range, optional half-day, reason)
 - Single-step approval (manager or HR approves/declines)
-- Leave balance per employee (fixed annual entitlement for Stage 1 — no complex accrual engine yet)
+- Leave balance per employee (planned leave entitlement — pro-rata + carry-over via tenant policy)
 - Team leave calendar (read-only month view)
 - Email notification on submit and on approve/decline (basic templates)
 

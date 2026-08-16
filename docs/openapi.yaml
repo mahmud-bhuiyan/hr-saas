@@ -1461,7 +1461,7 @@ paths:
             schema:
               $ref: "#/components/schemas/CreateLeaveRequest"
             example:
-              type: annual
+              type: planned
               startDate: "2026-03-10"
               endDate: "2026-03-12"
               reason: Family holiday
@@ -1644,7 +1644,7 @@ paths:
   /api/v1/leave/balances/me:
     get:
       tags: [Leave]
-      summary: Get my annual leave balance
+      summary: Get my planned leave balance
       operationId: getMyLeaveBalance
       security:
         - bearerAuth: []
@@ -3903,7 +3903,7 @@ paths:
     get:
       tags: [Settings]
       summary: Get leave policy settings
-      description: Company admin only. Returns annual entitlement, carry-over limit, and multi-step approval flag.
+      description: Company admin only. Returns planned/unplanned/unpaid entitlements, carry-over limit, and multi-step approval flag.
       operationId: getLeaveSettings
       security:
         - bearerAuth: []
@@ -3930,7 +3930,7 @@ paths:
     patch:
       tags: [Settings]
       summary: Update leave policy settings
-      description: Company admin only. Partial update of leave policy (entitlement, carry-over, multi-step approval).
+      description: Company admin only. Partial update of leave policy (entitlements, carry-over, multi-step approval).
       operationId: patchLeaveSettings
       security:
         - bearerAuth: []
@@ -3941,7 +3941,9 @@ paths:
             schema:
               $ref: "#/components/schemas/PatchLeaveSettingsRequest"
             example:
-              annualEntitlement: 25
+              plannedLeaveEntitlement: 25
+              unplannedLeaveEntitlement: 5
+              unpaidLeaveEntitlement: 0
               maxCarryOverDays: 5
               multiStepApprovalEnabled: true
       responses:
@@ -6583,13 +6585,30 @@ components:
 
     LeaveSettings:
       type: object
-      required: [annualEntitlement, maxCarryOverDays, multiStepApprovalEnabled]
+      required:
+        [
+          plannedLeaveEntitlement,
+          unplannedLeaveEntitlement,
+          unpaidLeaveEntitlement,
+          maxCarryOverDays,
+          multiStepApprovalEnabled,
+        ]
       properties:
-        annualEntitlement:
+        plannedLeaveEntitlement:
           type: number
           minimum: 0
           maximum: 365
           example: 25
+        unplannedLeaveEntitlement:
+          type: number
+          minimum: 0
+          maximum: 365
+          example: 5
+        unpaidLeaveEntitlement:
+          type: number
+          minimum: 0
+          maximum: 365
+          example: 0
         maxCarryOverDays:
           type: number
           minimum: 0
@@ -6603,7 +6622,15 @@ components:
       type: object
       minProperties: 1
       properties:
-        annualEntitlement:
+        plannedLeaveEntitlement:
+          type: number
+          minimum: 0
+          maximum: 365
+        unplannedLeaveEntitlement:
+          type: number
+          minimum: 0
+          maximum: 365
+        unpaidLeaveEntitlement:
           type: number
           minimum: 0
           maximum: 365
@@ -7254,7 +7281,8 @@ components:
 
     LeaveType:
       type: string
-      enum: [annual, sick, unpaid, planned]
+      enum: [planned, unplanned, unpaid, annual, sick]
+      description: Primary types are planned, unplanned, and unpaid. annual and sick are legacy values still accepted for existing records.
 
     LeaveRequestStatus:
       type: string

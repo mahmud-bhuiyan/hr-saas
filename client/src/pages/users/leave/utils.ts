@@ -2,14 +2,16 @@ import type { LeaveRequestStatus, LeaveType } from "../../../types";
 
 export const leaveTypeLabel = (type: LeaveType): string => {
   switch (type) {
+    case "planned":
+      return "Planned";
+    case "unplanned":
+      return "Unplanned";
+    case "unpaid":
+      return "Unpaid";
     case "annual":
       return "Annual";
     case "sick":
       return "Sick";
-    case "unpaid":
-      return "Unpaid";
-    case "planned":
-      return "Planned leave";
     default:
       return type;
   }
@@ -77,7 +79,7 @@ export const approvalStepLabel = (
 export type LeaveTab = "my-leave" | "employee-leave" | "approvals" | "calendar";
 
 export const emptyLeaveForm = {
-  type: "annual" as LeaveType,
+  type: "planned" as LeaveType,
   startDate: "",
   endDate: "",
   halfDay: false,

@@ -42,7 +42,7 @@ export const LeaveBalanceSummary = ({
     {
       label: "Entitlement",
       value: balance.entitlement,
-      note: `${balance.year} annual leave`,
+      note: `${balance.year} planned leave`,
     },
     ...(balance.carriedOver > 0
       ? [

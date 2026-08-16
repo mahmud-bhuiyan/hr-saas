@@ -123,7 +123,7 @@ Features added during Stage 2 implementation that extend the original step list.
 
 ## S2-5 — Done when
 
-- [x] Tenant leave settings: `annualEntitlement`, `maxCarryOverDays`, `multiStepApprovalEnabled`
+- [x] Tenant leave settings: `plannedLeaveEntitlement`, `unplannedLeaveEntitlement`, `unpaidLeaveEntitlement`, `maxCarryOverDays`, `multiStepApprovalEnabled`
 - [x] Pro-rata accrual: entitlement prorated from employee `startDate` within calendar year
 - [x] Carry-over: apply unused annual leave up to `maxCarryOverDays` on year boundary (job or on-demand)
 - [x] Multi-step approval: `approvalStep` on `LeaveRequest` (manager → HR when enabled)

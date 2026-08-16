@@ -30,6 +30,7 @@ Features added during Stage 3 implementation that extend the original step list.
 | Leave approval rota clash warnings | S3-7 | `conflictingShifts` on approver leave list + confirm modal on approve |
 | FTE factor in leave accrual | S3-7 | `calculateProRataEntitlement` scales by employee `fteFactor` |
 | Admin one-click employee login | — | `POST /employees/:id/create-login` creates/links User with default password `User@123`; profile **Create login** beside invite |
+| Leave policy entitlements split | S2-5 / S3-8 | Tenant leave settings: `plannedLeaveEntitlement`, `unplannedLeaveEntitlement`, `unpaidLeaveEntitlement` (+ `maxCarryOverDays`); request types align to planned/unplanned/unpaid |
 
 ---
 

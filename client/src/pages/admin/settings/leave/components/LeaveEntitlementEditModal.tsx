@@ -31,22 +31,54 @@ export const LeaveEntitlementEditModal = ({
     onClose={onClose}
     onSubmit={onSubmit}
     title="Edit leave entitlement"
-    description="Update annual entitlement and carry-over limits."
+    description="Update planned, unplanned, and unpaid leave days and carry-over limits."
     submitLabel="Save changes"
     loading={loading}
     submitDisabled={!hasChanges || loading}
   >
     <InputField
-      label="Annual entitlement (days)"
-      htmlFor="annual-entitlement"
-      id="annual-entitlement"
+      label="Planned leave (days)"
+      htmlFor="planned-leave-entitlement"
+      id="planned-leave-entitlement"
       type="number"
       min={0}
       max={365}
-      value={values.annualEntitlement}
-      onChange={(event) => onChange("annualEntitlement", event.target.value)}
+      value={values.plannedLeaveEntitlement}
+      onChange={(event) =>
+        onChange("plannedLeaveEntitlement", event.target.value)
+      }
       icon={<HiCalendarDays className="h-4 w-4 text-brand-600" />}
       description="Pro-rata applies automatically for mid-year starters based on employee start date."
+      disabled={loading}
+    />
+
+    <InputField
+      label="Unplanned leave (days)"
+      htmlFor="unplanned-leave-entitlement"
+      id="unplanned-leave-entitlement"
+      type="number"
+      min={0}
+      max={365}
+      value={values.unplannedLeaveEntitlement}
+      onChange={(event) =>
+        onChange("unplannedLeaveEntitlement", event.target.value)
+      }
+      icon={<HiCalendarDays className="h-4 w-4 text-brand-600" />}
+      disabled={loading}
+    />
+
+    <InputField
+      label="Unpaid leave (days)"
+      htmlFor="unpaid-leave-entitlement"
+      id="unpaid-leave-entitlement"
+      type="number"
+      min={0}
+      max={365}
+      value={values.unpaidLeaveEntitlement}
+      onChange={(event) =>
+        onChange("unpaidLeaveEntitlement", event.target.value)
+      }
+      icon={<HiCalendarDays className="h-4 w-4 text-brand-600" />}
       disabled={loading}
     />
 

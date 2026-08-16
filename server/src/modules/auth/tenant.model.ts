@@ -32,7 +32,11 @@ export interface ITenant {
   branding?: TenantBranding;
   attendanceGpsEnabled?: boolean;
   overtimeThresholdHours?: number;
+  /** @deprecated Prefer plannedLeaveEntitlement */
   annualEntitlement?: number;
+  plannedLeaveEntitlement?: number;
+  unplannedLeaveEntitlement?: number;
+  unpaidLeaveEntitlement?: number;
   maxCarryOverDays?: number;
   multiStepApprovalEnabled?: boolean;
   billingExempt?: boolean;
@@ -84,6 +88,9 @@ const tenantSchema = new Schema<ITenantDocument>(
     attendanceGpsEnabled: { type: Boolean, default: false },
     overtimeThresholdHours: { type: Number, default: 40, min: 1, max: 168 },
     annualEntitlement: { type: Number, default: 25, min: 0, max: 365 },
+    plannedLeaveEntitlement: { type: Number, default: 25, min: 0, max: 365 },
+    unplannedLeaveEntitlement: { type: Number, default: 5, min: 0, max: 365 },
+    unpaidLeaveEntitlement: { type: Number, default: 0, min: 0, max: 365 },
     maxCarryOverDays: { type: Number, default: 5, min: 0, max: 365 },
     multiStepApprovalEnabled: { type: Boolean, default: false },
     billingExempt: { type: Boolean, default: false },
