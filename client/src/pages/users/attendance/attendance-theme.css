@@ -1,0 +1,242 @@
+/* HR SaaS attendance log — theme-aware scoped styles */
+.att-attendance {
+  --att-bg: #f8fafc;
+  --att-card: #ffffff;
+  --att-card-hover: #f1f5f9;
+  --att-border: #e2e8f0;
+  --att-accent: #5bbfa8;
+  --att-accent-dim: #3d8f7c;
+  --att-text: #0f172a;
+  --att-muted: #64748b;
+  --att-w-off: #b45309;
+  --att-w-off-bg: #fef3c7;
+  --att-pill-active: #5bbfa8;
+  --att-bar-track: #e2e8f0;
+  --att-weekend-bg: #f8fafc;
+  --att-thead-bg: #f1f5f9;
+  --att-pill-text: #0f1923;
+  --att-clock-bg: rgba(241, 245, 249, 0.8);
+}
+
+.dark .att-attendance {
+  --att-bg: #0f1923;
+  --att-card: #162028;
+  --att-card-hover: #1a2832;
+  --att-border: #243442;
+  --att-accent: #5bbfa8;
+  --att-accent-dim: #3d8f7c;
+  --att-text: #e8edf2;
+  --att-muted: #8b9aab;
+  --att-w-off: #c4a574;
+  --att-w-off-bg: #2a2418;
+  --att-pill-active: #5bbfa8;
+  --att-bar-track: #243442;
+  --att-weekend-bg: #121c26;
+  --att-thead-bg: #121c26;
+  --att-pill-text: #0f1923;
+  --att-clock-bg: rgba(10, 16, 23, 0.3);
+}
+
+.att-attendance {
+  color: var(--att-text);
+}
+
+.att-card {
+  background-color: var(--att-card);
+  border: 1px solid var(--att-border);
+  border-radius: 0.5rem;
+}
+
+.att-card-header {
+  border-bottom: 1px solid var(--att-border);
+  padding: 0.75rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--att-text);
+}
+
+.att-muted {
+  color: var(--att-muted);
+}
+
+.att-accent-text {
+  color: var(--att-accent);
+}
+
+.att-link {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  transition: color 150ms ease, background-color 150ms ease, border-color 150ms ease;
+  color: var(--att-accent);
+}
+
+.att-link:hover {
+  color: var(--att-accent-dim);
+}
+
+.dark .att-link:hover {
+  color: #7dd4bc;
+}
+
+.att-tab {
+  padding: 0.5rem 1rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+  transition: color 150ms ease, background-color 150ms ease;
+  color: var(--att-muted);
+}
+
+.att-tab:hover {
+  color: var(--att-text);
+}
+
+.att-tab-active {
+  border-radius: 0.375rem;
+  background-color: var(--att-pill-active);
+  color: var(--att-pill-text);
+}
+
+.att-toggle {
+  position: relative;
+  height: 1.25rem;
+  width: 2.25rem;
+  border-radius: 9999px;
+  transition: background-color 150ms ease;
+  background-color: var(--att-bar-track);
+}
+
+.att-toggle-on {
+  background-color: var(--att-accent);
+}
+
+.att-toggle-thumb {
+  position: absolute;
+  top: 0.125rem;
+  left: 0.125rem;
+  height: 1rem;
+  width: 1rem;
+  border-radius: 9999px;
+  background-color: #ffffff;
+  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+  transition: transform 150ms ease;
+}
+
+.att-toggle-on .att-toggle-thumb {
+  transform: translateX(1rem);
+}
+
+.att-progress-track {
+  height: 0.5rem;
+  overflow: hidden;
+  border-radius: 9999px;
+  background-color: var(--att-bar-track);
+}
+
+.att-progress-fill {
+  height: 100%;
+  border-radius: 9999px;
+  background-color: var(--att-accent);
+}
+
+.att-month-pill {
+  padding: 0.25rem 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+  transition: color 150ms ease, background-color 150ms ease;
+  color: var(--att-muted);
+}
+
+.att-month-pill-active {
+  border-radius: 0.25rem;
+  background-color: var(--att-accent);
+  color: var(--att-pill-text);
+}
+
+.att-cal-cell {
+  position: relative;
+  min-height: 5.5rem;
+  border: 1px solid var(--att-border);
+  padding: 0.5rem;
+  background-color: var(--att-card);
+}
+
+.att-cal-cell-weekend {
+  background-color: var(--att-weekend-bg);
+}
+
+.att-cal-cell-selected {
+  outline: 2px solid var(--att-accent);
+  outline-offset: -2px;
+}
+
+.att-cal-cell-today .att-cal-day-num {
+  border-radius: 9999px;
+  background-color: var(--att-accent);
+  color: var(--att-pill-text);
+}
+
+.att-w-off {
+  position: absolute;
+  bottom: 0.25rem;
+  left: 0.25rem;
+  right: 0.25rem;
+  border-radius: 0.25rem;
+  padding: 0.125rem 0.25rem;
+  text-align: center;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  background-color: var(--att-w-off-bg);
+  color: var(--att-w-off);
+}
+
+.att-day-panel {
+  display: flex;
+  flex-direction: column;
+  border-left: 1px solid var(--att-border);
+  padding: 1rem;
+  background-color: var(--att-card);
+  min-width: 220px;
+}
+
+.att-bar-chart {
+  margin-top: 1rem;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 0.25rem;
+  height: 80px;
+}
+
+.att-bar {
+  width: 0.75rem;
+  border-radius: 0.25rem 0.25rem 0 0;
+  background: linear-gradient(to top, var(--att-accent-dim), var(--att-accent));
+}
+
+.att-attendance .card-surface,
+.att-attendance table {
+  background-color: var(--att-card) !important;
+  border-color: var(--att-border) !important;
+  color: var(--att-text);
+}
+
+.att-attendance thead th {
+  color: var(--att-muted) !important;
+  background-color: var(--att-thead-bg) !important;
+}
+
+.att-attendance tbody td {
+  border-color: var(--att-border) !important;
+  color: var(--att-text) !important;
+}
+
+.att-attendance tbody tr:hover {
+  background-color: var(--att-card-hover) !important;
+}

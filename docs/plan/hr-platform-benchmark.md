@@ -1,11 +1,11 @@
-# Keka — Platform Reference (Competitive Benchmark)
+# Reference HR — Platform Reference (Competitive Benchmark)
 
-**Purpose:** Canonical snapshot of [Keka](https://www.keka.com/)’s product scope, modules, and screens. Use this file to compare against our own plans (`00-stage-1-core-hr-plan.md`, `10-stage-2-operations-plan.md`, `11-stage-3-scheduling-payroll-plan.md`, `hr-saas-mern-project-plan.md`, and `modules/`) when scoping future work.
+**Purpose:** Canonical snapshot of [Reference HR](#)’s product scope, modules, and screens. Use this file to compare against our own plans (`00-stage-1-core-hr-plan.md`, `10-stage-2-operations-plan.md`, `11-stage-3-scheduling-payroll-plan.md`, `hr-saas-mern-project-plan.md`, and `modules/`) when scoping future work.
 
-**Our scope note:** This project targets **web only** (responsive). Keka’s native mobile apps are documented here for completeness but are **not** a target for our product.
+**Our scope note:** This project targets **web only** (responsive). The reference platform’s native mobile apps are documented here for completeness but are **not** a target for our product.
 
 **Last reviewed:** 2026-08-03  
-**Primary sources:** [keka.com](https://www.keka.com/), [Keka LLM info page](https://www.keka.com/llm-info), product marketing pages, help centre
+**Primary sources:** [example.com](#), [Reference LLM info page](#), product marketing pages, help centre
 
 ---
 
@@ -13,8 +13,8 @@
 
 | Attribute | Details |
 |-----------|---------|
-| **Product name** | Keka / Keka HR |
-| **Legal entity** | Keka Technologies Private Limited |
+| **Product name** | Reference HR |
+| **Legal entity** | Reference HR Technologies |
 | **Type** | Cloud HRMS / HCM / PeopleOS (People Operating System) |
 | **Founded** | 2014 (product launched 2015) |
 | **Founder & CEO** | Vijay Yalamanchili |
@@ -29,7 +29,7 @@
 
 ### Positioning
 
-Keka markets itself as a **unified PeopleOS** — one subscription covering HR, payroll, recruitment, performance, engagement, and (for services firms) PSA. Core pitch:
+Reference HR markets itself as a **unified PeopleOS** — one subscription covering HR, payroll, recruitment, performance, engagement, and (for services firms) PSA. Core pitch:
 
 - Single employee data layer across all modules (no siloed exports)
 - HR-team-first: configure payroll, policies, workflows without IT
@@ -41,13 +41,13 @@ Keka markets itself as a **unified PeopleOS** — one subscription covering HR, 
 
 ## 2. Product pillars
 
-Keka is organised into three main clouds, sold as one platform:
+Reference HR is organised into three main clouds, sold as one platform:
 
 | Pillar | Name | Focus |
 |--------|------|-------|
-| **A** | **Keka HR Cloud** | Core HR, leave, attendance, recruitment, performance, engagement, analytics |
-| **B** | **Keka Payroll Cloud** | Salary calculation, statutory compliance, payslips, reimbursements, F&F settlement |
-| **C** | **Keka PSA Cloud** | Professional services: projects, resources, billing, revenue analytics |
+| **A** | **Reference HR Cloud** | Core HR, leave, attendance, recruitment, performance, engagement, analytics |
+| **B** | **Reference Payroll Cloud** | Salary calculation, statutory compliance, payslips, reimbursements, F&F settlement |
+| **C** | **Reference PSA Cloud** | Professional services: projects, resources, billing, revenue analytics |
 
 All pillars share CoreHR as the central employee data hub.
 
@@ -76,7 +76,7 @@ All pillars share CoreHR as the central employee data hub.
 
 ### 3.2 Payroll
 
-**Purpose:** Automated payroll with embedded statutory compliance — Keka’s primary differentiator in India.
+**Purpose:** Automated payroll with embedded statutory compliance — the reference platform’s primary differentiator in India.
 
 | Capability | Details |
 |------------|---------|
@@ -235,7 +235,7 @@ All pillars share CoreHR as the central employee data hub.
 
 ---
 
-## 4. Screens checklist (Keka — full product)
+## 4. Screens checklist (Reference HR — full product)
 
 Use this checklist when comparing screen coverage against our app.
 
@@ -341,17 +341,17 @@ Use this checklist when comparing screen coverage against our app.
 - [ ] Subscription / billing
 - [ ] Audit log
 
-### Mobile (Keka only — not our target)
+### Mobile (reference platform only — not our target)
 - [ ] iOS app — clock, leave, payslips, approvals
 - [ ] Android app — same as iOS
 
 ---
 
-## 5. Roles (typical Keka deployment)
+## 5. Roles (typical Reference HR deployment)
 
 | Role | Typical access |
 |------|----------------|
-| **Super admin / Keka operator** | Platform-level (Keka internal — not tenant-scoped) |
+| **Super admin / platform operator** | Platform-level (platform internal — not tenant-scoped) |
 | **Company admin / HR admin** | Full tenant config, all modules |
 | **HR manager** | Employees, documents, leave, attendance, payroll runs, recruitment |
 | **Payroll admin** | Payroll processing, statutory filings, pay structures |
@@ -368,7 +368,7 @@ Use this checklist when comparing screen coverage against our app.
 |----------|----------|
 | Job boards | LinkedIn, Indeed, Naukri, 15+ boards |
 | Biometric | ZKTeco, Essl |
-| US payroll / benefits | Gusto, ADP (positioned as alternatives Keka replaces) |
+| US payroll / benefits | Gusto, ADP (positioned as alternatives Reference HR replaces) |
 | Accounting / ERP | Various ERP and accounting tools; REST API + webhooks |
 | Communication | Slack and others (marketing mentions) |
 
@@ -386,21 +386,21 @@ Use this checklist when comparing screen coverage against our app.
 
 ---
 
-## 8. Keka vs common HR SaaS patterns
+## 8. Reference HR vs common HR SaaS patterns
 
-| Pattern | Keka approach |
+| Pattern | Reference approach |
 |---------|---------------|
 | Payroll | **Native engine** with statutory compliance (India + US) |
 | ATS | **Built-in** — not a separate tool |
 | Performance | **Built-in** OKRs, 360, PIPs |
 | PSA | **Separate cloud** but same platform (services vertical) |
 | Mobile | **Native apps** central to employee experience |
-| Multi-tenant platform | Single Keka product — customers are tenants, not operators |
+| Multi-tenant platform | Single Reference product — customers are tenants, not operators |
 | Accounting handoff | Payroll is the system of record; exports secondary |
 
 ---
 
-## 9. Industries Keka targets
+## 9. Industries Reference HR targets
 
 - IT & SaaS
 - Manufacturing (shifts, biometric, blue-collar payroll)
@@ -415,12 +415,12 @@ Use this checklist when comparing screen coverage against our app.
 
 When planning our next stage:
 
-1. Pick a Keka module from **Section 3**
+1. Pick a reference module from **Section 3**
 2. Check **Section 4** screens against our stage plans and `client/src/pages/`
-3. Log gaps in our module plan or a future stage doc — do **not** edit this file unless refreshing the Keka benchmark
-4. For side-by-side status, add a comparison column to our module files or create a short `keka-vs-hr-saas-matrix.md` when needed
+3. Log gaps in our module plan or a future stage doc — do **not** edit this file unless refreshing the industry HR benchmark
+4. For side-by-side status, add a comparison column to our module files or create a short `hr-platform-vs-hr-saas-matrix.md` when needed
 
-**Intentional non-goals for our product (do not add to Keka doc):** native payroll/tax engine, native mobile apps, PSA, India statutory payroll — see our `11-payroll.md` and stage plans.
+**Intentional non-goals for our product (do not add to Reference HR doc):** native payroll/tax engine, native mobile apps, PSA, India statutory payroll — see our `11-payroll.md` and stage plans.
 
 ---
 
@@ -428,14 +428,14 @@ When planning our next stage:
 
 | Resource | URL |
 |----------|-----|
-| Homepage | https://www.keka.com/ |
-| HR Cloud | https://www.keka.com/us/hr-cloud |
-| Payroll | https://www.keka.com/ (Payroll Cloud) |
-| PSA | https://www.keka.com/us/psa |
-| Recruitment | https://keka.com/recruitment-management-software |
-| LLM / canonical info | https://www.keka.com/llm-info |
-| Help centre (PSA) | https://help.keka.com/hc/en-us |
+| Homepage | # |
+| HR Cloud | # |
+| Payroll | # (Payroll Cloud) |
+| PSA | # |
+| Recruitment | # |
+| LLM / canonical info | # |
+| Help centre (PSA) | # |
 
 ---
 
-*This document describes a third-party product for internal planning. Feature names and availability may change; verify on keka.com before client-facing comparisons.*
+*This document describes a third-party product for internal planning. Feature names and availability may change; verify on example.com before client-facing comparisons.*

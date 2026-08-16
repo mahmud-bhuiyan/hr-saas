@@ -3,7 +3,7 @@ import type { AttendanceCalendarDay, AttendanceLog } from "../../../../types";
 import type { AttendanceDisplayMode } from "../utils";
 import {
   buildMondayFirstCalendarDays,
-  formatKekaMonthYear,
+  formatAttendanceMonthYear,
   getMonthStrip,
   todayDateString,
 } from "../utils";
@@ -47,13 +47,13 @@ export const AttendanceCalendar = ({
   const selectedDay = selectedDate ? (dayMap.get(selectedDate) ?? null) : null;
 
   return (
-    <div className="keka-card overflow-hidden">
+    <div className="att-card overflow-hidden">
       <div
         className="flex flex-wrap items-center justify-between gap-3 border-b px-4 py-3"
-        style={{ borderColor: "var(--keka-border)" }}
+        style={{ borderColor: "var(--att-border)" }}
       >
         <h3 className="text-base font-semibold">
-          {formatKekaMonthYear(year, month)}
+          {formatAttendanceMonthYear(year, month)}
         </h3>
 
         <div className="flex flex-wrap items-center gap-1">
@@ -61,7 +61,7 @@ export const AttendanceCalendar = ({
             <button
               key={`${item.year}-${item.month}`}
               type="button"
-              className={`keka-month-pill ${item.year === year && item.month === month ? "keka-month-pill-active" : ""}`}
+              className={`att-month-pill ${item.year === year && item.month === month ? "att-month-pill-active" : ""}`}
               onClick={() => onMonthSelect(item.year, item.month)}
             >
               {item.label}
@@ -71,11 +71,11 @@ export const AttendanceCalendar = ({
 
         <div
           className="flex overflow-hidden rounded-md border"
-          style={{ borderColor: "var(--keka-border)" }}
+          style={{ borderColor: "var(--att-border)" }}
         >
           <button
             type="button"
-            className={`px-2.5 py-1.5 ${displayMode === "list" ? "keka-tab-active" : "keka-muted"}`}
+            className={`px-2.5 py-1.5 ${displayMode === "list" ? "att-tab-active" : "att-muted"}`}
             onClick={() => onDisplayModeChange("list")}
             aria-label="List view"
           >
@@ -83,7 +83,7 @@ export const AttendanceCalendar = ({
           </button>
           <button
             type="button"
-            className={`px-2.5 py-1.5 ${displayMode === "calendar" ? "keka-tab-active" : "keka-muted"}`}
+            className={`px-2.5 py-1.5 ${displayMode === "calendar" ? "att-tab-active" : "att-muted"}`}
             onClick={() => onDisplayModeChange("calendar")}
             aria-label="Calendar view"
           >
@@ -93,7 +93,7 @@ export const AttendanceCalendar = ({
       </div>
 
       {loading ? (
-        <div className="flex h-72 items-center justify-center keka-muted text-sm">
+        <div className="flex h-72 items-center justify-center att-muted text-sm">
           Loading calendar…
         </div>
       ) : (
@@ -102,15 +102,15 @@ export const AttendanceCalendar = ({
             <div
               className="grid grid-cols-7 border-b text-center text-[10px] font-semibold uppercase tracking-wide"
               style={{
-                borderColor: "var(--keka-border)",
-                color: "var(--keka-muted)",
+                borderColor: "var(--att-border)",
+                color: "var(--att-muted)",
               }}
             >
               {WEEK_HEADERS.map((label) => (
                 <div
                   key={label}
                   className="border-r py-2 last:border-r-0"
-                  style={{ borderColor: "var(--keka-border)" }}
+                  style={{ borderColor: "var(--att-border)" }}
                 >
                   {label}
                 </div>
@@ -127,27 +127,27 @@ export const AttendanceCalendar = ({
                   <button
                     key={cell.date}
                     type="button"
-                    className={`keka-cal-cell text-left ${cell.isWeekend ? "keka-cal-cell-weekend" : ""} ${isSelected ? "keka-cal-cell-selected" : ""} ${isToday ? "keka-cal-cell-today" : ""} ${!cell.inCurrentMonth ? "opacity-40" : ""}`}
+                    className={`att-cal-cell text-left ${cell.isWeekend ? "att-cal-cell-weekend" : ""} ${isSelected ? "att-cal-cell-selected" : ""} ${isToday ? "att-cal-cell-today" : ""} ${!cell.inCurrentMonth ? "opacity-40" : ""}`}
                     onClick={() =>
                       cell.inCurrentMonth && onDaySelect(cell.date)
                     }
                     disabled={!cell.inCurrentMonth}
                   >
-                    <span className="keka-cal-day-num inline-flex h-6 w-6 items-center justify-center text-xs font-medium">
+                    <span className="att-cal-day-num inline-flex h-6 w-6 items-center justify-center text-xs font-medium">
                       {cell.day}
                     </span>
 
                     {dayData &&
                       dayData.totalMinutes > 0 &&
                       cell.inCurrentMonth && (
-                        <p className="keka-accent-text mt-1 text-[10px] font-medium">
+                        <p className="att-accent-text mt-1 text-[10px] font-medium">
                           {Math.floor(dayData.totalMinutes / 60)}h{" "}
                           {dayData.totalMinutes % 60}m
                         </p>
                       )}
 
                     {cell.isWeekend && cell.inCurrentMonth && (
-                      <span className="keka-w-off">W-OFF</span>
+                      <span className="att-w-off">W-OFF</span>
                     )}
                   </button>
                 );

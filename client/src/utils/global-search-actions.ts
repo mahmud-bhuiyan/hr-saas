@@ -5,7 +5,6 @@ import {
   MY_ATTENDANCE_PATH,
   MY_DOCUMENTS_PATH,
   MY_DASHBOARD_PATH,
-  MY_EXPENSES_PATH,
   MY_LEAVE_PATH,
   MY_PROFILE_PATH,
   MY_ROTAS_PATH,
@@ -107,15 +106,6 @@ export const GLOBAL_SEARCH_ACTIONS: GlobalSearchActionDef[] = [
     roles: ["company_admin", "hr_manager", "manager", "employee"],
     module: "timesheets",
     keywords: ["timesheet", "hours", "overtime", "weekly"],
-  },
-  {
-    id: "expenses",
-    label: "Submit expense",
-    subtitle: "Expense claims and receipts",
-    route: MY_EXPENSES_PATH,
-    roles: ["company_admin", "hr_manager", "manager", "employee"],
-    module: "expenses",
-    keywords: ["expense", "receipt", "reimbursement", "claim"],
   },
   {
     id: "employees",

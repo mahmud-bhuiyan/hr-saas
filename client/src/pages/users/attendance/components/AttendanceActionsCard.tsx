@@ -7,7 +7,7 @@ import {
 } from "react-icons/hi2";
 import { Button } from "../../../../components/ui/Button";
 import type { AttendanceLog } from "../../../../types";
-import { formatKekaDate } from "../utils";
+import { formatAttendanceDate } from "../utils";
 
 type ClockInMethod = "kiosk" | "web";
 
@@ -62,26 +62,26 @@ export const AttendanceActionsCard = ({
     hour12: !use24Hour,
   });
 
-  const dateLabel = formatKekaDate(now.toISOString().slice(0, 10));
+  const dateLabel = formatAttendanceDate(now.toISOString().slice(0, 10));
 
   return (
-    <div className="keka-card flex h-full flex-col">
-      <div className="keka-card-header">Actions</div>
+    <div className="att-card flex h-full flex-col">
+      <div className="att-card-header">Actions</div>
 
       <div className="flex flex-1 flex-row gap-8 px-6 py-6">
         <div className="flex shrink-0 flex-col items-start">
           <div
             className="mb-3 rounded-md border px-5 py-3"
             style={{
-              borderColor: "var(--keka-border)",
-              backgroundColor: "var(--keka-clock-bg)",
+              borderColor: "var(--att-border)",
+              backgroundColor: "var(--att-clock-bg)",
             }}
           >
-            <span className="font-sans text-2xl font-medium tracking-wide text-[var(--keka-text)]">
+            <span className="font-sans text-2xl font-medium tracking-wide text-[var(--att-text)]">
               {timeLabel}
             </span>
           </div>
-          <p className="text-[13px] font-medium text-[var(--keka-text)]">
+          <p className="text-[13px] font-medium text-[var(--att-text)]">
             {dateLabel}
           </p>
         </div>
@@ -93,7 +93,7 @@ export const AttendanceActionsCard = ({
                 <HiMapPin className="h-4 w-4 text-amber-600 dark:text-amber-300" />
                 Location sharing
               </div>
-              <p className="keka-muted mb-3">
+              <p className="att-muted mb-3">
                 GPS is enabled for web clock-in. Your location will be stored
                 with this record.
               </p>
@@ -121,13 +121,13 @@ export const AttendanceActionsCard = ({
               <li>
                 <button
                   type="button"
-                  className="keka-link w-full text-left disabled:opacity-40"
+                  className="att-link w-full text-left disabled:opacity-40"
                   onClick={onClockOut}
                   disabled={loading}
                 >
                   <HiClock
                     className="h-5 w-5 shrink-0"
-                    style={{ color: "var(--keka-accent)" }}
+                    style={{ color: "var(--att-accent)" }}
                   />
                   <span className="text-[15px]">Clock Out</span>
                 </button>
@@ -137,13 +137,13 @@ export const AttendanceActionsCard = ({
                 <li>
                   <button
                     type="button"
-                    className="keka-link w-full text-left disabled:opacity-40"
+                    className="att-link w-full text-left disabled:opacity-40"
                     onClick={handleOfficeClockIn}
                     disabled={loading || showGpsConsent}
                   >
                     <HiBuildingOffice2
                       className="h-5 w-5 shrink-0"
-                      style={{ color: "var(--keka-accent)" }}
+                      style={{ color: "var(--att-accent)" }}
                     />
                     <span className="text-[15px]">Clock In</span>
                   </button>
@@ -151,13 +151,13 @@ export const AttendanceActionsCard = ({
                 <li>
                   <button
                     type="button"
-                    className="keka-link w-full text-left disabled:opacity-40"
+                    className="att-link w-full text-left disabled:opacity-40"
                     onClick={handleWebClockIn}
                     disabled={loading || showGpsConsent}
                   >
                     <HiComputerDesktop
                       className="h-5 w-5 shrink-0"
-                      style={{ color: "var(--keka-accent)" }}
+                      style={{ color: "var(--att-accent)" }}
                     />
                     <span className="text-[15px]">Web Clock-In</span>
                   </button>
@@ -167,7 +167,7 @@ export const AttendanceActionsCard = ({
           </ul>
 
           {clockedIn && session && (
-            <p className="keka-muted mt-auto pt-4 text-[10px]">
+            <p className="att-muted mt-auto pt-4 text-[10px]">
               <HiClock className="mr-1 inline h-3 w-3" />
               Active since{" "}
               {new Date(session.clockIn).toLocaleTimeString(undefined, {

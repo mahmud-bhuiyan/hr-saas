@@ -103,7 +103,7 @@ Employees clock in and out via the web app. Managers see who is currently workin
 
 ## 6. UI Screens & Flows
 
-### Screen: Attendance — My attendance tab (Keka-inspired)
+### Screen: Attendance — My attendance tab (HR SaaS)
 - **Route:** `/dashboard/attendance` (tab: My attendance)
 - **Access:** all tenant roles with linked employee record
 - **Elements:**
@@ -190,7 +190,7 @@ HR opens employee history → corrects missed punch → audit log entry
 - [x] Team live board
 - [x] HR correction modal
 - [x] GPS consent banner (conditional)
-- [x] Keka-style My attendance tab — summary cards, timings card, actions card
+- [x] HR SaaS-style My attendance tab — summary cards, timings card, actions card
 - [x] Month calendar with day detail panel
 - [x] Logs sub-tabs (Calendar + Attendance log)
 - [x] 24-hour format toggle
@@ -207,8 +207,8 @@ HR opens employee history → corrects missed punch → audit log entry
 
 - [ ] Auto clock-out at midnight for forgotten sessions?
 - [ ] Break tracking in Stage 2 or defer to Stage 3?
-- [ ] On-time arrival % and break minutes (Keka-style stats — needs shift/schedule data)
-- [ ] Overtime / attendance request tabs (Keka reference — future scope)
+- [ ] On-time arrival % and break minutes (HR SaaS-style stats — needs shift/schedule data)
+- [ ] Overtime / attendance request tabs (industry reference — future scope)
 
 ---
 

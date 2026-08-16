@@ -1,6 +1,6 @@
-import { Link } from 'react-router-dom';
-import { BrandMark } from './BrandMark';
-import type { ReactNode } from 'react';
+import { Link } from "react-router-dom";
+import { BrandMark } from "./BrandMark";
+import type { ReactNode } from "react";
 
 interface AuthLayoutProps {
   title: string;
@@ -9,10 +9,15 @@ interface AuthLayoutProps {
   footer?: ReactNode;
 }
 
-export const AuthLayout = ({ title, subtitle, children, footer }: AuthLayoutProps) => {
+export const AuthLayout = ({
+  title,
+  subtitle,
+  children,
+  footer,
+}: AuthLayoutProps) => {
   return (
     <div className="flex min-h-screen bg-white">
-      {/* Left — hero image (Keka-style split) */}
+      {/* Left — hero image (split layout) */}
       <div className="relative hidden min-h-screen lg:block lg:w-[70%]">
         <img
           src="/images/login-image.jpg"
@@ -51,20 +56,20 @@ export const AuthLayout = ({ title, subtitle, children, footer }: AuthLayoutProp
               <BrandMark compact />
             </Link>
             <p className="min-w-0 text-xs leading-snug text-slate-400">
-            By signing in, you agree to our{" "}
-            <Link
-              to="/terms"
-              className="underline decoration-slate-300 underline-offset-2 hover:text-slate-600"
-            >
-              Terms of Use
-            </Link>{" "}
-            and{" "}
-            <Link
-              to="/privacy"
-              className="underline decoration-slate-300 underline-offset-2 hover:text-slate-600"
-            >
-              Privacy Policy
-            </Link>
+              By signing in, you agree to our{" "}
+              <Link
+                to="/terms"
+                className="underline decoration-slate-300 underline-offset-2 hover:text-slate-600"
+              >
+                Terms of Use
+              </Link>{" "}
+              and{" "}
+              <Link
+                to="/privacy"
+                className="underline decoration-slate-300 underline-offset-2 hover:text-slate-600"
+              >
+                Privacy Policy
+              </Link>
             </p>
           </div>
         </div>

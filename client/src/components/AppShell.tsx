@@ -22,8 +22,6 @@ import type { IconType } from "react-icons";
 
 import { useAuth } from "../contexts/AuthContext";
 
-import { useHasLinkedEmployee } from "../hooks/useLinkedEmployee";
-
 import { useSiteConfig } from "../contexts/SiteConfigContext";
 
 import {
@@ -144,6 +142,15 @@ const navItems: Array<{
   },
 
   {
+    to: "/employees/active",
+    label: "My Team",
+    icon: HiUserGroup,
+    roles: ["company_admin", "hr_manager", "manager"],
+    module: "employees",
+    activePrefix: "/employees",
+  },
+
+  {
     to: MY_TIMESHEETS_PATH,
     label: "Timesheets",
     icon: HiTableCells,
@@ -168,15 +175,6 @@ const navItems: Array<{
   },
 
   {
-    to: "/employees/active",
-    label: "My Team",
-    icon: HiUserGroup,
-    roles: ["company_admin", "hr_manager", "manager"],
-    module: "employees",
-    activePrefix: "/employees",
-  },
-
-  {
     to: ADMIN_PAYROLL_PATH,
     label: "Payroll",
     icon: HiCurrencyDollar,
@@ -194,13 +192,9 @@ const navItems: Array<{
 
   {
     to: ADMIN_SETTINGS_PATH,
-
     label: "Settings",
-
     icon: HiCog6Tooth,
-
     roles: ["company_admin", "hr_manager"],
-
     module: "settings",
   },
 ];
@@ -224,7 +218,6 @@ const isNavItemActive = (
 
 export const AppShell = () => {
   const { user } = useAuth();
-  const hasLinkedEmployee = useHasLinkedEmployee();
   const { config } = useSiteConfig();
   const location = useLocation();
 
@@ -344,14 +337,6 @@ export const AppShell = () => {
               if (
                 item.to === MY_ATTENDANCE_PATH &&
                 !hasAnyMyModuleEnabled(user)
-              ) {
-                return false;
-              }
-
-              if (
-                item.to === MY_ATTENDANCE_PATH &&
-                user?.role === "company_admin" &&
-                hasLinkedEmployee !== true
               ) {
                 return false;
               }
