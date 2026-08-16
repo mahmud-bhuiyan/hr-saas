@@ -66,7 +66,7 @@ export const AttendanceSettingsPage = () => {
   ]);
 
   return (
-    <PageContainer maxWidth="lg">
+    <PageContainer>
       <SettingsPageHeader
         title="Attendance settings"
         description="Configure attendance options for your company."
