@@ -21,10 +21,12 @@ Features added during implementation that extend the original step list. Keep th
 
 | Added | Step | Description |
 |-------|------|---------------|
-| Super admin role | 2 | Platform operator; bootstrap via `npm run seed:superadmin` or first-user `POST /api/v1/admins` |
+| Super admin role | 2 | Platform operator; bootstrap via first-user `POST /api/v1/admins` |
 | Registration approval | 2 | Self-register creates **pending** tenant; super admin approves/rejects before login |
 | Super admin add company | 2 | `POST /api/v1/admin/registrations` — create approved company + admin in one step |
 | User profile & password | 2–3 | `GET/PATCH /api/v1/auth/me`, profile page, change-password modal |
+| Profile account details | 3 | My profile shows role, company, account status, timestamps, and linked employee fields when present |
+| Self-service phone update | 3 | Profile edit modal; `PATCH /api/v1/employees/me` updates phone on linked employee (email immutable) |
 | UI component kit | 3 | Reusable primitives in `client/src/components/ui/` (Button, Table, Modal, FormModal, etc.) |
 | Companies page (super admin) | 3 | `/super-admin/companies` — pending queue + add company |
 | Manager team-scoped employee read | 4 | Managers see direct reports only (`employee:read:team`) |
@@ -64,7 +66,7 @@ Features added during implementation that extend the original step list. Keep th
 - [x] JWT middleware rejects invalid/expired tokens (401)
 - [x] RBAC `authorize()` and `authorizePermission()` middleware in place
 - [x] Tenant middleware (`resolveTenant`, `requireTenant`) in place
-- [x] Super admin bootstrap (`POST /api/v1/admins`, `npm run seed:superadmin`)
+- [x] Super admin bootstrap (`POST /api/v1/admins`)
 - [x] Super admin: list / approve / reject pending registrations
 - [x] Super admin: create company directly (auto-approved)
 - [x] `docs/openapi.yaml` and Postman collection updated with auth + admin endpoints
@@ -157,7 +159,7 @@ Features added during implementation that extend the original step list. Keep th
 - [x] Bug fixes on demo walkthrough path (Stage 2 path addressed in S2-8)
 - [x] Forgot password flow — shipped in S2-1 (`/forgot-password`, `/reset-password`)
 - [x] Client demo sign-off per [00-stage-1-core-hr-plan.md](./00-stage-1-core-hr-plan.md) Section 7
-- [x] Automated demo seed scripts and demo-era unit tests removed intentionally — manual staging data only (`npm run seed:superadmin` for platform bootstrap)
+- [x] Automated demo seed scripts and demo-era unit tests removed intentionally — manual staging data only; bootstrap via `POST /api/v1/admins`
 
 **Review:** Stage 1 complete. See [STAGE-3-IMPLEMENTATION-STEPS.md](./STAGE-3-IMPLEMENTATION-STEPS.md) for Stage 3.
 

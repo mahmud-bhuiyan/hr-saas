@@ -4,6 +4,7 @@ import {
   HiIdentification,
   HiMapPin,
   HiPhone,
+  HiShieldCheck,
 } from "react-icons/hi2";
 import type { ReactNode } from "react";
 import { ThemeBannerBackground } from "../../../components/ThemeBannerBackground";
@@ -11,7 +12,7 @@ import { UserAvatar } from "../../../components/UserAvatar";
 import type { AuthUser, MyEmployeeProfile, UserProfile } from "../../../types";
 import { useCountryDialCodes } from "../../../hooks/useCountryDialCodes";
 import { formatPhone } from "../../../utils/phone";
-import { displayName } from "../../../utils/user";
+import { displayName, roleLabel } from "../../../utils/user";
 
 interface ProfileHeaderBannerProps {
   user: AuthUser;
@@ -112,6 +113,10 @@ export const ProfileHeaderBanner = ({
           >
             {email}
           </a>
+        </InfoItem>
+
+        <InfoItem icon={<HiShieldCheck className="h-4 w-4" />}>
+          {roleLabel(user.role)}
         </InfoItem>
 
         {phone && (

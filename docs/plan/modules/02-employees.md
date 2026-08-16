@@ -54,6 +54,8 @@ HR records for each person in a company: directory, profile, manager hierarchy, 
 | GET | `/api/v1/employees` | read / read:team | List with search, department, status filters |
 | GET | `/api/v1/employees/departments` | read / read:team | Distinct departments for filters |
 | POST | `/api/v1/employees` | create | Create employee |
+| GET | `/api/v1/employees/me` | Authenticated (tenant) | Linked employee profile for self-service |
+| PATCH | `/api/v1/employees/me` | Authenticated (tenant) | Update own phone on linked employee record |
 | GET | `/api/v1/employees/:id` | read / read:team | Get one |
 | PATCH | `/api/v1/employees/:id` | update | Partial update; deactivate via `status: terminated` |
 | GET | `/api/v1/employees/:id/reports` | read / read:team | Direct reports (org view) |
@@ -63,6 +65,7 @@ HR records for each person in a company: directory, profile, manager hierarchy, 
 | Method | Path | Permission | Description |
 |--------|------|------------|-------------|
 | POST | `/api/v1/employees/:id/invite` | create | Send invite email; create/link User |
+| POST | `/api/v1/employees/:id/create-login` | create | Create/link User with default password `User@123` (no email) |
 | POST | `/api/v1/employees/import/validate` | create | Parse CSV; return preview + errors |
 | POST | `/api/v1/employees/import/commit` | create | Create employees from validated CSV |
 
@@ -87,7 +90,7 @@ HR records for each person in a company: directory, profile, manager hierarchy, 
 | Employee profile | `/dashboard/employees/:id` | ✅ |
 | Edit details + deactivate | Profile page | ✅ |
 | Direct reports | Profile page section | ✅ |
-| Link to login user | Profile invite action | ✅ S2-1 |
+| Link to login user | Profile invite or create-login action | ✅ S2-1 + create-login |
 | Bulk CSV import | Directory page wizard | ✅ S2-6 |
 
 ---
@@ -101,6 +104,7 @@ HR records for each person in a company: directory, profile, manager hierarchy, 
 | Manager → direct reports | ✅ | Done |
 | Department as managed entity | Step 7 | Free text for now |
 | Employee ↔ User link / invite | Stage 2 S2-1 | Done |
+| Employee ↔ User one-click login | Out of plan | Done — default password `User@123` |
 | Bulk CSV import | Stage 2 S2-6 | Done |
 | departmentId FK migration | Stage 2 S2-6 | Optional |
 
@@ -118,12 +122,31 @@ HR records for each person in a company: directory, profile, manager hierarchy, 
 
 ### Tasks
 
-- [ ] `POST /employees/:id/invite` endpoint
-- [ ] Invite button on employee profile (HR/admin)
-- [ ] Email template via notification queue
-- [ ] OpenAPI + Postman
+- [x] `POST /employees/:id/invite` endpoint
+- [x] Invite button on employee profile (HR/admin)
+- [x] Email template via notification queue
+- [x] OpenAPI + Postman
 
 **Estimate:** 2 days (part of S2-1)
+
+---
+
+## 15. Admin one-click login (create-login)
+
+HR/admin can grant access without sending email, as an alternative to invite.
+
+### Business rules
+
+1. Same eligibility as invite: employee email required; 409 if already linked or email used in another tenant.
+2. Creates User with default password `User@123`, or links existing User in the same tenant (does not reset that user's password).
+3. Sets `Employee.userId` on success. No invite email is sent.
+4. Profile shows **Send invite** and **Create login** while the employee has no linked user.
+
+### Tasks
+
+- [x] `POST /employees/:id/create-login` endpoint
+- [x] Create login button on employee profile (HR/admin)
+- [x] OpenAPI + Postman
 
 ---
 
@@ -159,4 +182,5 @@ HR records for each person in a company: directory, profile, manager hierarchy, 
 - [x] Profile shows manager and direct reports
 - [x] Deactivate sets status to terminated
 - [x] Link employee record to login user via invite (Stage 2 S2-1)
+- [x] Admin one-click login with default password `User@123`
 - [x] Bulk CSV import with validation preview (Stage 2 S2-6)

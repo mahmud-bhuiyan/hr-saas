@@ -2,7 +2,7 @@
   "info": {
     "_postman_id": "hr-saas-api-collection",
     "name": "HR SaaS API",
-    "description": "All API requests for the HR SaaS platform. Import into Postman or use with Newman.\n\n**Setup:** Import `hr-saas.local.postman_environment.json` or set collection variables `baseUrl`, `accessToken`, `testPassword`, and `employeeEmail`.\n\n**Local test credentials:** After `cd server && npm run seed:test-data`, every seeded account signs in with its **email** and password **`User@123`** (`{{testPassword}}`).\n\n**Auth flow:** Register submits for approval (no token). Super admin approves, then company admin logs in. Login requests save `accessToken` automatically.",
+    "description": "All API requests for the HR SaaS platform. Import into Postman or use with Newman.\n\n**Setup:** Import `hr-saas.local.postman_environment.json` or set collection variables `baseUrl`, `accessToken`, `testPassword`, and `employeeEmail`.\n\n**Local test credentials:** Use an existing account. Employees created via **Create login** use password **`User@123`** (`{{testPassword}}`) until they change it.\n\n**Auth flow:** Register submits for approval (no token). Super admin approves, then company admin logs in. Login requests save `accessToken` automatically. Bootstrap the first super admin with **Admins → Create Admin (bootstrap super_admin)** when the database has no users.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
@@ -170,7 +170,7 @@
               "raw": "{\n  \"email\": \"{{adminEmail}}\",\n  \"password\": \"{{testPassword}}\"\n}"
             },
             "url": "{{baseUrl}}/api/v1/auth/login",
-            "description": "Acme company admin after `npm run seed:test-data` or super-admin company creation. Saves accessToken."
+            "description": "Company admin login. Saves accessToken."
           },
           "response": []
         },
@@ -203,7 +203,7 @@
               "raw": "{\n  \"email\": \"{{superAdminEmail}}\",\n  \"password\": \"{{testPassword}}\"\n}"
             },
             "url": "{{baseUrl}}/api/v1/auth/login",
-            "description": "Platform super admin (`npm run seed:superadmin` or seed:test-data). Saves accessToken."
+            "description": "Platform super admin login. Saves accessToken."
           },
           "response": []
         },
@@ -236,7 +236,7 @@
               "raw": "{\n  \"email\": \"{{employeeEmail}}\",\n  \"password\": \"{{testPassword}}\"\n}"
             },
             "url": "{{baseUrl}}/api/v1/auth/login",
-            "description": "Employee self-service login. Set `employeeEmail` to any seeded employee (e.g. alex.morgan@acme.com, jane.smith@acme.com). Password is always `User@123` after seed:test-data."
+            "description": "Employee self-service login. Set `employeeEmail` to an existing employee user. Password is `User@123` after **Create login** until they change it."
           },
           "response": []
         },
@@ -316,10 +316,10 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"firstName\": \"Jane\",\n  \"lastName\": \"Admin\",\n  \"email\": \"admin@acme.com\",\n  \"colorScheme\": \"dark\"\n}"
+              "raw": "{\n  \"firstName\": \"Jane\",\n  \"lastName\": \"Admin\",\n  \"colorScheme\": \"dark\"\n}"
             },
             "url": "{{baseUrl}}/api/v1/auth/me",
-            "description": "Update own profile. Include currentPassword + newPassword to change password."
+            "description": "Update own profile (name, theme). Email cannot be changed. Include currentPassword + newPassword to change password."
           },
           "response": []
         },
@@ -681,6 +681,35 @@
           "response": []
         },
         {
+          "name": "Update My Employee Phone",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"phone\": \"+12025550199\"\n}"
+            },
+            "url": "{{baseUrl}}/api/v1/employees/me",
+            "description": "Update own linked employee phone. 404 when no employee is linked."
+          },
+          "response": []
+        },
+        {
           "name": "List Departments",
           "request": {
             "auth": {
@@ -833,7 +862,32 @@
               "raw": "{\n  \"role\": \"employee\"\n}"
             },
             "url": "{{baseUrl}}/api/v1/employees/{{employeeId}}/invite",
-            "description": "Creates/links a user for an employee without userId and sends invite email. For local testing with a known password, run `npm run seed:test-data` instead (all employees get `User@123`)."
+            "description": "Creates/links a user for an employee without userId and sends invite email."
+          },
+          "response": []
+        },
+        {
+          "name": "Create Employee Login",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                { "key": "token", "value": "{{accessToken}}", "type": "string" }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"role\": \"employee\"\n}"
+            },
+            "url": "{{baseUrl}}/api/v1/employees/{{employeeId}}/create-login",
+            "description": "Creates/links a user for an employee without userId. New accounts use password User@123. No invite email is sent."
           },
           "response": []
         },

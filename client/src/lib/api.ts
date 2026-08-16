@@ -27,6 +27,7 @@ import type {
   MyEmployeeProfile,
   CreateEmployeeInput,
   UpdateEmployeeInput,
+  UpdateMyEmployeeInput,
   ListEmployeesQuery,
   LeaveRequest,
   LeaveBalance,
@@ -77,6 +78,8 @@ import type {
   ResetPasswordInput,
   MessageResponse,
   InviteEmployeeInput,
+  CreateEmployeeLoginInput,
+  CreateEmployeeLoginResult,
   AttendanceLog,
   AttendanceStatus,
   AttendanceSettings,
@@ -481,6 +484,18 @@ export const fetchMyEmployee = async (): Promise<MyEmployeeProfile> => {
   const json = await apiFetch<
     ApiSuccessResponse<{ employee: MyEmployeeProfile }>
   >("/api/v1/employees/me");
+  return json.data.employee;
+};
+
+export const updateMyEmployee = async (
+  input: UpdateMyEmployeeInput,
+): Promise<MyEmployeeProfile> => {
+  const json = await apiFetch<
+    ApiSuccessResponse<{ employee: MyEmployeeProfile }>
+  >("/api/v1/employees/me", {
+    method: "PATCH",
+    body: JSON.stringify(input),
+  });
   return json.data.employee;
 };
 
@@ -1300,6 +1315,20 @@ export const inviteEmployee = async (
 ): Promise<Employee> => {
   const json = await apiFetch<ApiSuccessResponse<Employee>>(
     `/api/v1/employees/${employeeId}/invite`,
+    {
+      method: "POST",
+      body: JSON.stringify(input),
+    },
+  );
+  return json.data;
+};
+
+export const createEmployeeLogin = async (
+  employeeId: string,
+  input: CreateEmployeeLoginInput = {},
+): Promise<CreateEmployeeLoginResult> => {
+  const json = await apiFetch<ApiSuccessResponse<CreateEmployeeLoginResult>>(
+    `/api/v1/employees/${employeeId}/create-login`,
     {
       method: "POST",
       body: JSON.stringify(input),

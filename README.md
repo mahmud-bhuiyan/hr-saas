@@ -91,23 +91,11 @@ Company admins connect Xero under **Settings → Payroll settings**. HR can then
 
 ### Super admin bootstrap
 
-After MongoDB is running and `server/.env.local` has `MONGODB_URI`:
-
-```bash
-cd server
-npm run seed:superadmin   # once — platform super admin (superadmin@hr.com / User@123)
-```
+After MongoDB is running and `server/.env.local` has `MONGODB_URI`, create the first platform super admin with **Admins → Create Admin (bootstrap super_admin)** in [docs/postman/hr-saas.postman_collection.json](./docs/postman/hr-saas.postman_collection.json) (`POST /api/v1/admins` when the database has no users).
 
 Demo/staging company data is created manually via the app or super-admin registration flows.
 
-For **local API testing**, seed Marvel Construct plus 10 sample employees (all passwords `User@123`):
-
-```bash
-cd server
-npm run seed:test-data   # superadmin@hr.com, info@marvelconstruct.co.uk, employee@one.com, …
-```
-
-Use **Auth → Login (Employee)** in [docs/postman/hr-saas.postman_collection.json](./docs/postman/hr-saas.postman_collection.json) with `employeeEmail` + `testPassword`.
+Use **Auth → Login** in the Postman collection with an existing account. Employees created via **Create login** use password `User@123` until they change it.
 
 ## Environment files
 
@@ -177,7 +165,7 @@ npm run verify:staging   # checks required env + MongoDB/Redis connectivity
 curl https://<api>/api/v1/health   # expect checks.mongodb ok, checks.redis ok
 ```
 
-After deploy, run `npm run seed:superadmin` once against the staging `MONGODB_URI` if needed.
+After deploy, create the first super admin with `POST /api/v1/admins` against the staging API if the database has no users.
 
 ## API documentation
 

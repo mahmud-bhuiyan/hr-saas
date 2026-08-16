@@ -44,7 +44,7 @@ This flow covers **time → pay data → expenses → compliance → monetizatio
 - **Audit log:** Record create/update/delete on Employee, HrDocument, User, LeaveRequest; HR/admin viewer UI
 - **Notifications:** BullMQ + Redis worker; in-app notification list + bell icon; queued email delivery (extends SendGrid)
 - **Forgot password:** Email-based reset flow (`/forgot-password`, `/reset-password`)
-- **Employee invite:** Link employee record to login user; invite email with set-password link
+- **Employee invite:** Link employee record to login user; invite email with set-password link, or one-click create login with default password `User@123`
 
 ### 2.2 Attendance (S2-2)
 
@@ -158,6 +158,7 @@ This flow covers **time → pay data → expenses → compliance → monetizatio
 
 ### Employees
 - [x] Employee invite action on profile
+- [x] Create login action on profile (default password `User@123`)
 - [x] Bulk CSV import wizard on directory page
 
 ### Reports

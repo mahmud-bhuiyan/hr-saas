@@ -13,6 +13,9 @@ export const EMPLOYEES_BASE_PATH = "/employees";
 export const EMPLOYEES_ACTIVE_PATH = "/employees/active";
 export const EMPLOYEES_INACTIVE_PATH = "/employees/inactive";
 
+/** Default password for admin one-click employee logins. */
+export const DEFAULT_EMPLOYEE_LOGIN_PASSWORD = "User@123";
+
 export const employeeViewPath = (
   id: string,
   basePath = EMPLOYEES_ACTIVE_PATH,

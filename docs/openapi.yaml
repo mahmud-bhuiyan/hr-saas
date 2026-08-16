@@ -263,8 +263,8 @@ paths:
       tags: [Auth]
       summary: Update current user profile
       description: |
-        Update the authenticated user's profile (name, email, password).
-        Returns a new access token when the email is changed.
+        Update the authenticated user's profile (name, password, theme preferences).
+        Email cannot be changed via this endpoint.
       operationId: updateCurrentUser
       security:
         - bearerAuth: []
@@ -277,7 +277,7 @@ paths:
             example:
               firstName: Jane
               lastName: Admin
-              email: admin@acme.com
+              colorScheme: dark
       responses:
         "200":
           description: Profile updated
@@ -296,12 +296,6 @@ paths:
           $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/Unauthorized"
-        "409":
-          description: Email already in use
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
 
   /api/v1/auth/me/avatar:
     post:
@@ -1000,6 +994,53 @@ paths:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
 
+    patch:
+      tags: [Employees]
+      summary: Update current user's employee phone
+      description: |
+        Updates the phone number on the employee record linked to the authenticated user.
+        No special permission required beyond tenant membership and a linked employee record.
+        Email and other HR fields cannot be changed here.
+      operationId: updateMyEmployee
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateMyEmployeeRequest"
+            example:
+              phone: "+12025550199"
+      responses:
+        "200":
+          description: Linked employee profile updated
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, data]
+                properties:
+                  status:
+                    type: string
+                    enum: [ok]
+                  data:
+                    type: object
+                    required: [employee]
+                    properties:
+                      employee:
+                        $ref: "#/components/schemas/MyEmployeeProfile"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          description: No employee record linked to this account
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
   /api/v1/employees/import/validate:
     post:
       tags: [Employees]
@@ -1228,6 +1269,63 @@ paths:
                     enum: [ok]
                   data:
                     $ref: "#/components/schemas/Employee"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          description: Employee not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "409":
+          description: Employee already linked to a user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /api/v1/employees/{id}/create-login:
+    post:
+      tags: [Employees]
+      summary: Create employee login with default password
+      description: |
+        Creates or links a user account for an employee without a linked user.
+        New accounts use the default password `User@123`. No invite email is sent.
+        Requires `employee:create`.
+      operationId: createEmployeeLogin
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/InviteEmployeeRequest"
+            example:
+              role: employee
+      responses:
+        "201":
+          description: Login created or existing user linked
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, data]
+                properties:
+                  status:
+                    type: string
+                    enum: [ok]
+                  data:
+                    $ref: "#/components/schemas/CreateEmployeeLoginResult"
         "400":
           $ref: "#/components/responses/BadRequest"
         "401":
@@ -5422,9 +5520,6 @@ components:
           format: uri
           nullable: true
           description: Profile photo URL; pass null or empty string to remove
-        email:
-          type: string
-          format: email
         currentPassword:
           type: string
         newPassword:
@@ -5444,9 +5539,6 @@ components:
       properties:
         user:
           $ref: "#/components/schemas/UserProfile"
-        accessToken:
-          type: string
-          description: New JWT when email changed
 
     UploadProfileAvatarRequest:
       type: object
@@ -5554,6 +5646,16 @@ components:
           type: string
           enum: [employee, manager, hr_manager]
           default: employee
+
+    CreateEmployeeLoginResult:
+      type: object
+      required: [employee, userCreated]
+      properties:
+        employee:
+          $ref: "#/components/schemas/Employee"
+        userCreated:
+          type: boolean
+          description: True when a new user was created; false when an existing tenant user was linked
 
     AuditLogEntry:
       type: object
@@ -5922,6 +6024,17 @@ components:
         defaultLocationName:
           type: string
           description: Resolved name of the employee default work location, when set
+
+    UpdateMyEmployeeRequest:
+      type: object
+      required: [phone]
+      properties:
+        phone:
+          type: string
+          minLength: 1
+          maxLength: 16
+          description: E.164-style phone including country dial code
+          example: "+12025550199"
 
     CreateEmployeeRequest:
       type: object

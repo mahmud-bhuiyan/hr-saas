@@ -52,7 +52,6 @@ export interface UserProfile extends AuthUser {
 export interface UpdateProfileInput {
   firstName?: string;
   lastName?: string;
-  email?: string;
   avatarUrl?: string | null;
   currentPassword?: string;
   newPassword?: string;
@@ -230,6 +229,10 @@ export interface UpdateEmployeeInput {
   payCurrency?: string;
   fteFactor?: number;
   defaultLocationId?: string | null;
+}
+
+export interface UpdateMyEmployeeInput {
+  phone: string;
 }
 
 export interface ListEmployeesQuery {
@@ -799,6 +802,13 @@ export interface MessageResponse {
 
 export interface InviteEmployeeInput {
   role?: "employee" | "manager" | "hr_manager";
+}
+
+export type CreateEmployeeLoginInput = InviteEmployeeInput;
+
+export interface CreateEmployeeLoginResult {
+  employee: Employee;
+  userCreated: boolean;
 }
 
 export type AttendanceMethod = "web" | "app" | "kiosk";
