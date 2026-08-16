@@ -11,6 +11,7 @@ import {
   getEffectiveBrandingHandler,
   getTenantBrandingSettingsHandler,
   patchTenantBrandingHandler,
+  uploadPlatformAssetHandler,
 } from "../platform/platform-settings.controller.js";
 import {
   getCompanyProfileHandler,
@@ -48,6 +49,10 @@ export const createSettingsRoutes = (env: ServerEnv): Router => {
 
   router.patch("/branding", authorize("company_admin"), (req, res) => {
     void patchTenantBrandingHandler(req, res);
+  });
+
+  router.post("/branding/upload", authorize("company_admin"), (req, res) => {
+    void uploadPlatformAssetHandler(env)(req, res);
   });
 
   router.get("/company", authorize("company_admin"), (req, res) => {

@@ -18,20 +18,20 @@ export const AttendanceStatsCard = ({
   const meAvg = avgHoursPerDay(weekMinutes, workDays);
 
   return (
-    <div className="keka-card flex h-full flex-col">
-      <div className="keka-card-header flex items-center justify-between">
+    <div className="att-card flex h-full flex-col">
+      <div className="att-card-header flex items-center justify-between">
         <span>Attendance Stats</span>
         <div className="flex items-center gap-2">
           <select
-            className="keka-muted cursor-pointer rounded border bg-transparent px-2 py-0.5 text-xs outline-none"
-            style={{ borderColor: "var(--keka-border)" }}
+            className="att-muted cursor-pointer rounded border bg-transparent px-2 py-0.5 text-xs outline-none"
+            style={{ borderColor: "var(--att-border)" }}
             defaultValue="last-week"
           >
             <option value="last-week">Last Week</option>
             <option value="this-week">This Week</option>
             <option value="this-month">This Month</option>
           </select>
-          <HiInformationCircle className="keka-muted h-4 w-4" />
+          <HiInformationCircle className="att-muted h-4 w-4" />
         </div>
       </div>
 
@@ -39,12 +39,12 @@ export const AttendanceStatsCard = ({
         {loading ? (
           <div
             className="h-24 animate-pulse rounded"
-            style={{ backgroundColor: "var(--keka-bar-track)" }}
+            style={{ backgroundColor: "var(--att-bar-track)" }}
           />
         ) : (
           <table className="w-full text-sm">
             <thead>
-              <tr className="keka-muted text-left text-[10px] uppercase tracking-wide">
+              <tr className="att-muted text-left text-[10px] uppercase tracking-wide">
                 <th className="pb-3 font-medium" />
                 <th className="pb-3 font-medium">Avg hrs / day</th>
                 <th className="pb-3 font-medium">On time arrival</th>
@@ -91,7 +91,7 @@ export const AttendanceStatsCard = ({
         )}
 
         {!loading && (
-          <p className="keka-muted mt-2 text-[10px]">
+          <p className="att-muted mt-2 text-[10px]">
             Week total: {formatAttendanceDuration(weekMinutes)}
           </p>
         )}

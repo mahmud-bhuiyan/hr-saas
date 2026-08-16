@@ -3,9 +3,11 @@ import {
   isValidElement,
   useEffect,
   useId,
+  useLayoutEffect,
   useMemo,
   useRef,
   useState,
+  type CSSProperties,
   type ChangeEvent,
   type KeyboardEvent,
   type OptionHTMLAttributes,
@@ -13,8 +15,12 @@ import {
   type ReactNode,
   type SelectHTMLAttributes,
 } from "react";
+import { createPortal } from "react-dom";
 import { HiChevronDown, HiMagnifyingGlass } from "react-icons/hi2";
 import { Input } from "./Input";
+
+const MENU_MAX_HEIGHT_PX = 240;
+const MENU_GAP_PX = 4;
 
 interface SelectOption {
   value: string;
@@ -99,11 +105,14 @@ export const Select = ({
   const generatedId = useId();
   const fieldId = id ?? generatedId;
   const containerRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
   const listRef = useRef<HTMLUListElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
   const [open, setOpen] = useState(false);
   const [activeIndex, setActiveIndex] = useState(-1);
   const [searchQuery, setSearchQuery] = useState("");
+  const [menuStyle, setMenuStyle] = useState<CSSProperties>({});
 
   const options = useMemo(() => parseOptions(children), [children]);
   const normalizedSearch = searchQuery.trim().toLowerCase();
@@ -150,6 +159,35 @@ export const Select = ({
 
   const enabledOptions = visibleOptions.filter((option) => !option.disabled);
 
+  const updateMenuPosition = () => {
+    const trigger = triggerRef.current;
+    if (!trigger) {
+      return;
+    }
+
+    const rect = trigger.getBoundingClientRect();
+    const spaceBelow = window.innerHeight - rect.bottom - MENU_GAP_PX;
+    const spaceAbove = rect.top - MENU_GAP_PX;
+    const openUpward =
+      spaceBelow < MENU_MAX_HEIGHT_PX && spaceAbove > spaceBelow;
+
+    setMenuStyle({
+      position: "fixed",
+      left: rect.left,
+      width: rect.width,
+      zIndex: 100,
+      ...(openUpward
+        ? {
+            bottom: window.innerHeight - rect.top + MENU_GAP_PX,
+            top: "auto",
+          }
+        : {
+            top: rect.bottom + MENU_GAP_PX,
+            bottom: "auto",
+          }),
+    });
+  };
+
   const moveActiveIndex = (direction: 1 | -1) => {
     if (enabledOptions.length === 0) {
       return;
@@ -172,18 +210,40 @@ export const Select = ({
     }
   };
 
+  useLayoutEffect(() => {
+    if (!open) {
+      return;
+    }
+
+    updateMenuPosition();
+
+    const handleReposition = () => {
+      updateMenuPosition();
+    };
+
+    window.addEventListener("resize", handleReposition);
+    window.addEventListener("scroll", handleReposition, true);
+
+    return () => {
+      window.removeEventListener("resize", handleReposition);
+      window.removeEventListener("scroll", handleReposition, true);
+    };
+  }, [open]);
+
   useEffect(() => {
     if (!open) {
       return;
     }
 
     const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as Node;
       if (
-        containerRef.current &&
-        !containerRef.current.contains(event.target as Node)
+        containerRef.current?.contains(target) ||
+        menuRef.current?.contains(target)
       ) {
-        closeMenu();
+        return;
       }
+      closeMenu();
     };
 
     const handleEscape = (event: globalThis.KeyboardEvent) => {
@@ -272,6 +332,98 @@ export const Select = ({
     }
   };
 
+  const menu = open
+    ? createPortal(
+        <div
+          ref={menuRef}
+          style={menuStyle}
+          className="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-lg dark:border-slate-700 dark:bg-slate-900"
+        >
+          {searchable && (
+            <div className="border-b border-slate-100 p-2 dark:border-slate-800">
+              <Input
+                ref={searchInputRef}
+                value={searchQuery}
+                onChange={(event) => {
+                  setSearchQuery(event.target.value);
+                  setActiveIndex(0);
+                }}
+                placeholder={searchPlaceholder}
+                icon={<HiMagnifyingGlass className="h-4 w-4 text-brand-600" />}
+                onKeyDown={(event) => {
+                  if (event.key === "ArrowDown") {
+                    event.preventDefault();
+                    moveActiveIndex(1);
+                  }
+                  if (event.key === "ArrowUp") {
+                    event.preventDefault();
+                    moveActiveIndex(-1);
+                  }
+                  if (event.key === "Enter" && enabledOptions[activeIndex]) {
+                    event.preventDefault();
+                    selectOption(enabledOptions[activeIndex]);
+                  }
+                  if (event.key === "Escape") {
+                    event.preventDefault();
+                    closeMenu();
+                  }
+                }}
+              />
+            </div>
+          )}
+          <ul
+            ref={listRef}
+            role="listbox"
+            aria-labelledby={fieldId}
+            tabIndex={-1}
+            onKeyDown={handleListKeyDown}
+            className="max-h-60 overflow-auto py-1"
+          >
+            {visibleOptions.length === 0 ? (
+              <li className="px-3 py-2.5 text-sm text-slate-500 dark:text-slate-400">
+                No matches found
+              </li>
+            ) : (
+              visibleOptions.map((option) => {
+                const enabledIndex = enabledOptions.findIndex(
+                  (item) => item.value === option.value,
+                );
+                const isSelected = option.value === selectedValue;
+                const isActive = enabledIndex === activeIndex;
+
+                return (
+                  <li key={option.value} role="presentation">
+                    <button
+                      type="button"
+                      role="option"
+                      aria-selected={isSelected}
+                      disabled={option.disabled}
+                      onMouseEnter={() => {
+                        if (enabledIndex >= 0) {
+                          setActiveIndex(enabledIndex);
+                        }
+                      }}
+                      onClick={() => selectOption(option)}
+                      className={`flex w-full items-center px-3 py-2.5 text-left text-sm transition disabled:cursor-not-allowed disabled:opacity-50 ${
+                        isSelected
+                          ? "bg-brand-600 text-white"
+                          : isActive
+                            ? "bg-brand-50 text-brand-700 dark:bg-brand-950/40 dark:text-brand-200"
+                            : "text-slate-700 hover:bg-slate-50 dark:text-slate-200 dark:hover:bg-slate-800"
+                      }`}
+                    >
+                      {option.label}
+                    </button>
+                  </li>
+                );
+              })
+            )}
+          </ul>
+        </div>,
+        document.body,
+      )
+    : null;
+
   return (
     <div className={`w-full min-w-0 ${wrapperClassName}`} ref={containerRef}>
       {name && <input type="hidden" name={name} value={selectedValue} />}
@@ -279,6 +431,7 @@ export const Select = ({
         className={`relative w-full rounded-lg border bg-white text-sm shadow-sm transition focus-within:outline-none focus-within:ring-2 focus-within:ring-brand-500 dark:border-slate-600 dark:bg-slate-800 ${borderClassName} ${className}`}
       >
         <button
+          ref={triggerRef}
           type="button"
           id={fieldId}
           disabled={disabled}
@@ -312,94 +465,8 @@ export const Select = ({
             aria-hidden
           />
         </button>
-
-        {open && (
-          <div className="absolute inset-x-0 top-full z-50 mt-1 overflow-hidden rounded-lg border border-slate-200 bg-white shadow-lg dark:border-slate-700 dark:bg-slate-900">
-            {searchable && (
-              <div className="border-b border-slate-100 p-2 dark:border-slate-800">
-                <Input
-                  ref={searchInputRef}
-                  value={searchQuery}
-                  onChange={(event) => {
-                    setSearchQuery(event.target.value);
-                    setActiveIndex(0);
-                  }}
-                  placeholder={searchPlaceholder}
-                  icon={
-                    <HiMagnifyingGlass className="h-4 w-4 text-brand-600" />
-                  }
-                  onKeyDown={(event) => {
-                    if (event.key === "ArrowDown") {
-                      event.preventDefault();
-                      moveActiveIndex(1);
-                    }
-                    if (event.key === "ArrowUp") {
-                      event.preventDefault();
-                      moveActiveIndex(-1);
-                    }
-                    if (event.key === "Enter" && enabledOptions[activeIndex]) {
-                      event.preventDefault();
-                      selectOption(enabledOptions[activeIndex]);
-                    }
-                    if (event.key === "Escape") {
-                      event.preventDefault();
-                      closeMenu();
-                    }
-                  }}
-                />
-              </div>
-            )}
-            <ul
-              ref={listRef}
-              role="listbox"
-              aria-labelledby={fieldId}
-              tabIndex={-1}
-              onKeyDown={handleListKeyDown}
-              className="max-h-60 overflow-auto py-1"
-            >
-              {visibleOptions.length === 0 ? (
-                <li className="px-3 py-2.5 text-sm text-slate-500 dark:text-slate-400">
-                  No matches found
-                </li>
-              ) : (
-                visibleOptions.map((option) => {
-                  const enabledIndex = enabledOptions.findIndex(
-                    (item) => item.value === option.value,
-                  );
-                  const isSelected = option.value === selectedValue;
-                  const isActive = enabledIndex === activeIndex;
-
-                  return (
-                    <li key={option.value} role="presentation">
-                      <button
-                        type="button"
-                        role="option"
-                        aria-selected={isSelected}
-                        disabled={option.disabled}
-                        onMouseEnter={() => {
-                          if (enabledIndex >= 0) {
-                            setActiveIndex(enabledIndex);
-                          }
-                        }}
-                        onClick={() => selectOption(option)}
-                        className={`flex w-full items-center px-3 py-2.5 text-left text-sm transition disabled:cursor-not-allowed disabled:opacity-50 ${
-                          isSelected
-                            ? "bg-brand-600 text-white"
-                            : isActive
-                              ? "bg-brand-50 text-brand-700 dark:bg-brand-950/40 dark:text-brand-200"
-                              : "text-slate-700 hover:bg-slate-50 dark:text-slate-200 dark:hover:bg-slate-800"
-                        }`}
-                      >
-                        {option.label}
-                      </button>
-                    </li>
-                  );
-                })
-              )}
-            </ul>
-          </div>
-        )}
       </div>
+      {menu}
       {error && <p className="mt-1 text-sm text-red-600">{error}</p>}
     </div>
   );

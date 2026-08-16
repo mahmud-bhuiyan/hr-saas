@@ -1,12 +1,7 @@
 import { useLocation } from "react-router-dom";
 import { NavTabBar } from "../../../components/ui/navigation/NavTabBar";
 import { useAuth } from "../../../contexts/AuthContext";
-import {
-  MY_ATTENDANCE_PATH,
-  MY_EXPENSES_PATH,
-  MY_LEAVE_PATH,
-  MY_PERFORMANCE_PATH,
-} from "../utils";
+import { MY_ATTENDANCE_PATH, MY_LEAVE_PATH } from "../utils";
 import type { TenantModuleId } from "../../../types/modules";
 import { isModuleEnabledForUser } from "../../../utils/modules";
 
@@ -17,8 +12,6 @@ const allTabs: Array<{
 }> = [
   { label: "ATTENDANCE", path: MY_ATTENDANCE_PATH, module: "attendance" },
   { label: "LEAVE", path: MY_LEAVE_PATH, module: "leave" },
-  { label: "PERFORMANCE", path: MY_PERFORMANCE_PATH },
-  { label: "EXPENSES & TRAVEL", path: MY_EXPENSES_PATH, module: "expenses" },
 ];
 
 export const MyTabs = () => {

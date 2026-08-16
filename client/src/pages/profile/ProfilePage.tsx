@@ -8,6 +8,7 @@ import {
   ApiError,
   fetchProfile,
   readFileAsBase64,
+  updateMyEmployee,
   updateProfile,
   uploadProfileAvatar,
 } from "../../lib/api";
@@ -16,7 +17,8 @@ import { toast } from "react-toastify";
 import { hasFormChanges, pickChangedFields } from "../../utils/form";
 import { hasPermission } from "../../utils/permissions";
 import { isQueryInitialLoad } from "../../utils/query";
-import { ProfileEditForm } from "./components/ProfileEditForm";
+import { ProfileDetailsSection } from "./components/ProfileDetailsSection";
+import { ProfileEditModal } from "./components/ProfileEditModal";
 import { ProfileHeaderBanner } from "./components/ProfileHeaderBanner";
 import { ProfileSecuritySection } from "./components/ProfileSecuritySection";
 import type { AuthUser } from "../../types";
@@ -49,7 +51,8 @@ export const ProfilePage = () => {
 
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
-  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [editModalOpen, setEditModalOpen] = useState(false);
   const [passwordModalOpen, setPasswordModalOpen] = useState(false);
 
   const profileQuery = useQuery({
@@ -58,6 +61,8 @@ export const ProfilePage = () => {
   });
 
   const employeeQuery = useLinkedEmployee();
+  const linkedEmployee = employeeQuery.data;
+  const canEditPhone = Boolean(linkedEmployee);
 
   const statusQuery = useMyAttendanceStatus();
   const canClock = Boolean(
@@ -74,28 +79,43 @@ export const ProfilePage = () => {
     () => ({
       firstName: profile?.firstName ?? "",
       lastName: profile?.lastName ?? "",
-      email: profile?.email ?? "",
+      phone: linkedEmployee?.phone ?? "",
     }),
-    [profile],
+    [profile, linkedEmployee],
   );
 
   const currentValues = useMemo(
-    () => ({ firstName, lastName, email }),
-    [firstName, lastName, email],
+    () => ({ firstName, lastName, phone }),
+    [firstName, lastName, phone],
   );
 
-  const profileFields = ["firstName", "lastName", "email"] as const;
+  const nameFields = ["firstName", "lastName"] as const;
+  const editableFields = canEditPhone
+    ? (["firstName", "lastName", "phone"] as const)
+    : nameFields;
+
   const hasChanges = hasFormChanges(currentValues, originalValues, [
-    ...profileFields,
+    ...editableFields,
   ]);
 
   useEffect(() => {
     if (profile) {
       setFirstName(profile.firstName ?? "");
       setLastName(profile.lastName ?? "");
-      setEmail(profile.email);
     }
   }, [profile]);
+
+  useEffect(() => {
+    setPhone(linkedEmployee?.phone ?? "");
+  }, [linkedEmployee]);
+
+  const resetEditForm = () => {
+    if (profile) {
+      setFirstName(profile.firstName ?? "");
+      setLastName(profile.lastName ?? "");
+    }
+    setPhone(linkedEmployee?.phone ?? "");
+  };
 
   const applyProfileUpdate = (data: {
     user: Parameters<typeof toAuthUser>[0];
@@ -109,11 +129,25 @@ export const ProfilePage = () => {
     void queryClient.invalidateQueries({ queryKey: ["profile", "me"] });
   };
 
-  const updateMutation = useMutation({
-    mutationFn: updateProfile,
-    onSuccess: (data) => {
+  const saveProfileMutation = useMutation({
+    mutationFn: async () => {
+      const nameChanges = pickChangedFields(currentValues, originalValues, [
+        ...nameFields,
+      ]);
+
+      if (Object.keys(nameChanges).length > 0) {
+        const data = await updateProfile(nameChanges);
+        applyProfileUpdate(data);
+      }
+
+      if (canEditPhone && phone !== originalValues.phone) {
+        await updateMyEmployee({ phone });
+        void queryClient.invalidateQueries({ queryKey: ["employees", "me"] });
+      }
+    },
+    onSuccess: () => {
       toast.success("Profile updated successfully.");
-      applyProfileUpdate(data);
+      setEditModalOpen(false);
     },
     onError: (err) => {
       toast.error(
@@ -164,6 +198,16 @@ export const ProfilePage = () => {
     await avatarRemoveMutation.mutateAsync();
   };
 
+  const handleOpenEdit = () => {
+    resetEditForm();
+    setEditModalOpen(true);
+  };
+
+  const handleCloseEdit = () => {
+    setEditModalOpen(false);
+    resetEditForm();
+  };
+
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
 
@@ -171,9 +215,12 @@ export const ProfilePage = () => {
       return;
     }
 
-    updateMutation.mutate(
-      pickChangedFields(currentValues, originalValues, [...profileFields]),
-    );
+    if (canEditPhone && !phone.trim()) {
+      toast.error("Phone is required.");
+      return;
+    }
+
+    saveProfileMutation.mutate();
   };
 
   if (isQueryInitialLoad(profileQuery)) {
@@ -197,29 +244,38 @@ export const ProfilePage = () => {
       <ProfileHeaderBanner
         user={user}
         profile={profile}
-        employee={employeeQuery.data}
+        employee={linkedEmployee}
         clockedIn={clockedIn}
       />
 
-      <ProfileEditForm
+      <ProfileDetailsSection
+        profile={profile}
+        employee={linkedEmployee}
+        onEdit={handleOpenEdit}
+      />
+
+      <ProfileSecuritySection
+        onChangePassword={() => setPasswordModalOpen(true)}
+      />
+
+      <ProfileEditModal
+        open={editModalOpen}
+        onClose={handleCloseEdit}
         user={user}
         firstName={firstName}
         lastName={lastName}
-        email={email}
+        phone={phone}
+        showPhone={canEditPhone}
         onFirstNameChange={setFirstName}
         onLastNameChange={setLastName}
-        onEmailChange={setEmail}
+        onPhoneChange={setPhone}
         onAvatarUpload={handleAvatarUpload}
         onAvatarRemove={handleAvatarRemove}
         avatarUploading={avatarUploadMutation.isPending}
         avatarRemoving={avatarRemoveMutation.isPending}
         onSubmit={handleSubmit}
-        loading={updateMutation.isPending}
+        loading={saveProfileMutation.isPending}
         hasChanges={hasChanges}
-      />
-
-      <ProfileSecuritySection
-        onChangePassword={() => setPasswordModalOpen(true)}
       />
 
       <ChangePasswordModal

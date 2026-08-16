@@ -52,7 +52,6 @@ export interface UserProfile extends AuthUser {
 export interface UpdateProfileInput {
   firstName?: string;
   lastName?: string;
-  email?: string;
   avatarUrl?: string | null;
   currentPassword?: string;
   newPassword?: string;
@@ -232,6 +231,10 @@ export interface UpdateEmployeeInput {
   defaultLocationId?: string | null;
 }
 
+export interface UpdateMyEmployeeInput {
+  phone: string;
+}
+
 export interface ListEmployeesQuery {
   search?: string;
   department?: string;
@@ -353,6 +356,7 @@ export interface LeaveCalendarEntry {
 
 export interface FaviconDisplaySettings {
   mimeType: FaviconMimeType;
+  shape: LogoShape;
 }
 
 export type SidebarBehavior = "fixed_collapsed" | "collapsible";
@@ -374,7 +378,7 @@ export interface SiteConfig {
 
 export type LogoObjectFit = "contain" | "cover";
 
-export type LogoShape = "default" | "circle";
+export type LogoShape = "default" | "rounded" | "circle" | "square";
 
 export type FaviconMimeType =
   | "auto"
@@ -402,6 +406,9 @@ export interface PlatformSiteSettings extends SiteConfig {
 
 export interface TenantBrandingOverrides {
   logoUrl: string | null;
+  faviconUrl: string | null;
+  logoShape: LogoShape | null;
+  faviconShape: LogoShape | null;
 }
 
 export interface PatchPlatformSiteSettingsInput {
@@ -426,6 +433,9 @@ export interface UploadPlatformAssetResponse {
 
 export interface PatchTenantBrandingInput {
   logoUrl?: string | null;
+  faviconUrl?: string | null;
+  logoShape?: LogoShape | null;
+  faviconShape?: LogoShape | null;
 }
 
 export interface CompanyProfile {
@@ -799,6 +809,13 @@ export interface MessageResponse {
 
 export interface InviteEmployeeInput {
   role?: "employee" | "manager" | "hr_manager";
+}
+
+export type CreateEmployeeLoginInput = InviteEmployeeInput;
+
+export interface CreateEmployeeLoginResult {
+  employee: Employee;
+  userCreated: boolean;
 }
 
 export type AttendanceMethod = "web" | "app" | "kiosk";

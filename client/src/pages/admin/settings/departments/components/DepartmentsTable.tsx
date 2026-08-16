@@ -1,3 +1,4 @@
+import { useMemo, useState } from "react";
 import {
   HiArchiveBox,
   HiArrowUturnLeft,
@@ -5,12 +6,16 @@ import {
   HiTrash,
 } from "react-icons/hi2";
 import { Button } from "../../../../../components/ui/Button";
+import { SearchToolbar } from "../../../../../components/ui/forms/SearchToolbar";
 import type { TableColumn } from "../../../../../components/ui/primitives/Table";
 import { Table } from "../../../../../components/ui/primitives/Table";
+import { usePagination } from "../../../../../hooks/usePagination";
 import type { Department } from "../../../../../types";
+import type { DepartmentsListVariant } from "../utils";
 
 interface DepartmentsTableProps {
   departments: Department[];
+  variant: DepartmentsListVariant;
   loading: boolean;
   onEdit: (department: Department) => void;
   onArchive: (department: Department) => void;
@@ -22,8 +27,20 @@ interface DepartmentsTableProps {
   actionPending?: boolean;
 }
 
+const matchesDepartmentSearch = (
+  department: Department,
+  query: string,
+): boolean => {
+  const normalized = query.trim().toLowerCase();
+  if (!normalized) {
+    return true;
+  }
+  return department.name.toLowerCase().includes(normalized);
+};
+
 export const DepartmentsTable = ({
   departments,
+  variant,
   loading,
   onEdit,
   onArchive,
@@ -34,6 +51,28 @@ export const DepartmentsTable = ({
   deleteLoadingId = null,
   actionPending = false,
 }: DepartmentsTableProps) => {
+  const [search, setSearch] = useState("");
+  const filteredDepartments = useMemo(
+    () => departments.filter((dept) => matchesDepartmentSearch(dept, search)),
+    [departments, search],
+  );
+  const showSearchToolbar = Boolean(search) || departments.length > 0;
+
+  const {
+    paginatedItems,
+    page,
+    pageSize,
+    setPage,
+    setPageSize,
+    total,
+    totalPages,
+    rangeStart,
+    rangeEnd,
+    pageSizeOptions,
+  } = usePagination(filteredDepartments, {
+    resetKey: `${variant}-${search}`,
+  });
+
   const columns: TableColumn<Department>[] = [
     {
       key: "name",
@@ -131,12 +170,46 @@ export const DepartmentsTable = ({
   ];
 
   return (
-    <Table<Department>
-      columns={columns}
-      data={departments}
-      getRowKey={(dept) => dept.id}
-      loading={loading}
-      emptyMessage="No departments yet. Create one to assign employees."
-    />
+    <>
+      {showSearchToolbar && (
+        <SearchToolbar
+          pageSize={{
+            id: `${variant}-department-page-size`,
+            value: pageSize,
+            onChange: setPageSize,
+            options: pageSizeOptions,
+          }}
+          search={{
+            id: `${variant}-department-search`,
+            value: search,
+            onChange: setSearch,
+            placeholder: "Department name…",
+          }}
+        />
+      )}
+
+      <Table<Department>
+        columns={columns}
+        data={paginatedItems}
+        getRowKey={(dept) => dept.id}
+        loading={loading}
+        emptyMessage={
+          search
+            ? "No departments match your search."
+            : "No departments yet. Create one to assign employees."
+        }
+        pagination={{
+          page,
+          pageSize,
+          total,
+          totalPages,
+          rangeStart,
+          rangeEnd,
+          onPageChange: setPage,
+          onPageSizeChange: setPageSize,
+          pageSizeOptions,
+        }}
+      />
+    </>
   );
 };

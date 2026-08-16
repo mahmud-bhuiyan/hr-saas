@@ -100,6 +100,7 @@ This flow covers **scheduling → staff visibility → payroll handoff**, buildi
 
 ### Employees
 - [x] Pay rate section on employee profile (HR/admin)
+- [x] Create login on employee profile (HR/admin)
 
 ### Rotas
 - [x] Weekly rota grid (`/dashboard/rotas`) — HR/manager

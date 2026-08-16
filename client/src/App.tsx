@@ -1,4 +1,4 @@
-import { Route, Routes } from "react-router-dom";
+import { Navigate, Route, Routes } from "react-router-dom";
 import { AppShell } from "./components/AppShell";
 import { ScrollToTop } from "./components/ScrollToTop";
 import { EmployeeRoute } from "./components/EmployeeRoute";
@@ -34,18 +34,22 @@ import {
 import { SuperAdminDashboardPage } from "./pages/super-admin/dashboard/SuperAdminDashboardPage";
 import { SettingsPage } from "./pages/admin/settings/SettingsPage";
 import { CompanySettingsPage } from "./pages/admin/settings/company/CompanySettingsPage";
-import { DepartmentsPage } from "./pages/admin/settings/departments/DepartmentsPage";
+import {
+  DepartmentsIndexRedirect,
+  DepartmentsPage,
+} from "./pages/admin/settings/departments/DepartmentsPage";
 import { AuditLogPage } from "./pages/admin/settings/audit-log/AuditLogPage";
 import { LeavePage } from "./pages/users/leave/LeavePage";
 import { DocumentsPage } from "./pages/documents/DocumentsPage";
 import { AttendancePage } from "./pages/users/attendance/AttendancePage";
 import { TimesheetsPage } from "./pages/timesheets/TimesheetsPage";
 import { RotasPage } from "./pages/rotas/RotasPage";
-import { ExpensesPage } from "./pages/users/expenses/ExpensesPage";
-import { PerformancePage } from "./pages/users/performance/PerformancePage";
 import { AttendanceSettingsPage } from "./pages/admin/settings/attendance/AttendanceSettingsPage";
 import { LeaveSettingsPage } from "./pages/admin/settings/leave/LeaveSettingsPage";
-import { LocationsPage } from "./pages/admin/settings/locations/LocationsPage";
+import {
+  LocationsIndexRedirect,
+  LocationsPage,
+} from "./pages/admin/settings/locations/LocationsPage";
 import { PayrollSettingsPage } from "./pages/admin/settings/payroll/PayrollSettingsPage";
 import { PayrollPage } from "./pages/admin/payroll/PayrollPage";
 import { BillingPage } from "./pages/admin/settings/billing/BillingPage";
@@ -58,7 +62,8 @@ import {
   ADMIN_SETTINGS_ATTENDANCE_PATH,
   ADMIN_SETTINGS_AUDIT_LOG_PATH,
   ADMIN_SETTINGS_BILLING_PATH,
-  ADMIN_SETTINGS_COMPANY_PATH,
+  ADMIN_SETTINGS_COMPANY_BRANDING_PATH,
+  ADMIN_SETTINGS_COMPANY_PROFILE_PATH,
   ADMIN_SETTINGS_DEPARTMENTS_PATH,
   ADMIN_SETTINGS_LEAVE_PATH,
   ADMIN_SETTINGS_LOCATIONS_PATH,
@@ -132,15 +137,6 @@ const App = () => {
                   </ModuleRoute>
                 }
               />
-              <Route
-                path="/my/expenses"
-                element={
-                  <ModuleRoute module="expenses">
-                    <ExpensesPage />
-                  </ModuleRoute>
-                }
-              />
-              <Route path="/my/performance" element={<PerformancePage />} />
               <Route
                 path="/my/timesheets"
                 element={
@@ -229,11 +225,17 @@ const App = () => {
                 }
               />
               <Route
-                path={ADMIN_SETTINGS_COMPANY_PATH}
+                path={ADMIN_SETTINGS_COMPANY_PROFILE_PATH}
                 element={
                   <ModuleRoute module="settings">
                     <CompanySettingsPage />
                   </ModuleRoute>
+                }
+              />
+              <Route
+                path={ADMIN_SETTINGS_COMPANY_BRANDING_PATH}
+                element={
+                  <Navigate to={ADMIN_SETTINGS_COMPANY_PROFILE_PATH} replace />
                 }
               />
               <Route
@@ -243,7 +245,11 @@ const App = () => {
                     <DepartmentsPage />
                   </ModuleRoute>
                 }
-              />
+              >
+                <Route index element={<DepartmentsIndexRedirect />} />
+                <Route path="active" />
+                <Route path="archived" />
+              </Route>
               <Route
                 path={ADMIN_SETTINGS_LOCATIONS_PATH}
                 element={
@@ -251,7 +257,11 @@ const App = () => {
                     <LocationsPage />
                   </ModuleRoute>
                 }
-              />
+              >
+                <Route index element={<LocationsIndexRedirect />} />
+                <Route path="active" />
+                <Route path="archived" />
+              </Route>
               <Route
                 path={ADMIN_SETTINGS_PAYROLL_PATH}
                 element={

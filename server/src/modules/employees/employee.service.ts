@@ -2,7 +2,10 @@ import { randomBytes } from "node:crypto";
 import mongoose from "mongoose";
 import type { UserRole } from "../../types/index.js";
 import { hasPermission } from "../../utils/permissions.js";
-import { hashPassword } from "../../utils/password.js";
+import {
+  DEFAULT_EMPLOYEE_LOGIN_PASSWORD,
+  hashPassword,
+} from "../../utils/password.js";
 import { employeeAuditSnapshot } from "../../utils/audit-snapshot.js";
 import { writeAuditLog, type AuditContext } from "../audit/audit.service.js";
 import { syncSeatCount } from "../billing/billing.service.js";
@@ -34,9 +37,11 @@ import {
 } from "./employee.model.js";
 import type {
   CreateEmployeeInput,
+  CreateEmployeeLoginInput,
   InviteEmployeeInput,
   ListEmployeesQuery,
   UpdateEmployeeInput,
+  UpdateMyEmployeeInput,
 } from "./employee.validation.js";
 
 export interface EmployeeManagerSummary {
@@ -781,6 +786,43 @@ export const getMyEmployee = async (
   };
 };
 
+export const updateMyEmployee = async (
+  tenantId: string,
+  userId: string,
+  input: UpdateMyEmployeeInput,
+  audit?: AuditContext,
+): Promise<MyEmployeeProfile> => {
+  const employee = await findEmployeeRecordForUser(tenantId, userId);
+
+  if (!employee) {
+    throw new EmployeeServiceError(
+      "No employee record linked to your account",
+      404,
+    );
+  }
+
+  const beforeSnapshot = employeeAuditSnapshot(employee);
+
+  await assertEmployeePhone(tenantId, input.phone);
+  employee.phone = input.phone;
+  employee.updatedBy = new mongoose.Types.ObjectId(userId);
+
+  await employee.save();
+
+  void writeAuditLog({
+    tenantId,
+    userId,
+    action: "update",
+    entityType: "Employee",
+    entityId: employee._id.toString(),
+    before: beforeSnapshot,
+    after: employeeAuditSnapshot(employee),
+    context: audit,
+  });
+
+  return getMyEmployee(tenantId, userId);
+};
+
 export const getEmployeeById = async (
   tenantId: string,
   employeeId: string,
@@ -1091,14 +1133,17 @@ export const updateEmployee = async (
   });
 };
 
-export const inviteEmployee = async (
+type EmployeeLoginRole = InviteEmployeeInput["role"];
+
+export interface CreateEmployeeLoginResult {
+  employee: EmployeePublic;
+  userCreated: boolean;
+}
+
+const loadEmployeeForLoginProvisioning = async (
   tenantId: string,
   employeeId: string,
-  input: InviteEmployeeInput,
-  invitedByUserId: string,
-  env: ServerEnv,
-  audit?: AuditContext,
-): Promise<EmployeePublic> => {
+): Promise<IEmployeeDocument> => {
   const employee = await Employee.findOne({
     _id: new mongoose.Types.ObjectId(employeeId),
     tenantId: new mongoose.Types.ObjectId(tenantId),
@@ -1110,7 +1155,7 @@ export const inviteEmployee = async (
 
   if (!employee.email) {
     throw new EmployeeServiceError(
-      "Employee must have an email address to invite",
+      "Employee must have an email address to grant login access",
       400,
     );
   }
@@ -1119,8 +1164,21 @@ export const inviteEmployee = async (
     throw new EmployeeServiceError("Employee already has a login account", 409);
   }
 
+  return employee;
+};
+
+const resolveOrCreateUserForEmployee = async (
+  tenantId: string,
+  employee: IEmployeeDocument,
+  role: EmployeeLoginRole,
+  password: string,
+): Promise<{
+  user: { _id: mongoose.Types.ObjectId; email: string };
+  created: boolean;
+}> => {
+  const email = employee.email!;
   const tenantObjectId = new mongoose.Types.ObjectId(tenantId);
-  let user = await User.findOne({ email: employee.email });
+  let user = await User.findOne({ email });
 
   if (user) {
     if (user.tenantId?.toString() !== tenantId) {
@@ -1139,29 +1197,38 @@ export const inviteEmployee = async (
         409,
       );
     }
-  } else {
-    const passwordHash = await hashPassword(randomBytes(24).toString("hex"));
-    user = await User.create({
-      email: employee.email,
-      passwordHash,
-      role: input.role ?? "employee",
-      tenantId: tenantObjectId,
-      firstName: employee.firstName,
-      lastName: employee.lastName,
-      isActive: true,
-    });
+
+    return { user, created: false };
   }
 
-  employee.userId = user._id;
-  employee.updatedBy = new mongoose.Types.ObjectId(invitedByUserId);
-  await employee.save();
+  const passwordHash = await hashPassword(password);
+  user = await User.create({
+    email,
+    passwordHash,
+    role: role ?? "employee",
+    tenantId: tenantObjectId,
+    firstName: employee.firstName,
+    lastName: employee.lastName,
+    isActive: true,
+  });
 
-  const token = await createPasswordResetTokenForUser(user._id.toString());
-  await sendInviteSetPasswordEmail(env, user.email, token);
+  return { user, created: true };
+};
+
+const linkEmployeeToUser = async (
+  tenantId: string,
+  employee: IEmployeeDocument,
+  userId: mongoose.Types.ObjectId,
+  actorUserId: string,
+  audit?: AuditContext,
+): Promise<EmployeePublic> => {
+  employee.userId = userId;
+  employee.updatedBy = new mongoose.Types.ObjectId(actorUserId);
+  await employee.save();
 
   void writeAuditLog({
     tenantId,
-    userId: invitedByUserId,
+    userId: actorUserId,
     action: "update",
     entityType: "Employee",
     entityId: employee._id.toString(),
@@ -1169,10 +1236,66 @@ export const inviteEmployee = async (
     context: audit,
   });
 
-  return getEmployeeById(tenantId, employeeId, {
-    userId: invitedByUserId,
+  return getEmployeeById(tenantId, employee._id.toString(), {
+    userId: actorUserId,
     role: "company_admin",
   });
+};
+
+export const inviteEmployee = async (
+  tenantId: string,
+  employeeId: string,
+  input: InviteEmployeeInput,
+  invitedByUserId: string,
+  env: ServerEnv,
+  audit?: AuditContext,
+): Promise<EmployeePublic> => {
+  const employee = await loadEmployeeForLoginProvisioning(tenantId, employeeId);
+  const { user } = await resolveOrCreateUserForEmployee(
+    tenantId,
+    employee,
+    input.role,
+    randomBytes(24).toString("hex"),
+  );
+
+  const publicEmployee = await linkEmployeeToUser(
+    tenantId,
+    employee,
+    user._id,
+    invitedByUserId,
+    audit,
+  );
+
+  const token = await createPasswordResetTokenForUser(user._id.toString());
+  await sendInviteSetPasswordEmail(env, user.email, token);
+
+  return publicEmployee;
+};
+
+export const createEmployeeLogin = async (
+  tenantId: string,
+  employeeId: string,
+  input: CreateEmployeeLoginInput,
+  createdByUserId: string,
+  audit?: AuditContext,
+): Promise<CreateEmployeeLoginResult> => {
+  const employee = await loadEmployeeForLoginProvisioning(tenantId, employeeId);
+  const { user, created } = await resolveOrCreateUserForEmployee(
+    tenantId,
+    employee,
+    input.role,
+    DEFAULT_EMPLOYEE_LOGIN_PASSWORD,
+  );
+
+  const publicEmployee = await linkEmployeeToUser(
+    tenantId,
+    employee,
+    user._id,
+    createdByUserId,
+    audit,
+  );
+
+  return { employee: publicEmployee, userCreated: created };
 };
 
 export class EmployeeServiceError extends Error {

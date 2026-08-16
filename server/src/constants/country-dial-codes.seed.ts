@@ -53,7 +53,6 @@ export const COUNTRY_DIAL_CODE_SEED: CountryDialCodeSeed[] = [
   { code: "CL", name: "Chile", dialCode: "56" },
   { code: "TR", name: "Turkey", dialCode: "90" },
   { code: "RU", name: "Russia", dialCode: "7" },
-  { code: "IL", name: "Israel", dialCode: "972" },
   { code: "QA", name: "Qatar", dialCode: "974" },
   { code: "KW", name: "Kuwait", dialCode: "965" },
   { code: "BH", name: "Bahrain", dialCode: "973" },

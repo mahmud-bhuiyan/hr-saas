@@ -47,8 +47,12 @@ type SearchResult =
   | { type: "action"; action: GlobalSearchActionDef }
   | { type: "employee"; employee: Employee };
 
+const homeIcon = <HiHome className="h-4 w-4 text-brand-600" aria-hidden />;
+
 const ACTION_ICONS: Record<string, ReactNode> = {
-  dashboard: <HiHome className="h-4 w-4 text-brand-600" aria-hidden />,
+  "admin-dashboard": homeIcon,
+  "employee-dashboard": homeIcon,
+  "super-admin-dashboard": homeIcon,
   profile: <HiUser className="h-4 w-4 text-brand-600" aria-hidden />,
   leave: <HiCalendarDays className="h-4 w-4 text-amber-500" aria-hidden />,
   attendance: <HiClock className="h-4 w-4 text-emerald-500" aria-hidden />,

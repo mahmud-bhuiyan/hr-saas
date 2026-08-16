@@ -11,6 +11,7 @@ export interface ILogoDisplay {
 
 export interface IFaviconDisplay {
   mimeType: FaviconMimeType;
+  shape: LogoShape;
 }
 
 export interface ISidebarDisplay {
@@ -40,7 +41,11 @@ const logoDisplaySchema = new Schema<ILogoDisplay>(
     heightPx: { type: Number, default: 32, min: 24, max: 80 },
     maxWidthPx: { type: Number, default: 160, min: 80, max: 320 },
     objectFit: { type: String, enum: ['contain', 'cover'], default: 'contain' },
-    shape: { type: String, enum: ['default', 'circle'], default: 'circle' },
+    shape: {
+      type: String,
+      enum: ['default', 'rounded', 'circle', 'square'],
+      default: 'circle',
+    },
     showSiteName: { type: Boolean, default: false },
   },
   { _id: false }
@@ -52,6 +57,11 @@ const faviconDisplaySchema = new Schema<IFaviconDisplay>(
       type: String,
       enum: ['auto', 'image/png', 'image/x-icon', 'image/svg+xml', 'image/webp'],
       default: 'auto',
+    },
+    shape: {
+      type: String,
+      enum: ['default', 'rounded', 'circle', 'square'],
+      default: 'circle',
     },
   },
   { _id: false }

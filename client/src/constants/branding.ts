@@ -1,6 +1,6 @@
 export type LogoObjectFit = 'contain' | 'cover';
 
-export type LogoShape = 'default' | 'circle';
+export type LogoShape = 'default' | 'rounded' | 'circle' | 'square';
 
 export type FaviconMimeType =
   | 'auto'
@@ -8,6 +8,20 @@ export type FaviconMimeType =
   | 'image/x-icon'
   | 'image/svg+xml'
   | 'image/webp';
+
+export const LOGO_SHAPE_OPTIONS: { value: LogoShape; label: string }[] = [
+  { value: 'default', label: 'Default' },
+  { value: 'rounded', label: 'Rounded' },
+  { value: 'circle', label: 'Circle' },
+  { value: 'square', label: 'Square' },
+];
+
+/** Guidance for favicon assets so circle/square clips render cleanly. */
+export const FAVICON_IMAGE_SIZE_HINT =
+  "Square mark preferred. Uploads auto-crop to 64×64 PNG.";
+
+export const LOGO_IMAGE_SIZE_HINT =
+  "Wide logos work best. Uploads optimize to PNG (max 800×240).";
 
 export const DEFAULT_LOGO_DISPLAY = {
   heightPx: 32,
@@ -19,6 +33,7 @@ export const DEFAULT_LOGO_DISPLAY = {
 
 export const DEFAULT_FAVICON_DISPLAY = {
   mimeType: 'auto' as FaviconMimeType,
+  shape: 'circle' as LogoShape,
 };
 
 export const DEFAULT_SIDEBAR_DISPLAY = {

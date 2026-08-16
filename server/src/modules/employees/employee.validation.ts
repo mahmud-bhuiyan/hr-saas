@@ -86,10 +86,21 @@ export const inviteEmployeeSchema = z.object({
     .default("employee"),
 });
 
+export const createEmployeeLoginSchema = inviteEmployeeSchema;
+
 export type CreateEmployeeInput = z.infer<typeof createEmployeeSchema>;
 export type UpdateEmployeeInput = z.infer<typeof updateEmployeeSchema>;
 export type ListEmployeesQuery = z.infer<typeof listEmployeesQuerySchema>;
 export type InviteEmployeeInput = z.infer<typeof inviteEmployeeSchema>;
+export type CreateEmployeeLoginInput = z.infer<
+  typeof createEmployeeLoginSchema
+>;
+
+export const updateMyEmployeeSchema = z.object({
+  phone: z.string().trim().min(1, "Phone is required").max(16),
+});
+
+export type UpdateMyEmployeeInput = z.infer<typeof updateMyEmployeeSchema>;
 
 export const employeeImportCsvSchema = z.object({
   csv: z.string().trim().min(1, "CSV content is required"),

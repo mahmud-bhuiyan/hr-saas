@@ -33,7 +33,7 @@
 | User list & role assignment | — | ✅ | — | — | — |
 | Tenant branding overrides | — | ✅ | — | — | — |
 
-*(Tenant branding: company admin sets optional logo + primary color overrides that merge with platform defaults from module 15.)*
+*(Tenant branding: company admin sets optional logo + favicon URL and shape overrides that merge with platform defaults from module 15.)*
 
 ---
 
@@ -47,7 +47,10 @@
   address: String,           // optional
   logoUrl: String | null,    // company logo (tenant-scoped) — future company profile
   branding: {
-    logoUrl: String | null
+    logoUrl: String | null,
+    faviconUrl: String | null,
+    logoShape: 'default' | 'rounded' | 'circle' | 'square' | null,
+    faviconShape: 'default' | 'rounded' | 'circle' | 'square' | null
   }
 }
 ```
@@ -74,6 +77,7 @@ Replaces free-text `department` on employees with a reference or normalized name
 | GET | `/api/v1/settings/branding` | Authenticated tenant user | Merged effective branding |
 | GET | `/api/v1/settings/branding/overrides` | `company_admin` | Raw tenant overrides for edit form |
 | PATCH | `/api/v1/settings/branding` | `company_admin` | Partial update tenant overrides |
+| POST | `/api/v1/settings/branding/upload` | `company_admin` | Upload logo/favicon to ImgBB (returns URL) |
 | GET | `/api/v1/settings/company` | `company_admin` | Company profile |
 | PATCH | `/api/v1/settings/company` | `company_admin` | Partial update (name, address, logo) |
 | GET | `/api/v1/settings/departments` | `hr_manager+` | List departments |
@@ -90,9 +94,8 @@ Platform site settings endpoints live in [15-platform-site-settings.md](./15-pla
 
 | Screen | Route | Access | Status |
 |--------|-------|--------|--------|
-| Company branding | `/dashboard/settings/company?tab=branding` | `company_admin` | ✅ |
+| Company profile (incl. logo & favicon) | `/admin/settings/company/profile` | `company_admin` | ✅ |
 | Settings hub | `/dashboard/settings` | `company_admin`, `hr_manager` | ✅ |
-| Company profile | `/dashboard/settings/company` | `company_admin` | ✅ |
 | Departments | `/dashboard/settings/departments` | `company_admin`, `hr_manager` | ✅ |
 | Users & roles | `/dashboard/settings/users` | `company_admin` | ✅ |
 | Platform site settings | `/super-admin/site/*` | `super_admin` | ✅ (module 15) |

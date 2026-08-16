@@ -80,16 +80,16 @@ export const AttendanceLogsSection = ({
         <h2 className="text-base font-semibold tracking-wide">
           Logs &amp; Requests
         </h2>
-        <label className="flex cursor-pointer items-center gap-2 text-xs keka-muted">
+        <label className="flex cursor-pointer items-center gap-2 text-xs att-muted">
           <span>24 hour format</span>
           <button
             type="button"
             role="switch"
             aria-checked={use24Hour}
             onClick={() => onUse24HourChange(!use24Hour)}
-            className={`keka-toggle ${use24Hour ? "keka-toggle-on" : ""}`}
+            className={`att-toggle ${use24Hour ? "att-toggle-on" : ""}`}
           >
-            <span className="keka-toggle-thumb" />
+            <span className="att-toggle-thumb" />
           </button>
         </label>
       </div>
@@ -100,7 +100,7 @@ export const AttendanceLogsSection = ({
             key={tab.id}
             type="button"
             disabled={tab.disabled}
-            className={`keka-tab ${logsTab === tab.id ? "keka-tab-active" : ""} ${tab.disabled ? "cursor-not-allowed opacity-40" : ""}`}
+            className={`att-tab ${logsTab === tab.id ? "att-tab-active" : ""} ${tab.disabled ? "cursor-not-allowed opacity-40" : ""}`}
             onClick={() => !tab.disabled && onLogsTabChange(tab.id)}
           >
             {tab.label}
@@ -110,7 +110,7 @@ export const AttendanceLogsSection = ({
 
       {(logsTab === "attendance-requests" ||
         logsTab === "overtime-requests") && (
-        <div className="keka-card px-4 py-8 text-center text-sm keka-muted">
+        <div className="att-card px-4 py-8 text-center text-sm att-muted">
           {logsTab === "attendance-requests"
             ? "Attendance requests are not available yet."
             : "Overtime requests are not available yet."}
@@ -135,7 +135,7 @@ export const AttendanceLogsSection = ({
       )}
 
       {showList && (
-        <div className="keka-card overflow-hidden p-4">
+        <div className="att-card overflow-hidden p-4">
           <AttendanceHistoryTable
             logs={historyLogs}
             loading={historyLoading}
@@ -146,18 +146,18 @@ export const AttendanceLogsSection = ({
             <div className="mt-4 flex justify-center gap-2">
               <button
                 type="button"
-                className="keka-tab rounded px-3 py-1 text-xs disabled:opacity-40"
+                className="att-tab rounded px-3 py-1 text-xs disabled:opacity-40"
                 disabled={historyPage <= 1}
                 onClick={() => onHistoryPageChange(historyPage - 1)}
               >
                 Previous
               </button>
-              <span className="keka-muted px-2 py-1 text-xs">
+              <span className="att-muted px-2 py-1 text-xs">
                 Page {historyPage}
               </span>
               <button
                 type="button"
-                className="keka-tab rounded px-3 py-1 text-xs disabled:opacity-40"
+                className="att-tab rounded px-3 py-1 text-xs disabled:opacity-40"
                 disabled={historyPage * historyLimit >= historyTotal}
                 onClick={() => onHistoryPageChange(historyPage + 1)}
               >

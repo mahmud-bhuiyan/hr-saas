@@ -27,6 +27,7 @@ import type {
   MyEmployeeProfile,
   CreateEmployeeInput,
   UpdateEmployeeInput,
+  UpdateMyEmployeeInput,
   ListEmployeesQuery,
   LeaveRequest,
   LeaveBalance,
@@ -77,6 +78,8 @@ import type {
   ResetPasswordInput,
   MessageResponse,
   InviteEmployeeInput,
+  CreateEmployeeLoginInput,
+  CreateEmployeeLoginResult,
   AttendanceLog,
   AttendanceStatus,
   AttendanceSettings,
@@ -484,6 +487,18 @@ export const fetchMyEmployee = async (): Promise<MyEmployeeProfile> => {
   return json.data.employee;
 };
 
+export const updateMyEmployee = async (
+  input: UpdateMyEmployeeInput,
+): Promise<MyEmployeeProfile> => {
+  const json = await apiFetch<
+    ApiSuccessResponse<{ employee: MyEmployeeProfile }>
+  >("/api/v1/employees/me", {
+    method: "PATCH",
+    body: JSON.stringify(input),
+  });
+  return json.data.employee;
+};
+
 export const fetchEmployeeReports = async (id: string): Promise<Employee[]> => {
   const json = await apiFetch<ApiSuccessResponse<{ reports: Employee[] }>>(
     `/api/v1/employees/${id}/reports`,
@@ -554,6 +569,19 @@ export const uploadPlatformAsset = async (
 ): Promise<UploadPlatformAssetResponse> => {
   const json = await apiFetch<ApiSuccessResponse<UploadPlatformAssetResponse>>(
     "/api/v1/admin/platform/site-settings/upload",
+    {
+      method: "POST",
+      body: JSON.stringify(input),
+    },
+  );
+  return json.data;
+};
+
+export const uploadTenantBrandingAsset = async (
+  input: UploadPlatformAssetInput,
+): Promise<UploadPlatformAssetResponse> => {
+  const json = await apiFetch<ApiSuccessResponse<UploadPlatformAssetResponse>>(
+    "/api/v1/settings/branding/upload",
     {
       method: "POST",
       body: JSON.stringify(input),
@@ -1300,6 +1328,20 @@ export const inviteEmployee = async (
 ): Promise<Employee> => {
   const json = await apiFetch<ApiSuccessResponse<Employee>>(
     `/api/v1/employees/${employeeId}/invite`,
+    {
+      method: "POST",
+      body: JSON.stringify(input),
+    },
+  );
+  return json.data;
+};
+
+export const createEmployeeLogin = async (
+  employeeId: string,
+  input: CreateEmployeeLoginInput = {},
+): Promise<CreateEmployeeLoginResult> => {
+  const json = await apiFetch<ApiSuccessResponse<CreateEmployeeLoginResult>>(
+    `/api/v1/employees/${employeeId}/create-login`,
     {
       method: "POST",
       body: JSON.stringify(input),

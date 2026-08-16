@@ -61,7 +61,7 @@ This flow covers **signup → people → leave workflow → documents → settin
 - Add / edit / deactivate employee — **done**
 - Employee profile: personal details, job title, department, start date, manager, employment status — **done**
 - Simple org view (manager → direct reports list) — **done**
-- Link employee record to login user (invite flow or admin-created account) — **deferred**
+- Link employee record to login user (invite email or admin-created login with default password) — **done**
 
 ### 2.4 Leave & Absence
 
@@ -131,14 +131,14 @@ Be explicit with the client so expectations stay aligned.
 - [x] Companies — pending queue, approve/reject, add company directly
 - [x] Platform site settings — site name, theme color, logo, favicon (`/super-admin/site/*`)
 - [x] Manage company modules — enable/disable HR modules per tenant (modal on companies page)
-- [x] Company branding overrides — logo + primary color (`/dashboard/settings/company?tab=branding`)
+- [x] Company branding overrides — logo + favicon (`/admin/settings/company/profile`)
 
 ### Dashboard
 - [x] Home dashboard (summary cards + quick links — **placeholders**; real counts in Step 7)
 - [x] App shell theme toggle (light/dark) — per-user preference in DB + localStorage via `ThemeContext`
 
 ### Account
-- [x] My profile (view / edit, change password)
+- [x] My profile (view all account details / edit name, email, photo, change password)
 
 ### Employees
 - [x] Employee directory
@@ -260,7 +260,7 @@ Full roadmap: [hr-saas-mern-project-plan.md](./hr-saas-mern-project-plan.md)
 | Foundation (Step 1) | ✅ Complete | |
 | Auth & tenant (Step 2) | ✅ Complete | Includes approval workflow + super admin add company |
 | App shell (Step 3) | ✅ Complete | UI kit, profile, companies page, user light/dark theme toggle (DB + localStorage) |
-| Employees (Step 4) | ✅ Ready for review | User link deferred |
+| Employees (Step 4) | ✅ Ready for review | Invite + one-click login (`User@123`) |
 | Leave (Step 5) | ✅ Complete | Email via SendGrid; user→employee via email fallback |
 | Documents (Step 6) | ✅ Ready for review | MinIO for local dev; AWS S3 or Cloudflare R2 in production |
 | Settings (Step 7) | ✅ Ready for review | Company profile, departments CRUD, users/roles; branding was done earlier |

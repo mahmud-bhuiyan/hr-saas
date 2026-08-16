@@ -22,7 +22,7 @@ import {
 import type { AttendanceLog, PatchAttendanceInput } from "../../../types";
 import { hasPermission } from "../../../utils/permissions";
 import { isQueryInitialLoad } from "../../../utils/query";
-import "./attendance-keka.css";
+import "./attendance-theme.css";
 import { AttendanceActionsCard } from "./components/AttendanceActionsCard";
 import { AttendanceEmployeeCorrections } from "./components/AttendanceEmployeeCorrections";
 import { AttendanceCorrectionModal } from "./components/AttendanceCorrectionModal";
@@ -266,13 +266,13 @@ export const AttendancePage = () => {
   const clockLoading = clockInMutation.isPending || clockOutMutation.isPending;
 
   const myAttendanceContent = canClock ? (
-    <div className="keka-attendance space-y-5">
+    <div className="att-attendance space-y-5">
       {missingEmployeeLink ? (
         <div className="rounded-lg border border-amber-300/60 bg-amber-50 px-4 py-3 text-sm text-amber-900 dark:border-amber-500/40 dark:bg-amber-500/10 dark:text-amber-200">
           <p className="font-medium">
             No employee profile linked to your account
           </p>
-          <p className="mt-1 keka-muted">
+          <p className="mt-1 att-muted">
             Attendance is recorded against employee records. Your user account
             is not linked to one, so personal clock-in and history are
             unavailable.

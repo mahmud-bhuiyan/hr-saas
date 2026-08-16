@@ -5,6 +5,7 @@ import { FormField } from "../../../../components/ui/FormField";
 import { Input } from "../../../../components/ui/Input";
 import { Select } from "../../../../components/ui/Select";
 import type { LogoObjectFit, LogoShape } from "../../../../types";
+import { LOGO_IMAGE_SIZE_HINT } from "../../../../constants/branding";
 import { ImageAssetField } from "./ImageAssetField";
 import type { SiteSettingsFormValues } from "../utils";
 
@@ -39,7 +40,9 @@ export const LogoSettingsTab = ({
       disabled={loading}
       icon={<HiPhoto className="h-4 w-4 text-brand-600" />}
       placeholder="https://example.com/logo.png"
-      saveHint="Paste a URL or upload an image, then save logo settings to apply changes."
+      description={LOGO_IMAGE_SIZE_HINT}
+      saveHint="Upload optimizes to PNG. Save to apply."
+      previewShape={values.logoShape}
     />
 
     <div className="grid gap-4 sm:grid-cols-2">
@@ -93,7 +96,9 @@ export const LogoSettingsTab = ({
           disabled={loading}
         >
           <option value="circle">Circle</option>
+          <option value="rounded">Rounded</option>
           <option value="default">Default</option>
+          <option value="square">Square</option>
         </Select>
       </FormField>
     </div>

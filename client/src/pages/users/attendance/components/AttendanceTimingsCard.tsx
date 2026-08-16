@@ -67,8 +67,8 @@ export const AttendanceTimingsCard = ({
   })();
 
   return (
-    <div className="keka-card flex h-full flex-col">
-      <div className="keka-card-header">Timings</div>
+    <div className="att-card flex h-full flex-col">
+      <div className="att-card-header">Timings</div>
 
       <div className="flex flex-1 flex-col px-4 py-4">
         <div className="mb-4 flex justify-between gap-1">
@@ -82,23 +82,23 @@ export const AttendanceTimingsCard = ({
                 key={`${label}-${index}`}
                 className="flex flex-1 flex-col items-center gap-1.5"
               >
-                <span className="keka-muted text-[10px] font-semibold">
+                <span className="att-muted text-[10px] font-semibold">
                   {label}
                 </span>
                 <span
                   className={`flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold ${
                     isToday
-                      ? "text-[var(--keka-pill-text)]"
+                      ? "text-[var(--att-pill-text)]"
                       : hasLogs
-                        ? "keka-accent-text"
-                        : "keka-muted"
+                        ? "att-accent-text"
+                        : "att-muted"
                   }`}
                   style={
                     isToday
-                      ? { backgroundColor: "var(--keka-accent)" }
+                      ? { backgroundColor: "var(--att-accent)" }
                       : hasLogs
                         ? { backgroundColor: "rgba(91, 191, 168, 0.15)" }
-                        : { backgroundColor: "var(--keka-bar-track)" }
+                        : { backgroundColor: "var(--att-bar-track)" }
                   }
                 >
                   {label}
@@ -111,7 +111,7 @@ export const AttendanceTimingsCard = ({
         <p className="text-sm font-medium">Today (Flexible Timings)</p>
 
         {session && (
-          <p className="keka-muted mt-1 text-xs">
+          <p className="att-muted mt-1 text-xs">
             {formatAttendanceTime(session.clockIn, use24Hour)}
             {session.clockOut
               ? ` – ${formatAttendanceTime(session.clockOut, use24Hour)}`
@@ -120,20 +120,20 @@ export const AttendanceTimingsCard = ({
         )}
 
         <div className="mt-4">
-          <div className="keka-progress-track">
+          <div className="att-progress-track">
             <div
-              className="keka-progress-fill"
+              className="att-progress-fill"
               style={{ width: `${progressPercent}%` }}
             />
           </div>
           <div className="mt-2 flex items-center justify-between text-xs">
-            <span className="keka-muted">
+            <span className="att-muted">
               Duration:{" "}
-              <span className="font-semibold text-[var(--keka-text)]">
+              <span className="font-semibold text-[var(--att-text)]">
                 {formatAttendanceDuration(displayMinutes)}
               </span>
             </span>
-            <span className="keka-muted flex items-center gap-1">
+            <span className="att-muted flex items-center gap-1">
               <HiOutlineBeaker className="h-3.5 w-3.5" />0 min
             </span>
           </div>

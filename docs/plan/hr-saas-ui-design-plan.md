@@ -1,9 +1,9 @@
-# Keka-Inspired UI Design Plan
+# HR SaaS UI Design Plan
 
-**Purpose:** Living design spec for gradually aligning the HR SaaS web UI with patterns from [Keka](https://www.keka.com/). Update this file as new screens or details are agreed — implementation follows the doc, one phase at a time.
+**Purpose:** Living design spec for gradually aligning the HR SaaS web UI with patterns from [Reference HR](#). Update this file as new screens or details are agreed — implementation follows the doc, one phase at a time.
 
 **Related docs:**
-- [keka-platform-reference.md](./keka-platform-reference.md) — Keka product/feature benchmark (not UI)
+- [hr-platform-benchmark.md](./hr-platform-benchmark.md) — Reference product/feature benchmark (not UI)
 
 **Platform:** Web only (responsive). No native mobile app.
 
@@ -11,11 +11,11 @@
 
 ---
 
-## 1. Design direction (Keka reference)
+## 1. Design direction (industry reference)
 
-From Keka’s dashboard shell (reference screenshot, Aug 2026):
+From the reference platform’s dashboard shell (reference screenshot, Aug 2026):
 
-| Element | Keka pattern | Our current app |
+| Element | reference pattern | Our current app |
 |---------|--------------|-----------------|
 | Top bar | Brand green bar; company name left; **centred global search**; notifications + avatar right | White/dark header; brand in sidebar column; **no global search**; user menu + bell + theme toggle right |
 | Sub-nav tabs | Dark strip under header (`DASHBOARD`, `WELCOME`, …) | None — sidebar only |
@@ -23,7 +23,7 @@ From Keka’s dashboard shell (reference screenshot, Aug 2026):
 | Dashboard hero | Full-width **welcome banner** with user’s name on textured green background | Text-only `PageHeader`: “Welcome back, {name}” |
 | Search placeholder | `Search employees or actions (Ex: Apply Leave)` + keyboard hint `Alt + K` | — |
 
-**Overall Keka feel:** Strong brand green, dark chrome, centred command palette, personal welcome on landing — HR tool that feels approachable, not spreadsheet-like.
+**Overall reference feel:** Strong brand green, dark chrome, centred command palette, personal welcome on landing — HR tool that feels approachable, not spreadsheet-like.
 
 **Our approach:** Adopt patterns incrementally. Do **not** re-skin the entire app in one pass. Each phase should ship a usable slice without breaking existing pages.
 
@@ -34,7 +34,7 @@ From Keka’s dashboard shell (reference screenshot, Aug 2026):
 | Phase | Scope | Status |
 |-------|-------|--------|
 | **Phase 1** | Global search bar in header + dashboard welcome banner | ✅ Done |
-| **Phase 2** | Keka-style My attendance tab — summary cards, calendar, day detail | ✅ Done |
+| **Phase 2** | HR SaaS-style My attendance tab — summary cards, calendar, day detail | ✅ Done |
 | Phase 3+ | TBD — client/design details to be added later | Not started |
 
 > **Rule:** Until a phase is marked “In development” or “Done” here, no code changes for that phase.
@@ -43,7 +43,7 @@ From Keka’s dashboard shell (reference screenshot, Aug 2026):
 
 ## 3. Phase 2 — Attendance log UI (My attendance tab)
 
-**Goal:** Align the **My attendance** tab on `/dashboard/attendance` with Keka’s attendance log layout — top summary cards, timings/actions cards, and a month calendar with day detail — without changing team live board, HR corrections, or clock-in/out behaviour.
+**Goal:** Align the **My attendance** tab on `/dashboard/attendance` with the reference platform’s attendance log layout — top summary cards, timings/actions cards, and a month calendar with day detail — without changing team live board, HR corrections, or clock-in/out behaviour.
 
 **Route:** `/dashboard/attendance` (My attendance tab only — no new URL)
 
@@ -74,7 +74,7 @@ Four `card-surface` stat cards:
 
 - Break tracking, on-time arrival %, team comparison stats (no shift data)
 - Overtime / attendance request sub-tabs
-- Keka dark chrome / Me-section sub-nav
+- Reference HR dark chrome / Me-section sub-nav
 - Changes to Team live board or HR corrections tabs
 
 ### 3.5 Files
@@ -95,7 +95,7 @@ Four `card-surface` stat cards:
 
 ## 4. Phase 1 — Global search + dashboard welcome
 
-**Goal:** Two Keka-inspired touches only. **Everything else stays as-is** (sidebar, colors, other pages, summary cards, quick links).
+**Goal:** Two HR SaaS touches only. **Everything else stays as-is** (sidebar, colors, other pages, summary cards, quick links).
 
 ### 3.1 Global search bar (header)
 
@@ -112,14 +112,14 @@ Search across two result types:
 | **Employees** | Match by name or email (tenant-scoped, role-respecting) | Navigate to employee profile/view |
 | **Actions / pages** | Static catalogue of navigable routes + common tasks the user can access | Navigate to route (or open modal if task is in-page, e.g. “Apply leave” → `/dashboard/leave`) |
 
-**Placeholder text (match Keka intent):**
+**Placeholder text (match reference intent):**
 ```text
 Search employees or actions (Ex: Apply Leave)
 ```
 
 **Keyboard shortcut (optional v1, recommended):**
 - `Alt + K` (Windows/Linux) / `Option + K` (macOS) — focus search from anywhere in the app shell
-- Show small hint badge in the search field when unfocused (like Keka)
+- Show small hint badge in the search field when unfocused (like the reference UI)
 
 #### UX pattern
 - **Command-palette style:** typing opens a dropdown/popover with grouped results:
@@ -182,7 +182,7 @@ Examples:
 - `Welcome Alex!` (first name only)
 - Fallback: email local-part or “there” if no name — same as current `displayName()` helper in `DashboardPage.tsx`
 
-#### Visual (Keka-inspired, adapt to our theme)
+#### Visual (HR SaaS, adapt to our theme)
 - Full-width **hero banner** with rounded corners (e.g. `rounded-xl`)
 - Background: brand green gradient or subtle textured pattern (CSS gradient acceptable for v1; custom asset optional later)
 - Text: large, bold, white — e.g. `text-2xl` or `text-3xl font-semibold`
@@ -193,7 +193,7 @@ Phase 1 options (pick one at implementation time):
 
 | Option | Description |
 |--------|-------------|
-| **A (recommended)** | Replace current `PageHeader` title on dashboard with the banner; keep optional short description below banner or drop “Dashboard” label for cleaner Keka-like feel |
+| **A (recommended)** | Replace current `PageHeader` title on dashboard with the banner; keep optional short description below banner or drop “Dashboard” label for cleaner Reference HR-like feel |
 | **B** | Keep `PageHeader` and add banner above it (may feel redundant — avoid unless client wants both) |
 
 **Default recommendation:** Option A — banner replaces the “Welcome back, …” `PageHeader` title; retain summary cards and quick links unchanged.
@@ -204,7 +204,7 @@ Phase 1 options (pick one at implementation time):
 - **No new API** for Phase 1
 
 #### Out of scope (Phase 1 dashboard)
-- Keka-style sub-tabs (`DASHBOARD` / `WELCOME`)
+- HR SaaS-style sub-tabs (`DASHBOARD` / `WELCOME`)
 - Company name in header (“SJ INNOVATION HR TEAM” style) — future phase
 - Onboarding checklist / “Welcome” tab content
 - Changing dashboard summary cards or quick links layout
@@ -241,7 +241,7 @@ Phase 1 options (pick one at implementation time):
 
 ## 6. Future phases (placeholder)
 
-Details to be added when client provides direction. Candidates from Keka UI (not committed):
+Details to be added when client provides direction. Candidates from reference UI (not committed):
 
 - [ ] Header: company/tenant name beside logo (uppercase strip)
 - [ ] Brand green top bar + dark sub-nav tabs
@@ -269,5 +269,5 @@ Details to be added when client provides direction. Candidates from Keka UI (not
 
 | Date | Change |
 |------|--------|
-| 2026-08-03 | Phase 2 implemented — Keka-style My attendance tab (summary cards, calendar, day detail) |
+| 2026-08-03 | Phase 2 implemented — HR SaaS-style My attendance tab (summary cards, calendar, day detail) |
 | 2026-08-03 | Phase 1 implemented — `GlobalSearch`, `DashboardWelcomeBanner`, AppShell + dashboard wired |

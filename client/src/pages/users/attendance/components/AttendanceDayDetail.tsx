@@ -48,10 +48,10 @@ export const AttendanceDayDetail = ({
   );
 
   return (
-    <div className="keka-day-panel w-full lg:w-56 xl:w-64">
+    <div className="att-day-panel w-full lg:w-56 xl:w-64">
       {!selectedDate || !hasSessions ? (
         <div className="flex h-full flex-col items-center justify-center text-center">
-          <p className="keka-muted text-xs">
+          <p className="att-muted text-xs">
             {selectedDate
               ? "No attendance on this day"
               : "Select a day to view details"}
@@ -62,20 +62,20 @@ export const AttendanceDayDetail = ({
           <p className="text-sm font-semibold">
             Flexi Timing ({dateShort})
             {isToday && (
-              <span className="keka-accent-text ml-1 text-[10px] font-normal">
+              <span className="att-accent-text ml-1 text-[10px] font-normal">
                 · Today
               </span>
             )}
           </p>
-          {timeRange && <p className="keka-muted mt-1 text-xs">{timeRange}</p>}
+          {timeRange && <p className="att-muted mt-1 text-xs">{timeRange}</p>}
 
-          <div className="keka-bar-chart">
-            <div className="keka-bar" style={{ height: `${barHeight}px` }} />
+          <div className="att-bar-chart">
+            <div className="att-bar" style={{ height: `${barHeight}px` }} />
           </div>
 
           <div className="mt-4 grid grid-cols-2 gap-3 text-center">
             <div>
-              <p className="keka-muted text-[9px] font-semibold uppercase tracking-wide">
+              <p className="att-muted text-[9px] font-semibold uppercase tracking-wide">
                 Gross hours
               </p>
               <p className="mt-1 text-sm font-bold">
@@ -83,7 +83,7 @@ export const AttendanceDayDetail = ({
               </p>
             </div>
             <div>
-              <p className="keka-muted text-[9px] font-semibold uppercase tracking-wide">
+              <p className="att-muted text-[9px] font-semibold uppercase tracking-wide">
                 Effective hours
               </p>
               <p className="mt-1 text-sm font-bold">
@@ -97,7 +97,7 @@ export const AttendanceDayDetail = ({
               <div
                 key={session.id}
                 className="rounded border px-2 py-2 text-xs"
-                style={{ borderColor: "var(--keka-border)" }}
+                style={{ borderColor: "var(--att-border)" }}
               >
                 <p className="font-medium">
                   {formatAttendanceTime(session.clockIn, use24Hour)}
@@ -107,7 +107,7 @@ export const AttendanceDayDetail = ({
                     : "In progress"}
                 </p>
                 <div className="mt-1 flex items-center justify-between gap-2">
-                  <span className="keka-muted">
+                  <span className="att-muted">
                     {formatAttendanceDuration(session.durationMinutes)}
                   </span>
                   {canCorrect && (

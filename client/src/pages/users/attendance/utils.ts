@@ -101,7 +101,7 @@ export const MONTH_ABBR = [
   "DEC",
 ] as const;
 
-export interface KekaCalendarDay {
+export interface AttendanceCalendarDay {
   date: string;
   day: number;
   year: number;
@@ -110,11 +110,11 @@ export interface KekaCalendarDay {
   isWeekend: boolean;
 }
 
-/** Monday-first calendar grid (Keka layout). */
+/** Monday-first calendar grid (Monday-first layout). */
 export const buildMondayFirstCalendarDays = (
   year: number,
   month: number,
-): KekaCalendarDay[] => {
+): AttendanceCalendarDay[] => {
   const daysInMonth = new Date(Date.UTC(year, month, 0)).getUTCDate();
   const sundayFirst = new Date(Date.UTC(year, month - 1, 1)).getUTCDay();
   const mondayFirstOffset = sundayFirst === 0 ? 6 : sundayFirst - 1;
@@ -125,7 +125,7 @@ export const buildMondayFirstCalendarDays = (
     Date.UTC(prevYear, prevMonth, 0),
   ).getUTCDate();
 
-  const cells: KekaCalendarDay[] = [];
+  const cells: AttendanceCalendarDay[] = [];
 
   for (let i = 0; i < mondayFirstOffset; i += 1) {
     const day = daysInPrevMonth - mondayFirstOffset + i + 1;
@@ -196,7 +196,7 @@ export const getMonthStrip = (
   return items;
 };
 
-export const formatKekaDate = (dateStr: string): string => {
+export const formatAttendanceDate = (dateStr: string): string => {
   const d = new Date(`${dateStr}T00:00:00.000Z`);
   return d.toLocaleDateString(undefined, {
     weekday: "short",
@@ -206,7 +206,10 @@ export const formatKekaDate = (dateStr: string): string => {
   });
 };
 
-export const formatKekaMonthYear = (year: number, month: number): string => {
+export const formatAttendanceMonthYear = (
+  year: number,
+  month: number,
+): string => {
   const name = new Date(Date.UTC(year, month - 1, 1)).toLocaleString(
     undefined,
     { month: "long" },

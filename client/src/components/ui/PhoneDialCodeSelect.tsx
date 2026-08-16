@@ -1,11 +1,14 @@
 import {
   useEffect,
   useId,
+  useLayoutEffect,
   useMemo,
   useRef,
   useState,
+  type CSSProperties,
   type KeyboardEvent,
 } from "react";
+import { createPortal } from "react-dom";
 import { HiChevronDown, HiMagnifyingGlass } from "react-icons/hi2";
 import type { CountryDialCode } from "../../utils/phone";
 import { sortDialCodesNumerically } from "../../utils/phone";
@@ -17,6 +20,10 @@ interface PhoneDialCodeSelectProps {
   disabled?: boolean;
   onChange: (dialCode: string) => void;
 }
+
+const MENU_WIDTH_PX = 256;
+const MENU_MAX_HEIGHT_PX = 200;
+const MENU_GAP_PX = 4;
 
 const matchesDialCodeSearch = (
   country: CountryDialCode,
@@ -46,11 +53,14 @@ export const PhoneDialCodeSelect = ({
 }: PhoneDialCodeSelectProps) => {
   const listboxId = useId();
   const containerRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
   const listRef = useRef<HTMLUListElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
   const [open, setOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [activeIndex, setActiveIndex] = useState(-1);
+  const [menuStyle, setMenuStyle] = useState<CSSProperties>({});
 
   const sortedOptions = useMemo(
     () => sortDialCodesNumerically(options),
@@ -91,18 +101,74 @@ export const PhoneDialCodeSelect = ({
     setActiveIndex(nextIndex);
   };
 
+  const updateMenuPosition = () => {
+    const trigger = triggerRef.current;
+    if (!trigger) {
+      return;
+    }
+
+    const rect = trigger.getBoundingClientRect();
+    const spaceBelow = window.innerHeight - rect.bottom - MENU_GAP_PX;
+    const spaceAbove = rect.top - MENU_GAP_PX;
+    const openUpward =
+      spaceBelow < MENU_MAX_HEIGHT_PX && spaceAbove > spaceBelow;
+
+    const left = Math.min(
+      Math.max(MENU_GAP_PX, rect.left),
+      window.innerWidth - MENU_WIDTH_PX - MENU_GAP_PX,
+    );
+
+    setMenuStyle({
+      position: "fixed",
+      left,
+      width: MENU_WIDTH_PX,
+      zIndex: 100,
+      ...(openUpward
+        ? {
+            bottom: window.innerHeight - rect.top + MENU_GAP_PX,
+            top: "auto",
+          }
+        : {
+            top: rect.bottom + MENU_GAP_PX,
+            bottom: "auto",
+          }),
+    });
+  };
+
+  useLayoutEffect(() => {
+    if (!open) {
+      return;
+    }
+
+    updateMenuPosition();
+
+    const handleReposition = () => {
+      updateMenuPosition();
+    };
+
+    window.addEventListener("resize", handleReposition);
+    window.addEventListener("scroll", handleReposition, true);
+
+    return () => {
+      window.removeEventListener("resize", handleReposition);
+      window.removeEventListener("scroll", handleReposition, true);
+    };
+  }, [open]);
+
   useEffect(() => {
     if (!open) {
       return;
     }
 
     const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as Node;
       if (
-        containerRef.current &&
-        !containerRef.current.contains(event.target as Node)
+        containerRef.current?.contains(target) ||
+        menuRef.current?.contains(target)
       ) {
-        closeMenu();
+        return;
       }
+      closeMenu();
     };
 
     const handleEscape = (event: globalThis.KeyboardEvent) => {
@@ -191,32 +257,13 @@ export const PhoneDialCodeSelect = ({
     }
   };
 
-  return (
-    <div ref={containerRef} className="relative shrink-0">
-      <button
-        type="button"
-        aria-haspopup="listbox"
-        aria-expanded={open}
-        aria-controls={listboxId}
-        aria-label="Country code"
-        disabled={disabled}
-        onClick={() => {
-          if (!disabled) {
-            setOpen((prev) => !prev);
-          }
-        }}
-        onKeyDown={handleTriggerKeyDown}
-        className="flex shrink-0 items-center gap-0.5 border-0 bg-transparent py-0 pl-0 pr-0.5 text-sm font-medium text-slate-700 focus:outline-none focus:ring-0 disabled:cursor-not-allowed disabled:opacity-50 dark:text-slate-200"
-      >
-        <span>+{value}</span>
-        <HiChevronDown
-          className={`h-3.5 w-3.5 shrink-0 text-slate-400 transition-transform ${open ? "rotate-180" : ""}`}
-          aria-hidden
-        />
-      </button>
-
-      {open && (
-        <div className="absolute left-0 top-full z-50 mt-1 w-64 overflow-hidden rounded-lg border border-slate-200 bg-white shadow-lg dark:border-slate-700 dark:bg-slate-900">
+  const menu = open
+    ? createPortal(
+        <div
+          ref={menuRef}
+          style={menuStyle}
+          className="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-lg dark:border-slate-700 dark:bg-slate-900"
+        >
           <div className="border-b border-slate-100 p-2 dark:border-slate-800">
             <Input
               ref={searchInputRef}
@@ -254,7 +301,7 @@ export const PhoneDialCodeSelect = ({
             aria-label="Country codes"
             tabIndex={-1}
             onKeyDown={handleListKeyDown}
-            className="max-h-60 overflow-auto py-1"
+            className="max-h-40 overflow-auto py-1"
           >
             {visibleOptions.length === 0 ? (
               <li className="px-3 py-2.5 text-sm text-slate-500 dark:text-slate-400">
@@ -291,8 +338,36 @@ export const PhoneDialCodeSelect = ({
               })
             )}
           </ul>
-        </div>
-      )}
+        </div>,
+        document.body,
+      )
+    : null;
+
+  return (
+    <div ref={containerRef} className="relative shrink-0">
+      <button
+        ref={triggerRef}
+        type="button"
+        aria-haspopup="listbox"
+        aria-expanded={open}
+        aria-controls={listboxId}
+        aria-label="Country code"
+        disabled={disabled}
+        onClick={() => {
+          if (!disabled) {
+            setOpen((prev) => !prev);
+          }
+        }}
+        onKeyDown={handleTriggerKeyDown}
+        className="flex shrink-0 items-center gap-0.5 border-0 bg-transparent py-0 pl-0 pr-0.5 text-sm font-medium text-slate-700 focus:outline-none focus:ring-0 disabled:cursor-not-allowed disabled:opacity-50 dark:text-slate-200"
+      >
+        <span>+{value}</span>
+        <HiChevronDown
+          className={`h-3.5 w-3.5 shrink-0 text-slate-400 transition-transform ${open ? "rotate-180" : ""}`}
+          aria-hidden
+        />
+      </button>
+      {menu}
     </div>
   );
 };

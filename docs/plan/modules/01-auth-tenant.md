@@ -63,7 +63,7 @@ Authentication, multi-tenant isolation, and company onboarding. Every business r
 | POST   | `/api/v1/auth/refresh`                          | Cookie                   | New access token                              |
 | POST   | `/api/v1/auth/logout`                           | Public                   | Clear refresh cookie                          |
 | GET    | `/api/v1/auth/me`                               | Authenticated            | Current user profile (includes `colorScheme`) |
-| PATCH  | `/api/v1/auth/me`                               | Authenticated            | Update profile / password / `colorScheme`     |
+| PATCH  | `/api/v1/auth/me`                               | Authenticated            | Update profile / password / `colorScheme` (email immutable) |
 | POST   | `/api/v1/admins`                                | Bootstrap or super_admin | Create admin user                             |
 | GET    | `/api/v1/admin/registrations`                   | super_admin              | List registrations                            |
 | POST   | `/api/v1/admin/registrations`                   | super_admin              | Create approved company + admin               |
@@ -88,7 +88,7 @@ Authentication, multi-tenant isolation, and company onboarding. Every business r
 2. Super admin can create a company in one step — tenant and admin are active immediately.
 3. Company admins sign in with a **User** account only — no employee record is created automatically on company approval or direct creation. To use self-service HR (leave, attendance, etc.), create and link an employee record for the admin explicitly.
 4. `tenantId` comes from JWT only; never trust client-supplied tenant id.
-5. Super admin bootstrap: `npm run seed:superadmin` or first `POST /api/v1/admins` when DB has zero users.
+5. Super admin bootstrap: first `POST /api/v1/admins` when DB has zero users.
 6. User UI theme preference (`colorScheme`) is stored on the User document. Login, refresh, and `GET /auth/me` return it; clients may cache in localStorage for instant paint. `PATCH /auth/me` with `{ colorScheme }` is the source of truth when authenticated.
 
 ---
@@ -99,7 +99,7 @@ Authentication, multi-tenant isolation, and company onboarding. Every business r
 | ------------------------------------ | ----------------------------------- | ------------------------------------------------------------------- |
 | Login                                | `/login`                            | ✅                                                                  |
 | Register company                     | `/register`                         | ✅                                                                  |
-| My profile                           | `/dashboard/profile`                | ✅                                                                  |
+| My profile                           | `/my/profile`                       | ✅ Account details (role, company, status, dates) + edit + password |
 | Theme toggle (light/dark)            | App shell header                    | ✅                                                                  |
 | Companies (super admin)              | `/super-admin/companies`            | ✅                                                                  |
 | Platform site settings (super admin) | `/super-admin/site/*` | ✅ Complete                                                         |

@@ -21,18 +21,23 @@ Features added during implementation that extend the original step list. Keep th
 
 | Added | Step | Description |
 |-------|------|---------------|
-| Super admin role | 2 | Platform operator; bootstrap via `npm run seed:superadmin` or first-user `POST /api/v1/admins` |
+| Super admin role | 2 | Platform operator; bootstrap via first-user `POST /api/v1/admins` |
 | Registration approval | 2 | Self-register creates **pending** tenant; super admin approves/rejects before login |
 | Super admin add company | 2 | `POST /api/v1/admin/registrations` — create approved company + admin in one step |
 | User profile & password | 2–3 | `GET/PATCH /api/v1/auth/me`, profile page, change-password modal |
+| Profile account details | 3 | My profile shows role, company, account status, timestamps, and linked employee fields when present |
+| Self-service phone update | 3 | Profile edit modal; `PATCH /api/v1/employees/me` updates phone on linked employee (email immutable) |
 | UI component kit | 3 | Reusable primitives in `client/src/components/ui/` (Button, Table, Modal, FormModal, etc.) |
 | Companies page (super admin) | 3 | `/super-admin/companies` — pending queue + add company |
 | Manager team-scoped employee read | 4 | Managers see direct reports only (`employee:read:team`) |
 | Direct reports org view | 4 | `GET /api/v1/employees/:id/reports` + profile section |
 | Platform site customization | 7 | Super admin: global site name, theme color, logo, favicon |
-| Per-tenant branding overrides | 7 | Company admin: logo + primary color override (pulled forward from Stage 3) |
+| Per-tenant branding overrides | 7 | Company admin: logo + favicon URL overrides (pulled forward from Stage 3) |
+| Company branding on profile page | 7 | Logo/favicon edits live on `/admin/settings/company/profile` (branding tab removed) |
 | ImgBB logo/favicon upload | 7 | Super admin: upload or URL for platform logo/favicon via `IMGBB_API_KEY` |
 | Logo/favicon display settings | 7 | Super admin: logo size/fit/name toggle; favicon MIME type + preview |
+| Tenant logo/favicon shape overrides | 7 | Company admin: shape controls (default/rounded/circle/square) on branding form; merged into effective branding for BrandMark |
+| Tenant branding ImgBB upload | 7 | Company admin: paste URL or upload logo/favicon; client normalizes favicon to 64×64 PNG and logo to max 800×240 before ImgBB upload |
 | Document storage (Step 6) | 6 | S3 presigned upload/download; `document:read:own` for employees; MinIO in docker compose |
 | User light/dark theme preference | 3 | Per-user `colorScheme` on User model; `PATCH /api/v1/auth/me`; header toggle; `ThemeContext` + localStorage cache; dark-mode styling on dashboard surfaces |
 | Per-company module access control | 2 | Super admin toggles tenant `enabledModules`; server middleware + client nav guards — see [18-module-access-control.md](./modules/18-module-access-control.md) |
@@ -64,7 +69,7 @@ Features added during implementation that extend the original step list. Keep th
 - [x] JWT middleware rejects invalid/expired tokens (401)
 - [x] RBAC `authorize()` and `authorizePermission()` middleware in place
 - [x] Tenant middleware (`resolveTenant`, `requireTenant`) in place
-- [x] Super admin bootstrap (`POST /api/v1/admins`, `npm run seed:superadmin`)
+- [x] Super admin bootstrap (`POST /api/v1/admins`)
 - [x] Super admin: list / approve / reject pending registrations
 - [x] Super admin: create company directly (auto-approved)
 - [x] `docs/openapi.yaml` and Postman collection updated with auth + admin endpoints
@@ -139,10 +144,10 @@ Features added during implementation that extend the original step list. Keep th
 - [x] Platform site settings (super admin): site name, primary color, logo, favicon
 - [x] Logo/favicon ImgBB upload + display customization (height, fit, favicon type)
 - [x] Public `GET /api/v1/platform/site-config` + super_admin PATCH endpoints
-- [x] Tenant branding overrides (company admin): logo URL + primary color
+- [x] Tenant branding overrides (company admin): logo URL + favicon URL
 - [x] Client: dynamic theme, title, favicon from site config
 - [x] Super admin screen: `/super-admin/site/*`
-- [x] Company admin screen: `/dashboard/settings/company` (branding tab)
+- [x] Company admin screen: `/admin/settings/company/profile` (profile details + logo/favicon)
 - [x] Dashboard summary cards wired to real counts (role-based: super admin, tenant admin, manager, employee)
 - [x] `docs/openapi.yaml` and Postman collection updated (platform + branding endpoints)
 
@@ -157,7 +162,7 @@ Features added during implementation that extend the original step list. Keep th
 - [x] Bug fixes on demo walkthrough path (Stage 2 path addressed in S2-8)
 - [x] Forgot password flow — shipped in S2-1 (`/forgot-password`, `/reset-password`)
 - [x] Client demo sign-off per [00-stage-1-core-hr-plan.md](./00-stage-1-core-hr-plan.md) Section 7
-- [x] Automated demo seed scripts and demo-era unit tests removed intentionally — manual staging data only (`npm run seed:superadmin` for platform bootstrap)
+- [x] Automated demo seed scripts and demo-era unit tests removed intentionally — manual staging data only; bootstrap via `POST /api/v1/admins`
 
 **Review:** Stage 1 complete. See [STAGE-3-IMPLEMENTATION-STEPS.md](./STAGE-3-IMPLEMENTATION-STEPS.md) for Stage 3.
 
