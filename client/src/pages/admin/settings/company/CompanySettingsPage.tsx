@@ -1,10 +1,8 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { FormEvent, useEffect, useMemo, useState } from "react";
-import { Navigate, useLocation } from "react-router-dom";
-import { ADMIN_SETTINGS_PATH } from "../../utils";
+import { Navigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { PageContainer } from "../../../../components/ui/PageContainer";
-import { SettingsPageHeader } from "../components/SettingsPageHeader";
 import { useAuth } from "../../../../contexts/AuthContext";
 import { useSiteConfig } from "../../../../contexts/SiteConfigContext";
 import {
@@ -23,30 +21,24 @@ import type {
 import { hasFormChanges, pickChangedFields } from "../../../../utils/form";
 import { getUniqueDialCodes } from "../../../../utils/phone";
 import { isAnyQueryInitialLoad } from "../../../../utils/query";
-import { CompanyProfileForm } from "./components/CompanyProfileForm";
-import type { CompanyProfileFormValues } from "./components/CompanyProfileForm";
-import { CompanySettingsTabs } from "./components/CompanySettingsTabs";
+import { ADMIN_SETTINGS_PATH } from "../../utils";
+import { SettingsPageHeader } from "../components/SettingsPageHeader";
+import { CompanyProfileCards } from "./components/CompanyProfileCards";
+import { CompanyProfileEditModal } from "./components/CompanyProfileEditModal";
+import type { CompanyProfileFormValues } from "./components/CompanyProfileEditModal";
 import { TenantBrandingForm } from "./components/TenantBrandingForm";
 import type { TenantBrandingFormValues } from "./components/TenantBrandingForm";
-import {
-  companySettingsTabFromPathname,
-  type CompanySettingsTab,
-} from "./utils";
 
-const profileFormKeys = [
-  "name",
-  "address",
-  "logoUrl",
-  "defaultPhoneDialCode",
-] as const;
+const profileFormKeys = ["name", "address", "defaultPhoneDialCode"] as const;
 const brandingFormKeys = ["logoUrl", "faviconUrl"] as const;
+
+type SavingSection = "profile" | "branding" | null;
 
 const toProfileFormValues = (
   profile: CompanyProfile,
 ): CompanyProfileFormValues => ({
   name: profile.name,
   address: profile.address ?? "",
-  logoUrl: profile.logoUrl ?? "",
   defaultPhoneDialCode: profile.defaultPhoneDialCode,
 });
 
@@ -75,9 +67,6 @@ const toProfilePatchInput = (
   if (changed.address !== undefined) {
     input.address = String(changed.address);
   }
-  if (changed.logoUrl !== undefined) {
-    input.logoUrl = String(changed.logoUrl) || null;
-  }
   if (changed.defaultPhoneDialCode !== undefined) {
     input.defaultPhoneDialCode = String(changed.defaultPhoneDialCode);
   }
@@ -103,8 +92,6 @@ const toBrandingPatchInput = (
 };
 
 export const CompanySettingsPage = () => {
-  const { pathname } = useLocation();
-  const activeTab = companySettingsTabFromPathname(pathname);
   const { user } = useAuth();
   const { displayName, refresh } = useSiteConfig();
   const queryClient = useQueryClient();
@@ -116,7 +103,8 @@ export const CompanySettingsPage = () => {
     useState<TenantBrandingFormValues | null>(null);
   const [brandingOriginal, setBrandingOriginal] =
     useState<TenantBrandingFormValues | null>(null);
-  const [savingTab, setSavingTab] = useState<CompanySettingsTab | null>(null);
+  const [savingSection, setSavingSection] = useState<SavingSection>(null);
+  const [profileEditOpen, setProfileEditOpen] = useState(false);
 
   const profileQuery = useQuery({
     queryKey: ["settings", "company"],
@@ -192,10 +180,11 @@ export const CompanySettingsPage = () => {
       const formValues = toProfileFormValues(profile);
       setProfileValues(formValues);
       setProfileOriginal(formValues);
-      setSavingTab(null);
+      setSavingSection(null);
+      setProfileEditOpen(false);
     },
     onError: (err) => {
-      setSavingTab(null);
+      setSavingSection(null);
       toast.error(
         err instanceof ApiError
           ? err.message
@@ -216,10 +205,10 @@ export const CompanySettingsPage = () => {
       const formValues = toBrandingFormValues(refreshed);
       setBrandingValues(formValues);
       setBrandingOriginal(formValues);
-      setSavingTab(null);
+      setSavingSection(null);
     },
     onError: (err) => {
-      setSavingTab(null);
+      setSavingSection(null);
       toast.error(
         err instanceof ApiError
           ? err.message
@@ -233,8 +222,22 @@ export const CompanySettingsPage = () => {
     if (!profileValues || !profileOriginal || !profileHasChanges) {
       return;
     }
-    setSavingTab("profile");
+    setSavingSection("profile");
     profileMutation.mutate(toProfilePatchInput(profileValues, profileOriginal));
+  };
+
+  const handleOpenProfileEdit = () => {
+    if (profileOriginal) {
+      setProfileValues(profileOriginal);
+    }
+    setProfileEditOpen(true);
+  };
+
+  const handleCloseProfileEdit = () => {
+    setProfileEditOpen(false);
+    if (profileOriginal) {
+      setProfileValues(profileOriginal);
+    }
   };
 
   const handleBrandingSubmit = (e: FormEvent) => {
@@ -242,7 +245,7 @@ export const CompanySettingsPage = () => {
     if (!brandingValues || !brandingOriginal || !brandingHasChanges) {
       return;
     }
-    setSavingTab("branding");
+    setSavingSection("branding");
     brandingMutation.mutate(
       toBrandingPatchInput(brandingValues, brandingOriginal),
     );
@@ -256,13 +259,9 @@ export const CompanySettingsPage = () => {
     return <Navigate to={ADMIN_SETTINGS_PATH} replace />;
   }
 
-  if (!activeTab) {
-    return <Navigate to={ADMIN_SETTINGS_PATH} replace />;
-  }
-
   const isLoading =
     isAnyQueryInitialLoad(profileQuery, brandingQuery, countryDialCodesQuery) ||
-    !profileValues ||
+    !profileOriginal ||
     !brandingValues;
   const isError =
     profileQuery.isError ||
@@ -271,8 +270,7 @@ export const CompanySettingsPage = () => {
 
   if (isLoading) {
     return (
-      <PageContainer flushTop>
-        <CompanySettingsTabs />
+      <PageContainer>
         <p className="text-sm text-slate-500">Loading company settings…</p>
       </PageContainer>
     );
@@ -280,27 +278,43 @@ export const CompanySettingsPage = () => {
 
   if (isError) {
     return (
-      <PageContainer flushTop>
-        <CompanySettingsTabs />
+      <PageContainer>
         <p className="text-sm text-red-600">Failed to load company settings.</p>
       </PageContainer>
     );
   }
 
   return (
-    <PageContainer flushTop className="space-y-6">
-      <CompanySettingsTabs />
+    <PageContainer className="space-y-6">
       <SettingsPageHeader
-        title={activeTab === "profile" ? "Company profile" : "Logo & favicon"}
-        description={
-          activeTab === "profile"
-            ? "Update your company name, address, default phone country code, and company logo URL used on employee and admin records."
-            : "Override the platform logo and favicon shown in the app for your company. Theme colors stay personal to each user."
-        }
+        title="Company profile"
+        description="Update your company name, address, phone country code, logo, and favicon."
       />
 
-      {activeTab === "profile" && (
-        <CompanyProfileForm
+      <CompanyProfileCards
+        values={profileOriginal}
+        dialCodeOptions={dialCodeOptions}
+        onEdit={handleOpenProfileEdit}
+      />
+
+      <TenantBrandingForm
+        values={brandingValues}
+        displayName={displayName}
+        onChange={(field, value) =>
+          setBrandingValues((prev) =>
+            prev ? { ...prev, [field]: value } : prev,
+          )
+        }
+        onClearField={handleClearBrandingField}
+        onSubmit={handleBrandingSubmit}
+        loading={brandingMutation.isPending && savingSection === "branding"}
+        hasChanges={brandingHasChanges}
+      />
+
+      {profileValues && (
+        <CompanyProfileEditModal
+          open={profileEditOpen}
+          onClose={handleCloseProfileEdit}
           values={profileValues}
           dialCodeOptions={dialCodeOptions}
           onChange={(field, value) =>
@@ -309,24 +323,8 @@ export const CompanySettingsPage = () => {
             )
           }
           onSubmit={handleProfileSubmit}
-          loading={profileMutation.isPending && savingTab === "profile"}
+          loading={profileMutation.isPending && savingSection === "profile"}
           hasChanges={profileHasChanges}
-        />
-      )}
-
-      {activeTab === "branding" && (
-        <TenantBrandingForm
-          values={brandingValues}
-          displayName={displayName}
-          onChange={(field, value) =>
-            setBrandingValues((prev) =>
-              prev ? { ...prev, [field]: value } : prev,
-            )
-          }
-          onClearField={handleClearBrandingField}
-          onSubmit={handleBrandingSubmit}
-          loading={brandingMutation.isPending && savingTab === "branding"}
-          hasChanges={brandingHasChanges}
         />
       )}
     </PageContainer>

@@ -1,4 +1,4 @@
-import { Route, Routes } from "react-router-dom";
+import { Navigate, Route, Routes } from "react-router-dom";
 import { AppShell } from "./components/AppShell";
 import { ScrollToTop } from "./components/ScrollToTop";
 import { EmployeeRoute } from "./components/EmployeeRoute";
@@ -229,9 +229,7 @@ const App = () => {
               <Route
                 path={ADMIN_SETTINGS_COMPANY_BRANDING_PATH}
                 element={
-                  <ModuleRoute module="settings">
-                    <CompanySettingsPage />
-                  </ModuleRoute>
+                  <Navigate to={ADMIN_SETTINGS_COMPANY_PROFILE_PATH} replace />
                 }
               />
               <Route

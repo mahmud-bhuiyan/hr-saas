@@ -131,7 +131,7 @@ Be explicit with the client so expectations stay aligned.
 - [x] Companies — pending queue, approve/reject, add company directly
 - [x] Platform site settings — site name, theme color, logo, favicon (`/super-admin/site/*`)
 - [x] Manage company modules — enable/disable HR modules per tenant (modal on companies page)
-- [x] Company branding overrides — logo + favicon (`/admin/settings/company/branding`)
+- [x] Company branding overrides — logo + favicon (`/admin/settings/company/profile`)
 
 ### Dashboard
 - [x] Home dashboard (summary cards + quick links — **placeholders**; real counts in Step 7)
