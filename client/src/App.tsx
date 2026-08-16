@@ -46,7 +46,10 @@ import { TimesheetsPage } from "./pages/timesheets/TimesheetsPage";
 import { RotasPage } from "./pages/rotas/RotasPage";
 import { AttendanceSettingsPage } from "./pages/admin/settings/attendance/AttendanceSettingsPage";
 import { LeaveSettingsPage } from "./pages/admin/settings/leave/LeaveSettingsPage";
-import { LocationsPage } from "./pages/admin/settings/locations/LocationsPage";
+import {
+  LocationsIndexRedirect,
+  LocationsPage,
+} from "./pages/admin/settings/locations/LocationsPage";
 import { PayrollSettingsPage } from "./pages/admin/settings/payroll/PayrollSettingsPage";
 import { PayrollPage } from "./pages/admin/payroll/PayrollPage";
 import { BillingPage } from "./pages/admin/settings/billing/BillingPage";
@@ -254,7 +257,11 @@ const App = () => {
                     <LocationsPage />
                   </ModuleRoute>
                 }
-              />
+              >
+                <Route index element={<LocationsIndexRedirect />} />
+                <Route path="active" />
+                <Route path="archived" />
+              </Route>
               <Route
                 path={ADMIN_SETTINGS_PAYROLL_PATH}
                 element={

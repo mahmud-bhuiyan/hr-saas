@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { FormEvent, useState } from "react";
-import { Navigate } from "react-router-dom";
+import { Navigate, useLocation } from "react-router-dom";
 import { ADMIN_SETTINGS_PATH } from "../../utils";
 import { HiPlus } from "react-icons/hi2";
 import { toast } from "react-toastify";
@@ -8,8 +8,6 @@ import { Button } from "../../../../components/ui/Button";
 import { ConfirmModal } from "../../../../components/ui/forms/ConfirmModal";
 import { PageContainer } from "../../../../components/ui/PageContainer";
 import { SettingsPageHeader } from "../components/SettingsPageHeader";
-import { TabGroup } from "../../../../components/ui/TabGroup";
-import { useTabUrlState } from "../../../../hooks/useTabUrlState";
 import { useAuth } from "../../../../contexts/AuthContext";
 import {
   ApiError,
@@ -24,20 +22,16 @@ import { isQueryInitialLoad } from "../../../../utils/query";
 import { hasPermission } from "../../../../utils/permissions";
 import { LocationFormModal } from "./components/LocationFormModal";
 import { LocationsTable } from "./components/LocationsTable";
-
-type LocationsTab = "active" | "archived";
-
-const LOCATIONS_TAB_IDS = [
-  "active",
-  "archived",
-] as const satisfies readonly LocationsTab[];
+import { LocationsTabs } from "./components/LocationsTabs";
+import { LOCATIONS_ACTIVE_PATH, locationsListVariant } from "./utils";
 
 export const LocationsPage = () => {
+  const { pathname } = useLocation();
+  const variant = locationsListVariant(pathname);
+  const isActiveList = variant === "active";
+
   const { user } = useAuth();
   const queryClient = useQueryClient();
-  const { activeTab, setActiveTab } = useTabUrlState(LOCATIONS_TAB_IDS, {
-    defaultTab: "active",
-  });
   const [createOpen, setCreateOpen] = useState(false);
   const [createForm, setCreateForm] = useState({
     name: "",
@@ -56,6 +50,7 @@ export const LocationsPage = () => {
   const [deleteTarget, setDeleteTarget] = useState<WorkLocation | null>(null);
 
   const canAccess = user && hasPermission(user.role, "location:read");
+  const canManage = user && hasPermission(user.role, "location:manage");
 
   const locationsQuery = useQuery({
     queryKey: ["locations", "all"],
@@ -194,9 +189,14 @@ export const LocationsPage = () => {
     return <Navigate to={ADMIN_SETTINGS_PATH} replace />;
   }
 
+  if (!variant) {
+    return <Navigate to={LOCATIONS_ACTIVE_PATH} replace />;
+  }
+
   const allLocations = locationsQuery.data ?? [];
-  const activeLocations = allLocations.filter((loc) => !loc.isArchived);
-  const archivedLocations = allLocations.filter((loc) => loc.isArchived);
+  const locations = allLocations.filter((loc) =>
+    isActiveList ? !loc.isArchived : loc.isArchived,
+  );
 
   const tableActionPending =
     createMutation.isPending ||
@@ -206,23 +206,6 @@ export const LocationsPage = () => {
     restoreLoadingId !== null ||
     deleteLoadingId !== null;
 
-  const tableProps = {
-    loading: isQueryInitialLoad(locationsQuery),
-    onEdit: (location: WorkLocation) => {
-      setEditTarget(location);
-      setEditForm({
-        name: location.name,
-        address: location.address ?? "",
-        timezone: location.timezone ?? "",
-      });
-    },
-    onArchive: handleArchive,
-    onRestore: handleRestore,
-    archiveLoadingId,
-    restoreLoadingId,
-    actionPending: tableActionPending,
-  };
-
   const editChanged =
     editTarget &&
     (editForm.name.trim() !== editTarget.name ||
@@ -230,12 +213,15 @@ export const LocationsPage = () => {
       editForm.timezone.trim() !== (editTarget.timezone ?? ""));
 
   return (
-    <PageContainer className="space-y-6">
+    <PageContainer flushTop>
+      <LocationsTabs />
       <SettingsPageHeader
-        title="Work locations"
+        title={
+          isActiveList ? "Active work locations" : "Archived work locations"
+        }
         description="Sites where employees work — used for shift scheduling and rota planning."
         action={
-          hasPermission(user!.role, "location:manage") ? (
+          isActiveList && canManage ? (
             <Button
               icon={<HiPlus className="h-4 w-4 text-white" />}
               onClick={() => setCreateOpen(true)}
@@ -246,32 +232,28 @@ export const LocationsPage = () => {
         }
       />
 
-      <TabGroup<LocationsTab>
-        activeId={activeTab}
-        onChange={setActiveTab}
-        tabs={[
-          {
-            id: "active",
-            label: "Active",
-            count: activeLocations.length,
-            content: (
-              <LocationsTable locations={activeLocations} {...tableProps} />
-            ),
-          },
-          {
-            id: "archived",
-            label: "Archived",
-            count: archivedLocations.length,
-            content: (
-              <LocationsTable
-                locations={archivedLocations}
-                {...tableProps}
-                onDelete={handleDelete}
-                deleteLoadingId={deleteLoadingId}
-              />
-            ),
-          },
-        ]}
+      <LocationsTable
+        locations={locations}
+        loading={isQueryInitialLoad(locationsQuery)}
+        onEdit={(location) => {
+          setEditTarget(location);
+          setEditForm({
+            name: location.name,
+            address: location.address ?? "",
+            timezone: location.timezone ?? "",
+          });
+        }}
+        onArchive={handleArchive}
+        onRestore={handleRestore}
+        archiveLoadingId={archiveLoadingId}
+        restoreLoadingId={restoreLoadingId}
+        actionPending={tableActionPending}
+        {...(isActiveList
+          ? {}
+          : {
+              onDelete: handleDelete,
+              deleteLoadingId,
+            })}
       />
 
       <LocationFormModal
@@ -346,4 +328,8 @@ export const LocationsPage = () => {
       />
     </PageContainer>
   );
+};
+
+export const LocationsIndexRedirect = () => {
+  return <Navigate to="active" replace />;
 };

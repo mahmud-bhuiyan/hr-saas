@@ -1,17 +1,9 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
+import { type FormEvent, useEffect, useState } from "react";
 import { Navigate, useSearchParams } from "react-router-dom";
-import { ADMIN_SETTINGS_PATH } from "../../utils";
-import {
-  HiBanknotes,
-  HiCalendarDays,
-  HiLink,
-  HiSignal,
-  HiXMark,
-} from "react-icons/hi2";
+import { HiLink, HiXMark } from "react-icons/hi2";
 import { toast } from "react-toastify";
 import { Button } from "../../../../components/ui/Button";
-import { InputField, SelectField } from "../../../../components/ui/formFields";
 import { PageContainer } from "../../../../components/ui/PageContainer";
 import { SettingsPageHeader } from "../components/SettingsPageHeader";
 import { useAuth } from "../../../../contexts/AuthContext";
@@ -23,40 +15,27 @@ import {
   fetchPayrollSettings,
   patchPayrollSettings,
 } from "../../../../lib/api";
-import type { PayPeriodType } from "../../../../types";
-import { hasFormChanges } from "../../../../utils/form";
+import { hasFormChanges, pickChangedFields } from "../../../../utils/form";
+import { ADMIN_SETTINGS_PATH } from "../../utils";
+import { PayrollConfigCard } from "./components/PayrollConfigCard";
+import { PayrollConfigEditModal } from "./components/PayrollConfigEditModal";
+import { XeroAccountCodesCard } from "./components/XeroAccountCodesCard";
+import { XeroAccountCodesEditModal } from "./components/XeroAccountCodesEditModal";
+import {
+  DEFAULT_PAYROLL_FORM,
+  toPayrollForm,
+  type PayrollConfigFormValues,
+  type PayrollSettingsFormValues,
+  type XeroAccountCodesFormValues,
+} from "./utils";
 
-type PayrollSettingsForm = {
-  payPeriodType: PayPeriodType;
-  defaultPayCurrency: string;
-  payrollWeekStartDay: string;
-  xeroExpenseAccountCode: string;
-  xeroPayableAccountCode: string;
-};
+const CONFIG_KEYS = [
+  "payPeriodType",
+  "defaultPayCurrency",
+  "payrollWeekStartDay",
+] as const;
 
-const WEEKDAY_OPTIONS = [
-  { value: "0", label: "Sunday" },
-  { value: "1", label: "Monday" },
-  { value: "2", label: "Tuesday" },
-  { value: "3", label: "Wednesday" },
-  { value: "4", label: "Thursday" },
-  { value: "5", label: "Friday" },
-  { value: "6", label: "Saturday" },
-];
-
-const toForm = (settings: {
-  payPeriodType: PayPeriodType;
-  defaultPayCurrency: string;
-  payrollWeekStartDay: number;
-  xeroExpenseAccountCode: string;
-  xeroPayableAccountCode: string;
-}): PayrollSettingsForm => ({
-  payPeriodType: settings.payPeriodType,
-  defaultPayCurrency: settings.defaultPayCurrency,
-  payrollWeekStartDay: String(settings.payrollWeekStartDay),
-  xeroExpenseAccountCode: settings.xeroExpenseAccountCode,
-  xeroPayableAccountCode: settings.xeroPayableAccountCode,
-});
+const XERO_KEYS = ["xeroExpenseAccountCode", "xeroPayableAccountCode"] as const;
 
 export const PayrollSettingsPage = () => {
   const { user } = useAuth();
@@ -77,20 +56,33 @@ export const PayrollSettingsPage = () => {
     enabled: Boolean(canManage),
   });
 
-  const [form, setForm] = useState<PayrollSettingsForm>({
-    payPeriodType: "weekly",
-    defaultPayCurrency: "GBP",
-    payrollWeekStartDay: "1",
-    xeroExpenseAccountCode: "477",
-    xeroPayableAccountCode: "804",
+  const [original, setOriginal] =
+    useState<PayrollSettingsFormValues>(DEFAULT_PAYROLL_FORM);
+  const [configForm, setConfigForm] = useState<PayrollConfigFormValues>({
+    payPeriodType: DEFAULT_PAYROLL_FORM.payPeriodType,
+    defaultPayCurrency: DEFAULT_PAYROLL_FORM.defaultPayCurrency,
+    payrollWeekStartDay: DEFAULT_PAYROLL_FORM.payrollWeekStartDay,
   });
-  const [original, setOriginal] = useState<PayrollSettingsForm>(form);
+  const [xeroForm, setXeroForm] = useState<XeroAccountCodesFormValues>({
+    xeroExpenseAccountCode: DEFAULT_PAYROLL_FORM.xeroExpenseAccountCode,
+    xeroPayableAccountCode: DEFAULT_PAYROLL_FORM.xeroPayableAccountCode,
+  });
+  const [configEditOpen, setConfigEditOpen] = useState(false);
+  const [xeroEditOpen, setXeroEditOpen] = useState(false);
 
   useEffect(() => {
     if (settingsQuery.data) {
-      const next = toForm(settingsQuery.data);
-      setForm(next);
+      const next = toPayrollForm(settingsQuery.data);
       setOriginal(next);
+      setConfigForm({
+        payPeriodType: next.payPeriodType,
+        defaultPayCurrency: next.defaultPayCurrency,
+        payrollWeekStartDay: next.payrollWeekStartDay,
+      });
+      setXeroForm({
+        xeroExpenseAccountCode: next.xeroExpenseAccountCode,
+        xeroPayableAccountCode: next.xeroPayableAccountCode,
+      });
     }
   }, [settingsQuery.data]);
 
@@ -111,28 +103,87 @@ export const PayrollSettingsPage = () => {
     setSearchParams({}, { replace: true });
   }, [searchParams, setSearchParams, queryClient]);
 
-  const saveMutation = useMutation({
-    mutationFn: () =>
-      patchPayrollSettings({
-        payPeriodType: form.payPeriodType,
-        defaultPayCurrency: form.defaultPayCurrency.toUpperCase(),
-        payrollWeekStartDay: Number(form.payrollWeekStartDay),
-        xeroExpenseAccountCode: form.xeroExpenseAccountCode.trim(),
-        xeroPayableAccountCode: form.xeroPayableAccountCode.trim(),
-      }),
-    onSuccess: () => {
-      toast.success("Payroll settings saved");
-      setOriginal(form);
-      void queryClient.invalidateQueries({ queryKey: ["settings", "payroll"] });
-      void queryClient.invalidateQueries({
-        queryKey: ["payroll", "accounting", "status"],
+  const invalidateSettings = () => {
+    void queryClient.invalidateQueries({ queryKey: ["settings", "payroll"] });
+    void queryClient.invalidateQueries({
+      queryKey: ["payroll", "accounting", "status"],
+    });
+  };
+
+  const configSaveMutation = useMutation({
+    mutationFn: () => {
+      const changed = pickChangedFields(
+        configForm as unknown as Record<string, unknown>,
+        {
+          payPeriodType: original.payPeriodType,
+          defaultPayCurrency: original.defaultPayCurrency,
+          payrollWeekStartDay: original.payrollWeekStartDay,
+        } as unknown as Record<string, unknown>,
+        [...CONFIG_KEYS],
+      );
+
+      return patchPayrollSettings({
+        ...(changed.payPeriodType !== undefined
+          ? { payPeriodType: configForm.payPeriodType }
+          : {}),
+        ...(changed.defaultPayCurrency !== undefined
+          ? { defaultPayCurrency: configForm.defaultPayCurrency.toUpperCase() }
+          : {}),
+        ...(changed.payrollWeekStartDay !== undefined
+          ? { payrollWeekStartDay: Number(configForm.payrollWeekStartDay) }
+          : {}),
       });
+    },
+    onSuccess: () => {
+      toast.success("Payroll configuration saved");
+      setOriginal((prev) => ({ ...prev, ...configForm }));
+      setConfigEditOpen(false);
+      invalidateSettings();
     },
     onError: (error: unknown) => {
       toast.error(
         error instanceof ApiError
           ? error.message
-          : "Failed to save payroll settings",
+          : "Failed to save payroll configuration",
+      );
+    },
+  });
+
+  const xeroSaveMutation = useMutation({
+    mutationFn: () => {
+      const changed = pickChangedFields(
+        xeroForm as unknown as Record<string, unknown>,
+        {
+          xeroExpenseAccountCode: original.xeroExpenseAccountCode,
+          xeroPayableAccountCode: original.xeroPayableAccountCode,
+        } as unknown as Record<string, unknown>,
+        [...XERO_KEYS],
+      );
+
+      return patchPayrollSettings({
+        ...(changed.xeroExpenseAccountCode !== undefined
+          ? {
+              xeroExpenseAccountCode: xeroForm.xeroExpenseAccountCode.trim(),
+            }
+          : {}),
+        ...(changed.xeroPayableAccountCode !== undefined
+          ? {
+              xeroPayableAccountCode: xeroForm.xeroPayableAccountCode.trim(),
+            }
+          : {}),
+      });
+    },
+    onSuccess: () => {
+      toast.success("Xero account codes saved");
+      setOriginal((prev) => ({ ...prev, ...xeroForm }));
+      setXeroEditOpen(false);
+      invalidateSettings();
+    },
+    onError: (error: unknown) => {
+      toast.error(
+        error instanceof ApiError
+          ? error.message
+          : "Failed to save Xero account codes",
       );
     },
   });
@@ -170,119 +221,83 @@ export const PayrollSettingsPage = () => {
     return <Navigate to={ADMIN_SETTINGS_PATH} replace />;
   }
 
-  const changed = hasFormChanges(form, original, [
-    "payPeriodType",
-    "defaultPayCurrency",
-    "payrollWeekStartDay",
-    "xeroExpenseAccountCode",
-    "xeroPayableAccountCode",
-  ]);
+  const configChanged = hasFormChanges(
+    configForm as unknown as Record<string, unknown>,
+    {
+      payPeriodType: original.payPeriodType,
+      defaultPayCurrency: original.defaultPayCurrency,
+      payrollWeekStartDay: original.payrollWeekStartDay,
+    } as unknown as Record<string, unknown>,
+    [...CONFIG_KEYS],
+  );
+
+  const xeroChanged = hasFormChanges(
+    xeroForm as unknown as Record<string, unknown>,
+    {
+      xeroExpenseAccountCode: original.xeroExpenseAccountCode,
+      xeroPayableAccountCode: original.xeroPayableAccountCode,
+    } as unknown as Record<string, unknown>,
+    [...XERO_KEYS],
+  );
+
+  const handleOpenConfigEdit = () => {
+    setConfigForm({
+      payPeriodType: original.payPeriodType,
+      defaultPayCurrency: original.defaultPayCurrency,
+      payrollWeekStartDay: original.payrollWeekStartDay,
+    });
+    setConfigEditOpen(true);
+  };
+
+  const handleCloseConfigEdit = () => {
+    setConfigEditOpen(false);
+    setConfigForm({
+      payPeriodType: original.payPeriodType,
+      defaultPayCurrency: original.defaultPayCurrency,
+      payrollWeekStartDay: original.payrollWeekStartDay,
+    });
+  };
+
+  const handleOpenXeroEdit = () => {
+    setXeroForm({
+      xeroExpenseAccountCode: original.xeroExpenseAccountCode,
+      xeroPayableAccountCode: original.xeroPayableAccountCode,
+    });
+    setXeroEditOpen(true);
+  };
+
+  const handleCloseXeroEdit = () => {
+    setXeroEditOpen(false);
+    setXeroForm({
+      xeroExpenseAccountCode: original.xeroExpenseAccountCode,
+      xeroPayableAccountCode: original.xeroPayableAccountCode,
+    });
+  };
+
+  const handleConfigSubmit = (event: FormEvent) => {
+    event.preventDefault();
+    if (!configChanged || configSaveMutation.isPending) return;
+    configSaveMutation.mutate();
+  };
+
+  const handleXeroSubmit = (event: FormEvent) => {
+    event.preventDefault();
+    if (!xeroChanged || xeroSaveMutation.isPending) return;
+    xeroSaveMutation.mutate();
+  };
 
   const accounting = accountingQuery.data;
 
   return (
-    <PageContainer className="space-y-6" maxWidth="lg">
+    <PageContainer className="space-y-6">
       <SettingsPageHeader
         title="Payroll settings"
         description="Configure pay period type, currency, week start, and Xero accounting integration."
       />
 
-      <div className="card-surface space-y-5 p-6">
-        <SelectField
-          label="Pay period type"
-          value={form.payPeriodType}
-          onChange={(event) =>
-            setForm((prev) => ({
-              ...prev,
-              payPeriodType: event.target.value as PayPeriodType,
-            }))
-          }
-          icon={<HiCalendarDays className="h-4 w-4 text-brand-600" />}
-          options={[
-            { value: "weekly", label: "Weekly" },
-            { value: "biweekly", label: "Biweekly" },
-            { value: "monthly", label: "Monthly" },
-          ]}
-        />
-
-        <InputField
-          label="Default pay currency"
-          htmlFor="pay-currency"
-          id="pay-currency"
-          value={form.defaultPayCurrency}
-          onChange={(event) =>
-            setForm((prev) => ({
-              ...prev,
-              defaultPayCurrency: event.target.value.toUpperCase(),
-            }))
-          }
-          maxLength={3}
-          icon={<HiBanknotes className="h-4 w-4 text-brand-600" />}
-        />
-
-        <SelectField
-          label="Payroll week starts on"
-          value={form.payrollWeekStartDay}
-          onChange={(event) =>
-            setForm((prev) => ({
-              ...prev,
-              payrollWeekStartDay: event.target.value,
-            }))
-          }
-          icon={<HiSignal className="h-4 w-4 text-brand-600" />}
-          options={WEEKDAY_OPTIONS}
-        />
-
-        <div className="border-t border-slate-200 pt-5 dark:border-slate-700">
-          <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100">
-            Xero account codes
-          </h3>
-          <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">
-            Chart of accounts codes used when syncing payroll as a manual
-            journal.
-          </p>
-
-          <div className="mt-4 space-y-4">
-            <InputField
-              label="Wages expense account"
-              htmlFor="xero-expense-account"
-              id="xero-expense-account"
-              value={form.xeroExpenseAccountCode}
-              onChange={(event) =>
-                setForm((prev) => ({
-                  ...prev,
-                  xeroExpenseAccountCode: event.target.value,
-                }))
-              }
-              icon={<HiBanknotes className="h-4 w-4 text-brand-600" />}
-            />
-
-            <InputField
-              label="Wages payable account"
-              htmlFor="xero-payable-account"
-              id="xero-payable-account"
-              value={form.xeroPayableAccountCode}
-              onChange={(event) =>
-                setForm((prev) => ({
-                  ...prev,
-                  xeroPayableAccountCode: event.target.value,
-                }))
-              }
-              icon={<HiBanknotes className="h-4 w-4 text-brand-600" />}
-            />
-          </div>
-        </div>
-
-        <div className="flex justify-end pt-2">
-          <Button
-            loading={saveMutation.isPending}
-            loadingText="Saving…"
-            disabled={!changed}
-            onClick={() => saveMutation.mutate()}
-          >
-            Save changes
-          </Button>
-        </div>
+      <div className="grid gap-6 sm:grid-cols-2">
+        <PayrollConfigCard values={original} onEdit={handleOpenConfigEdit} />
+        <XeroAccountCodesCard values={original} onEdit={handleOpenXeroEdit} />
       </div>
 
       <div className="card-surface space-y-4 p-6">
@@ -343,6 +358,30 @@ export const PayrollSettingsPage = () => {
           </Button>
         )}
       </div>
+
+      <PayrollConfigEditModal
+        open={configEditOpen}
+        onClose={handleCloseConfigEdit}
+        values={configForm}
+        onChange={(field, value) =>
+          setConfigForm((prev) => ({ ...prev, [field]: value }))
+        }
+        onSubmit={handleConfigSubmit}
+        loading={configSaveMutation.isPending}
+        hasChanges={configChanged}
+      />
+
+      <XeroAccountCodesEditModal
+        open={xeroEditOpen}
+        onClose={handleCloseXeroEdit}
+        values={xeroForm}
+        onChange={(field, value) =>
+          setXeroForm((prev) => ({ ...prev, [field]: value }))
+        }
+        onSubmit={handleXeroSubmit}
+        loading={xeroSaveMutation.isPending}
+        hasChanges={xeroChanged}
+      />
     </PageContainer>
   );
 };

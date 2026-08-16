@@ -65,13 +65,6 @@ const settingsLinks: SettingsLink[] = [
     roles: ["company_admin"],
   },
   {
-    to: ADMIN_SETTINGS_AUDIT_LOG_PATH,
-    label: "Audit log",
-    description: "Review sensitive changes across your organization.",
-    icon: HiClipboardDocumentList,
-    roles: ["company_admin", "hr_manager"],
-  },
-  {
     to: ADMIN_SETTINGS_ATTENDANCE_PATH,
     label: "Attendance",
     description: "Configure GPS tracking and attendance policies.",
@@ -91,6 +84,13 @@ const settingsLinks: SettingsLink[] = [
     description: "Manage your per-seat Stripe subscription and seat count.",
     icon: HiCreditCard,
     roles: ["company_admin"],
+  },
+  {
+    to: ADMIN_SETTINGS_AUDIT_LOG_PATH,
+    label: "Audit log",
+    description: "Review sensitive changes across your organization.",
+    icon: HiClipboardDocumentList,
+    roles: ["company_admin", "hr_manager"],
   },
 ];
 
