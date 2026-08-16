@@ -114,7 +114,7 @@ export const BillingPage = () => {
   const showManage = !isExempt && hasActive;
 
   return (
-    <PageContainer maxWidth="2xl">
+    <PageContainer>
       <SettingsPageHeader
         title="Billing"
         description="Manage your per-seat subscription. Seat count syncs with active employees."
