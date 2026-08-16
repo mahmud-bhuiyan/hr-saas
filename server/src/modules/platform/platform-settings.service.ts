@@ -1,5 +1,5 @@
-import mongoose from 'mongoose';
-import type { ServerEnv } from '../../config/env.js';
+import mongoose from "mongoose";
+import type { ServerEnv } from "../../config/env.js";
 import {
   DEFAULT_FAVICON_DISPLAY,
   DEFAULT_LOGO_DISPLAY,
@@ -13,36 +13,36 @@ import {
   type SiteConfig,
   type EffectiveBranding,
   type TenantBrandingOverrides,
-} from '../../constants/platform-settings.js';
-import { Tenant, type ITenantDocument } from '../auth/tenant.model.js';
-import { uploadPlatformAssetToImgbb } from './imgbb.service.js';
-import { PlatformSettings } from './platform-settings.model.js';
+} from "../../constants/platform-settings.js";
+import { Tenant, type ITenantDocument } from "../auth/tenant.model.js";
+import { uploadPlatformAssetToImgbb } from "./imgbb.service.js";
+import { PlatformSettings } from "./platform-settings.model.js";
 import type {
   PatchPlatformSettingsInput,
   PatchTenantBrandingInput,
   UploadPlatformAssetInput,
-} from './platform-settings.validation.js';
-import { stripDataUrlPrefix } from './platform-settings.validation.js';
+} from "./platform-settings.validation.js";
+import { stripDataUrlPrefix } from "./platform-settings.validation.js";
 
 export class PlatformSettingsServiceError extends Error {
   constructor(
     message: string,
-    public statusCode: number
+    public statusCode: number,
   ) {
     super(message);
-    this.name = 'PlatformSettingsServiceError';
+    this.name = "PlatformSettingsServiceError";
   }
 }
 
 const normalizeUrl = (value: string | null | undefined): string | null => {
-  if (value === null || value === '' || value === undefined) {
+  if (value === null || value === "" || value === undefined) {
     return null;
   }
   return value;
 };
 
 const mergeLogoDisplay = (
-  current?: Partial<LogoDisplaySettings> | null
+  current?: Partial<LogoDisplaySettings> | null,
 ): LogoDisplaySettings => ({
   heightPx: current?.heightPx ?? DEFAULT_LOGO_DISPLAY.heightPx,
   maxWidthPx: current?.maxWidthPx ?? DEFAULT_LOGO_DISPLAY.maxWidthPx,
@@ -52,17 +52,19 @@ const mergeLogoDisplay = (
 });
 
 const mergeFaviconDisplay = (
-  current?: Partial<FaviconDisplaySettings> | null
+  current?: Partial<FaviconDisplaySettings> | null,
 ): FaviconDisplaySettings => ({
   mimeType: current?.mimeType ?? DEFAULT_FAVICON_DISPLAY.mimeType,
 });
 
 const mergeSidebarDisplay = (
-  current?: Partial<SidebarDisplaySettings> | null
+  current?: Partial<SidebarDisplaySettings> | null,
 ): SidebarDisplaySettings => ({
   behavior: current?.behavior ?? DEFAULT_SIDEBAR_DISPLAY.behavior,
-  collapsedWidthPx: current?.collapsedWidthPx ?? DEFAULT_SIDEBAR_DISPLAY.collapsedWidthPx,
-  expandedWidthPx: current?.expandedWidthPx ?? DEFAULT_SIDEBAR_DISPLAY.expandedWidthPx,
+  collapsedWidthPx:
+    current?.collapsedWidthPx ?? DEFAULT_SIDEBAR_DISPLAY.collapsedWidthPx,
+  expandedWidthPx:
+    current?.expandedWidthPx ?? DEFAULT_SIDEBAR_DISPLAY.expandedWidthPx,
 });
 
 const toSiteConfig = (doc: {
@@ -97,27 +99,28 @@ export const getPlatformSiteConfig = async (): Promise<SiteConfig> => {
   return toSiteConfig(doc);
 };
 
-export const getPlatformSiteSettings = async (): Promise<PlatformSiteSettings> => {
-  const doc = await getPlatformDocument();
-  if (!doc) {
-    return {
-      ...DEFAULT_PLATFORM_SETTINGS,
-      logoDisplay: { ...DEFAULT_LOGO_DISPLAY },
-      faviconDisplay: { ...DEFAULT_FAVICON_DISPLAY },
-      sidebarDisplay: { ...DEFAULT_SIDEBAR_DISPLAY },
-    };
-  }
+export const getPlatformSiteSettings =
+  async (): Promise<PlatformSiteSettings> => {
+    const doc = await getPlatformDocument();
+    if (!doc) {
+      return {
+        ...DEFAULT_PLATFORM_SETTINGS,
+        logoDisplay: { ...DEFAULT_LOGO_DISPLAY },
+        faviconDisplay: { ...DEFAULT_FAVICON_DISPLAY },
+        sidebarDisplay: { ...DEFAULT_SIDEBAR_DISPLAY },
+      };
+    }
 
-  return {
-    ...toSiteConfig(doc),
-    updatedAt: doc.updatedAt?.toISOString(),
-    updatedBy: doc.updatedBy?.toString(),
+    return {
+      ...toSiteConfig(doc),
+      updatedAt: doc.updatedAt?.toISOString(),
+      updatedBy: doc.updatedBy?.toString(),
+    };
   };
-};
 
 export const patchPlatformSiteSettings = async (
   input: PatchPlatformSettingsInput,
-  userId: string
+  userId: string,
 ): Promise<PlatformSiteSettings> => {
   const current = await getPlatformSiteConfig();
 
@@ -136,17 +139,25 @@ export const patchPlatformSiteSettings = async (
     ...(input.sidebarDisplay ?? {}),
   });
 
-  if (nextSidebarDisplay.expandedWidthPx <= nextSidebarDisplay.collapsedWidthPx) {
+  if (
+    nextSidebarDisplay.expandedWidthPx <= nextSidebarDisplay.collapsedWidthPx
+  ) {
     throw new PlatformSettingsServiceError(
-      'Expanded sidebar width must be greater than compact width',
-      400
+      "Expanded sidebar width must be greater than compact width",
+      400,
     );
   }
 
   const next: SiteConfig = {
     siteName: input.siteName ?? current.siteName,
-    logoUrl: input.logoUrl !== undefined ? normalizeUrl(input.logoUrl) : current.logoUrl,
-    faviconUrl: input.faviconUrl !== undefined ? normalizeUrl(input.faviconUrl) : current.faviconUrl,
+    logoUrl:
+      input.logoUrl !== undefined
+        ? normalizeUrl(input.logoUrl)
+        : current.logoUrl,
+    faviconUrl:
+      input.faviconUrl !== undefined
+        ? normalizeUrl(input.faviconUrl)
+        : current.faviconUrl,
     logoDisplay: nextLogoDisplay,
     faviconDisplay: nextFaviconDisplay,
     sidebarDisplay: nextSidebarDisplay,
@@ -161,11 +172,14 @@ export const patchPlatformSiteSettings = async (
         updatedBy: new mongoose.Types.ObjectId(userId),
       },
     },
-    { upsert: true, new: true, runValidators: true }
+    { upsert: true, new: true, runValidators: true },
   ).lean();
 
   if (!doc) {
-    throw new PlatformSettingsServiceError('Failed to update platform settings', 500);
+    throw new PlatformSettingsServiceError(
+      "Failed to update platform settings",
+      500,
+    );
   }
 
   return {
@@ -177,26 +191,37 @@ export const patchPlatformSiteSettings = async (
 
 export const uploadPlatformAsset = async (
   env: ServerEnv,
-  input: UploadPlatformAssetInput
-): Promise<{ url: string; asset: 'logo' | 'favicon' }> => {
+  input: UploadPlatformAssetInput,
+): Promise<{ url: string; asset: "logo" | "favicon" }> => {
   const base64 = stripDataUrlPrefix(input.imageBase64.trim());
-  const url = await uploadPlatformAssetToImgbb(env, input.asset, base64, input.filename);
+  const url = await uploadPlatformAssetToImgbb(
+    env,
+    input.asset,
+    base64,
+    input.filename,
+  );
   return { url, asset: input.asset };
 };
 
-const getTenantBrandingOverrides = (tenant: ITenantDocument): TenantBrandingOverrides => ({
+const getTenantBrandingOverrides = (
+  tenant: ITenantDocument,
+): TenantBrandingOverrides => ({
   logoUrl: tenant.branding?.logoUrl ?? null,
+  faviconUrl: tenant.branding?.faviconUrl ?? null,
 });
 
 export const mergeBranding = (
   platform: SiteConfig,
-  overrides: TenantBrandingOverrides
+  overrides: TenantBrandingOverrides,
 ): SiteConfig => ({
   ...platform,
   logoUrl: overrides.logoUrl ?? platform.logoUrl,
+  faviconUrl: overrides.faviconUrl ?? platform.faviconUrl,
 });
 
-export const getEffectiveBranding = async (tenantId?: string): Promise<EffectiveBranding> => {
+export const getEffectiveBranding = async (
+  tenantId?: string,
+): Promise<EffectiveBranding> => {
   const platform = await getPlatformSiteConfig();
 
   if (!tenantId) {
@@ -205,7 +230,7 @@ export const getEffectiveBranding = async (tenantId?: string): Promise<Effective
 
   const tenant = await Tenant.findById(tenantId);
   if (!tenant) {
-    throw new PlatformSettingsServiceError('Tenant not found', 404);
+    throw new PlatformSettingsServiceError("Tenant not found", 404);
   }
 
   return {
@@ -215,11 +240,11 @@ export const getEffectiveBranding = async (tenantId?: string): Promise<Effective
 };
 
 export const getTenantBrandingSettings = async (
-  tenantId: string
+  tenantId: string,
 ): Promise<TenantBrandingOverrides> => {
   const tenant = await Tenant.findById(tenantId);
   if (!tenant) {
-    throw new PlatformSettingsServiceError('Tenant not found', 404);
+    throw new PlatformSettingsServiceError("Tenant not found", 404);
   }
   return getTenantBrandingOverrides(tenant);
 };
@@ -227,19 +252,23 @@ export const getTenantBrandingSettings = async (
 export const patchTenantBranding = async (
   tenantId: string,
   input: PatchTenantBrandingInput,
-  userId: string
+  userId: string,
 ): Promise<EffectiveBranding> => {
   const tenant = await Tenant.findById(tenantId);
   if (!tenant) {
-    throw new PlatformSettingsServiceError('Tenant not found', 404);
+    throw new PlatformSettingsServiceError("Tenant not found", 404);
   }
 
   if (!tenant.branding) {
-    tenant.branding = { logoUrl: null };
+    tenant.branding = { logoUrl: null, faviconUrl: null };
   }
 
   if (input.logoUrl !== undefined) {
     tenant.branding.logoUrl = normalizeUrl(input.logoUrl);
+  }
+
+  if (input.faviconUrl !== undefined) {
+    tenant.branding.faviconUrl = normalizeUrl(input.faviconUrl);
   }
 
   tenant.updatedBy = new mongoose.Types.ObjectId(userId);

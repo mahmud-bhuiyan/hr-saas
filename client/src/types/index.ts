@@ -405,6 +405,7 @@ export interface PlatformSiteSettings extends SiteConfig {
 
 export interface TenantBrandingOverrides {
   logoUrl: string | null;
+  faviconUrl: string | null;
 }
 
 export interface PatchPlatformSiteSettingsInput {
@@ -429,6 +430,7 @@ export interface UploadPlatformAssetResponse {
 
 export interface PatchTenantBrandingInput {
   logoUrl?: string | null;
+  faviconUrl?: string | null;
 }
 
 export interface CompanyProfile {

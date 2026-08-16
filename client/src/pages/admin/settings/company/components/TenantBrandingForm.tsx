@@ -1,11 +1,13 @@
 import { FormEvent } from "react";
-import { HiPhoto } from "react-icons/hi2";
+import { HiGlobeAlt, HiPhoto } from "react-icons/hi2";
+import { FaviconImage } from "../../../../../components/FaviconImage";
 import { FormActions } from "../../../../../components/ui/FormActions";
 import { FormField } from "../../../../../components/ui/FormField";
 import { Input } from "../../../../../components/ui/Input";
 
 export interface TenantBrandingFormValues extends Record<string, unknown> {
   logoUrl: string;
+  faviconUrl: string;
 }
 
 interface TenantBrandingFormProps {
@@ -33,30 +35,53 @@ export const TenantBrandingForm = ({
       className="card-surface space-y-6 p-6"
     >
       <p className="text-sm text-slate-600 dark:text-slate-400">
-        Override the platform logo for your company. Leave the field empty and
-        save to revert to the platform default. Theme colors are controlled by
-        each user&apos;s personal theme choice.
+        Override the platform logo and favicon for your company. Leave a field
+        empty and save to revert that asset to the platform default. Theme
+        colors are controlled by each user&apos;s personal theme choice, not
+        here.
       </p>
 
-      <FormField label="Logo URL override" htmlFor="logoUrl">
-        <Input
-          id="logoUrl"
-          value={values.logoUrl}
-          onChange={(e) => onChange("logoUrl", e.target.value)}
-          placeholder="https://example.com/company-logo.png"
-          icon={<HiPhoto className="h-4 w-4 text-brand-600" />}
-          disabled={loading}
-        />
-        {values.logoUrl && (
-          <button
-            type="button"
-            onClick={() => onClearField("logoUrl")}
-            className="mt-2 text-sm text-brand-600 hover:text-brand-700"
-          >
-            Clear logo override
-          </button>
-        )}
-      </FormField>
+      <div className="grid gap-6 sm:grid-cols-2">
+        <FormField label="Logo URL override" htmlFor="logoUrl">
+          <Input
+            id="logoUrl"
+            value={values.logoUrl}
+            onChange={(e) => onChange("logoUrl", e.target.value)}
+            placeholder="https://example.com/company-logo.png"
+            icon={<HiPhoto className="h-4 w-4 text-brand-600" />}
+            disabled={loading}
+          />
+          {values.logoUrl && (
+            <button
+              type="button"
+              onClick={() => onClearField("logoUrl")}
+              className="mt-2 text-sm text-brand-600 hover:text-brand-700"
+            >
+              Clear logo override
+            </button>
+          )}
+        </FormField>
+
+        <FormField label="Favicon URL override" htmlFor="faviconUrl">
+          <Input
+            id="faviconUrl"
+            value={values.faviconUrl}
+            onChange={(e) => onChange("faviconUrl", e.target.value)}
+            placeholder="https://example.com/favicon.ico"
+            icon={<HiGlobeAlt className="h-4 w-4 text-brand-600" />}
+            disabled={loading}
+          />
+          {values.faviconUrl && (
+            <button
+              type="button"
+              onClick={() => onClearField("faviconUrl")}
+              className="mt-2 text-sm text-brand-600 hover:text-brand-700"
+            >
+              Clear favicon override
+            </button>
+          )}
+        </FormField>
+      </div>
 
       <div className="space-y-4 border-t border-slate-200 pt-3 dark:border-slate-700">
         <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
@@ -75,9 +100,14 @@ export const TenantBrandingForm = ({
                 {displayName}
               </span>
             )}
-            <span className="rounded-full bg-brand-600 px-3 py-1 text-xs text-white">
-              Logo
-            </span>
+            <div className="flex items-center gap-2">
+              {values.faviconUrl ? (
+                <FaviconImage src={values.faviconUrl} className="h-6 w-6" />
+              ) : null}
+              <span className="rounded-full bg-brand-600 px-3 py-1 text-xs text-white">
+                Branding
+              </span>
+            </div>
           </div>
         </div>
       </div>

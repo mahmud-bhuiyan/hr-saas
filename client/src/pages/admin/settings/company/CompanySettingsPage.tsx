@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { FormEvent, useEffect, useMemo, useState } from "react";
-import { Navigate } from "react-router-dom";
+import { Navigate, useLocation } from "react-router-dom";
 import { ADMIN_SETTINGS_PATH } from "../../utils";
 import { toast } from "react-toastify";
 import { PageContainer } from "../../../../components/ui/PageContainer";
@@ -23,10 +23,15 @@ import type {
 import { hasFormChanges, pickChangedFields } from "../../../../utils/form";
 import { getUniqueDialCodes } from "../../../../utils/phone";
 import { isAnyQueryInitialLoad } from "../../../../utils/query";
-import { CompanySettingsTabs } from "./components/CompanySettingsTabs";
+import { CompanyProfileForm } from "./components/CompanyProfileForm";
 import type { CompanyProfileFormValues } from "./components/CompanyProfileForm";
+import { CompanySettingsTabs } from "./components/CompanySettingsTabs";
+import { TenantBrandingForm } from "./components/TenantBrandingForm";
 import type { TenantBrandingFormValues } from "./components/TenantBrandingForm";
-import type { CompanySettingsTab } from "./utils";
+import {
+  companySettingsTabFromPathname,
+  type CompanySettingsTab,
+} from "./utils";
 
 const profileFormKeys = [
   "name",
@@ -34,7 +39,7 @@ const profileFormKeys = [
   "logoUrl",
   "defaultPhoneDialCode",
 ] as const;
-const brandingFormKeys = ["logoUrl"] as const;
+const brandingFormKeys = ["logoUrl", "faviconUrl"] as const;
 
 const toProfileFormValues = (
   profile: CompanyProfile,
@@ -47,8 +52,10 @@ const toProfileFormValues = (
 
 const toBrandingFormValues = (overrides: {
   logoUrl: string | null;
+  faviconUrl: string | null;
 }): TenantBrandingFormValues => ({
   logoUrl: overrides.logoUrl ?? "",
+  faviconUrl: overrides.faviconUrl ?? "",
 });
 
 const toProfilePatchInput = (
@@ -88,11 +95,16 @@ const toBrandingPatchInput = (
   if (changed.logoUrl !== undefined) {
     input.logoUrl = String(changed.logoUrl) || null;
   }
+  if (changed.faviconUrl !== undefined) {
+    input.faviconUrl = String(changed.faviconUrl) || null;
+  }
 
   return input;
 };
 
 export const CompanySettingsPage = () => {
+  const { pathname } = useLocation();
+  const activeTab = companySettingsTabFromPathname(pathname);
   const { user } = useAuth();
   const { displayName, refresh } = useSiteConfig();
   const queryClient = useQueryClient();
@@ -244,6 +256,10 @@ export const CompanySettingsPage = () => {
     return <Navigate to={ADMIN_SETTINGS_PATH} replace />;
   }
 
+  if (!activeTab) {
+    return <Navigate to={ADMIN_SETTINGS_PATH} replace />;
+  }
+
   const isLoading =
     isAnyQueryInitialLoad(profileQuery, brandingQuery, countryDialCodesQuery) ||
     !profileValues ||
@@ -255,7 +271,8 @@ export const CompanySettingsPage = () => {
 
   if (isLoading) {
     return (
-      <PageContainer>
+      <PageContainer flushTop>
+        <CompanySettingsTabs />
         <p className="text-sm text-slate-500">Loading company settings…</p>
       </PageContainer>
     );
@@ -263,44 +280,55 @@ export const CompanySettingsPage = () => {
 
   if (isError) {
     return (
-      <PageContainer>
+      <PageContainer flushTop>
+        <CompanySettingsTabs />
         <p className="text-sm text-red-600">Failed to load company settings.</p>
       </PageContainer>
     );
   }
 
   return (
-    <PageContainer className="space-y-6">
+    <PageContainer flushTop className="space-y-6">
+      <CompanySettingsTabs />
       <SettingsPageHeader
-        title="Company"
-        description="Update your company profile and customize branding shown across the platform."
+        title={activeTab === "profile" ? "Company profile" : "Logo & favicon"}
+        description={
+          activeTab === "profile"
+            ? "Update your company name, address, default phone country code, and company logo URL used on employee and admin records."
+            : "Override the platform logo and favicon shown in the app for your company. Theme colors stay personal to each user."
+        }
       />
 
-      <CompanySettingsTabs
-        dialCodeOptions={dialCodeOptions}
-        profile={{
-          values: profileValues,
-          onChange: (field, value) =>
+      {activeTab === "profile" && (
+        <CompanyProfileForm
+          values={profileValues}
+          dialCodeOptions={dialCodeOptions}
+          onChange={(field, value) =>
             setProfileValues((prev) =>
               prev ? { ...prev, [field]: value } : prev,
-            ),
-          onSubmit: handleProfileSubmit,
-          loading: profileMutation.isPending && savingTab === "profile",
-          hasChanges: profileHasChanges,
-        }}
-        branding={{
-          values: brandingValues,
-          displayName,
-          onChange: (field, value) =>
+            )
+          }
+          onSubmit={handleProfileSubmit}
+          loading={profileMutation.isPending && savingTab === "profile"}
+          hasChanges={profileHasChanges}
+        />
+      )}
+
+      {activeTab === "branding" && (
+        <TenantBrandingForm
+          values={brandingValues}
+          displayName={displayName}
+          onChange={(field, value) =>
             setBrandingValues((prev) =>
               prev ? { ...prev, [field]: value } : prev,
-            ),
-          onClearField: handleClearBrandingField,
-          onSubmit: handleBrandingSubmit,
-          loading: brandingMutation.isPending && savingTab === "branding",
-          hasChanges: brandingHasChanges,
-        }}
-      />
+            )
+          }
+          onClearField={handleClearBrandingField}
+          onSubmit={handleBrandingSubmit}
+          loading={brandingMutation.isPending && savingTab === "branding"}
+          hasChanges={brandingHasChanges}
+        />
+      )}
     </PageContainer>
   );
 };

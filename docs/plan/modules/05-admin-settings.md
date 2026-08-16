@@ -33,7 +33,7 @@
 | User list & role assignment | — | ✅ | — | — | — |
 | Tenant branding overrides | — | ✅ | — | — | — |
 
-*(Tenant branding: company admin sets optional logo + primary color overrides that merge with platform defaults from module 15.)*
+*(Tenant branding: company admin sets optional logo + favicon overrides that merge with platform defaults from module 15.)*
 
 ---
 
@@ -47,7 +47,8 @@
   address: String,           // optional
   logoUrl: String | null,    // company logo (tenant-scoped) — future company profile
   branding: {
-    logoUrl: String | null
+    logoUrl: String | null,
+    faviconUrl: String | null
   }
 }
 ```
@@ -90,7 +91,7 @@ Platform site settings endpoints live in [15-platform-site-settings.md](./15-pla
 
 | Screen | Route | Access | Status |
 |--------|-------|--------|--------|
-| Company branding | `/dashboard/settings/company?tab=branding` | `company_admin` | ✅ |
+| Company branding | `/admin/settings/company/branding` | `company_admin` | ✅ |
 | Settings hub | `/dashboard/settings` | `company_admin`, `hr_manager` | ✅ |
 | Company profile | `/dashboard/settings/company` | `company_admin` | ✅ |
 | Departments | `/dashboard/settings/departments` | `company_admin`, `hr_manager` | ✅ |

@@ -12,6 +12,7 @@ export type PayRateType = "hourly" | "salary";
 
 export interface TenantBranding {
   logoUrl: string | null;
+  faviconUrl: string | null;
 }
 
 export interface ITenant {
@@ -65,6 +66,7 @@ const tenantSchema = new Schema<ITenantDocument>(
     updatedBy: { type: Schema.Types.ObjectId, ref: "User" },
     branding: {
       logoUrl: { type: String, default: null },
+      faviconUrl: { type: String, default: null },
     },
     attendanceGpsEnabled: { type: Boolean, default: false },
     overtimeThresholdHours: { type: Number, default: 40, min: 1, max: 168 },

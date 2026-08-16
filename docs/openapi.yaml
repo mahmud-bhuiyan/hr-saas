@@ -6393,9 +6393,13 @@ components:
 
     TenantBrandingOverrides:
       type: object
-      required: [logoUrl]
+      required: [logoUrl, faviconUrl]
       properties:
         logoUrl:
+          type: string
+          nullable: true
+          format: uri
+        faviconUrl:
           type: string
           nullable: true
           format: uri
@@ -6461,6 +6465,10 @@ components:
       minProperties: 1
       properties:
         logoUrl:
+          type: string
+          nullable: true
+          format: uri
+        faviconUrl:
           type: string
           nullable: true
           format: uri

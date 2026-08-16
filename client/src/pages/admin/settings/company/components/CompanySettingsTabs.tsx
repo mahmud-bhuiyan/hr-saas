@@ -1,81 +1,30 @@
-import { FormEvent } from "react";
-import { TabGroup } from "../../../../../components/ui/TabGroup";
-import { useTabUrlState } from "../../../../../hooks/useTabUrlState";
-import { COMPANY_SETTINGS_TAB_IDS, type CompanySettingsTab } from "../utils";
-import type { CountryDialCode } from "../../../../../utils/phone";
+import { useLocation } from "react-router-dom";
+import { NavTabBar } from "../../../../../components/ui/navigation/NavTabBar";
 import {
-  CompanyProfileForm,
-  type CompanyProfileFormValues,
-} from "./CompanyProfileForm";
-import {
-  TenantBrandingForm,
-  type TenantBrandingFormValues,
-} from "./TenantBrandingForm";
+  COMPANY_SETTINGS_BRANDING_PATH,
+  COMPANY_SETTINGS_PROFILE_PATH,
+} from "../utils";
 
-interface CompanySettingsTabsProps {
-  dialCodeOptions: CountryDialCode[];
-  profile: {
-    values: CompanyProfileFormValues;
-    onChange: (field: keyof CompanyProfileFormValues, value: string) => void;
-    onSubmit: (event: FormEvent) => void;
-    loading: boolean;
-    hasChanges: boolean;
-  };
-  branding: {
-    values: TenantBrandingFormValues;
-    displayName: string;
-    onChange: (field: keyof TenantBrandingFormValues, value: string) => void;
-    onClearField: (field: keyof TenantBrandingFormValues) => void;
-    onSubmit: (event: FormEvent) => void;
-    loading: boolean;
-    hasChanges: boolean;
-  };
-}
+const tabs = [
+  { label: "Company Profile", path: COMPANY_SETTINGS_PROFILE_PATH },
+  { label: "Logo & Favicon", path: COMPANY_SETTINGS_BRANDING_PATH },
+] as const;
 
-export const CompanySettingsTabs = ({
-  dialCodeOptions,
-  profile,
-  branding,
-}: CompanySettingsTabsProps) => {
-  const { activeTab, setActiveTab } = useTabUrlState(COMPANY_SETTINGS_TAB_IDS, {
-    defaultTab: "profile",
-  });
+export const CompanySettingsTabs = () => {
+  const location = useLocation();
+
+  const activeId =
+    tabs.find((tab) => location.pathname.startsWith(tab.path))?.path ?? "";
 
   return (
-    <TabGroup<CompanySettingsTab>
-      activeId={activeTab}
-      onChange={setActiveTab}
-      tabs={[
-        {
-          id: "profile",
-          label: "Profile",
-          content: (
-            <CompanyProfileForm
-              values={profile.values}
-              dialCodeOptions={dialCodeOptions}
-              onChange={profile.onChange}
-              onSubmit={profile.onSubmit}
-              loading={profile.loading}
-              hasChanges={profile.hasChanges}
-            />
-          ),
-        },
-        {
-          id: "branding",
-          label: "Branding",
-          content: (
-            <TenantBrandingForm
-              values={branding.values}
-              displayName={branding.displayName}
-              onChange={branding.onChange}
-              onClearField={branding.onClearField}
-              onSubmit={branding.onSubmit}
-              loading={branding.loading}
-              hasChanges={branding.hasChanges}
-            />
-          ),
-        },
-      ]}
+    <NavTabBar
+      bleed
+      tabs={tabs.map((tab) => ({
+        id: tab.path,
+        label: tab.label,
+        to: tab.path,
+      }))}
+      activeId={activeId}
     />
   );
 };

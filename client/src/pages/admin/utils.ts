@@ -12,7 +12,11 @@ export const ADMIN_REPORTS_ABSENCE_PATH = "/admin/reports/absence";
 
 export const ADMIN_SETTINGS_PATH = "/admin/settings";
 
-export const ADMIN_SETTINGS_COMPANY_PATH = "/admin/settings/company";
+export const ADMIN_SETTINGS_COMPANY_PROFILE_PATH =
+  "/admin/settings/company/profile";
+
+export const ADMIN_SETTINGS_COMPANY_BRANDING_PATH =
+  "/admin/settings/company/branding";
 
 export const ADMIN_SETTINGS_DEPARTMENTS_PATH = "/admin/settings/departments";
 

@@ -22,7 +22,7 @@ import {
   ADMIN_SETTINGS_ATTENDANCE_PATH,
   ADMIN_SETTINGS_AUDIT_LOG_PATH,
   ADMIN_SETTINGS_BILLING_PATH,
-  ADMIN_SETTINGS_COMPANY_PATH,
+  ADMIN_SETTINGS_COMPANY_PROFILE_PATH,
   ADMIN_SETTINGS_DEPARTMENTS_PATH,
   ADMIN_SETTINGS_LEAVE_PATH,
   ADMIN_SETTINGS_LOCATIONS_PATH,
@@ -35,9 +35,10 @@ type SettingsLink = NavCardGroupItem & {
 
 const settingsLinks: SettingsLink[] = [
   {
-    to: ADMIN_SETTINGS_COMPANY_PATH,
+    to: ADMIN_SETTINGS_COMPANY_PROFILE_PATH,
     label: "Company",
-    description: "Update company profile, address, logo, and branding.",
+    description:
+      "Update company profile details, address, phone country code, logo, and favicon branding.",
     icon: HiBuildingOffice2,
     roles: ["company_admin"],
   },

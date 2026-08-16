@@ -32,7 +32,7 @@ Features added during implementation that extend the original step list. Keep th
 | Manager team-scoped employee read | 4 | Managers see direct reports only (`employee:read:team`) |
 | Direct reports org view | 4 | `GET /api/v1/employees/:id/reports` + profile section |
 | Platform site customization | 7 | Super admin: global site name, theme color, logo, favicon |
-| Per-tenant branding overrides | 7 | Company admin: logo + primary color override (pulled forward from Stage 3) |
+| Per-tenant branding overrides | 7 | Company admin: logo + favicon URL overrides (pulled forward from Stage 3) |
 | ImgBB logo/favicon upload | 7 | Super admin: upload or URL for platform logo/favicon via `IMGBB_API_KEY` |
 | Logo/favicon display settings | 7 | Super admin: logo size/fit/name toggle; favicon MIME type + preview |
 | Document storage (Step 6) | 6 | S3 presigned upload/download; `document:read:own` for employees; MinIO in docker compose |
@@ -141,7 +141,7 @@ Features added during implementation that extend the original step list. Keep th
 - [x] Platform site settings (super admin): site name, primary color, logo, favicon
 - [x] Logo/favicon ImgBB upload + display customization (height, fit, favicon type)
 - [x] Public `GET /api/v1/platform/site-config` + super_admin PATCH endpoints
-- [x] Tenant branding overrides (company admin): logo URL + primary color
+- [x] Tenant branding overrides (company admin): logo URL + favicon URL
 - [x] Client: dynamic theme, title, favicon from site config
 - [x] Super admin screen: `/super-admin/site/*`
 - [x] Company admin screen: `/dashboard/settings/company` (branding tab)

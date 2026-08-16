@@ -32,6 +32,11 @@ export const CompanyProfileForm = ({
 }: CompanyProfileFormProps) => {
   return (
     <form onSubmit={onSubmit} className="card-surface space-y-4 p-6">
+      <p className="text-sm text-slate-600 dark:text-slate-400">
+        These details identify your company across the platform — on records,
+        directories, and default phone formatting for new employees.
+      </p>
+
       <FormField label="Company name" htmlFor="company-name">
         <Input
           id="company-name"

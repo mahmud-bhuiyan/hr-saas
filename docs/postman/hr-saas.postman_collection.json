@@ -2516,10 +2516,10 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"logoUrl\": \"https://example.com/logo.png\"\n}"
+              "raw": "{\n  \"logoUrl\": \"https://example.com/logo.png\",\n  \"faviconUrl\": \"https://example.com/favicon.ico\"\n}"
             },
             "url": "{{baseUrl}}/api/v1/settings/branding",
-            "description": "Company admin only. Set null or empty to revert to platform default."
+            "description": "Company admin only. Set null or empty to revert logo/favicon overrides to platform defaults."
           },
           "response": []
         },

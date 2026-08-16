@@ -56,7 +56,8 @@ import {
   ADMIN_SETTINGS_ATTENDANCE_PATH,
   ADMIN_SETTINGS_AUDIT_LOG_PATH,
   ADMIN_SETTINGS_BILLING_PATH,
-  ADMIN_SETTINGS_COMPANY_PATH,
+  ADMIN_SETTINGS_COMPANY_BRANDING_PATH,
+  ADMIN_SETTINGS_COMPANY_PROFILE_PATH,
   ADMIN_SETTINGS_DEPARTMENTS_PATH,
   ADMIN_SETTINGS_LEAVE_PATH,
   ADMIN_SETTINGS_LOCATIONS_PATH,
@@ -218,7 +219,15 @@ const App = () => {
                 }
               />
               <Route
-                path={ADMIN_SETTINGS_COMPANY_PATH}
+                path={ADMIN_SETTINGS_COMPANY_PROFILE_PATH}
+                element={
+                  <ModuleRoute module="settings">
+                    <CompanySettingsPage />
+                  </ModuleRoute>
+                }
+              />
+              <Route
+                path={ADMIN_SETTINGS_COMPANY_BRANDING_PATH}
                 element={
                   <ModuleRoute module="settings">
                     <CompanySettingsPage />
